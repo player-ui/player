@@ -21,6 +21,7 @@ const externalFlow = {
           Next: "END_FWD",
           Prev: "END_BCK",
         },
+        testProperty: "testValue",
       },
       END_FWD: {
         state_type: "END",
@@ -34,12 +35,22 @@ const externalFlow = {
   },
 };
 
+const refMatch = { ref: "test-1" };
+const refAndDataMatch = { ref: "test-1", testProperty: "testValue" };
+
 test("handles the external state", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin((state, options) => {
-        return options.data.get("transitionValue");
-      }),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            (state, options) => {
+              return options.data.get("transitionValue");
+            },
+          ],
+        ]),
+      ),
     ],
   });
 
@@ -51,9 +62,16 @@ test("handles the external state", async () => {
 test("thrown errors will fail player", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin((state, options) => {
-        throw new Error("Bad Code");
-      }),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            (state, options) => {
+              throw new Error("Bad Code");
+            },
+          ],
+        ]),
+      ),
     ],
   });
 
@@ -65,9 +83,16 @@ test("thrown errors will fail player", async () => {
 test("works async", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(() => {
-        return Promise.resolve("Prev");
-      }),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            () => {
+              return Promise.resolve("Prev");
+            },
+          ],
+        ]),
+      ),
     ],
   });
 
@@ -76,53 +101,173 @@ test("works async", async () => {
   expect(completed.endState.outcome).toBe("BCK");
 });
 
-test("allows multiple plugins", async () => {
+test("allows multiple plugins - last one wins", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(() => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve("Next");
-          }, 100);
-        });
-      }),
-      new ExternalActionPlugin(() => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve("Prev");
-          }, 50);
-        });
-      }),
-      new ExternalActionPlugin(() => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(undefined);
-          }, 10);
-        });
-      }),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            () => {
+              return "Next";
+            },
+          ],
+        ]),
+      ),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            () => {
+              return "Prev";
+            },
+          ],
+        ]),
+      ),
     ],
   });
 
   const completed = await player.start(externalFlow as Flow);
 
-  // Prev should win
+  // Last handler registered wins (Prev)
   expect(completed.endState.outcome).toBe("BCK");
+});
+
+test("logs debug message when replacing handler", async () => {
+  const mockDebug = vitest.fn();
+
+  const player = new Player({
+    plugins: [
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            () => {
+              return "Next";
+            },
+          ],
+        ]),
+      ),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            () => {
+              return "Prev";
+            },
+          ],
+        ]),
+      ),
+    ],
+    logger: {
+      trace: vitest.fn(),
+      debug: mockDebug,
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
+    },
+  });
+
+  await player.start(externalFlow as Flow);
+
+  // Should have logged that the handler was replaced
+  // Check if any of the calls match our expected message
+  const replacementCalls = mockDebug.mock.calls.filter(
+    (call) =>
+      call[0] === "Registry: Replacing existing entry for key " &&
+      call[1] === refMatch,
+  );
+  expect(replacementCalls.length).toBeGreaterThan(0);
+});
+
+test("different plugins, more specific match overrides less specific match", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refAndDataMatch,
+            () => {
+              return "Next";
+            },
+          ],
+        ]),
+      ),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            () => {
+              return "Prev";
+            },
+          ],
+        ]),
+      ),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  // More specific match (refAndDataMatch) should win, returning "Next" which leads to outcome "FWD"
+  expect(completed.endState.outcome).toBe("FWD");
+});
+
+test("within same plugin, more specific match overrides less specific match", async () => {
+  const moreSpecificHandlerCalled = vitest.fn();
+  const lessSpecificHandlerCalled = vitest.fn();
+
+  const player = new Player({
+    plugins: [
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refAndDataMatch,
+            () => {
+              moreSpecificHandlerCalled();
+              return "Next";
+            },
+          ],
+          [
+            refMatch,
+            () => {
+              lessSpecificHandlerCalled();
+              return "Prev";
+            },
+          ],
+        ]),
+      ),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  // More specific match should win regardless of Map insertion order
+  expect(moreSpecificHandlerCalled).toHaveBeenCalledOnce();
+  expect(lessSpecificHandlerCalled).not.toHaveBeenCalled();
+  expect(completed.endState.outcome).toBe("FWD");
 });
 
 test("only transitions if player still on this external state", async () => {
   let resolver: (() => void) | undefined;
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin((state, options) => {
-        return new Promise((res) => {
-          // Only save resolver for first external action
-          if (!resolver) {
-            resolver = () => {
-              res(options.data.get("transitionValue"));
-            };
-          }
-        });
-      }),
+      new ExternalActionPlugin(
+        new Map([
+          [
+            refMatch,
+            (state, options) => {
+              return new Promise((res) => {
+                // Only save resolver for first external action
+                if (!resolver) {
+                  resolver = () => {
+                    res(options.data.get("transitionValue"));
+                  };
+                }
+              });
+            },
+          ],
+        ]),
+      ),
     ],
   });
 
@@ -203,13 +348,20 @@ describe("edge cases", () => {
   test("async action nodes not transitioning from navigation states with *", async () => {
     const player = new Player({
       plugins: [
-        new ExternalActionPlugin(() => {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              resolve("next");
-            }, 100);
-          });
-        }),
+        new ExternalActionPlugin(
+          new Map([
+            [
+              { ref: "view_1" },
+              () => {
+                return new Promise((resolve) => {
+                  setTimeout(() => {
+                    resolve("next");
+                  }, 100);
+                });
+              },
+            ],
+          ]),
+        ),
       ],
     });
 
