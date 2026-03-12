@@ -108,26 +108,39 @@ public class Hook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: CreatedFrom
     }
 }
 
-/**
- A waterfall hook with 2 parameters. The handler receives (state, transitionValue) and must return
- the state so the JS runtime can pass it to the next tap or use it as the result.
- Used for flow hooks like beforeTransition where the return value is the (possibly modified) state.
- Aligns with FlowHooks.transition and afterTransition: use tap { state, transitionValue in ... return state }.
- */
-public class WaterfallHook2: BaseJSHook {
-    /**
-     Attach a closure to the hook. When the hook is fired in the JS runtime, the handler receives
-     the current state as NavigationBaseState? and the transition value as String. Return the state
-     (pass-through or modified), or nil to pass through the original state.
-     - parameters:
-       - hook: A function (state, transitionValue) -> state (or nil to pass through)
-     */
-    public func tap(_ hook: @escaping (NavigationBaseState?, String) -> NavigationBaseState?) {
-        let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value, value2 in
-            guard let val = value, let val2 = value2 else { return nil }
-            let transitionValue = val2.toString() ?? ""
-            let typedState = NavigationBaseState.createInstance(value: val)
-            return hook(typedState, transitionValue)?.jsValue ?? val
+/// Types that can be converted back to JSValue (e.g. return type R in waterfall hooks).
+public protocol JSValueProviding {
+    var jsValue: JSValue { get }
+}
+
+/// Waterfall hook with 2 args (T, U) returning R. Aligns with web SyncWaterfallHook<[T, U]>.
+public class SyncWaterfallHook2JS<T, R, U>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue & JSValueProviding {
+    public func tap(_ hook: @escaping (T, U) -> R) {
+        let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value1, value2 in
+            guard let value1, let value2,
+                  let hookValue = T.createInstance(value: value1) as? T else {
+                return nil
+            }
+            // Prefer toObject(); fallback to toString() for JS string primitives (e.g. U == String).
+            let hookValue2: U? = (value2.toObject() as? U) ?? ((value2.toString() as Any) as? U)
+            guard let hookValue2 else { return nil }
+            let returnValue = hook(hookValue, hookValue2)
+            return returnValue.jsValue
+        }
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/// Waterfall hook with 1 arg T returning R. Aligns with web SyncWaterfallHook<[T]>.
+public class SyncWaterfallHookJS<T, R>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue & JSValueProviding {
+    public func tap(_ hook: @escaping (T) -> R) {
+        let tapMethod: @convention(block) (JSValue?) -> JSValue? = { value in
+            guard let val = value,
+                  let hookValue = T.createInstance(value: val) as? T else {
+                return nil
+            }
+            let returnValue = hook(hookValue)
+            return returnValue.jsValue
         }
         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
     }

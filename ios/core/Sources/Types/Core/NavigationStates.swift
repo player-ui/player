@@ -2,7 +2,7 @@ import Foundation
 import JavaScriptCore
 
 /// The base representation of a state within a Flow
-open class NavigationBaseState: CreatedFromJSValue {
+open class NavigationBaseState: CreatedFromJSValue, JSValueProviding {
     public typealias T = NavigationBaseState
 
     /// A property to determine the type of state this is
@@ -10,7 +10,7 @@ open class NavigationBaseState: CreatedFromJSValue {
 
     internal let rawValue: JSValue
 
-    /// The backing JSValue. Use when returning this state from a waterfall hook (e.g. beforeTransition).
+    /// Backing JSValue for returning from waterfall hooks.
     public var jsValue: JSValue { rawValue }
 
     public static func createInstance(value: JSValue) -> NavigationBaseState {
