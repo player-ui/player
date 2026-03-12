@@ -123,7 +123,7 @@ public class HermesRuntime private constructor(
         }
         when {
             hbc != null && hbc.isNotEmpty() -> {
-                println("AndroidPlayer: Evaluating Hermes bytecode")
+                println("HermesRuntime: Evaluating Hermes bytecode")
                 evaluateHermesBytecode(hbc, scriptContext.id)
             }
             sourceMap != null -> evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
