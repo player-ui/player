@@ -116,6 +116,7 @@ public class HermesRuntime private constructor(
 
     override fun load(scriptContext: ScriptContext): Any? = evaluateInJSThreadBlocking {
         val sourceMap = scriptContext.sourceMap
+        // TODO: remove this ASAP, this shouldn't happen if versions are resolved properly in consumer app
         val hbc = try {
             scriptContext.preCompiledScript
         } catch (e: NoSuchMethodError) {
@@ -123,8 +124,13 @@ public class HermesRuntime private constructor(
         }
         when {
             hbc != null && hbc.isNotEmpty() -> {
-                println("AndroidPlayer: Evaluating Hermes bytecode")
-                evaluateHermesBytecode(hbc, scriptContext.id)
+                try {
+                    evaluateHermesBytecode(hbc, scriptContext.id)
+                } catch (e: Exception) {
+                    sourceMap?.apply {
+                        evaluateJavaScriptWithSourceMap(scriptContext.script, this, scriptContext.id)
+                    } ?: evaluateJavaScript(scriptContext.script, scriptContext.id)
+                }
             }
             sourceMap != null -> evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
             else -> evaluateJavaScript(scriptContext.script, scriptContext.id)

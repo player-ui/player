@@ -64,5 +64,6 @@ public data class ScriptContext(
     val id: String,
     val sourceMap: String? = null,
 ) {
+    @ExperimentalPlayerApi
     var preCompiledScript: ByteArray? = null
 }
