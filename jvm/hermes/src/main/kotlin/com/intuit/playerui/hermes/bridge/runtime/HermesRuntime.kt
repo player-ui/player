@@ -127,9 +127,7 @@ public class HermesRuntime private constructor(
                 try {
                     evaluateHermesBytecode(hbc, scriptContext.id)
                 } catch (e: Exception) {
-                    sourceMap?.apply {
-                        evaluateJavaScriptWithSourceMap(scriptContext.script, this, scriptContext.id)
-                    } ?: evaluateJavaScript(scriptContext.script, scriptContext.id)
+                    load(scriptContext.copy())
                 }
             }
             sourceMap != null -> evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
