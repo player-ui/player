@@ -170,6 +170,10 @@ export class FlowInstance {
 
   /** Check if the flow has a transition for the given error type in its current state. */
   public hasTransitionForError(errorType: string): boolean {
+    if (this.lookupInMap(this.flow.errorTransitions, errorType) !== undefined) {
+      return true;
+    }
+
     if (!this.currentState || this.currentState.value.state_type === "END") {
       return false;
     }

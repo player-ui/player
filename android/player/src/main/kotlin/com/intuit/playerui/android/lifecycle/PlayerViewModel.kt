@@ -6,10 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
-import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.bridge.runtime.Runtime
-import com.intuit.playerui.core.error.ErrorSeverity
 import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
@@ -212,8 +210,8 @@ public open class PlayerViewModel(
     public fun fail(throwable: Throwable) {
         player.inProgressState?.controllers?.error?.captureError(
             throwable,
-                ErrorTypes.RENDER
-            )
+            ErrorTypes.RENDER,
+        )
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */

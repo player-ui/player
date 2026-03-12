@@ -4,7 +4,7 @@ import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
-import { isErrorWithMetadata } from "./utils";
+import { isErrorWithMetadata, makeJsonStringifyReplacer } from "./utils";
 
 /**
  * Private symbol used to authorize ErrorController's writes to errorState
@@ -35,24 +35,6 @@ export interface ErrorControllerOptions {
   /** Data model for setting errorState (can be set later via setOptions) */
   model?: DataController;
 }
-
-type ReplacerFunction = (key: string, value: any) => any;
-
-/** Returns a function to be used as the `replacer` for JSON.stringify that tracks and ignores circular references. */
-const makeJsonStringifyReplacer = (): ReplacerFunction => {
-  const cache = new Set();
-  return (_: string, value: any) => {
-    if (typeof value === "object" && value !== null) {
-      if (cache.has(value)) {
-        // Circular reference found, discard key
-        return "[CIRCULAR]";
-      }
-      // Store value in our collection
-      cache.add(value);
-    }
-    return value;
-  };
-};
 
 /** The orchestrator for player error handling */
 export class ErrorController {
@@ -114,8 +96,8 @@ export class ErrorController {
       playerError.errorType = error.type;
       playerError.severity = error.severity ?? playerError.severity;
       playerError.metadata = {
-        ...error.metadata,
         ...playerError.metadata,
+        ...error.metadata,
       };
     }
 
@@ -127,7 +109,6 @@ export class ErrorController {
 
     this.options.logger.debug(
       `[ErrorController] Captured error: ${error.message}`,
-      // TODO: Find a better way to do this. Either centralize the stringify replacer in the print plugin or something else.
       JSON.stringify(
         {
           errorType: playerError.errorType,

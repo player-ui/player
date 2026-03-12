@@ -18,6 +18,7 @@ import {
 } from "../index";
 import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
+import { AsyncNodeError } from "../AsyncNodeError";
 
 const transform: BeforeTransformFunction = createAsyncTransform({
   transformAssetType: "chat-message",
@@ -1112,7 +1113,13 @@ describe("view", () => {
         const playerState = player.getState();
         expect(playerState.status).toBe("error");
         const errorState = playerState as ErrorState;
-        expect(errorState.error.message).toBe("Promise Rejected");
+        expect(errorState.error.message).toBe(
+          "An error occured during async node resolution. See cause for details.",
+        );
+        expect(errorState.error).toBeInstanceOf(AsyncNodeError);
+        expect((errorState.error as AsyncNodeError).cause?.message).toBe(
+          "Promise Rejected",
+        );
       });
     });
   });
