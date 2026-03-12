@@ -118,13 +118,13 @@ public class SyncWaterfallHook2JS<T, R, U>: BaseJSHook where T: CreatedFromJSVal
     public func tap(_ hook: @escaping (T, U) -> R) {
         let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value1, value2 in
             guard let value1, let value2,
-                  let hookValue = T.createInstance(value: value1) as? T else {
+                  let hookValue1 = T.createInstance(value: value1) as? T else {
                 return nil
             }
             // Prefer toObject(); fallback to toString() for JS string primitives (e.g. U == String).
             let hookValue2: U? = (value2.toObject() as? U) ?? ((value2.toString() as Any) as? U)
             guard let hookValue2 else { return nil }
-            let returnValue = hook(hookValue, hookValue2)
+            let returnValue = hook(hookValue1, hookValue2)
             return returnValue.jsValue
         }
         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
