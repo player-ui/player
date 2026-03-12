@@ -177,24 +177,24 @@ describe("auto-scroll plugin", () => {
 
     const action = await findByRole(container, "button");
     act(() => action.click());
-    await act(() => waitFor(() => {}));
-
-    expect(scrollIntoViewWithOffset).toBeCalledWith(
-      expect.anything(),
-      expect.objectContaining({ id: "view" }),
-      40,
+    await waitFor(() =>
+      expect(scrollIntoViewWithOffset).toBeCalledWith(
+        expect.anything(),
+        expect.objectContaining({ id: "view" }),
+        40,
+      ),
     );
 
     // Mock the case where the base element can't be found, so document.body is used as a fallback
     getBaseElementMock.mockReturnValue(null);
 
     act(() => action.click());
-    await act(() => waitFor(() => {}));
-
-    expect(scrollIntoViewWithOffset).toHaveBeenLastCalledWith(
-      expect.anything(),
-      document.body,
-      40,
+    await waitFor(() =>
+      expect(scrollIntoViewWithOffset).toHaveBeenLastCalledWith(
+        expect.anything(),
+        document.body,
+        40,
+      ),
     );
   });
 
@@ -233,12 +233,12 @@ describe("auto-scroll plugin", () => {
 
     const action = await findByRole(container, "button");
     act(() => action.click());
-    await act(() => waitFor(() => {}));
-
-    expect(scrollIntoViewWithOffset).toBeCalledWith(
-      expect.anything(),
-      document.body,
-      0,
+    await waitFor(() =>
+      expect(scrollIntoViewWithOffset).toBeCalledWith(
+        expect.anything(),
+        document.body,
+        0,
+      ),
     );
   });
 
@@ -277,6 +277,115 @@ describe("auto-scroll plugin", () => {
     });
 
     expect(scrollIntoViewWithOffset).not.toBeCalled();
+  });
+});
+
+const twoViewFlow = {
+  id: "two-view-flow",
+  views: [
+    {
+      id: "view-1",
+      type: "info",
+      primaryInfo: {
+        asset: { id: "info-1", type: "input", binding: "person.name" },
+      },
+      actions: [
+        { asset: { id: "next-action", type: "action", value: "Next" } },
+      ],
+    },
+    {
+      id: "view-2",
+      type: "info",
+      primaryInfo: {
+        asset: { id: "info-2", type: "input", binding: "person.age" },
+      },
+      actions: [],
+    },
+  ],
+  schema: {},
+  data: { person: { name: "sam", age: "30" } },
+  navigation: {
+    BEGIN: "FLOW_Start",
+    FLOW_Start: {
+      startState: "VIEW_1",
+      VIEW_1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: { "*": "VIEW_2" },
+      },
+      VIEW_2: {
+        state_type: "VIEW",
+        ref: "view-2",
+        transitions: { "*": "END_Done" },
+      },
+      END_Done: { state_type: "END", outcome: "done" },
+    },
+  },
+};
+
+describe("scroll reset on view transition", () => {
+  test("does not scroll to page 1 elements after view transition (stale scrollableMap)", async () => {
+    vitest.clearAllMocks();
+
+    const withFirstAppearance = (Component: ComponentType<any>) => {
+      const Scrollable = (props: any) => {
+        const register = useRegisterAsScrollable();
+        useLayoutEffect(() => {
+          register({ type: ScrollType.FirstAppearance, ref: props.id });
+        }, []);
+        return <Component {...props} />;
+      };
+      return Scrollable;
+    };
+
+    // "info-1" (page 1) is always findable — simulates the race window where
+    // page 1 is still in the DOM when the transition fires.
+    // "info-2" (page 2) is NOT findable — so if the map still has "info-1"
+    // after transition, scrollIntoViewWithOffset will be called (bug).
+    // if clearScrollableMap() cleared the map, "info-1" is gone and nothing scrolls.
+    document.getElementById = (id: string) => {
+      if (id === "info-1") {
+        return { getBoundingClientRect: () => ({ top: 50 }) } as any;
+      }
+      return null;
+    };
+
+    const wp = new ReactPlayer({
+      plugins: [
+        new AssetTransformPlugin([
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
+        ]),
+        new CommonTypesPlugin(),
+        new AutoScrollManagerPlugin({}),
+      ],
+    });
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, withFirstAppearance(Input));
+
+    wp.start(twoViewFlow as any);
+
+    const { container } = render(
+      <div>
+        <React.Suspense fallback="loading...">
+          <wp.Component />
+        </React.Suspense>
+      </div>,
+    );
+
+    // wait for page 1 to settle, then clear mock counts
+    await act(() => waitFor(() => {}));
+    vitest.clearAllMocks();
+
+    // navigate to page 2
+    const action = await findByRole(container, "button");
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    // map was cleared on transition — "info-1" is no longer a scroll target
+    expect(scrollIntoViewWithOffset).not.toHaveBeenCalled();
   });
 });
 
