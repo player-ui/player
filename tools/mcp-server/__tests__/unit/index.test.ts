@@ -111,18 +111,16 @@ describe("MCP Server Index", () => {
       const tools = await buildToolDefinitions();
 
       const searchTool = tools.find((t) => t.name === "player_search_api");
-      expect(searchTool?.inputSchema.properties.scope.enum).toEqual([
+      expect((searchTool?.inputSchema.properties?.scope as any)?.enum).toEqual([
         "all",
         "core",
         "react",
       ]);
 
       const listTool = tools.find((t) => t.name === "player_list_packages");
-      expect(listTool?.inputSchema.properties.category.enum).toEqual([
-        "all",
-        "core",
-        "react",
-      ]);
+      expect((listTool?.inputSchema.properties?.category as any)?.enum).toEqual(
+        ["all", "core", "react"],
+      );
     });
 
     it("should mark required fields correctly", async () => {
@@ -462,7 +460,7 @@ describe("MCP Server Index", () => {
     });
 
     it("should handle string errors in formatting", () => {
-      const mockError = "Plain string error";
+      const mockError: unknown = "Plain string error";
 
       const errorMessage =
         mockError instanceof Error ? mockError.message : String(mockError);

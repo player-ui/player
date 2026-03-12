@@ -26,7 +26,7 @@
       ],
       "dependencies": [],
       "knowledgeFile": "core/types.md",
-      "estimatedTokens": 2900,
+      "estimatedTokens": 4000,
       "exports": [
         "Asset",
         "AssetWrapper",
@@ -100,7 +100,7 @@
         "@player-ui/make-flow"
       ],
       "knowledgeFile": "core/player.md",
-      "estimatedTokens": 2900,
+      "estimatedTokens": 4800,
       "exports": [
         "Player",
         "PlayerPlugin",
@@ -171,7 +171,7 @@
       ],
       "peerDependencies": ["react"],
       "knowledgeFile": "react/player.md",
-      "estimatedTokens": 1700,
+      "estimatedTokens": 2500,
       "exports": [
         "ReactPlayer",
         "ReactPlayerPlugin",
