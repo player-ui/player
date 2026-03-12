@@ -62,3 +62,91 @@ plugin.get(assetId: "test")
 
   </Fragment>
 </PlatformTabs>
+
+## Partial Match Registry
+
+The `@player-ui/partial-match-registry` package provides a `Registry` that functions as a fuzzy-match dictionary. It's used by this plugin and others like the [External Action Plugin](/plugins/multiplatform/external-action/).
+
+The `Registry` maps `match`es (typically objects) to `value`s and retrieves the best value for a given query.
+
+### Basic Usage
+
+```typescript
+import { Registry } from '@player-ui/partial-match-registry';
+
+// Create a registry that maps state patterns to handlers
+const registry = new Registry<(state: any) => string>();
+
+// Register handlers with different specificity levels
+registry.set({ ref: "action" }, (state) => "default");
+registry.set({ ref: "action", type: "special" }, (state) => "special");
+
+// Query for matches
+// Returns the "default" handler (exact match)
+registry.get({ ref: "action" }); 
+
+// Returns the "special" handler (more specific match)
+registry.get({ ref: "action", type: "special" }); 
+
+// Returns the "special" handler (fuzzy match - query has extra properties)
+registry.get({ ref: "action", type: "special", extra: "data" }); 
+```
+
+### How Matching Works
+
+#### Fuzzy Matching
+
+A `match` satisfies a query if all properties in the `match` exist in the query with the same values. The query can have additional properties.
+
+```typescript
+registry.set({ ref: "action" }, "handler");
+
+// These all match:
+registry.get({ ref: "action" });                    // ✓ exact match
+registry.get({ ref: "action", extra: "prop" });     // ✓ fuzzy match
+registry.get({ ref: "action", foo: "bar" });        // ✓ fuzzy match
+
+// These don't match:
+registry.get({ ref: "other" });                     // ✗ different ref
+registry.get({ type: "action" });                   // ✗ missing ref
+```
+
+#### Specificity
+
+Specificity is determined by counting the number of leaf properties in an object:
+
+- `{ ref: "action" }` has specificity **1**
+- `{ ref: "action", type: "special" }` has specificity **2**
+- `{ ref: "action", metadata: { role: "admin" } }` has specificity **2** (leaf properties: `ref` and `metadata.role`)
+
+#### Precedence Rules
+
+When multiple `match`es satisfy a query, more specific `match`es always take precedence.
+
+```typescript
+registry.set({ ref: "action" }, "generic"); // specificity: 1
+registry.set({ ref: "action", type: "special" }, "specific"); // specificity: 2
+
+// Query with both properties
+// Returns "specific" (higher specificity)
+registry.get({ ref: "action", type: "special" });
+
+// Query with only ref
+// Returns "generic" (only match)
+registry.get({ ref: "action" });
+```
+
+### Overriding Entries
+
+The registry supports overriding existing entries (i.e. `match`:`value` pairs) by registering a new value with the same `match`. When you call `set` with a `match` that has the same specificity and value as an existing `match`, the old entry is replaced:
+
+```typescript
+registry.set({ ref: "action" }, "original");
+registry.get({ ref: "action" }); // Returns "original"
+
+// Override with the exact same match
+registry.set({ ref: "action" }, "updated");
+registry.get({ ref: "action" }); // Returns "updated"
+```
+
+When a `logger` is provided to the registry constructor, it will emit a debug message whenever an entry is replaced, making it easy to track overrides during development.
