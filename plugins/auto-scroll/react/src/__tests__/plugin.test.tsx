@@ -338,17 +338,14 @@ describe("scroll reset on view transition", () => {
       return Scrollable;
     };
 
-    // "info-1" (page 1) is always findable — simulates the race window where
-    // page 1 is still in the DOM when the transition fires.
-    // "info-2" (page 2) is NOT findable — so if the map still has "info-1"
-    // after transition, scrollIntoViewWithOffset will be called (bug).
-    // if clearScrollableMap() cleared the map, "info-1" is gone and nothing scrolls.
-    document.getElementById = (id: string) => {
+    // only "info-1" (page 1) is findable. if the map isn't cleared on transition,
+    // "info-1" remains a scroll target and scrollIntoViewWithOffset gets called.
+    vitest.spyOn(document, "getElementById").mockImplementation((id) => {
       if (id === "info-1") {
         return { getBoundingClientRect: () => ({ top: 50 }) } as any;
       }
       return null;
-    };
+    });
 
     const wp = new ReactPlayer({
       plugins: [
@@ -375,9 +372,9 @@ describe("scroll reset on view transition", () => {
       </div>,
     );
 
-    // wait for page 1 to settle, then clear mock counts
+    // wait for page 1 to settle, then reset scroll call history so we only assert on page 2
     await act(() => waitFor(() => {}));
-    vitest.clearAllMocks();
+    (scrollIntoViewWithOffset as ReturnType<typeof vitest.fn>).mockClear();
 
     // navigate to page 2
     const action = await findByRole(container, "button");
@@ -386,6 +383,7 @@ describe("scroll reset on view transition", () => {
 
     // map was cleared on transition — "info-1" is no longer a scroll target
     expect(scrollIntoViewWithOffset).not.toHaveBeenCalled();
+    vitest.restoreAllMocks();
   });
 });
 
