@@ -30,6 +30,9 @@ public class DataController internal constructor(
 
     public fun get(binding: Binding): Any? = get?.invoke(binding)
 
+    /** Return a read-only version of this DataController for post-completion data access */
+    public fun makeReadOnly(): ReadOnlyDataController = ReadOnlyDataController(node)
+
     internal object Serializer : NodeWrapperSerializer<DataController>(::DataController)
 }
 

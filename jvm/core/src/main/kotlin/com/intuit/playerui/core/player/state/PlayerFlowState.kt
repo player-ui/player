@@ -14,7 +14,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializabl
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataController
-import com.intuit.playerui.core.data.DataModelWithParser
+import com.intuit.playerui.core.data.ReadOnlyDataController
 import com.intuit.playerui.core.experimental.RuntimeClassDiscriminator
 import com.intuit.playerui.core.expressions.ExpressionController
 import com.intuit.playerui.core.expressions.ExpressionEvaluator
@@ -62,9 +62,8 @@ public class CompletedState(
 
     internal val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
 
-    // TODO: Completed state dataModel change needs rectification here
-    public val dataModel: DataModelWithParser by lazy {
-        DataModelWithParser(controllers.data.node)
+    public val dataModel: ReadOnlyDataController by lazy {
+        controllers.data.makeReadOnly()
     }
 
     internal object Serializer : NodeWrapperSerializer<CompletedState>(::CompletedState, COMPLETED.value)
