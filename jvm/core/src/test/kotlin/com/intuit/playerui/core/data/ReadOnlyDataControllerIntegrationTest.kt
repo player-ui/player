@@ -1,6 +1,5 @@
 package com.intuit.playerui.core.data
 
-import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
@@ -9,45 +8,46 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.TestTemplate
 
 internal class ReadOnlyDataControllerIntegrationTest : PlayerTest() {
-    private val flowWithData = """
-        {
-          "id": "read-only-data-test",
-          "views": [
-            {
-              "id": "view-1",
-              "type": "action",
-              "label": {
-                "asset": {
-                  "id": "action-label",
-                  "type": "text",
-                  "value": "Continue"
-                }
-              }
-            }
-          ],
-          "data": {
-            "name": "Player",
-            "count": 10
-          },
-          "navigation": {
-            "BEGIN": "FLOW_1",
-            "FLOW_1": {
-              "startState": "VIEW_1",
-              "VIEW_1": {
-                "state_type": "VIEW",
-                "ref": "view-1",
-                "transitions": {
-                  "*": "END_Done"
-                }
-              },
-              "END_Done": {
-                "state_type": "END",
-                "outcome": "done"
-              }
-            }
-          }
+    private val flowWithData =
+"""
+{
+  "id": "read-only-data-test",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "action",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Continue"
         }
-    """.trimIndent()
+      }
+    }
+  ],
+  "data": {
+    "name": "Player",
+    "count": 10
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+""".trimIndent()
 
     @TestTemplate
     fun `completed state exposes read-only data controller`() = runBlockingTest {
@@ -68,7 +68,7 @@ internal class ReadOnlyDataControllerIntegrationTest : PlayerTest() {
 
         val completedState = completable.await()
         assertEquals("Player", completedState.dataModel.get("name"))
-        assertEquals(10.0, completedState.dataModel.get("count"))
+        assertEquals(10, completedState.dataModel.get("count"))
     }
 
     @TestTemplate
