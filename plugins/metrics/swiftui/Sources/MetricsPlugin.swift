@@ -9,10 +9,8 @@ import Foundation
 import JavaScriptCore
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// A Plugin that provides request time data to `MetricsPlugin`
 public class RequestTimePlugin: NativePlugin {

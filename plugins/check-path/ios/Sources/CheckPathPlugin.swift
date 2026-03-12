@@ -7,9 +7,7 @@
 
 import Foundation
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /// Base functionality for CheckPath
 open class BaseCheckPathPlugin: JSBasePlugin {

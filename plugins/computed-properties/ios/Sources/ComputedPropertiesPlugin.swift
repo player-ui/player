@@ -1,8 +1,6 @@
 import Foundation
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  Wrapper to instantiate @player/computed-properties-plugin

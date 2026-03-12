@@ -8,9 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  Represenation of a Beacon coming from Player

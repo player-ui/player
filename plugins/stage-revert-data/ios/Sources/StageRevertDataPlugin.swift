@@ -1,9 +1,7 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  Plugin to stage data changes until an approved transition is made

@@ -8,9 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  Plugin for registering custom types Player

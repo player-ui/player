@@ -8,9 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  This plugin is for registering a handler for EXTERNAL states

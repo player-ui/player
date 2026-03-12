@@ -7,9 +7,7 @@
 
 import Foundation
 import JavaScriptCore
-#if SWIFT_PACKAGE
 import PlayerUILogger
-#endif
 
 // MARK: PlayerError
 

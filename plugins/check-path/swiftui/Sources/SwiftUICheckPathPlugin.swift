@@ -1,11 +1,9 @@
 import Foundation
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUICheckPathPlugin
-#endif
 
 /// SwiftUI Version of `CheckPathPlugin` that puts itself into `\.checkPath` in EnvironmentValues
 public class SwiftUICheckPathPlugin: BaseCheckPathPlugin, NativePlugin {

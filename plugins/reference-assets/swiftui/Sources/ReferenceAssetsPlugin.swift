@@ -1,9 +1,7 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /**
  Reference Assets for the `SwiftUIPlayer`

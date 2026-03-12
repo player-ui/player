@@ -22,13 +22,11 @@ public class ResourceUtilities {
         - name: The name of the file
         - ext: The extension of the file
         - bundle: The bundle to load URLs from
-        - pathComponent: Optional path component to append (legacy support)
      - returns:
         A URL to the file if the bundle can be loaded
      */
-    public static func urlForFile(name: String, ext: String, bundle: Bundle, pathComponent: String? = nil) -> URL? {
-        let baseURL = pathComponent.map { bundle.resourceURL?.appendingPathComponent($0) } ?? bundle.resourceURL
-        guard let bundleURL = baseURL else { return nil }
+    public static func urlForFile(name: String, ext: String, bundle: Bundle) -> URL? {
+        guard let bundleURL = bundle.resourceURL else { return nil }
         return Bundle(url: bundleURL)?.url(forResource: name, withExtension: ext)
     }
 }

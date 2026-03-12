@@ -1,11 +1,9 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUILogger
 import PlayerUISwiftUI
-#endif
 
 extension JSContext {
     func createAssetJsValue(string: String) -> JSValue {

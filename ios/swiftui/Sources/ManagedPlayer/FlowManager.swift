@@ -8,9 +8,7 @@
 import Foundation
 import Combine
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  A protocol declaring the required properties for a FlowManager

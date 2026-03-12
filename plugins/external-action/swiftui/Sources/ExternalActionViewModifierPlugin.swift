@@ -1,11 +1,9 @@
 import JavaScriptCore
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIExternalActionPlugin
-#endif
 
 /**
  A variation on `ExternalActionPlugin` for `SwiftUIPlayer` that applies a ViewModifier to SwiftUIPlayer content when in an external state
