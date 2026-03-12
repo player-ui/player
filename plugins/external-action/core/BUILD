@@ -15,4 +15,7 @@ js_pipeline(
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],
+    deps = [
+        ":node_modules/@player-ui/partial-match-registry",
+    ],
 )

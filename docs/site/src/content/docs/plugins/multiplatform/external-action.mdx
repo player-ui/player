@@ -8,6 +8,10 @@ import { PackageManagers } from 'starlight-package-managers'
 
 The External Action Plugin is an easy way to handle External states from the navigation of a Player flow.
 
+:::note[Handler Matching]
+The plugin uses the [Partial Match Registry](/plugins/multiplatform/partial-match-fingerprint/#partial-match-registry) to match external states to handlers. See the registry documentation for details on how fuzzy matching and specificity work.
+:::
+
 ## Usage
 
 <PlatformTabs>
@@ -17,16 +21,23 @@ Install the plugin:
 
 <PackageManagers pkg="@player-ui/external-action-plugin" />
 
-Create a handler for external actions:
+Create handlers for external actions:
 
 ```js
-import { ExternalStateHandler } from '@player-ui/external-action-plugin';
+import { ExternalActionPlugin } from '@player-ui/external-action-plugin';
 
-const externalActionHandler: ExternalStateHandler = async (state, options) => {
-  if (state.ref === 'custom') {
-    return 'next';
-  }
-}
+const plugin = new ExternalActionPlugin(
+  new Map([
+    [{ ref: 'custom' }, async (state, options) => {
+      // Handle external state with ref: 'custom'
+      return 'next';
+    }],
+    [{ ref: 'other-action' }, async (state, options) => {
+      // Handle external state with ref: 'other-action'
+      return 'prev';
+    }],
+  ])
+);
 ```
 
 Add it to Player:
@@ -36,11 +47,23 @@ import { Player } from "@player-ui/player";
 import { ExternalActionPlugin } from "@player-ui/external-action-plugin";
 
 const player = new Player({
-  plugins: [new ExternalActionPlugin(externalActionHandler)],
+  plugins: [plugin],
 });
 ```
 
-This will transition any `EXTERNAL` state in Player's navigation, with a `ref` property of `custom` using the `next` transition.
+This will transition any `EXTERNAL` state in Player's navigation based on the registered handlers. Handlers are matched using partial object matching, with more specific matches taking precedence:
+
+```js
+new ExternalActionPlugin(
+  new Map([
+    // Less specific - matches any state with ref: 'action'
+    [{ ref: 'action' }, () => 'default'],
+    
+    // More specific - matches state with both ref and type
+    [{ ref: 'action', type: 'special' }, () => 'special'],
+  ])
+)
+```
 
   </Fragment>
   <Fragment slot='ios'>

@@ -8,9 +8,9 @@ TBA
 
 ## Breaking Changes
 
-Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release. 
+Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release.  If a change pertains to only one platform, that section will be prefaced with "(Core)", "(iOS)", or "(Android)". E.g. (iOS) `.anyArray` and `.anyDictionary` use `AnyType`.
 
-### `.anyArray` and `.anyDictionary` use `AnyType`
+### (iOS) `.anyArray` and `.anyDictionary` use `AnyType`
 
 The `AnyType` enum now conforms to `Sendable` protocol and is concurrency-safe. This required removing all APIs that depended on the `Any` type:
 
@@ -37,7 +37,7 @@ let anyType = AnyType.anyDictionary(data: ["key": .string(data: "value")])
 let anyArray = AnyType.anyArray(data: [.string(data: "key"), .number(data: 2)])
 ```
 
-### `AnyType` will only decode `.unknownData` with `AnyTypeDecodingContext`
+### (iOS) `AnyType` will only decode `.unknownData` with `AnyTypeDecodingContext`
 
 Users are required to provide `AnyTypeDecodingContext` when attempting to decode `anyArray` or `anyDictionary`. The decoder will throw if we need the context but one is not provided. As a side effect of this, `.unknownData` will only be returned when a context is provided. For example:
 
@@ -55,7 +55,7 @@ let anyType = try? AnyTypeDecodingContext(rawData: data) // with context
             .decode(AnyType.self, from: data) // This will return .unknownData
 ```
 
-### `AnyTypeDecodingContext.objectFor` is no longer `public`.
+### (iOS) `AnyTypeDecodingContext.objectFor` is no longer `public`.
 
 All decoding of `AnyType` is now handled internally. So `AnyTypeDecodingContext.objectFor(path: [CodingKey]) throws -> Any` is no longer exposed to users.
 
@@ -145,7 +145,7 @@ flowManager.terminate(playerState)`}</code></pre></td>
   </tbody>
 </table>
 
-#### 4. (Kotlin-only) `AsyncIterator` takes 3 types
+#### 4. (Android) `AsyncIterator` takes 3 types
 
 The generic `AsyncIterator` now accepts 3 types instead of 2:
 
@@ -161,7 +161,7 @@ public suspend fun terminate(data: Data? = null) {}
 
 **Migration**: Provide the `Data` type appropriate for your use case. If `terminate` will always be called with `nill`, use `Nothing`.
 
-### Dropped CocoaPods Support
+### (iOS) Dropped CocoaPods Support
 
 Since CocoaPods is in maintenance mode, we are dropping support in favour of using Swift Package Manager (SPM) only. Please leverage the Swift Package, e.g.
 
@@ -178,11 +178,103 @@ targets: [
         ],
     ),
 ]
+
+### `ExternalActionPlugin` uses registry-based handler matching
+
+The `ExternalActionPlugin` now accepts a `Map` of state matchers to handlers instead of a single handler function. This enables:
+- Multiple plugins to register handlers for different external states. The last registered handler will be used.
+- Fuzzy matching with specificity ordering (more specific matches take precedence)
+- Automatic logging when handlers are replaced
+
+**Migration:**
+
+```typescript
+// Before - single handler for all external states
+new ExternalActionPlugin((state, options) => {
+  if (state.ref === "my-action") {
+    return "Next";
+  }
+})
+
+// After - map of matchers to handlers
+new ExternalActionPlugin(
+  new Map([
+    [{ ref: "my-action" }, (state, options) => "Next"],
+    [{ ref: "other-action" }, (state, options) => "Prev"],
+  ])
+)
+```
+
+Handlers are matched by the registry using partial object matching. More specific matchers (with more properties) take precedence over less specific ones:
+
+```typescript
+new ExternalActionPlugin(
+  new Map([
+    // Less specific - matches any state with ref: "action"
+    [{ ref: "action" }, () => "default"],
+    // More specific - matches state with both ref and type
+    [{ ref: "action", type: "special" }, () => "special"],
+  ])
+)
+```
+
+## Behavioural Changes & Bug Fixes
+
+### Partial Match Registry replaces exact matches, with log
+
+The `Registry.set()` method now replaces existing entries with exactly matching keys/`match`es. Previously, calling `set()` would always insert a new entry without removing any existing entries. This would potentially create duplicate matches.
+
+Whenever a replacement happens, a `debug` log will occur.
+
+**Example:**
+
+```typescript
+const registry = new Registry<string>();
+
+// Add two entries
+registry.set({ foo: "bar" }, "exact-match");
+registry.set({ foo: "bar", baz: "qux" }, "more-specific-match");
+
+// Before (old behavior):
+// Calling set() again would add a third entry, potentially causing unexpected behavior
+registry.set({ foo: "bar" }, "new-exact-match");
+// Result: All 3 entries exist in the registry
+
+// After (new behavior):
+// Calling set() replaces the exact match only
+registry.set({ foo: "bar" }, "new-exact-match");
+// Result: The { foo: "bar" } entry is replaced
+// The { foo: "bar", baz: "qux" } entry remains unchanged
+
+registry.get({ foo: "bar" }); // Returns "new-exact-match"
+registry.get({ foo: "bar", baz: "qux" }); // Returns "more-specific-match"
+```
+
+### (Core) Partial Match Registry uses MOST SPECIFIC match
+
+The `Registry.get()` method now consistently returns the **most specific** matching entry, regardless of the order entries were added. Previously, it would return the most recent matching entry.
+
+**Example:**
+
+```typescript
+const registry = new Registry<string>();
+
+// Scenario: Add more specific match first, then less specific
+registry.set({ foo: "bar", metaData: { role: "baz" } }, "more-specific");
+registry.set({ foo: "bar" }, "less-specific");
+
+const query = { foo: "bar", metaData: { role: "baz" }, extra: "data" };
+
+// Before: Result would be most recent match
+registry.get(query); // Returns "less-specific"
+
+// After: Always returns the most specific match
+registry.get(query); // Always returns "more-specific"
 ```
 
 ## New Features
 
-### Convenience Methods for `AnyType`
+### (iOS) Convenience Methods for `AnyType`
 
 Added `as<T>(_:)` convenience method and `AnyType` (`anyDictionary`) subscripting for type-safe value extraction:
 
