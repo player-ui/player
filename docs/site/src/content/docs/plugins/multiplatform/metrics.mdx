@@ -3,7 +3,7 @@ title: Metrics
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
-import PodAndPackage from "../../../../components/PodAndPackage.astro";
+import SPM from "../../../../components/SPM.astro";
 import Image from "../../../../components/Image.astro";
 import metricsTiming from "../../../../assets/metrics-timing.png";
 
@@ -71,7 +71,7 @@ const player = new ReactPlayer({
 
 The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. Due to current SwiftUI limitations, update time can't be tracked yet. It can be used in conjunction with a core plugin that utilizes the events, through `findPlugin`, or standalone.
 
-<PodAndPackage product="MetricsPlugin" />
+<SPM product="MetricsPlugin" />
 
 ### Swift Usage
 

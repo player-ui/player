@@ -9,10 +9,8 @@ import Foundation
 import JavaScriptCore
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// A Plugin that provides request time data to `MetricsPlugin`
 public class RequestTimePlugin: NativePlugin {
@@ -48,16 +46,7 @@ class RequestTimeWebPlugin: JSBasePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "PlayerUI_MetricsPlugin.bundle"
-        )
-        #endif
     }
 }
 /**
@@ -121,16 +110,7 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "PlayerUI_MetricsPlugin.bundle"
-        )
-        #endif
     }
 
     /**

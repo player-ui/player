@@ -8,9 +8,7 @@
 import Combine
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 public enum AssetRenderError: Error {
     // Thrown when the asset fails to decode its data from the JS runtime into its swift data type

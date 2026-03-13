@@ -10,10 +10,8 @@ import JavaScriptCore
 import Combine
 import SwiftHooks
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUILogger
-#endif
 
 /**
  A `HeadlessPlayer` implementation that renders itself as a SwiftUI View

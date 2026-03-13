@@ -93,36 +93,17 @@ PlayerViewModel(manager: someFlowManager)
   <tbody>
     <tr>
       <td><strong>React</strong></td>
-      <td>
-<pre><code class="language-tsx">next: (
-  previousValue?: CompletedState,
-) => Promise&lt;FinalState | NextState&lt;Flow&gt;&gt;;
-</code></pre>
-      </td>
-      <td>
-<pre><code class="language-tsx">next: (
-  result?: CompletedState,
-) => Promise&lt;FinalState | NextState&gt;
-</code></pre>
-<br><strong>Migration:</strong> Change the function signature to match.
-      </td>
+      <td><pre><code class="language-tsx">next: (previousValue?: CompletedState) =&gt; Promise&lt;FinalState | NextState&lt;Flow&gt;&gt;</code></pre></td>
+      <td><pre><code class="language-tsx">next: (result?: CompletedState) =&gt; Promise&lt;FinalState | NextState&gt;</code></pre><br/><strong>Migration:</strong> Change the function signature to match.</td>
     </tr>
     <tr>
       <td><strong>Swift</strong></td>
-      <td>
-<pre><code class="language-swift">func next(_ state: CompletedState?) async throws -> NextState
-</code></pre>
-      </td>
-      <td>
-<pre><code class="language-swift">func next(result: CompletedState?) async throws -> String?</code></pre>
-<br><strong>Migration:</strong> Instead of <code>.flow(someString)</code>, return the <code>String</code> directly. Instead of <code>.finished</code>, return <code>nil</code>.
-      </td>
+      <td><pre><code class="language-swift">func next(_ state: CompletedState?) async throws -&gt; NextState</code></pre></td>
+      <td><pre><code class="language-swift">func next(result: CompletedState?) async throws -&gt; String?</code></pre><br/><strong>Migration:</strong> Instead of <code>.flow(someString)</code>, return the <code>String</code> directly. Instead of <code>.finished</code>, return <code>nil</code>.</td>
     </tr>
     <tr>
       <td><strong>Kotlin</strong></td>
-      <td>
-<pre><code class="language-kotlin">suspend fun next(result: CompletedState?): String?</code></pre>
-      </td>
+      <td><pre><code class="language-kotlin">suspend fun next(result: CompletedState?): String?</code></pre></td>
       <td>Unchanged</td>
     </tr>
   </tbody>
@@ -143,18 +124,11 @@ This API is now the same across all platforms. It accepts an optional `InProgres
   <tbody>
     <tr>
       <td><strong>React</strong></td>
-      <td>
-<pre><code>terminate?: (data?: FlowResult["data"]) =&gt; void</code></td></pre>
-      <td>
-<pre><code>terminate?: (state?: InProgressState) =&gt; void</code></pre>
-<br><strong>Migration:</strong> Call terminate with the <code>InProgressState</code> instead of the flow data. This may look like: 
-<pre>
-<code>const state = reactPlayer.player.getState();
+      <td><pre><code>terminate?: (data?: FlowResult["data"]) =&gt; void</code></pre></td>
+      <td><pre><code>terminate?: (state?: InProgressState) =&gt; void</code></pre><br/><strong>Migration:</strong> Call terminate with the <code>InProgressState</code> instead of the flow data. This may look like: <pre><code>{`const state = reactPlayer.player.getState();
 if (playerState?.status === "in-progress") {
     flowManager.terminate(playerState)
-}
-</code></pre>
-      </td>
+}`}</code></pre></td>
     </tr>
     <tr>
       <td><strong>Swift</strong></td>
@@ -163,16 +137,10 @@ if (playerState?.status === "in-progress") {
     </tr>
     <tr>
       <td><strong>Kotlin</strong></td>
-      <td><pre><code>suspend fun terminate()</code></pre>
-      <em>(on <code>AsyncFlowIterator</code>)</em></td>
-      <td><pre><code>suspend fun terminate(data: InProgressState? = null)</code></pre>
-      <em>(on <code>FlowManager</code>)</em><br>
-      <br><strong>Migration:</strong> Call terminate with the <code>InProgressState</code>. This may look like:
-      <pre>
-<code>// In PlayerViewModel.kt:
+      <td><pre><code>suspend fun terminate()</code></pre> <em>(on <code>AsyncFlowIterator</code>)</em></td>
+      <td><pre><code>suspend fun terminate(data: InProgressState? = null)</code></pre> <em>(on <code>FlowManager</code>)</em><br/><br/><strong>Migration:</strong> Call terminate with the <code>InProgressState</code>. This may look like: <pre><code>{`// In PlayerViewModel.kt:
 val playerState = player.inProgressState
-flowManager.terminate(playerState)</code></pre>
-      </td>
+flowManager.terminate(playerState)`}</code></pre></td>
     </tr>
   </tbody>
 </table>
@@ -192,6 +160,25 @@ public suspend fun terminate(data: Data? = null) {}
 ```
 
 **Migration**: Provide the `Data` type appropriate for your use case. If `terminate` will always be called with `nill`, use `Nothing`.
+
+### Dropped CocoaPods Support
+
+Since CocoaPods is in maintenance mode, we are dropping support in favour of using Swift Package Manager (SPM) only. Please leverage the Swift Package, e.g.
+
+```swift
+// In your Package.swift
+.dependencies: [
+    .package(url: "https://github.com/player-ui/playerui-swift-package.git", from: "1.0.0"),
+],
+targets: [
+    .target(
+        name: "SomeExampleTarget",
+        dependencies: [
+            .product(name: "PlayerUI", package: "playerui-swift-package"),
+        ],
+    ),
+]
+```
 
 ## New Features
 

@@ -3,7 +3,7 @@
 //  PlayerUI_Tests
 //
 //  Created by Harris Borawski on 3/12/21.
-//  Copyright © 2021 CocoaPods. All rights reserved.
+//  Copyright © 2021 Intuit. All rights reserved.
 //
 
 import Foundation

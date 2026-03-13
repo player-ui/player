@@ -8,9 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  This plugin is for registering a handler for EXTERNAL states
@@ -67,14 +65,8 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
         }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExternalActionPlugin.self), pathComponent: "PlayerUI_ExternalActionPlugin.bundle")
-        #endif
     }
 
-    #if SWIFT_PACKAGE
     public static let bundle = Bundle.module
-    #endif
 }

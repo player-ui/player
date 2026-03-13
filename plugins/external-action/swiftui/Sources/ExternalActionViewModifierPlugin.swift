@@ -1,11 +1,9 @@
 import JavaScriptCore
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIExternalActionPlugin
-#endif
 
 /**
  A variation on `ExternalActionPlugin` for `SwiftUIPlayer` that applies a ViewModifier to SwiftUIPlayer content when in an external state
@@ -98,18 +96,10 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(
             name: fileName, ext: "js",
             bundle: ExternalActionPlugin.bundle
         )
-        #else
-        ResourceUtilities.urlForFile(
-            name: fileName, ext: "js",
-            bundle: Bundle(for: ExternalActionPlugin.self),
-            pathComponent: "PlayerUI_ExternalActionPlugin.bundle"
-        )
-        #endif
     }
 }
 

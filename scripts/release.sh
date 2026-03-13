@@ -25,7 +25,7 @@ readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //
 bazel build --config=release $PKG_NPM_LABELS
 
 # iOS Prepublish
-bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
+bazel build --config=release //:PlayerUI_SPM
 
 # Maven Central Prepublish
 MVN_RELEASE_TYPE=snapshot

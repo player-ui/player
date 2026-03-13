@@ -9,9 +9,7 @@ import Foundation
 import Combine
 import SwiftHooks
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /// A plugin used by the ManagedPlayer.
 ///

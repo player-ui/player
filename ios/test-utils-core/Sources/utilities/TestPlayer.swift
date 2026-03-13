@@ -8,10 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUILogger
-#endif
 
 /**
  A `HeadlessPlayer` implementation for testing purposes. It utilizes @player-ui/make-flow as a means of resolving assets IDs to types

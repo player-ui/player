@@ -41,11 +41,7 @@ class InternalAssets {
         return image?.withRenderingMode(.alwaysTemplate)
     }
 
-    #if SWIFT_PACKAGE
     static var bundleURL: URL? { Bundle.module.resourceURL }
-    #else
-    static var bundleURL: URL? { Bundle(for: InternalAssets.self).resourceURL?.appendingPathComponent("ReferenceAssets.bundle") }
-    #endif
 }
 
 extension UIImage {

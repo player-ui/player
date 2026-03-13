@@ -114,16 +114,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-#if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-#else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: AsyncNodePlugin.self),
-            pathComponent: "PlayerUIAsyncNodePlugin.bundle"
-        )
-#endif
     }
 }
 
@@ -185,15 +176,6 @@ public class AsyncNodePluginPlugin: JSBasePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-#if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-#else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: AsyncNodePluginPlugin.self),
-            pathComponent: "PlayerUIAsyncNodePlugin.bundle"
-        )
-#endif
     }
 }

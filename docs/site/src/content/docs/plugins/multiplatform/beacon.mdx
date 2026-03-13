@@ -3,7 +3,7 @@ title: Beacon Plugin
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
-import PodAndPackage from "../../../../components/PodAndPackage.astro";
+import SPM from "../../../../components/SPM.astro";
 
 The beacon plugin enables users to send and/or collect beaconing information from assets in a normalized API. It exposes a common API for publishing beacons from an asset library, and will automatically attach itself to the current view, enabling additional meta-data to be added to each event.
 
@@ -94,7 +94,7 @@ This will add additional React Context to the running player for the producers f
   </Fragment>
   <Fragment slot='ios'>
 
-<PodAndPackage product="BeaconPlugin" />
+<SPM product="BeaconPlugin" />
 
 ### Swift Usage
 
@@ -127,13 +127,8 @@ class CustomBeaconPlugin: JSBasePlugin {
     self.init(fileName: "custom-beacon", pluginName: "CustomBeaconPlugin")
   }
   override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(
-          name: fileName,
-          ext: "js",
-          bundle: Bundle(for: <YourMainPodClass>.self),
-          pathComponent: "<YourResourceBundleName>.bundle"
-        )
-    }
+    ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+  }
 }
 
 // In some SwiftUI View

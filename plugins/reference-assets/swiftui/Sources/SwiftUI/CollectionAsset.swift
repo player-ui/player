@@ -1,10 +1,8 @@
 import SwiftUI
 import Combine
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /**
  Data Decoded by Player for `CollectionAsset`
