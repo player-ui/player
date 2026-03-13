@@ -1,3 +1,15 @@
+# 0.15.1-next.4 (Fri Mar 13 2026)
+
+#### 🐛 Bug Fix
+
+- fix autoscroll issue due to stale scrollableMap [#815](https://github.com/player-ui/player/pull/815) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 1
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
 # 0.15.1-next.3 (Thu Mar 12 2026)
 
 #### 🐛 Bug Fix
