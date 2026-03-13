@@ -1,9 +1,12 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include <cstring>
 #include <jsi/jsi.h>
 #include <fbjni/fbjni.h>
 #include <fbjni/ByteBuffer.h>
+#include "Buffers.h"
 #include "RuntimeScope.h"
 
 using namespace facebook::jni;
@@ -68,6 +71,7 @@ public:
     static void registerNatives();
 
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
+    local_ref<JJSIValue_jhybridobject> evaluateHermesBytecode(alias_ref<JRuntimeThreadContext>, alias_ref<jbyteArray> byteArray,std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
 
