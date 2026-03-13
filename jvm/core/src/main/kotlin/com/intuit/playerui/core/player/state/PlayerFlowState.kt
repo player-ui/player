@@ -62,9 +62,7 @@ public class CompletedState(
 
     internal val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
 
-    public val dataModel: ReadOnlyDataController by lazy {
-        controllers.data.makeReadOnly()
-    }
+    public val dataModel: ReadOnlyDataController get() = controllers.data
 
     internal object Serializer : NodeWrapperSerializer<CompletedState>(::CompletedState, COMPLETED.value)
 }
@@ -153,14 +151,18 @@ public val InProgressState.lastViewUpdate: Asset? get() = controllers.view.curre
 /** A function to get the current state of the flow state-machine */
 public val InProgressState.currentFlowState: NamedState? get() = controllers.flow.current?.currentState
 
-public val InProgressState.dataModel: DataController get() = controllers.data
+public val InProgressState.dataModel: DataController get() = controllers.data as DataController
 
 @Serializable(ControllerState.Serializer::class)
 public class ControllerState internal constructor(
     override val node: Node,
 ) : NodeWrapper {
-    /** The manager for data for a flow */
-    public val data: DataController by NodeSerializableField(DataController.serializer())
+    /**
+     * The manager for data for a flow. Uses [ReadOnlyDataController.serializer] so the concrete
+     * type ([DataController] vs [ReadOnlyDataController]) is determined by whether the underlying
+     * JS object exposes a [set] function.
+     */
+    public val data: ReadOnlyDataController by NodeSerializableField(ReadOnlyDataController.serializer())
 
     /** The view manager for a flow */
     public val view: ViewController by NodeSerializableField(ViewController.serializer())

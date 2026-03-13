@@ -8,7 +8,9 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -55,10 +57,21 @@ internal class ReadOnlyDataControllerTest : NodeBaseTest() {
     }
 
     @Test
-    fun `makeReadOnly on DataController returns ReadOnlyDataController`() {
-        val dataController = DataController(node)
+    fun `DataController inherits get from ReadOnlyDataController`() {
         every { node.getInvokable<Unit>("set", any()) } returns Invokable { }
-        val readOnly = dataController.makeReadOnly()
-        assertEquals(ReadOnlyDataController::class, readOnly::class)
+        val dataController = DataController(node)
+        assertTrue(dataController is ReadOnlyDataController)
+        assertEquals("Player", dataController.get("name"))
+    }
+
+    @Test
+    fun `DataController is a subtype of ReadOnlyDataController`() {
+        every { node.getInvokable<Unit>("set", any()) } returns Invokable { }
+        val dataController = DataController(node)
+        // DataController must be assignable to ReadOnlyDataController so callers typed to the
+        // base receive a DataController instance where the JS object supports set (in-progress),
+        // or a plain ReadOnlyDataController where it does not (completed).
+        assertTrue(dataController is ReadOnlyDataController)
+        assertFalse(readOnlyDataController is DataController)
     }
 }
