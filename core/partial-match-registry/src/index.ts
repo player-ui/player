@@ -1,4 +1,4 @@
-import SortedArray from "sorted-array";
+import { sort } from "fast-sort";
 import type { Matcher } from "./deep-partial-matcher";
 import { createObjectMatcher } from "./deep-partial-matcher";
 
@@ -24,16 +24,12 @@ interface RegistryIndex<V> {
   matcher: Matcher;
 }
 
-/** create an empty sorted array using the matcher count */
-const createSortedArray = <V>() =>
-  new SortedArray<RegistryIndex<V>>([], (c) => c.matcher.count);
-
 /**
  * A partial match registry is a map that uses an object to "match" against keys.
  * More specific matches take precedence over less specific ones.
  */
 export class Registry<V> {
-  private store = createSortedArray<V>();
+  private store: Array<RegistryIndex<V>> = [];
 
   constructor(initialSet?: Array<[any, V]>) {
     initialSet?.forEach(([match, value]) => {
@@ -42,22 +38,35 @@ export class Registry<V> {
   }
 
   /** Add match -> value mapping to the registry */
-  set(match: any, value: V) {
+  set(match: any, value: V): void {
     const matcher =
       typeof match === "object"
         ? createObjectMatcher(match)
         : createBasicMatcher(match);
 
-    this.store.insert({
+    // Find and remove any existing entry that matches this key
+    // Use matcher to check for matching keys (handles deep equality)
+    const existingIndex = this.store.findIndex(
+      (entry) => entry.matcher(match) && matcher(entry.key),
+    );
+    if (existingIndex !== -1) {
+      this.store.splice(existingIndex, 1);
+    }
+
+    this.store.push({
       key: match,
       value,
       matcher,
     });
+
+    // Sort in descending order by matcher.count (highest specificity first)
+    this.store = sort(this.store).desc((entry) => entry.matcher.count);
   }
 
   /** Fetch the best match in the registry */
   get(query: any): V | undefined {
-    for (const entry of this.store.array) {
+    // Store is sorted by matcher.count (descending), so iterate forward
+    for (const entry of this.store) {
       if (entry.matcher(query)) {
         return entry.value;
       }
@@ -66,18 +75,18 @@ export class Registry<V> {
 
   /** Loop over all entries and run callback */
   forEach(callbackfn: (value: RegistryIndex<V>) => void): void {
-    for (const entry of this.store.array) {
+    for (const entry of this.store) {
       callbackfn(entry);
     }
   }
 
   /** Reset the items in the registry */
-  clear() {
-    this.store = createSortedArray<V>();
+  clear(): void {
+    this.store = [];
   }
 
   /** Check if the registry is empty*/
-  isRegistryEmpty() {
-    return this.store.array.length === 0;
+  isRegistryEmpty(): boolean {
+    return this.store.length === 0;
   }
 }

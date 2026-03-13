@@ -27,11 +27,18 @@ test("falls back to a partially matched object", () => {
   expect(registry.get({ foo: "bar", bar: "baz" })).toBe("blah");
 });
 
-test("uses more specific match if one exists", () => {
+test("uses more specific match if one exists where more specific one is added last", () => {
   const query = { foo: "bar", metaData: { role: "baz" } };
   registry.set({ foo: "bar" }, "blah");
   expect(registry.get(query)).toBe("blah");
   registry.set({ foo: "bar", metaData: { role: "baz" } }, "stuff");
+  expect(registry.get(query)).toBe("stuff");
+});
+
+test("uses more specific match if one exists where more specific one is added first", () => {
+  const query = { foo: "bar", metaData: { role: "baz" } };
+  registry.set({ foo: "bar", metaData: { role: "baz" } }, "stuff");
+  registry.set({ foo: "bar" }, "blah");
   expect(registry.get(query)).toBe("stuff");
 });
 
@@ -66,4 +73,27 @@ test("check if registry is empty", () => {
 
   expect(registry.isRegistryEmpty()).toBe(false);
   expect(emptyRegistry.isRegistryEmpty()).toBe(true);
+});
+
+test("replacement only replaces exact matches, not fuzzy matches", () => {
+  registry.set({ foo: "bar" }, "exact-match");
+  registry.set({ foo: "bar", baz: "qux" }, "more-specific-match");
+
+  // Override the exact match - should only remove the exact match
+  registry.set({ foo: "bar" }, "new-exact-match");
+
+  // The exact match should be replaced
+  expect(registry.get({ foo: "bar" })).toBe("new-exact-match");
+
+  // The more specific match should still exist and be found by fuzzy matching
+  expect(registry.get({ foo: "bar", baz: "qux" })).toBe("more-specific-match");
+
+  // Now override the more specific match
+  registry.set({ foo: "bar", baz: "qux" }, "new-specific-match");
+
+  // The more specific match should be replaced
+  expect(registry.get({ foo: "bar", baz: "qux" })).toBe("new-specific-match");
+
+  // The exact match should still exist
+  expect(registry.get({ foo: "bar" })).toBe("new-exact-match");
 });
