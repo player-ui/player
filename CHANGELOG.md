@@ -1,3 +1,18 @@
+# 0.15.1-next.3 (Thu Mar 12 2026)
+
+#### 🐛 Bug Fix
+
+- HBC [#808](https://github.com/player-ui/player/pull/808) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- CI: Consolidate Test/Coverage Steps for JS/JVM targets [#810](https://github.com/player-ui/player/pull/810) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.1-next.2 (Tue Mar 10 2026)
 
 #### 🐛 Bug Fix
