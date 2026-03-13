@@ -1,3 +1,54 @@
+# 0.15.1-next.4 (Fri Mar 13 2026)
+
+#### 🐛 Bug Fix
+
+- fix autoscroll issue due to stale scrollableMap [#815](https://github.com/player-ui/player/pull/815) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 1
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.15.1-next.3 (Thu Mar 12 2026)
+
+#### 🐛 Bug Fix
+
+- HBC [#808](https://github.com/player-ui/player/pull/808) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- CI: Consolidate Test/Coverage Steps for JS/JVM targets [#810](https://github.com/player-ui/player/pull/810) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.15.1-next.2 (Tue Mar 10 2026)
+
+#### 🐛 Bug Fix
+
+- Updated CollectionAsset to render the label [#811](https://github.com/player-ui/player/pull/811) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
+# 0.15.1-next.1 (Wed Mar 04 2026)
+
+#### 🐛 Bug Fix
+
+- Snapshot API nested list recursive processing [#809](https://github.com/player-ui/player/pull/809) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.15.1-next.0 (Wed Feb 25 2026)
 
 #### 🐛 Bug Fix

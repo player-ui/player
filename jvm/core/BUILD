@@ -17,6 +17,7 @@ main_deps = main_exports + [
 
 main_resources = [
     "//core/player:player_native_bundle",
+    "//core/player:hbc",
 ]
 
 # Test dependencies
