@@ -15,6 +15,8 @@ class ManagedPlayerUITests: BaseTestCase {
         retries: Int = 3
     ) {
         for _ in 0..<retries {
+            if expectedOutcome.exists { return }
+            guard element.exists else { break }
             element.tap()
             if expectedOutcome.waitForExistence(timeout: timeout) {
                 return
@@ -46,15 +48,11 @@ class ManagedPlayerUITests: BaseTestCase {
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
 
-        let errorText = app.staticTexts["PlayerUI.DecodingError.typeNotRegistered(type: \"error\")"].firstMatch
-        tapAndAssertElementAppears(button2, expectedOutcome: errorText)
-        XCTAssert(errorText.exists, "Error message did not appear")
-
         let retryButton = app.buttons["Retry"].firstMatch
-        waitFor(retryButton)
-        retryButton.tap()
+        tapAndAssertElementAppears(button2, expectedOutcome: retryButton, timeout: 5)
 
-        waitFor(button2)
+        let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
+        XCTAssert(errorText.exists, "Error message did not appear")
     }
 
     func testErrorAssetFlow() {

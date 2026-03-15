@@ -256,6 +256,7 @@ extension String {
                     {
                       "id": "second_view",
                       "type": "action",
+                      "exp": "{{foo.bar..}",
                       "value": "end",
                       "label": {
                         "asset": {
@@ -264,10 +265,6 @@ extension String {
                           "value": "End View 2"
                         }
                       }
-                    },
-                    {
-                      "id": "error_view",
-                      "type": "error"
                     }
                   ],
                   "navigation": {
@@ -277,13 +274,6 @@ extension String {
                       "view_2": {
                         "state_type": "VIEW",
                         "ref": "second_view",
-                        "transitions": {
-                          "*": "VIEW_ERR"
-                        }
-                      },
-                      "VIEW_ERR": {
-                        "state_type": "VIEW",
-                        "ref": "error_view",
                         "transitions": {
                           "*": "END_Done"
                         }
