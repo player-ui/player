@@ -1,3 +1,16 @@
+# 0.15.1-next.6 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Add beforeTransition hook to Flow and parity test [iOS] [#803](https://github.com/player-ui/player/pull/803) ([@bsatyani](https://github.com/bsatyani) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- [@bsatyani](https://github.com/bsatyani)
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.15.1-next.5 (Mon Mar 16 2026)
 
 #### 🐛 Bug Fix
