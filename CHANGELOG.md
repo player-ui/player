@@ -1,3 +1,15 @@
+# 0.15.1-next.5 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Fix flaky tests in ManagedPlayerUITest [#813](https://github.com/player-ui/player/pull/813) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
 # 0.15.1-next.4 (Fri Mar 13 2026)
 
 #### 🐛 Bug Fix
