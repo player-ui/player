@@ -64,14 +64,14 @@ importers:
         specifier: ^4.6.0
         version: 4.7.0(monaco-editor@0.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@player-tools/cli':
-        specifier: 0.12.0
-        version: 0.12.0(@babel/core@7.28.0)(@oclif/config@1.18.16)(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(jsonc-parser@2.3.1)
+        specifier: 0.13.0-next.5
+        version: 0.13.0-next.5(@babel/core@7.28.0)(@oclif/config@1.18.16)(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(jsonc-parser@2.3.1)
       '@player-tools/dsl':
-        specifier: 0.12.0
-        version: 0.12.0(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(react@18.3.1)
+        specifier: 0.13.0-next.5
+        version: 0.13.0-next.5(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(react@18.3.1)
       '@player-tools/xlr':
-        specifier: 0.12.0
-        version: 0.12.0
+        specifier: 0.13.0-next.5
+        version: 0.13.0-next.5
       '@player-tools/xlr-utils':
         specifier: 0.6.1-next.2
         version: 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
@@ -2565,31 +2565,31 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==, tarball: https://registry.npmjs.org/@pkgr/core/-/core-0.2.9.tgz}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@player-tools/cli@0.12.0':
-    resolution: {integrity: sha512-Mcl4WE8Z63hBzEsDYfA40Bo4zHgtJHmMRDv+62kbOPJdEVqvurxE14oy1IusfJneTgtXjyAdKaLgtsYiMTrnmA==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.12.0.tgz}
+  '@player-tools/cli@0.13.0-next.5':
+    resolution: {integrity: sha512-kmvXXLBs85xGcz4ALN8KfkA8b3j2/wEOlh8j+hQn6ZUQlnocMIoqBR51rj/GCz2pvn/2ewQWGNKrg3mFTs7dbw==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.13.0-next.5.tgz}
     hasBin: true
 
-  '@player-tools/dsl@0.12.0':
-    resolution: {integrity: sha512-HA5Qei+yZEdCCxa6zjr7klOb1DhCxAHVER+CxiVGB2IlTKFX34jMY+UECLZViVF1vlhmmCQI50BcksWev3Qb3Q==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.12.0.tgz}
+  '@player-tools/dsl@0.13.0-next.5':
+    resolution: {integrity: sha512-t/9NZvm3ixOBNkV+hiOsy48UypO0O3e7jVbGOcIAgMJC8ho8TcaGNVh7UeV8ooq4cpP1uaPQgDpKV41BAP7CUA==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.13.0-next.5.tgz}
     peerDependencies:
       '@types/react': ^18.2.51
       react: ^18.2.0
 
-  '@player-tools/json-language-service@0.12.0':
-    resolution: {integrity: sha512-ASwRnmV/mNuPvIUbvmXj3On67w8qq3i0tEtfZk5+6030qyI0KEK0HcghCcGPbzdslWGOlAGyidt7LjKtA6BJrA==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.12.0.tgz}
+  '@player-tools/json-language-service@0.13.0-next.5':
+    resolution: {integrity: sha512-ZSeOUYovLw9qSSNvOB2Vs9+HCPo1S1+TBPx25S6R9SFeTRE7msRBFpHRrh1acRtqQHP/x/vEN22XInlu7e4K5w==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.13.0-next.5.tgz}
 
-  '@player-tools/xlr-converters@0.12.0':
-    resolution: {integrity: sha512-FMhxpDnlHnty05QtfL6BLuC5K1+gikwm/OBXy0AM8iTQ5w4W4t/XX8aWvd/DNizE/i9Erp9/pD4jIV9av1ToyQ==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.12.0.tgz}
+  '@player-tools/xlr-converters@0.13.0-next.5':
+    resolution: {integrity: sha512-muu7RT6hdNdeul71QCIY3J6tBFDNgLWumLUxlg2USQFKqttkAMdrBJLposLCQFlLoKSzX3wK52jlLSp89mb/zg==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.13.0-next.5.tgz}
     peerDependencies:
       typescript: 5.5.4
 
-  '@player-tools/xlr-sdk@0.12.0':
-    resolution: {integrity: sha512-KMzv/hJLJ0zQVhamFv4HMNl7I7EpuJJuOs7kj5zK3ywHCs1z08jheqzyfA1ka14vo2lvha3aS1CS5H7Ayw1ErA==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.12.0.tgz}
+  '@player-tools/xlr-sdk@0.13.0-next.5':
+    resolution: {integrity: sha512-v3iEXagLOz1PxK8QqQnilKyR3bXqc/UnCVsBOS+JjqCLTDq8kFpZ409kEtIBiD1o0Glfo9naQWpCQT8JooDLoA==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.13.0-next.5.tgz}
     peerDependencies:
       typescript: 5.5.4
 
-  '@player-tools/xlr-utils@0.12.0':
-    resolution: {integrity: sha512-PzdNkiJy/RvHuorW2ece/Swq1GQ2XUWiNnsxFdLEud5TFVrynePuFCEJZm+7Bssf4Ju3nCLFr0ARUB8M4zHq4w==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.12.0.tgz}
+  '@player-tools/xlr-utils@0.13.0-next.5':
+    resolution: {integrity: sha512-UldHb9Ge41aNGkwhrBkRufudxnsXdf9H9aGD1Tiz+WGK5LA/fS7Mvk48YdsPewFT0tOv5N4Lmp0pkYIaGOafHA==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.13.0-next.5.tgz}
     peerDependencies:
       jsonc-parser: ^2.3.1
       typescript: 5.5.4
@@ -2600,8 +2600,8 @@ packages:
       jsonc-parser: ^2.3.1
       typescript: ^5.4.4
 
-  '@player-tools/xlr@0.12.0':
-    resolution: {integrity: sha512-iB3PmIJd8dygTgjak8GKdQqkAkc23JpxMyd+OCnAU8Uctrsl46YPTBZIhtKn2Vbn4vzAQmJkl4cz2C8xDgnvDg==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.12.0.tgz}
+  '@player-tools/xlr@0.13.0-next.5':
+    resolution: {integrity: sha512-aCKiUdFMrnEmvVoO7wv0fzLIupJa5NbBGDMr/mEQXVd8On/URUVwcpUdHdm/xtZCckscmJBs1iH5nTtCprtDOw==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.13.0-next.5.tgz}
 
   '@player-tools/xlr@0.6.1-next.2':
     resolution: {integrity: sha512-0wAtiDR/7Xjxe3zVrYP+i1MuhR1VyEgu8x2FiSqxfTwWPP3cQn9UGPt2jL6W2hdVZRER3JBQpe1Giw8WM+xH7w==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.6.1-next.2.tgz}
@@ -11375,7 +11375,7 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@player-tools/cli@0.12.0(@babel/core@7.28.0)(@oclif/config@1.18.16)(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(jsonc-parser@2.3.1)':
+  '@player-tools/cli@0.13.0-next.5(@babel/core@7.28.0)(@oclif/config@1.18.16)(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(jsonc-parser@2.3.1)':
     dependencies:
       '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.0)
       '@babel/preset-env': 7.28.0(@babel/core@7.28.0)
@@ -11384,12 +11384,12 @@ snapshots:
       '@babel/register': 7.27.1(@babel/core@7.28.0)
       '@oclif/core': 1.9.0
       '@oclif/plugin-plugins': 1.10.11(@oclif/config@1.18.16)
-      '@player-tools/dsl': 0.12.0(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(react@18.3.1)
-      '@player-tools/json-language-service': 0.12.0
-      '@player-tools/xlr': 0.12.0
-      '@player-tools/xlr-converters': 0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)
-      '@player-tools/xlr-sdk': 0.12.0(typescript@5.5.4)
-      '@player-tools/xlr-utils': 0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/dsl': 0.13.0-next.5(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(react@18.3.1)
+      '@player-tools/json-language-service': 0.13.0-next.5
+      '@player-tools/xlr': 0.13.0-next.5
+      '@player-tools/xlr-converters': 0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr-sdk': 0.13.0-next.5(typescript@5.5.4)
+      '@player-tools/xlr-utils': 0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)
       chalk: 4.1.2
       cosmiconfig: 7.1.0
       cross-fetch: 3.2.0
@@ -11420,7 +11420,7 @@ snapshots:
       - jsonc-parser
       - supports-color
 
-  '@player-tools/dsl@0.12.0(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(react@18.3.1)':
+  '@player-tools/dsl@0.13.0-next.5(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(@types/react@18.3.23)(react@18.3.1)':
     dependencies:
       '@player-ui/player': 0.12.0-next.1
       '@player-ui/types': 0.12.0-next.1
@@ -11445,11 +11445,11 @@ snapshots:
       - '@swc/wasm'
       - '@types/node'
 
-  '@player-tools/json-language-service@0.12.0':
+  '@player-tools/json-language-service@0.13.0-next.5':
     dependencies:
-      '@player-tools/xlr': 0.12.0
-      '@player-tools/xlr-sdk': 0.12.0(typescript@5.5.4)
-      '@player-tools/xlr-utils': 0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr': 0.13.0-next.5
+      '@player-tools/xlr-sdk': 0.13.0-next.5(typescript@5.5.4)
+      '@player-tools/xlr-utils': 0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)
       '@player-ui/player': 0.12.0-next.1
       change-case: 4.1.2
       cross-fetch: 3.2.0
@@ -11464,20 +11464,20 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@player-tools/xlr-converters@0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)':
+  '@player-tools/xlr-converters@0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)':
     dependencies:
-      '@player-tools/xlr': 0.12.0
-      '@player-tools/xlr-utils': 0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr': 0.13.0-next.5
+      '@player-tools/xlr-utils': 0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)
       tslib: 2.8.1
       typescript: 5.5.4
     transitivePeerDependencies:
       - jsonc-parser
 
-  '@player-tools/xlr-sdk@0.12.0(typescript@5.5.4)':
+  '@player-tools/xlr-sdk@0.13.0-next.5(typescript@5.5.4)':
     dependencies:
-      '@player-tools/xlr': 0.12.0
-      '@player-tools/xlr-converters': 0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)
-      '@player-tools/xlr-utils': 0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr': 0.13.0-next.5
+      '@player-tools/xlr-converters': 0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr-utils': 0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)
       '@types/fs-extra': 9.0.13
       '@types/node': 18.19.122
       fs-extra: 10.1.0
@@ -11485,9 +11485,9 @@ snapshots:
       tslib: 2.8.1
       typescript: 5.5.4
 
-  '@player-tools/xlr-utils@0.12.0(jsonc-parser@2.3.1)(typescript@5.5.4)':
+  '@player-tools/xlr-utils@0.13.0-next.5(jsonc-parser@2.3.1)(typescript@5.5.4)':
     dependencies:
-      '@player-tools/xlr': 0.12.0
+      '@player-tools/xlr': 0.13.0-next.5
       jsonc-parser: 2.3.1
       tslib: 2.8.1
       typescript: 5.5.4
@@ -11502,7 +11502,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@player-tools/xlr@0.12.0':
+  '@player-tools/xlr@0.13.0-next.5':
     dependencies:
       tslib: 2.8.1
 
