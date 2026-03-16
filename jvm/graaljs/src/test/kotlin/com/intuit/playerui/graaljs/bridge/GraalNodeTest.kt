@@ -5,7 +5,9 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.getJson
+import com.intuit.playerui.core.bridge.snapshot
 import com.intuit.playerui.core.bridge.toJson
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.graaljs.base.GraalTest
 import com.intuit.playerui.graaljs.extensions.blockingLock
@@ -274,5 +276,70 @@ internal class GraalNodeTest : GraalTest() {
             ),
         )
         Assertions.assertEquals("testId", node.getSerializable("flow", Flow.serializer())?.id)
+    }
+
+    @OptIn(ExperimentalPlayerApi::class)
+    @Test
+    fun snapshot() = format.context.blockingLock {
+        val node = buildNodeFromMap(
+            "title" to "Player Flow",
+            "count" to 42,
+            "rate" to 3.5,
+            "isActive" to true,
+            "nothing" to null,
+            "callback" to Invokable { "should be nulled" },
+            "settings" to mapOf(
+                "theme" to "dark",
+                "nested" to mapOf(
+                    "level" to 2,
+                    "tags" to listOf("a", "b"),
+                ),
+            ),
+            "items" to listOf(
+                mapOf("id" to "item1", "label" to "First"),
+                mapOf("id" to "item2", "label" to "Second"),
+                "plainString",
+                100,
+                null,
+                mapOf(
+                    "id" to "item3",
+                    "children" to listOf(
+                        mapOf("id" to "child1", "value" to "deep"),
+                    ),
+                ),
+            ),
+            "emptyList" to listOf<Any>(),
+        )
+        val snapshot = node.snapshot()
+        // primitives
+        Assertions.assertEquals("Player Flow", snapshot["title"])
+        Assertions.assertEquals(42, snapshot["count"])
+        Assertions.assertEquals(3.5, snapshot["rate"])
+        Assertions.assertEquals(true, snapshot["isActive"])
+        Assertions.assertNull(snapshot["nothing"])
+        // functions become null
+        Assertions.assertNull(snapshot["callback"])
+        // nested nodes are recursively snapshotted into plain maps
+        val settings = snapshot["settings"] as Map<*, *>
+        Assertions.assertEquals("dark", settings["theme"])
+        val nested = settings["nested"] as Map<*, *>
+        Assertions.assertEquals(2, nested["level"])
+        Assertions.assertEquals(listOf("a", "b"), nested["tags"])
+        // lists with mixed content: nodes, primitives, and nulls
+        val items = snapshot["items"] as List<*>
+        Assertions.assertEquals(6, items.size)
+        Assertions.assertEquals(mapOf("id" to "item1", "label" to "First"), items[0])
+        Assertions.assertEquals(mapOf("id" to "item2", "label" to "Second"), items[1])
+        Assertions.assertEquals("plainString", items[2])
+        Assertions.assertEquals(100, items[3])
+        Assertions.assertNull(items[4])
+        // deeply nested: node inside list with its own list of nodes
+        val item3 = items[5] as Map<*, *>
+        Assertions.assertEquals("item3", item3["id"])
+        val children = item3["children"] as List<*>
+        Assertions.assertEquals(1, children.size)
+        Assertions.assertEquals(mapOf("id" to "child1", "value" to "deep"), children[0])
+        // empty list preserved
+        Assertions.assertEquals(emptyList<Any>(), snapshot["emptyList"])
     }
 }

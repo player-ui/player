@@ -42,6 +42,9 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   /** static offset */
   private offset: number;
 
+  /** clears scrollableMap in AutoScrollProvider — set when the provider mounts */
+  private clearScrollableMap: () => void;
+
   /** map of scroll type to set of ids that are registered under that type */
   private alreadyScrolledTo: Array<string>;
   private scrollFn: (
@@ -56,10 +59,11 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     this.initialRender = false;
     this.failedNavigation = false;
     this.alreadyScrolledTo = [];
+    this.clearScrollableMap = () => {};
     this.scrollFn = this.calculateScroll.bind(this);
   }
 
-  getFirstScrollableElement(idList: Set<string>, type: ScrollType) {
+  getFirstScrollableElement(idList: Set<string>, type: ScrollType): string {
     const highestElement = {
       id: "",
       ypos: 0,
@@ -98,7 +102,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     return highestElement.id;
   }
 
-  calculateScroll(scrollableElements: Map<ScrollType, Set<string>>) {
+  calculateScroll(scrollableElements: Map<ScrollType, Set<string>>): string {
     let currentScroll = ScrollType.FirstAppearance;
     if (this.initialRender) {
       if (this.autoScrollOnLoad) {
@@ -127,7 +131,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   }
 
   // Hooks into player flow to determine what scroll targets need to be evaluated at specific lifecycle points
-  apply(player: Player) {
+  apply(player: Player): void {
     player.hooks.flowController.tap(this.name, (fc) => {
       fc.hooks.flow.tap(this.name, (flow) => {
         flow.hooks.transition.tap(this.name, () => {
@@ -135,6 +139,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
           this.initialRender = true;
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
+          this.clearScrollableMap();
           // Reset scroll position for new view
           window.scroll(0, 0);
         });
@@ -147,9 +152,12 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     });
   }
 
-  applyReact(reactPlayer: ReactPlayer) {
+  applyReact(reactPlayer: ReactPlayer): void {
     reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       const { scrollFn, getBaseElement, offset } = this;
+      const setScrollableMapClearer = (clear: () => void) => {
+        this.clearScrollableMap = clear;
+      };
 
       function AutoScrollManagerComponent() {
         return (
@@ -157,6 +165,9 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
             getElementToScrollTo={scrollFn}
             getBaseElement={getBaseElement}
             offset={offset}
+            onMount={(clear) => {
+              setScrollableMapClearer(clear);
+            }}
           >
             <Comp />
           </AutoScrollProvider>

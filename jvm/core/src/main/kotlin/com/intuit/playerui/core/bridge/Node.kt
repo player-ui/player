@@ -168,10 +168,17 @@ public fun Node.getSymbol(key: String): String? {
 
 /** Decode a [Node] entirely as a snapshot of its current data. Will allow for additional data access after a [Node]s runtime has been released */
 @ExperimentalPlayerApi
-internal fun Node.snapshot(): Map<String, Any?> = entries.associate { (key, value) ->
+public fun Node.snapshot(): Map<String, Any?> = entries.associate { (key, value) ->
     key to when (value) {
         is Node -> value.snapshot()
         is Function<*> -> null
+        is List<*> -> value.map {
+            when (it) {
+                is Node -> it.snapshot()
+                is Function<*> -> null
+                else -> it
+            }
+        }
         else -> value
     }
 }
