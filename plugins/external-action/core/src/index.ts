@@ -40,19 +40,13 @@ export class ExternalActionPlugin implements PlayerPlugin {
   public readonly symbol: symbol = ExternalActionPlugin.Symbol;
 
   /**
-   * Whether this is the first plugin instance.
-   * Only the first plugin instance creates the registry; all others use the first plugin's registry.
-   */
-  private isFirstPluginInstance: boolean = true;
-
-  /**
    * The shared registry that maps external states to handlers.
    * All plugin instances use the same registry.
    */
   private registry?: Registry<ExternalStateHandler>;
 
   /**
-   * The handlers for this plugin.
+   * The handlers for this plugin instance.
    */
   private readonly handlers: Map<
     Partial<NavigationFlowExternalState> &
@@ -91,11 +85,11 @@ export class ExternalActionPlugin implements PlayerPlugin {
   }
 
   apply(player: Player): void {
-    this.createRegistry(player);
-    this.registerHandlers(player);
+    const isFirstInstance = this.createRegistry(player);
+    this.registerHandlers();
 
-    // Since every instance uses the same registry, we should only tap once to avoid redundant taps.
-    if (!this.isFirstPluginInstance) {
+    // Only the first instance should tap the hooks to avoid redundant taps
+    if (!isFirstInstance) {
       return;
     }
 
@@ -145,31 +139,34 @@ export class ExternalActionPlugin implements PlayerPlugin {
   }
 
   /**
-   * Create the registry for this plugin instance.
+   * Create or share the registry for this plugin instance.
    *
    * Uses the Player's plugin registry to find if another instance of ExternalActionPlugin
    * has already been registered. If found, this instance will share that plugin's registry.
    * Otherwise, this instance creates a new registry.
    *
    * @param player - The Player instance this plugin is being applied to
+   * @returns True if this is the first plugin instance, false otherwise
    */
-  private createRegistry(player: Player): void {
-    // This should find the first instance of this plugin registered to the Player.
+  private createRegistry(player: Player): boolean {
+    // Find the first instance of this plugin registered to the Player
     const existing = player.findPlugin<ExternalActionPlugin>(
       ExternalActionPluginSymbol,
     );
-    // If we found a plugin and it's not ourselves, we are not the first plugin instance.
+    
+    // If we found a plugin and it's not ourselves, we are not the first plugin instance
     if (existing && existing !== this) {
-      this.isFirstPluginInstance = false;
       // Use the first plugin's registry
       this.registry = existing.registry;
-    } else {
-      // We are the first plugin instance, create the registry
-      this.registry = new Registry<ExternalStateHandler>(
-        undefined,
-        player.logger,
-      );
+      return false;
     }
+    
+    // We are the first plugin instance, create the registry
+    this.registry = new Registry<ExternalStateHandler>(
+      undefined,
+      player.logger,
+    );
+    return true;
   }
 
   /**
@@ -177,12 +174,10 @@ export class ExternalActionPlugin implements PlayerPlugin {
    *
    * If a handler with the same specificity already exists, it will be replaced
    * and a debug log will be emitted (accessible via player.logger.debug).
-   *
-   * @param player - The Player instance (used to access the registry)
    */
-  private registerHandlers(player: Player): void {
+  private registerHandlers(): void {
     for (const [state, handler] of this.handlers) {
-      // Registry will handle keeping only the last handler for each state.
+      // Registry will handle keeping only the last handler for each state
       this.registry?.set(state, handler);
     }
   }
