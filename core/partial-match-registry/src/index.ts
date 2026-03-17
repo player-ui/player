@@ -45,11 +45,11 @@ export class Registry<V> {
    * @param initialSet - Optional array of [key, value] tuples to populate the registry
    * @param logger - Optional logger instance for debug logging (e.g., when entries are replaced)
    */
-  constructor(initialSet?: Array<[any, V]>, logger?: Logger | undefined) {
+  constructor(initialSet?: Array<[any, V]>, logger?: Logger) {
+    this.logger = logger;
     initialSet?.forEach(([match, value]) => {
       this.set(match, value);
     });
-    this.logger = logger;
   }
 
   /**
@@ -103,7 +103,7 @@ export class Registry<V> {
   get(query: any): V | undefined {
     // Store is sorted by matcher.count (descending), so iterate forward
     for (const entry of this.store) {
-      if (entry && entry.matcher(query)) {
+      if (entry.matcher(query)) {
         return entry.value;
       }
     }
