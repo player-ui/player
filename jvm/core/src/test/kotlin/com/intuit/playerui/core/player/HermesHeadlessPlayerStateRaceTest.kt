@@ -62,4 +62,3 @@ internal class HermesHeadlessPlayerStateRaceTest {
         assertTrue(player.state is ReleasedState)
     }
 }
-
