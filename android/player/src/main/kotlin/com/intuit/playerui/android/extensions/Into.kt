@@ -3,6 +3,7 @@ package com.intuit.playerui.android.extensions
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.MainThread
 import androidx.core.view.children
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
@@ -15,6 +16,7 @@ import androidx.transition.TransitionManager
  * @receiver [View] to inject
  * @param root [FrameLayout] to be injected to
  */
+@MainThread
 public infix fun View?.into(root: FrameLayout) {
     val existing = root.getChildAt(0)
     if (this != existing) {
@@ -33,6 +35,7 @@ public infix fun View?.into(root: FrameLayout) {
  * @param transition [Transition] to take effect if given
  */
 
+@MainThread
 public fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
     root.removeAllViews()
     if (this == null) {
@@ -58,6 +61,7 @@ public fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
  * @receiver [View] to inject
  * @param root [ViewGroup] to be injected to
  */
+@MainThread
 public infix fun View?.into(root: ViewGroup) {
     if (this == null) {
         root.visibility = View.GONE
@@ -78,6 +82,7 @@ public infix fun View?.into(root: ViewGroup) {
  * @receiver Collection of [View]s to inject
  * @param root [ViewGroup] to be injected to
  */
+@MainThread
 public infix fun List<View?>.into(root: ViewGroup) {
     val filtered = filterNotNull()
     if (filtered.isEmpty()) {

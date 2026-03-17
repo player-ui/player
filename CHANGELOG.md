@@ -1,3 +1,19 @@
+# 0.15.2-next.1 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Fix: Compose android view must launch on main thread [#820](https://github.com/player-ui/player/pull/820) ([@A1shK](https://github.com/A1shK) [@kharrop](https://github.com/kharrop))
+- Removing docs-preview from forks [#824](https://github.com/player-ui/player/pull/824) ([@kharrop](https://github.com/kharrop))
+- Add Claude Code GitHub Workflow [#822](https://github.com/player-ui/player/pull/822) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 3
+
+- [@A1shK](https://github.com/A1shK)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.15.1 (Mon Mar 16 2026)
 
 #### 🐛 Bug Fix
