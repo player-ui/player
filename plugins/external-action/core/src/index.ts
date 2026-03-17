@@ -140,14 +140,14 @@ export class ExternalActionPlugin implements PlayerPlugin {
     const existing = player.findPlugin<ExternalActionPlugin>(
       ExternalActionPluginSymbol,
     );
-    
+
     // If we found a plugin and it's not ourselves, we are not the first plugin instance
     if (existing && existing !== this) {
       // Use the first plugin's registry
       this.registry = existing.registry;
       return false;
     }
-    
+
     // We are the first plugin instance, create the registry
     this.registry = new Registry<ExternalStateHandler>(
       undefined,

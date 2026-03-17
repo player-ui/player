@@ -132,4 +132,3 @@ test("logs debug message when initialSet has duplicate keys", () => {
   expect(registryWithDuplicates.get({ type: "action" })).toBe("third-value");
   expect(registryWithDuplicates.get({ type: "other" })).toBe("other-value");
 });
-
