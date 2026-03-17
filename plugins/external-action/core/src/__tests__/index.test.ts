@@ -1,8 +1,7 @@
-import { expect, test, vitest } from "vitest";
+import { expect, test, vitest, describe } from "vitest";
 import type { Flow, InProgressState, NamedState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { ExternalActionPlugin } from "..";
-import { describe } from "node:test";
 import { waitFor } from "@testing-library/react";
 
 const externalFlow = {
@@ -464,5 +463,47 @@ describe("edge cases", () => {
         ?.currentState;
       expect(currentState?.name).toBe("VIEW_1");
     });
+  });
+
+  test("no handler registered for external state - no transition occurs", async () => {
+    // Create a player with NO handlers registered
+    const player = new Player({
+      plugins: [
+        new ExternalActionPlugin(
+          new Map([
+            // Register handler for a different ref - not matching our external state
+            [{ ref: "different-ref" }, () => "Next"],
+          ]),
+        ),
+      ],
+    });
+
+    const started = player.start(externalFlow as Flow);
+
+    // Wait for player to reach the external state
+    await vitest.waitFor(() =>
+      expect(player.getState().status).toBe("in-progress"),
+    );
+
+    // Get the current state
+    const state = player.getState() as InProgressState;
+    const currentState = state.controllers.flow.current?.currentState;
+
+    // Should be stuck on the external state
+    expect(currentState?.name).toBe("EXT_1");
+    expect(currentState?.value.state_type).toBe("EXTERNAL");
+
+    // Wait a bit to ensure no transition occurs
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Should still be on the external state (no transition occurred)
+    const laterState = player.getState() as InProgressState;
+    const laterCurrentState = laterState.controllers.flow.current?.currentState;
+    expect(laterCurrentState?.name).toBe("EXT_1");
+    expect(laterCurrentState?.value.state_type).toBe("EXTERNAL");
+
+    // Clean up - manually transition to end the flow
+    laterState.controllers.flow.transition("Next");
+    await started;
   });
 });
