@@ -10,7 +10,7 @@ parameters:
 
 orbs:
   macos: circleci/macos@2.5.4
-  android: circleci/android@3.1.0
+  android: circleci/android@3.2.0
   codecov: codecov/codecov@5.4.3
 
 executors:
@@ -66,12 +66,6 @@ commands:
     steps:
       - attach_workspace:
           at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-
       - setup_auth
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: |
@@ -89,10 +83,6 @@ jobs:
     steps:
       - checkout:
           method: full
-
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -113,6 +103,7 @@ jobs:
           root: .
           paths:
             - .
+  
   bazelrc_fork:
     executor: minimal
     steps:
@@ -141,17 +132,12 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
       - persist_to_workspace:
           root: .
           paths:
             - .
 
-  build_ios:
+  build_and_test_ios:
     executor: ios
     steps:
       - attach_workspace:
@@ -187,7 +173,6 @@ jobs:
               --config=ci-mac \
               --jobs=1 \
               --experimental_use_llvm_covmap \
-              --combined_report=lcov \
               --test_output=all \
               --test_timeout=1800 \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
@@ -211,16 +196,18 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
+
       - run:
+          name: Collect iOS coverage
           when: always
           command: |
-            mkdir -p _ios_coverage/lcov
-            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
+            mkdir -p coverage
+            cp ./bazel-out/_coverage/_coverage_report.dat coverage/ios_coverage.dat
 
       - persist_to_workspace:
           root: .
           paths:
-            - _ios_coverage
+            - coverage/ios_coverage.dat
 
       - store_test_results:
           path: _test_results
@@ -235,6 +222,8 @@ jobs:
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
+      - run: bazel coverage --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+
       - run:
           when: always
           command: |
@@ -245,8 +234,29 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
+      - run:
+          name: Collect JS/JVM coverage
+          when: always
+          command: |
+            mkdir -p coverage
+            cp ./bazel-out/_coverage/_coverage_report.dat coverage/js_jvm_coverage.dat
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage/js_jvm_coverage.dat
+
       - store_test_results:
           path: _test_results
+
+  upload_coverage:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - codecov/upload:
+          files: coverage/ios_coverage.dat,coverage/js_jvm_coverage.dat
 
   android_test:
     executor: android
@@ -284,49 +294,11 @@ jobs:
       - store_artifacts:
           path: screenshots
 
-  coverage:
-    executor: base
-    steps:
-      - attach_workspace:
-          at: ~/player
-
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-
-      - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter('android|ios|swiftui', //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
-
-      - run:
-          when: always
-          command: |
-            RESULTS_DIR=_test_results
-            find -L ./bazel-testlogs -name test.xml | while read line
-            do
-              mkdir -p $RESULTS_DIR/$(dirname $line)
-              cp $line $RESULTS_DIR/$(dirname $line)
-            done
-
-      - store_test_results:
-          path: _test_results
-
-      - codecov/upload:
-          files: ./bazel-out/_coverage/_coverage_report.dat,./_ios_coverage/lcov/_coverage_report.dat
-
   bundle_analyze:
     executor: base
     steps:
       - attach_workspace:
           at: ~/player
-
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
 
       - run: ./scripts/bundle-analyze.sh
 
@@ -346,11 +318,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
       - setup_auth
       - run:
           name: Check if docs should run
@@ -387,11 +354,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
       - run:
           name: Build docs
           command: |
@@ -463,7 +425,7 @@ workflows:
             - setup
             - bazelrc_fork
 
-      - build_ios:
+      - build_and_test_ios:
           name: build-ios-trunk
           filters:
             branches:
@@ -473,7 +435,7 @@ workflows:
             - bazelrc
             - build-trunk
 
-      - build_ios:
+      - build_and_test_ios:
           name: build-ios-fork
           filters:
             branches:
@@ -491,7 +453,7 @@ workflows:
           context:
             - Publish
           requires:
-            - build-trunk
+            - test-trunk
             - build-ios-trunk
             - android-test-trunk
 
@@ -535,24 +497,24 @@ workflows:
           requires:
             - build-fork
 
-      - coverage:
-          name: coverage-trunk
+      - upload_coverage:
+          name: upload-coverage-trunk
           filters:
             branches:
               ignore:
                 - /pull\/.*/
           requires:
-            - build-trunk
+            - test-trunk
             - build-ios-trunk
 
-      - coverage:
-          name: coverage-fork
+      - upload_coverage:
+          name: upload-coverage-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
           requires:
-            - build-fork
+            - test-fork
             - build-ios-fork
 
       - bundle_analyze:
@@ -563,15 +525,6 @@ workflows:
                 - /pull\/.*/
           requires:
             - test-trunk
-
-      - bundle_analyze:
-          name: bundle-analyze-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - test-fork
 
       - bench_js:
           name: js-benchmark-tests-trunk
@@ -602,17 +555,6 @@ workflows:
           requires:
             - test-trunk
 
-      - build_and_deploy_docs_preview:
-          name: preview-docs-fork
-          context:
-            - Publish
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - test-fork
-
   build_and_test_main:
     when:
       equal: ["", << pipeline.parameters.GHA_Action >>]
@@ -633,7 +575,7 @@ workflows:
           requires:
             - bazelrc
 
-      - build_ios:
+      - build_and_test_ios:
           requires:
             - build
 
@@ -643,30 +585,34 @@ workflows:
           requires:
             - build
 
-      - coverage:
+      - test:
           requires:
             - build
-            - build_ios
+            - build_and_test_ios
+
+      - upload_coverage:
+          requires:
+            - test
 
       - bundle_analyze:
           name: bundle-analyze
           requires:
-            - coverage
+            - test
 
       - build_docs:
           context:
             - Publish
           requires:
-            - coverage
+            - test
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - coverage
+            - test
             - bundle-analyze
-            - build_ios
+            - build_and_test_ios
             - build_docs
 
   full_release:
@@ -685,7 +631,7 @@ workflows:
           requires:
             - setup
 
-      - build_ios:
+      - build_and_test_ios:
           requires:
             - bazelrc
 
@@ -695,27 +641,31 @@ workflows:
           requires:
             - build
 
-      - coverage:
+      - test:
           requires:
             - build
+
+      - upload_coverage:
+          requires:
+            - test
 
       - bundle_analyze:
           name: bundle-analyze
           requires:
-            - coverage
+            - test
 
       - build_docs:
           context:
             - Publish
           requires:
-            - coverage
+            - test
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - coverage
+            - test
             - bundle_analyze
-            - build_ios
+            - build_and_test_ios
             - build_docs

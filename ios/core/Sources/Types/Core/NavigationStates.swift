@@ -2,13 +2,16 @@ import Foundation
 import JavaScriptCore
 
 /// The base representation of a state within a Flow
-open class NavigationBaseState: CreatedFromJSValue {
+open class NavigationBaseState: CreatedFromJSValue, JSValueProviding {
     public typealias T = NavigationBaseState
 
     /// A property to determine the type of state this is
     public let stateType: String
 
     internal let rawValue: JSValue
+
+    /// Backing JSValue for returning from waterfall hooks. Use when returning this state from a waterfall hook (e.g. beforeTransition).
+    public var jsValue: JSValue { rawValue }
 
     public static func createInstance(value: JSValue) -> NavigationBaseState {
         let base = NavigationBaseState(value)
