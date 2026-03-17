@@ -12,8 +12,7 @@
     "pnpm": "^10.18.1"
   },
   "packageManager": "pnpm@10.18.1",
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
     "@astrojs/react": "^4.0.0",
     "@astrojs/starlight": "^0.35.2",
@@ -95,6 +94,7 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-react": "^7.37.4",
+    "fast-sort": "^3.4.1",
     "github-slugger": "^1.0.0",
     "globby": "^11.0.1",
     "gray-matter": "^4.0.3",
@@ -143,7 +143,6 @@
     "seamless-scroll-polyfill": "^2.3.4",
     "sharp": "^0.33.5",
     "signale": "^1.4.0",
-    "sorted-array": "^2.0.4",
     "source-map-js": "^1.0.2",
     "starlight-package-managers": "^0.7.0",
     "std-mocks": "^1.0.1",
