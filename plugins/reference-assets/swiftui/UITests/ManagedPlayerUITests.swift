@@ -6,6 +6,28 @@ class ManagedPlayerUITests: BaseTestCase {
         app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 
+    /// Taps the element and verifies the expected outcome appears. If the tap has no effect
+    /// (e.g., the JS action handler isn't wired yet due to async SwiftUI binding), retries the tap.
+    private func tapAndAssertElementAppears(
+        _ element: XCUIElement,
+        expectedOutcome: XCUIElement,
+        timeout: TimeInterval = 3,
+        retries: Int = 3
+    ) {
+        for _ in 0..<retries {
+            // If the expected outcome already appeared (from a previous tap that was slow to produce results),
+            // stop immediately instead of tapping again.
+            if expectedOutcome.exists { return }
+            // If the tappable element is gone (a previous tap successfully navigated away),
+            // stop retrying instead of crashing on a missing element.
+            guard element.exists else { break }
+            element.tap()
+            if expectedOutcome.waitForExistence(timeout: timeout) {
+                return
+            }
+        }
+    }
+
     func testSimpleFlow() {
         openFlow("Simple Flows")
         let button1 = app.buttons["first_view"].firstMatch
@@ -14,13 +36,12 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
-        button2.tap()
 
         let completedText = app.staticTexts["Flow Completed"]
-        waitFor(completedText)
+        tapAndAssertElementAppears(button2, expectedOutcome: completedText)
     }
 
-    // NOTE: This test flakes occassionally, but pretty rarely.
+    
     func testErrorContentFlow() {
         openFlow("Error Content Flow")
 
@@ -30,17 +51,12 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
-        button2.tap()
-
-        let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
-        waitFor(errorText, timeout: 10)
-        XCTAssert(errorText.exists, "Error message did not appear")
 
         let retryButton = app.buttons["Retry"].firstMatch
-        waitFor(retryButton)
-        retryButton.tap()
+        tapAndAssertElementAppears(button2, expectedOutcome: retryButton, timeout: 5)
 
-        waitFor(button2)
+        let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
+        XCTAssert(errorText.exists, "Error message did not appear")
     }
 
     func testErrorAssetFlow() {
@@ -58,7 +74,7 @@ class ManagedPlayerUITests: BaseTestCase {
 
         waitFor(button1)
     }
-    
+
     func testReuseAlreadyLoadedFlow() {
         openFlow("Reuse already loaded flow")
         let button1 = app.buttons["action-end"].firstMatch

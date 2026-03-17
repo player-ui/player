@@ -1,3 +1,80 @@
+# 0.15.2-next.1 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Fix: Compose android view must launch on main thread [#820](https://github.com/player-ui/player/pull/820) ([@A1shK](https://github.com/A1shK) [@kharrop](https://github.com/kharrop))
+- Removing docs-preview from forks [#824](https://github.com/player-ui/player/pull/824) ([@kharrop](https://github.com/kharrop))
+- Add Claude Code GitHub Workflow [#822](https://github.com/player-ui/player/pull/822) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 3
+
+- [@A1shK](https://github.com/A1shK)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.1 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Release main [#823](https://github.com/player-ui/player/pull/823) ([@intuit-svc](https://github.com/intuit-svc))
+- Add beforeTransition hook to Flow and parity test [iOS] [#803](https://github.com/player-ui/player/pull/803) ([@bsatyani](https://github.com/bsatyani) [@spentacular](https://github.com/spentacular))
+- Fix flaky tests in ManagedPlayerUITest [#813](https://github.com/player-ui/player/pull/813) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- fix autoscroll issue due to stale scrollableMap [#815](https://github.com/player-ui/player/pull/815) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- HBC [#808](https://github.com/player-ui/player/pull/808) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- CI: Consolidate Test/Coverage Steps for JS/JVM targets [#810](https://github.com/player-ui/player/pull/810) ([@KetanReddy](https://github.com/KetanReddy))
+- Updated CollectionAsset to render the label [#811](https://github.com/player-ui/player/pull/811) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Snapshot API nested list recursive processing [#809](https://github.com/player-ui/player/pull/809) ([@brocollie08](https://github.com/brocollie08))
+- Publicize Node.snapshot API [#806](https://github.com/player-ui/player/pull/806) ([@brocollie08](https://github.com/brocollie08))
+- Cleanup Managed Player tests and remove async act [#795](https://github.com/player-ui/player/pull/795) ([@spentacular](https://github.com/spentacular))
+- Add Player Base Image for Codespaces [#800](https://github.com/player-ui/player/pull/800) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add guide to creating a CLI Preset [#801](https://github.com/player-ui/player/pull/801) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document guide to writing DSL Plugin and Player CLI Plugin [#792](https://github.com/player-ui/player/pull/792) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document `PlayerLanguageService` [#787](https://github.com/player-ui/player/pull/787) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@bsatyani](https://github.com/bsatyani)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.1-next.6 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Add beforeTransition hook to Flow and parity test [iOS] [#803](https://github.com/player-ui/player/pull/803) ([@bsatyani](https://github.com/bsatyani) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- [@bsatyani](https://github.com/bsatyani)
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.1-next.5 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Fix flaky tests in ManagedPlayerUITest [#813](https://github.com/player-ui/player/pull/813) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
 # 0.15.1-next.4 (Fri Mar 13 2026)
 
 #### 🐛 Bug Fix

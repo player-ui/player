@@ -108,6 +108,44 @@ public class Hook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: CreatedFrom
     }
 }
 
+/// Types that can be converted back to JSValue (e.g. return type R in waterfall hooks).
+public protocol JSValueProviding {
+    var jsValue: JSValue { get }
+}
+
+/// Waterfall hook with 2 args (T, U) returning R. Aligns with web SyncWaterfallHook<[T, U]>.
+public class SyncWaterfallHook2JS<T, R, U>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue & JSValueProviding {
+    public func tap(_ hook: @escaping (T, U) -> R) {
+        let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value1, value2 in
+            guard let value1, let value2,
+                  let hookValue1 = T.createInstance(value: value1) as? T else {
+                return nil
+            }
+            // Prefer toObject(); fallback to toString() for JS string primitives (e.g. U == String).
+            let hookValue2: U? = (value2.toObject() as? U) ?? ((value2.toString() as Any) as? U)
+            guard let hookValue2 else { return nil }
+            let returnValue = hook(hookValue1, hookValue2)
+            return returnValue.jsValue
+        }
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/// Waterfall hook with 1 arg T returning R. Aligns with web SyncWaterfallHook<[T]>.
+public class SyncWaterfallHookJS<T, R>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue & JSValueProviding {
+    public func tap(_ hook: @escaping (T) -> R) {
+        let tapMethod: @convention(block) (JSValue?) -> JSValue? = { value in
+            guard let val = value,
+                  let hookValue = T.createInstance(value: val) as? T else {
+                return nil
+            }
+            let returnValue = hook(hookValue)
+            return returnValue.jsValue
+        }
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
 /**
  This class represents an object in the JS runtime that can be tapped into
  to receive JS events
