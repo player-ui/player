@@ -26,18 +26,16 @@ Create handlers for external actions:
 ```js
 import { ExternalActionPlugin } from '@player-ui/external-action-plugin';
 
-const plugin = new ExternalActionPlugin(
-  new Map([
-    [{ ref: 'custom' }, async (state, options) => {
-      // Handle external state with ref: 'custom'
-      return 'next';
-    }],
-    [{ ref: 'other-action' }, async (state, options) => {
-      // Handle external state with ref: 'other-action'
-      return 'prev';
-    }],
-  ])
-);
+const plugin = new ExternalActionPlugin([
+  [{ ref: 'custom' }, async (state, options) => {
+    // Handle external state with ref: 'custom'
+    return 'next';
+  }],
+  [{ ref: 'other-action' }, async (state, options) => {
+    // Handle external state with ref: 'other-action'
+    return 'prev';
+  }],
+]);
 ```
 
 Add it to Player:
@@ -53,15 +51,13 @@ const player = new Player({
 This will transition any `EXTERNAL` state in Player's navigation based on the registered handlers. Handlers are matched using partial object matching, with more specific matches taking precedence:
 
 ```js
-new ExternalActionPlugin(
-  new Map([
-    // Less specific - matches any state with ref: 'action'
-    [{ ref: 'action' }, () => 'default'],
-    
-    // More specific - matches state with both ref and type
-    [{ ref: 'action', type: 'special' }, () => 'special'],
-  ])
-)
+new ExternalActionPlugin([
+  // Less specific - matches any state with ref: 'action'
+  [{ ref: 'action' }, () => 'default'],
+  
+  // More specific - matches state with both ref and type
+  [{ ref: 'action', type: 'special' }, () => 'special'],
+])
 ```
 
   </Fragment>

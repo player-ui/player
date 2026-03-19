@@ -14,6 +14,9 @@ export type ExternalStateHandler = (
   options: InProgressState["controllers"],
 ) => string | undefined | Promise<string | undefined>;
 
+type ExternalActionMatch = Partial<NavigationFlowExternalState> &
+  Pick<NavigationFlowExternalState, "ref">;
+
 /**
  * A plugin to handle external action states
  *
@@ -38,39 +41,33 @@ export class ExternalActionPlugin implements PlayerPlugin {
    * The handlers for this plugin instance.
    */
   private readonly handlers: Map<
-    Partial<NavigationFlowExternalState> &
-      Pick<NavigationFlowExternalState, "ref">,
+    ExternalActionMatch,
     ExternalStateHandler
   >;
 
   /**
    * Creates a new ExternalActionPlugin
    *
-   * @param handlers - Map of state matchers to handler functions.
-   *                   Keys are partial state objects used for matching.
-   *                   More specific keys (with more properties) take precedence.
+   * @param handlers - Array of [matcher, handler] tuples.
+   *                   Matchers are partial state objects used for matching.
+   *                   More specific matchers (with more properties) take precedence.
    *
    * @example
    * ```typescript
-   * new ExternalActionPlugin(
-   *   new Map([
-   *     // Less specific - matches any state with ref: "action"
-   *     [{ ref: "action" }, (state, options) => "default"],
+   * new ExternalActionPlugin([
+   *   // Less specific - matches any state with ref: "action"
+   *   [{ ref: "action" }, (state, options) => "default"],
    *
-   *     // More specific - matches state with both ref and type
-   *     [{ ref: "action", type: "special" }, (state, options) => "special"],
-   *   ])
-   * )
+   *   // More specific - matches state with both ref and type
+   *   [{ ref: "action", type: "special" }, (state, options) => "special"],
+   * ])
    * ```
    */
   constructor(
-    handlers: Map<
-      Partial<NavigationFlowExternalState> &
-        Pick<NavigationFlowExternalState, "ref">,
-      ExternalStateHandler
-    >,
+    // This array of tuples is an established player pattern. Internally we use a Map.
+    handlers: [ExternalActionMatch, ExternalStateHandler][],
   ) {
-    this.handlers = handlers;
+    this.handlers = new Map(handlers);
   }
 
   apply(player: Player): void {

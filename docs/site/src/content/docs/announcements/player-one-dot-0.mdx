@@ -196,26 +196,22 @@ new ExternalActionPlugin((state, options) => {
   }
 })
 
-// After - map of matchers to handlers
-new ExternalActionPlugin(
-  new Map([
-    [{ ref: "my-action" }, (state, options) => "Next"],
-    [{ ref: "other-action" }, (state, options) => "Prev"],
-  ])
-)
+// After - array of [matcher, handler] tuples
+new ExternalActionPlugin([
+  [{ ref: "my-action" }, (state, options) => "Next"],
+  [{ ref: "other-action" }, (state, options) => "Prev"],
+])
 ```
 
 Handlers are matched by the registry using partial object matching. More specific matchers (with more properties) take precedence over less specific ones:
 
 ```typescript
-new ExternalActionPlugin(
-  new Map([
-    // Less specific - matches any state with ref: "action"
-    [{ ref: "action" }, () => "default"],
-    // More specific - matches state with both ref and type
-    [{ ref: "action", type: "special" }, () => "special"],
-  ])
-)
+new ExternalActionPlugin([
+  // Less specific - matches any state with ref: "action"
+  [{ ref: "action" }, () => "default"],
+  // More specific - matches state with both ref and type
+  [{ ref: "action", type: "special" }, () => "special"],
+])
 ```
 
 ## Behavioural Changes & Bug Fixes
