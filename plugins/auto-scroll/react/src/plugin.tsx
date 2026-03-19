@@ -140,12 +140,9 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
           this.clearScrollableMap();
-          // Cancel any in-flight seamless-scroll-polyfill RAF animation.
-          // The polyfill has no public abort API — dispatching a wheel event
-          // triggers its internal cancelScroll() → cancelAnimationFrame(rafId).
+          // Cancel any in-flight polyfill smooth-scroll animation before resetting.
           window.dispatchEvent(new WheelEvent("wheel", { bubbles: true }));
-          // Reset scroll position for new view (instant to avoid competing with the polyfill)
-          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          window.scroll(0, 0);
         });
         flow.hooks.skipTransition.intercept({
           call: () => {

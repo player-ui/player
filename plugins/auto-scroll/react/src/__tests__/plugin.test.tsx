@@ -388,14 +388,14 @@ describe("scroll reset on view transition", () => {
 });
 
 describe("scroll reset on view transition cancels in-flight polyfill animation", () => {
-  test("dispatches a wheel event and calls scrollTo with instant behavior on transition", async () => {
+  test("dispatches a wheel event and calls scroll(0,0) on transition", async () => {
     vitest.clearAllMocks();
 
     const dispatchSpy = vitest
       .spyOn(window, "dispatchEvent")
       .mockImplementation(() => true);
-    const scrollToSpy = vitest
-      .spyOn(window, "scrollTo")
+    const scrollSpy = vitest
+      .spyOn(window, "scroll")
       .mockImplementation(() => {});
 
     vitest.spyOn(document, "getElementById").mockReturnValue(null);
@@ -437,12 +437,8 @@ describe("scroll reset on view transition cancels in-flight polyfill animation",
       expect.objectContaining({ type: "wheel" }),
     );
 
-    // scroll reset must use behavior: instant
-    expect(scrollToSpy).toHaveBeenCalledWith({
-      top: 0,
-      left: 0,
-      behavior: "instant",
-    });
+    // scroll must be reset to top
+    expect(scrollSpy).toHaveBeenCalledWith(0, 0);
 
     vitest.restoreAllMocks();
   });
