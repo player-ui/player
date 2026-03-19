@@ -32,8 +32,6 @@ interface RegistryIndex<V> {
 /**
  * A partial match registry is a map that uses an object to "match" against keys.
  * More specific matches take precedence over less specific ones.
- *
- * @param V - The type of values stored in the registry
  */
 export class Registry<V> {
   private store: Array<RegistryIndex<V>> = [];
