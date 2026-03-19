@@ -2,6 +2,7 @@ import { test, expect, vitest } from "vitest";
 import { Player } from "@player-ui/player";
 import { PubSubPlugin } from "../plugin";
 import { PubSubPluginSymbol } from "../symbols";
+import { TinyPubSub } from "../pubsub";
 
 const minimal = {
   id: "minimal",
@@ -144,6 +145,47 @@ test("only calls subscription once if multiple pubsub plugins are registered", (
 
   expect(topLevel).toBeCalledTimes(1);
   expect(topLevel).toBeCalledWith("pet.names", ["ginger", "daisy"]);
+});
+
+test("uses an external shared pubsub instance across two plugins", () => {
+  const sharedPubSub = new TinyPubSub();
+  const pubsub1 = new PubSubPlugin({ pubsub: sharedPubSub });
+  const pubsub2 = new PubSubPlugin({
+    expressionName: "customPublish",
+    pubsub: sharedPubSub,
+  });
+
+  const player = new Player({ plugins: [pubsub1, pubsub2] });
+
+  const spy = vitest.fn();
+  pubsub1.subscribe("pet", spy);
+
+  player.start(multistart as any);
+
+  // both publish() and customPublish() expressions hit the same shared bus
+  expect(spy).toBeCalledTimes(2);
+  expect(spy).toHaveBeenNthCalledWith(1, "pet", ["ginger", "daisy"]);
+  expect(spy).toHaveBeenNthCalledWith(2, "pet", ["ginger", "daisy"]);
+});
+
+test("external pubsub is not replaced by another plugin's pubsub on the same player", () => {
+  const sharedPubSub = new TinyPubSub();
+  const pubsub1 = new PubSubPlugin();
+  const pubsub2 = new PubSubPlugin({
+    expressionName: "customPublish",
+    pubsub: sharedPubSub,
+  });
+
+  const player = new Player({ plugins: [pubsub1, pubsub2] });
+
+  const spy = vitest.fn();
+  // subscribe via the external pubsub directly
+  sharedPubSub.subscribe("pet", spy);
+
+  // customName flow fires customPublish("pet.names", ...), routed through pubsub2's external bus
+  player.start(customName as any);
+
+  expect(spy).toBeCalledTimes(1);
 });
 
 test("calls subscription for each pubsub registered through pubsubplugin", () => {

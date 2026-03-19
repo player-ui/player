@@ -3,13 +3,20 @@ import type {
   PlayerPlugin,
   ExpressionContext,
 } from "@player-ui/player";
-import type { SubscribeHandler, TinyPubSub } from "./pubsub";
-import { pubsub } from "./pubsub";
+import type { SubscribeHandler } from "./pubsub";
+import { pubsub, TinyPubSub } from "./pubsub";
 import { PubSubPluginSymbol } from "./symbols";
 
 export interface PubSubConfig {
   /** A custom expression name to register  */
-  expressionName: string;
+  expressionName?: string;
+  /**
+   * An external TinyPubSub instance to use instead of creating a new one.
+   * When provided, this instance is always used and will not be replaced by
+   * another registered PubSubPlugin's instance on the same player.
+   * This allows sharing a single pubsub bus across multiple plugins or players.
+   */
+  pubsub?: TinyPubSub;
 }
 
 /**
@@ -24,24 +31,29 @@ export interface PubSubConfig {
 export class PubSubPlugin implements PlayerPlugin {
   name = "pub-sub";
 
-  static Symbol = PubSubPluginSymbol;
-  public readonly symbol = PubSubPlugin.Symbol;
+  static Symbol: symbol = PubSubPluginSymbol;
+  public readonly symbol: symbol = PubSubPlugin.Symbol;
 
   protected pubsub: TinyPubSub;
 
   private expressionName: string;
 
+  private usesExternalPubSub: boolean;
+
   constructor(config?: PubSubConfig) {
     this.expressionName = config?.expressionName ?? "publish";
-    this.pubsub = pubsub;
+    this.pubsub = config?.pubsub ?? pubsub;
+    this.usesExternalPubSub = config?.pubsub !== undefined;
   }
 
-  apply(player: Player) {
-    // if there is already a pubsub plugin, reuse its pubsub instance
-    // to maintain the singleton across bundles for iOS/Android
-    const existing = player.findPlugin<PubSubPlugin>(PubSubPluginSymbol);
-    if (existing !== undefined) {
-      this.pubsub = existing.pubsub;
+  apply(player: Player): void {
+    // if there is already a pubsub plugin and no external pubsub was provided,
+    // reuse its pubsub instance to maintain the singleton across bundles for iOS/Android
+    if (!this.usesExternalPubSub) {
+      const existing = player.findPlugin<PubSubPlugin>(PubSubPluginSymbol);
+      if (existing !== undefined) {
+        this.pubsub = existing.pubsub;
+      }
     }
 
     player.hooks.expressionEvaluator.tap(this.name, (expEvaluator) => {
@@ -76,7 +88,7 @@ export class PubSubPlugin implements PlayerPlugin {
    * @param event - The name of the event to publish. Can take sub-topics like: foo.bar
    * @param data - Any additional data to attach to the event
    */
-  publish(event: string, ...args: unknown[]) {
+  publish(event: string, ...args: unknown[]): void {
     this.pubsub.publish(event, ...args);
   }
 
@@ -90,7 +102,7 @@ export class PubSubPlugin implements PlayerPlugin {
   subscribe<T extends string, A extends unknown[]>(
     event: T,
     handler: SubscribeHandler<T, A>,
-  ) {
+  ): string {
     return this.pubsub.subscribe(event, handler);
   }
 
@@ -99,14 +111,14 @@ export class PubSubPlugin implements PlayerPlugin {
    *
    * @param token - A token from a `subscribe` call
    */
-  unsubscribe(token: string) {
+  unsubscribe(token: string): void {
     this.pubsub.unsubscribe(token);
   }
 
   /**
    * Remove all subscriptions
    */
-  clear() {
+  clear(): void {
     this.pubsub.clear();
   }
 }
