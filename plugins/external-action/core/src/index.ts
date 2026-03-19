@@ -40,10 +40,7 @@ export class ExternalActionPlugin implements PlayerPlugin {
   /**
    * The handlers for this plugin instance.
    */
-  private readonly handlers: Map<
-    ExternalActionMatch,
-    ExternalStateHandler
-  >;
+  private readonly handlers: Map<ExternalActionMatch, ExternalStateHandler>;
 
   /**
    * Creates a new ExternalActionPlugin
