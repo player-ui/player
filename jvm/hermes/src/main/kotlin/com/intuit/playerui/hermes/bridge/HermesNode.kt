@@ -3,6 +3,7 @@ package com.intuit.playerui.hermes.bridge
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
@@ -61,7 +62,18 @@ public class HermesNode(
     override fun isEmpty(): Boolean = size == 0
 
     context(RuntimeThreadContext)
-    private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
+    private fun getJSIValue(key: String): Value {
+        // `getProperty` may throw an NPE if the underlying JSI object/runtime is already released.
+        if (runtime.isReleased() || jsiObject.isReleased()) {
+            throw PlayerRuntimeException(runtime, "JSI object released while reading property \"$key\"")
+        }
+
+        return try {
+            jsiObject.getProperty(runtime, key)
+        } catch (e: NullPointerException) {
+            throw PlayerRuntimeException(runtime, "NullPointerException reading JSI property \"$key\"", e)
+        }
+    }
 
     context(RuntimeThreadContext)
     private fun getJSIObject(key: String): Object? = getJSIValue(key)
@@ -79,7 +91,7 @@ public class HermesNode(
         ?.asFunction(runtime)
 
     override operator fun get(key: String): Any? = runtime.evaluateInJSThreadBlocking {
-        jsiObject.getProperty(runtime, key).handleValue(format)
+        getJSIValue(key).handleValue(format)
     }
 
     override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = runtime

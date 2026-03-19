@@ -6,7 +6,7 @@ common --cxxopt=-std=c++17
 
 # Java Specific Configs
 common --java_language_version=17
-common --tool_java_language_version=17
+common --java_runtime_version=17
 common --tool_java_language_version=17
 common --tool_java_runtime_version=17
 
@@ -53,7 +53,7 @@ coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 # Base ci config for all executors. Other ci configs should inherit from this and add resource limitations.
 common:ci-base --build_metadata=ROLE=CI
-common:ci-base --remote_build_event_upload=minimal 
+common:ci-base --remote_build_event_upload=minimal
 common:ci-base --nolegacy_important_outputs
 # Only show progress every 60 seconds on CI.
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
