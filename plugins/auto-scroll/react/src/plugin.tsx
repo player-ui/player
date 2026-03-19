@@ -140,7 +140,8 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
           this.clearScrollableMap();
-          // Reset scroll position for new view
+          // Cancel any in-flight polyfill smooth-scroll animation before resetting.
+          window.dispatchEvent(new WheelEvent("wheel", { bubbles: true }));
           window.scroll(0, 0);
         });
         flow.hooks.skipTransition.intercept({

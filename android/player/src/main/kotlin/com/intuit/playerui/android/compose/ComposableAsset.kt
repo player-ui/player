@@ -25,6 +25,7 @@ import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
@@ -102,7 +103,7 @@ public abstract class ComposableAsset<Data>(
     @Composable
     private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         AndroidView(factory = ::FrameLayout, modifier) {
-            hydrationScope.launch {
+            hydrationScope.launch(Dispatchers.Main) {
                 render(styles) into it
             }
         }
