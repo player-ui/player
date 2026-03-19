@@ -34,8 +34,8 @@ public class ThrowableSerializer : KSerializer<Throwable> {
         element("stackTrace", serializedStackTraceSerializer.descriptor.nullable, isOptional = true)
         element("cause", defer { ThrowableSerializer().descriptor.nullable }, isOptional = true)
         element("type", String.serializer().descriptor.nullable, isOptional = true)
-        element("severity", defer { ErrorSeverity.serializer().descriptor.nullable }, isOptional = true)
-        element("metadata", defer { GenericSerializer().descriptor.nullable }, isOptional = true)
+        element("severity", ErrorSeverity.serializer().descriptor.nullable, isOptional = true)
+        element("metadata", GenericSerializer().descriptor.nullable, isOptional = true)
     }
 
     override fun deserialize(decoder: Decoder): PlayerException {
@@ -89,14 +89,27 @@ public class ThrowableSerializer : KSerializer<Throwable> {
             } else {
                 while (true) {
                     when (val index = decodeElementIndex(descriptor)) {
-                        0 -> serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
-                        1 -> message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
+                        0 ->
+                            serialized =
+                                decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
+
+                        1 ->
+                            message =
+                                decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
+
                         2 -> stackTrace = decodeStackTraceFromStack()
                         3 -> stackTrace = decodeSerializedStackTrace()
                         4 -> cause = decodeNullableSerializableElement(descriptor, 4, nullable)
                         5 -> type = decodeNullableSerializableElement(descriptor, 5, String.serializer().nullable)
-                        6 -> severity = decodeNullableSerializableElement(descriptor, 6, ErrorSeverity.serializer().nullable)
-                        7 -> metadata = decodeNullableSerializableElement(descriptor, 7, GenericSerializer()) as? Map<String, Any>
+                        6 ->
+                            severity =
+                                decodeNullableSerializableElement(descriptor, 6, ErrorSeverity.serializer().nullable)
+                        7 -> metadata = decodeNullableSerializableElement(
+                            descriptor,
+                            7,
+                            GenericSerializer(),
+                        ) as? Map<String, Any>
+
                         CompositeDecoder.DECODE_DONE -> break
                         else -> error("Unexpected index: $index")
                     }

@@ -8,7 +8,10 @@ export const ASYNC_ERROR_TYPE = "ASYNC-PLUGIN";
 export type AsyncErrorMetadata = {
   node: Node.Async;
 };
-export class AsyncNodeError extends Error implements PlayerErrorMetadata {
+export class AsyncNodeError
+  extends Error
+  implements PlayerErrorMetadata<AsyncErrorMetadata>
+{
   readonly type: string = ASYNC_ERROR_TYPE;
   readonly severity: ErrorSeverity = ErrorSeverity.ERROR;
   readonly metadata: AsyncErrorMetadata;

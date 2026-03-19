@@ -2,6 +2,7 @@ package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.player.HeadlessPlayer
@@ -196,24 +197,26 @@ internal class AsyncNodePluginTest : PlayerTest() {
         Assertions.assertEquals("New", asset1?.get("value"))
     }
 
-    // TODO: Uncomment test. The ErrorRecoveryPlugin in ReferenceAssetsPlugin is absorbing the error and preventing the test from succeeding.
-//    @TestTemplate
-//    fun `async node error bubbles up and fails the player state`() = runBlockingTest {
-//        plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
-//            throw Exception("This is an error message from onAsyncNode")
-//        }
-//
-//        if (player is HeadlessPlayer) {
-//            val invokable = (player as HeadlessPlayer).node.getInvokable<Unit>("registerPlugin")
-//            invokable?.invoke(refPlugin.node)
-//        }
-//        val errorMessage = assertThrows<Exception> {
-//            runBlockingTest {
-//                player.start(chatMessageContent).await()
-//            }
-//        }.message
-//        assertEquals("This is an error message from onAsyncNode", errorMessage)
-//    }
+    @TestTemplate
+    fun `async node error bubbles up and fails the player state`() = runBlockingTest {
+        plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
+            throw Exception("This is an error message from onAsyncNode")
+        }
+
+        val refPlugin = ReferenceAssetsPlugin()
+        refPlugin.apply(runtime)
+        if (player is HeadlessPlayer) {
+            val invokable = (player as HeadlessPlayer).node.getInvokable<Unit>("registerPlugin")
+            invokable?.invoke(refPlugin.node)
+        }
+        val err = assertThrows<JSErrorException> {
+            runBlockingTest {
+                player.start(chatMessageContent).await()
+            }
+        }
+        assertEquals("Error: An error occured during async node resolution. See cause for details.", err.message)
+        assertEquals("This is an error message from onAsyncNode", err.node.getObject("cause")?.getString("message"))
+    }
 
     @TestTemplate
     fun `async node error hook catches and gracefully handles the error`() = runBlockingTest {

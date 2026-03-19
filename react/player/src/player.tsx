@@ -23,6 +23,10 @@ import type { ReactPlayerProps } from "./app";
 import { ReactPlayer as PlayerComp } from "./app";
 import { OnUpdatePlugin } from "./plugins/onupdate-plugin";
 
+/** Backup context for receiving ReactPlayerComponentProps when components setup in the webComponent call don't pass the props down to their inner components. */
+export const ReactPlayerPropsContext: React.Context<ReactPlayerComponentProps> =
+  React.createContext<ReactPlayerComponentProps>({ isInErrorState: false });
+
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
   __PLAYER_DEVTOOLS_PLUGIN?: {
@@ -56,7 +60,11 @@ export interface ReactPlayerOptions {
   plugins?: Array<ReactPlayerPlugin>;
 }
 
-export type ReactPlayerComponentProps = Record<string, unknown>;
+export type ReactPlayerComponentProps = {
+  /** Whether or not player is currently recovering from an error. */
+  isInErrorState?: boolean;
+  [key: string]: unknown;
+};
 
 /** A Player that renders UI through React */
 export class ReactPlayer {
@@ -68,7 +76,10 @@ export class ReactPlayer {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
      */
-    webComponent: SyncWaterfallHook<[React.ComponentType], Record<string, any>>;
+    webComponent: SyncWaterfallHook<
+      [React.ComponentType<any>],
+      Record<string, any>
+    >;
     /**
      * A hook to create a React Component that's used to render a specific view.
      * It will be called for each view update from the core player.
@@ -101,7 +112,8 @@ export class ReactPlayer {
     onBeforeViewReset: new AsyncParallelHook(),
   };
 
-  public readonly viewUpdateSubscription = new Subscribe<View>();
+  public readonly viewUpdateSubscription: Subscribe<View> =
+    new Subscribe<View>();
   private reactPlayerInfo: ReactPlayerInfo;
 
   constructor(options?: ReactPlayerOptions) {
@@ -185,48 +197,110 @@ export class ReactPlayer {
 
     /** Wrap the Error boundary and context provider after the hook call to catch anything wrapped by the hook */
     const ReactPlayerComponent = (props: ReactPlayerComponentProps) => {
-      return (
-        <ErrorBoundary
-          FallbackComponent={(pops: FallbackProps) => {
-            const { error, resetErrorBoundary } = pops;
-            const { subscribe } = useSubscriber(this.viewUpdateSubscription);
+      const trackedErrors = React.useRef(new Map<Error, boolean>());
+      const [errorSubId, setErrorSubId] = React.useState<number | undefined>(
+        undefined,
+      );
+      const { subscribe, unsubscribe } = useSubscriber(
+        this.viewUpdateSubscription,
+      );
 
-            const pErr = React.useMemo(() => {
-              const playerState = this.player.getState();
+      const componentProps: ReactPlayerComponentProps = React.useMemo(
+        () => ({
+          ...props,
+          isInErrorState: errorSubId !== undefined,
+        }),
+        [props, errorSubId],
+      );
 
-              if (playerState.status === "in-progress") {
-                subscribe(
-                  (_, unsubscribe) => {
-                    unsubscribe();
-                    resetErrorBoundary();
-                  },
-                  {
-                    initializeWithPreviousValue: false,
-                  },
-                );
+      /** Callback to remove all tracked errors and unsub from  */
+      const clearErrorTracking = React.useCallback(() => {
+        trackedErrors.current.clear();
+        setErrorSubId((prev) => {
+          if (prev !== undefined) {
+            unsubscribe(prev);
+          }
 
-                return playerState.controllers.error.captureError(
-                  error,
-                  ErrorTypes.RENDER,
-                );
-              }
+          return undefined;
+        });
+      }, []);
 
-              return undefined;
-            }, [error]);
+      React.useEffect(() => {
+        // Clear errors and error subscription on unmount
+        return clearErrorTracking;
+      }, [clearErrorTracking]);
 
-            // If error unhandled or will be handled with a transition show nothing
-            if (!pErr?.skipped) {
-              return null;
+      /** capture error and return true or false to represent if we are recovering from the error or not. */
+      const captureError = React.useCallback(
+        (err: Error) => {
+          setErrorSubId((prev) => {
+            // Don't sub more than once.
+            if (prev !== undefined) {
+              return prev;
             }
 
-            // If error handled through onError hook, I dunno, show something
-            // TODO: What do we even show here? Should it be the previous successful view?
-            return <div>WE ARE RECOVERING</div>;
+            // subscribe and remember id.
+            return subscribe(clearErrorTracking, {
+              initializeWithPreviousValue: false,
+            });
+          });
+
+          // If player isn't in progress we can't actually render anything so render errors are irrelevant.
+          const playerState = this.player.getState();
+          if (playerState.status !== "in-progress") {
+            this.player.logger.warn(
+              `[ReactPlayer]: An error occurred during rendering but was ignored due to a change in the player state (current state: '${playerState.status}'). Error Details:`,
+              err,
+            );
+            return false;
+          }
+
+          // Only capture each error once.
+          const currentError = trackedErrors.current.get(err);
+          if (currentError !== undefined) {
+            return currentError;
+          }
+
+          const { skipped } = playerState.controllers.error.captureError(
+            err,
+            ErrorTypes.RENDER,
+          );
+
+          trackedErrors.current.set(err, skipped);
+
+          return skipped;
+        },
+        [errorSubId],
+      );
+
+      return (
+        <ErrorBoundary
+          fallbackRender={(fallbackProps: FallbackProps) => {
+            const isRecovering = captureError(fallbackProps.error);
+
+            if (!isRecovering) {
+              // Display nothing if not recovering. Let the player state fail and handle what the view will be.
+              return null;
+            }
+            fallbackProps.resetErrorBoundary();
+
+            // Render the same as on success when recovering to preserve the react tree.
+            return (
+              <ReactPlayerPropsContext.Provider
+                value={{ ...componentProps, isInErrorState: true }}
+              >
+                <PlayerContext.Provider value={{ player: this.player }}>
+                  <BaseComp {...componentProps} isInErrorState />
+                </PlayerContext.Provider>
+              </ReactPlayerPropsContext.Provider>
+            );
           }}
         >
-          <PlayerContext.Provider value={{ player: this.player }}>
-            <BaseComp {...props} />
-          </PlayerContext.Provider>
+          <ReactPlayerPropsContext.Provider value={{ ...componentProps }}>
+            <PlayerContext.Provider value={{ player: this.player }}>
+              <BaseComp {...componentProps} />
+            </PlayerContext.Provider>
+          </ReactPlayerPropsContext.Provider>
         </ErrorBoundary>
       );
     };
@@ -238,9 +312,19 @@ export class ReactPlayer {
     const ActualPlayerComp = this.hooks.playerComponent.call(PlayerComp);
 
     /** the component to use to render the player */
-    const WebPlayerComponent = () => {
+    const WebPlayerComponent: React.ComponentType = (): React.ReactElement => {
+      const { isInErrorState } = React.useContext(ReactPlayerPropsContext);
       const view = useSubscribedState<View>(this.viewUpdateSubscription);
+      const lastSuccessfulView = React.useRef<View | undefined>(undefined);
       this.viewUpdateSubscription.suspend();
+
+      React.useEffect(() => {
+        if (!isInErrorState) {
+          lastSuccessfulView.current = view;
+        }
+      }, [isInErrorState, view]);
+
+      const displayedView = isInErrorState ? lastSuccessfulView.current : view;
 
       return (
         <AssetContext.Provider
@@ -248,7 +332,7 @@ export class ReactPlayer {
             registry: this.assetRegistry,
           }}
         >
-          {view && <ActualPlayerComp view={view} />}
+          {displayedView && <ActualPlayerComp view={displayedView} />}
         </AssetContext.Provider>
       );
     };

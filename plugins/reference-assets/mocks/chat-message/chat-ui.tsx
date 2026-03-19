@@ -11,7 +11,7 @@ import { binding as b } from "@player-tools/dsl";
 import { expression as e } from "@player-tools/dsl";
 
 const view1 = (
-  <Collection>
+  <Collection id="chat-view">
     <Collection.Values>
       <ChatMessage id="chat-demo">
         <ChatMessage.Value>
@@ -23,6 +23,11 @@ const view1 = (
       <Action exp={e`send({{content}})`}>
         <Action.Label> Send </Action.Label>
       </Action>
+      <Text>
+        To demonstrate error recovery mechanisms, the message can be sent in
+        poorly formatted content that will throw during the transform or at
+        render-time of the asset:
+      </Text>
       <Action exp={e`sendBroken({{content}})`}>
         <Action.Label> Send Broken Render Asset </Action.Label>
       </Action>

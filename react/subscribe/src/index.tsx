@@ -77,6 +77,7 @@ export class Subscribe<T> {
     this.callbacks.forEach((c) => c(val));
   }
 
+  private lastId: number = 0;
   /**
    * Subscribe to updates
    */
@@ -87,7 +88,7 @@ export class Subscribe<T> {
       initializeWithPreviousValue?: boolean;
     },
   ): SubscribeID {
-    const id = this.callbacks.size;
+    const id = this.lastId++;
     this.callbacks.set(id, callback);
 
     if (

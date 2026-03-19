@@ -4,11 +4,14 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
+import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
@@ -18,12 +21,15 @@ public enum class ErrorSeverity(
     public val value: String,
 ) {
     /** Cannot continue, flow must end */
+    @SerialName("fatal")
     FATAL("fatal"),
 
     /** Standard error, may allow recovery */
+    @SerialName("error")
     ERROR("error"),
 
     /** Non-blocking, logged for telemetry */
+    @SerialName("warning")
     WARNING("warning"),
 }
 
@@ -64,12 +70,15 @@ public class PlayerErrorInfo internal constructor(
     public val errorType: String by NodeSerializableField(String.serializer()) { "" }
 
     /** Impact level */
-    public val severity: ErrorSeverity?
-        get() = node.getString("severity")?.let { ErrorSeverity.valueOf(it.uppercase()) }
+    public val severity: ErrorSeverity? by NodeSerializableField(ErrorSeverity.serializer().nullable)
 
     /** Additional metadata */
-    public val metadata: Map<String, Any?>?
-        get() = node.getObject("metadata") as? Map<String, Any?>
+    public val metadata: Map<String, Any?>? by NodeSerializableField(
+        MapSerializer(
+            String.serializer(),
+            GenericSerializer(),
+        ).nullable,
+    )
 
     internal object Serializer : NodeWrapperSerializer<PlayerErrorInfo>(::PlayerErrorInfo)
 }
