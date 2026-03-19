@@ -22,21 +22,23 @@ const createContentFromMessage = (message: string, id: string): any => ({
   },
 });
 
-const createBrokenContentFromMessage = (
-  message: string,
-  id: string,
-  timing: "render" | "transform",
-): any => ({
+/** This content will fail to display its label since it isn't a valid asset */
+const createBrokenRenderContent = (id: string): any => ({
   asset: {
-    type: "chat-message",
     id,
-    value: {
-      asset: {
-        type: "throwing",
-        id: `${id}-value`,
-        value: message,
-        timing,
-      },
+    type: "input",
+    binding: "binding",
+    label: 100,
+  },
+});
+
+/** this content will fail to fetch from the data model since the binding is an object */
+const createBrokenTransformContent = (id: string): any => ({
+  asset: {
+    id,
+    type: "input",
+    binding: {
+      prop: "value",
     },
   },
 });
@@ -120,31 +122,24 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       );
     };
 
+    /** These expressions are used as examples in the storybook to allow broken content through and show the error recovery fallback pattern. */
     const sendBrokenMessage: send = (
       context: ExpressionContext,
-      message: string,
+      _: string,
       nodeId?: string,
     ) => {
       return sendMessage(context, nodeId, () =>
-        createBrokenContentFromMessage(
-          message,
-          `chat-demo-${counter++}`,
-          "render",
-        ),
+        createBrokenRenderContent(`chat-demo-${counter++}`),
       );
     };
 
     const sendBrokenTransformMessage: send = (
       context: ExpressionContext,
-      message: string,
+      _: string,
       nodeId?: string,
     ) => {
       return sendMessage(context, nodeId, () =>
-        createBrokenContentFromMessage(
-          message,
-          `chat-demo-${counter++}`,
-          "transform",
-        ),
+        createBrokenTransformContent(`chat-demo-${counter++}`),
       );
     };
 

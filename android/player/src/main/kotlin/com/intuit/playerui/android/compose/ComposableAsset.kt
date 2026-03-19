@@ -30,6 +30,7 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.state.inProgressState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base class for assets that render using Jetpack Compose.
@@ -59,6 +60,10 @@ public abstract class ComposableAsset<Data>(
             try {
                 value = getData()
             } catch (error: Throwable) {
+                if (error is CancellationException) {
+                    throw error
+                }
+
                 player.inProgressState?.controllers?.error?.captureError(
                     AssetRenderException(assetContext, "Error fetching data while rendering asset. See cause for details", error),
                     ErrorTypes.RENDER,

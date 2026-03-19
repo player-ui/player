@@ -21,7 +21,6 @@ public class ReferenceAssetsPlugin: JSBasePlugin, NativePlugin {
             registry.register("collection", asset: CollectionAsset.self)
             registry.register("input", asset: InputAsset.self)
             registry.register("info", asset: InfoAsset.self)
-            registry.register("throwing", asset: ThrowingAsset.self)
         }
     }
     /**

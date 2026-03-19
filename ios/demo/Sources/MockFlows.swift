@@ -1444,7 +1444,7 @@ static let chatMessageBasic: String = """
   },
   "views": [
     {
-      "id": "root",
+      "id": "chat-view",
       "type": "collection",
       "values": [
         {
@@ -1453,7 +1453,7 @@ static let chatMessageBasic: String = """
             "type": "chat-message",
             "value": {
               "asset": {
-                "id": "values-0-value",
+                "id": "chat-view-values-0-value",
                 "type": "text",
                 "value": "Start chatting now!"
               }
@@ -1469,12 +1469,12 @@ static let chatMessageBasic: String = """
         },
         {
           "asset": {
-            "id": "values-2",
+            "id": "chat-view-values-2",
             "type": "action",
             "exp": "send({{content}})",
             "label": {
               "asset": {
-                "id": "values-2-label",
+                "id": "chat-view-values-2-label",
                 "type": "text",
                 "value": " Send "
               }
@@ -1483,12 +1483,19 @@ static let chatMessageBasic: String = """
         },
         {
           "asset": {
-            "id": "values-3",
+            "id": "chat-view-values-3",
+            "type": "text",
+            "value": "To demonstrate error recovery mechanisms, the message can be sent in poorly formatted content that will throw during the transform or at render-time of the asset:"
+          }
+        },
+        {
+          "asset": {
+            "id": "chat-view-values-4",
             "type": "action",
             "exp": "sendBroken({{content}})",
             "label": {
               "asset": {
-                "id": "values-3-label",
+                "id": "chat-view-values-4-label",
                 "type": "text",
                 "value": " Send Broken Render Asset "
               }
@@ -1497,12 +1504,12 @@ static let chatMessageBasic: String = """
         },
         {
           "asset": {
-            "id": "values-4",
+            "id": "chat-view-values-5",
             "type": "action",
             "exp": "sendBrokenTransform({{content}})",
             "label": {
               "asset": {
-                "id": "values-4-label",
+                "id": "chat-view-values-5-label",
                 "type": "text",
                 "value": " Send Broken Transform Asset "
               }
@@ -1518,7 +1525,7 @@ static let chatMessageBasic: String = """
       "startState": "VIEW_1",
       "VIEW_1": {
         "state_type": "VIEW",
-        "ref": "root",
+        "ref": "chat-view",
         "transitions": {
           "*": "END_Done"
         }

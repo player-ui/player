@@ -325,13 +325,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       context.inProgressNodes.delete(node.id);
       this.parseNodeAndUpdate(node, context, result, options.parseNode);
     } catch (e: unknown) {
-      options.logger?.warn("[AsyncPlugin]: Error caught");
       const cause = e instanceof Error ? e : new Error(String(e));
       const playerState = this.basePlugin?.getPlayerInstance()?.getState();
 
       if (playerState?.status !== "in-progress") {
         options.logger?.warn(
-          "An error occured during async node resolution, but the player instance is no londer running. Exception: ",
+          "[AsyncNodePlugin]: An error occured during async node resolution, but the player instance is no londer running. Exception: ",
           cause,
         );
         return;
@@ -415,42 +414,30 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
     player.hooks.errorController.tap("async", (errorController) => {
       errorController.hooks.onError.tap("async", (playerError) => {
-        player.logger.warn("[AsyncPlugin]: Error Detected");
         if (currentContext === undefined) {
-          player.logger.warn("[AsyncPlugin]: No context, exiting...");
           return undefined;
         }
 
         /** Try to handle the error using the onAsyncNodeError hook. Returns true if new content is provided. */
         const tryHandleError = (asyncNode: Node.Async): boolean => {
-          player.logger.warn(
-            `[AsyncPlugin]: Handling error for ${asyncNode.id}`,
-          );
           if (this.basePlugin === undefined) {
             player.logger.warn(
-              `[AsyncPlugin]: No plugin detected. Error handling will fail`,
-            );
-          }
-          let result: any = undefined;
-          try {
-            result = this.basePlugin?.hooks.onAsyncNodeError.call(
-              playerError.error,
-              asyncNode,
-            );
-          } catch (err: unknown) {
-            player.logger.error(
-              "[AsyncPlugin]: No idea what happened here: ",
-              err,
+              `[AsyncNodePlugin]: No plugin detected. Error handling will fail`,
             );
           }
 
+          let result: any = undefined;
+          result = this.basePlugin?.hooks.onAsyncNodeError.call(
+            playerError.error,
+            asyncNode,
+          );
+
           if (result === undefined) {
-            player.logger.warn(`[AsyncPlugin]: No result for error`);
             return false;
           }
 
-          player.logger?.error(
-            "Async node handling failed and resolved with a fallback. Cause:",
+          player.logger?.warn(
+            "[AsyncNodePlugin]: Async node handling failed and resolved with a fallback. Cause:",
             playerError.error.message,
           );
 
@@ -477,7 +464,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           const generatedBy = currentContext.generatedByMap.get(node);
           if (generatedBy) {
             const entry = currentContext.asyncNodeCache.get(generatedBy);
+
             if (!entry) {
+              node = node.parent;
               continue;
             }
 

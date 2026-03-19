@@ -149,8 +149,8 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                 )
                 encodeNullableSerializableElement(descriptor, 4, nullable, value.cause)
                 if (value is PlayerExceptionMetadata) {
-                    encodeNullableSerializableElement(descriptor, 5, String.serializer(), value.type)
-                    encodeNullableSerializableElement(descriptor, 6, ErrorSeverity.serializer().nullable, value.severity)
+                    encodeStringElement(descriptor, 5, value.type)
+                    encodeNullableSerializableElement(descriptor, 6, String.serializer(), value.severity?.value)
                     encodeNullableSerializableElement(descriptor, 7, GenericSerializer(), value.metadata)
                 }
             }

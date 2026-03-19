@@ -7,7 +7,6 @@ import {
   imageTransform,
   infoTransform,
   inputTransform,
-  throwingTransform,
 } from "../assets";
 import type {
   ActionAsset,
@@ -18,7 +17,6 @@ import type {
   InfoAsset,
   InputAsset,
   TextAsset,
-  ThrowingAsset,
 } from "../assets";
 
 export class ReferenceAssetsTransformPlugin
@@ -32,7 +30,6 @@ export class ReferenceAssetsTransformPlugin
         CollectionAsset,
         ChoiceAsset,
         ChatMessageAsset,
-        ThrowingAsset,
       ],
       [InfoAsset]
     >
@@ -48,7 +45,6 @@ export class ReferenceAssetsTransformPlugin
         [{ type: "info" }, infoTransform],
         [{ type: "choice" }, choiceTransform],
         [{ type: "chat-message" }, chatMessageTransform],
-        [{ type: "throwing" }, throwingTransform],
       ]),
     );
   }

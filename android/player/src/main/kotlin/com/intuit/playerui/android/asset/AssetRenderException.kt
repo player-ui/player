@@ -36,6 +36,7 @@ Caused by: ${exception.message}
             """.trimMargin()
         }
         initialMessage = "$errorMessage\nException occurred in asset with id '${rootAsset.id}' of type '${rootAsset.type}"
+        this.message = initialMessage
         this.rootAsset = rootAsset
     }
 

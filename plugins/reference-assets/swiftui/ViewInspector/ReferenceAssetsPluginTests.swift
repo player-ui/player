@@ -27,6 +27,6 @@ class SwiftUIReferenceAssetsPluginTests: XCTestCase {
     func testReferenceAssetRegistration() {
         let player = SwiftUIPlayer(flow: "", plugins: [ReferenceAssetsPlugin()])
 
-        XCTAssertEqual(player.assetRegistry.registeredAssets.count, 5)
+        XCTAssertEqual(player.assetRegistry.registeredAssets.count, 6)
     }
 }
