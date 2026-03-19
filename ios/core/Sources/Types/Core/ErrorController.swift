@@ -152,10 +152,7 @@ public class ErrorController: CreatedFromJSValue {
         if let err = error as? JSConvertibleError & Error {
             args.append(value.context.error(for: err) as Any)
         } else {
-            args.append([
-                "message": error.localizedDescription,
-                "name": String(describing: type(of: error))
-            ] as [String: Any])
+            args.append(value.context.error(for: PlayerError.unknownResponse(error)) as Any)
         }
         
         args.append(errorType)
