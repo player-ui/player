@@ -31,14 +31,12 @@ public class TinyPubSub {
      * Creates the JS TinyPubSub instance on first call; subsequent calls are no-ops and
      * return the same variable name.
      */
-    internal fun getOrCreate(runtime: Runtime<*>): String =
-        jsVarName ?: run {
-            val varName = "_playerui_pubsub_${System.identityHashCode(this)}"
-            runtime.execute("globalThis.$varName = new PubSubPlugin.TinyPubSub()")
-            node = runtime.execute("globalThis.$varName") as? Node
-            jsVarName = varName
-            varName
-        }
+    internal fun getOrCreate(runtime: Runtime<*>): String = jsVarName ?: run {
+        val varName = "_playerui_pubsub_${System.identityHashCode(this)}"
+        runtime.execute("globalThis.$varName = new PubSubPlugin.TinyPubSub()")
+        node = runtime.execute("globalThis.$varName") as? Node
+        jsVarName = varName
+        varName
     }
 
     /**
