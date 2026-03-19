@@ -40,16 +40,14 @@ const refAndDataMatch = { ref: "test-1", testProperty: "testValue" };
 test("handles the external state", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            (state, options) => {
-              return options.data.get("transitionValue");
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          (state, options) => {
+            return options.data.get("transitionValue");
+          },
+        ],
+      ]),
     ],
   });
 
@@ -61,16 +59,14 @@ test("handles the external state", async () => {
 test("thrown errors will fail player", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            (state, options) => {
-              throw new Error("Bad Code");
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          (state, options) => {
+            throw new Error("Bad Code");
+          },
+        ],
+      ]),
     ],
   });
 
@@ -82,16 +78,14 @@ test("thrown errors will fail player", async () => {
 test("works async", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            () => {
-              return Promise.resolve("Prev");
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          () => {
+            return Promise.resolve("Prev");
+          },
+        ],
+      ]),
     ],
   });
 
@@ -103,26 +97,22 @@ test("works async", async () => {
 test("allows multiple plugins - last one wins", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            () => {
-              return "Next";
-            },
-          ],
-        ]),
-      ),
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            () => {
-              return "Prev";
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          () => {
+            return "Next";
+          },
+        ],
+      ]),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          () => {
+            return "Prev";
+          },
+        ],
+      ]),
     ],
   });
 
@@ -137,26 +127,22 @@ test("logs debug message when replacing handler", async () => {
 
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            () => {
-              return "Next";
-            },
-          ],
-        ]),
-      ),
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            () => {
-              return "Prev";
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          () => {
+            return "Next";
+          },
+        ],
+      ]),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          () => {
+            return "Prev";
+          },
+        ],
+      ]),
     ],
     logger: {
       trace: vitest.fn(),
@@ -182,26 +168,22 @@ test("logs debug message when replacing handler", async () => {
 test("different plugins, more specific match overrides less specific match", async () => {
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refAndDataMatch,
-            () => {
-              return "Next";
-            },
-          ],
-        ]),
-      ),
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            () => {
-              return "Prev";
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refAndDataMatch,
+          () => {
+            return "Next";
+          },
+        ],
+      ]),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          () => {
+            return "Prev";
+          },
+        ],
+      ]),
     ],
   });
 
@@ -217,30 +199,28 @@ test("within same plugin, more specific match overrides less specific match", as
 
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refAndDataMatch,
-            () => {
-              moreSpecificHandlerCalled();
-              return "Next";
-            },
-          ],
-          [
-            refMatch,
-            () => {
-              lessSpecificHandlerCalled();
-              return "Prev";
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refAndDataMatch,
+          () => {
+            moreSpecificHandlerCalled();
+            return "Next";
+          },
+        ],
+        [
+          refMatch,
+          () => {
+            lessSpecificHandlerCalled();
+            return "Prev";
+          },
+        ],
+      ]),
     ],
   });
 
   const completed = await player.start(externalFlow as Flow);
 
-  // More specific match should win regardless of Map insertion order
+  // More specific match should win regardless of insertion order
   expect(moreSpecificHandlerCalled).toHaveBeenCalledOnce();
   expect(lessSpecificHandlerCalled).not.toHaveBeenCalled();
   expect(completed.endState.outcome).toBe("FWD");
@@ -250,23 +230,21 @@ test("only transitions if player still on this external state", async () => {
   let resolver: (() => void) | undefined;
   const player = new Player({
     plugins: [
-      new ExternalActionPlugin(
-        new Map([
-          [
-            refMatch,
-            (state, options) => {
-              return new Promise((res) => {
-                // Only save resolver for first external action
-                if (!resolver) {
-                  resolver = () => {
-                    res(options.data.get("transitionValue"));
-                  };
-                }
-              });
-            },
-          ],
-        ]),
-      ),
+      new ExternalActionPlugin([
+        [
+          refMatch,
+          (state, options) => {
+            return new Promise((res) => {
+              // Only save resolver for first external action
+              if (!resolver) {
+                resolver = () => {
+                  res(options.data.get("transitionValue"));
+                };
+              }
+            });
+          },
+        ],
+      ]),
     ],
   });
 
@@ -347,20 +325,18 @@ describe("edge cases", () => {
   test("async action nodes not transitioning from navigation states with *", async () => {
     const player = new Player({
       plugins: [
-        new ExternalActionPlugin(
-          new Map([
-            [
-              { ref: "view_1" },
-              () => {
-                return new Promise((resolve) => {
-                  setTimeout(() => {
-                    resolve("next");
-                  }, 100);
-                });
-              },
-            ],
-          ]),
-        ),
+        new ExternalActionPlugin([
+          [
+            { ref: "view_1" },
+            () => {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve("next");
+                }, 100);
+              });
+            },
+          ],
+        ]),
       ],
     });
 
@@ -469,12 +445,10 @@ describe("edge cases", () => {
     // Create a player with NO handlers registered
     const player = new Player({
       plugins: [
-        new ExternalActionPlugin(
-          new Map([
-            // Register handler for a different ref - not matching our external state
-            [{ ref: "different-ref" }, () => "Next"],
-          ]),
-        ),
+        new ExternalActionPlugin([
+          // Register handler for a different ref - not matching our external state
+          [{ ref: "different-ref" }, () => "Next"],
+        ]),
       ],
     });
 
