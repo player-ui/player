@@ -182,6 +182,52 @@ targets: [
 
 ## New Features
 
+### `PubSubPlugin`: injectable pubsub instance and per-instance isolation
+
+The `PubSubPlugin` now creates a **fresh `TinyPubSub` instance for every plugin construction** instead of sharing a module-level singleton. This means two `PubSubPlugin` instances that are not registered to the same player will no longer accidentally share an event bus.
+
+In addition, you can now pass an external `TinyPubSub` instance (TypeScript / Kotlin) or a `TinyPubSub` handle (Swift) to the constructor. This lets you wire multiple plugins—or even multiple players—to the same bus, and pairs naturally with a second plugin that uses a custom `expressionName`.
+
+`TinyPubSub` is now exported from `@player-ui/pubsub-plugin` for TypeScript consumers.
+
+#### TypeScript
+
+```ts
+import { TinyPubSub, PubSubPlugin } from "@player-ui/pubsub-plugin";
+
+const sharedBus = new TinyPubSub();
+
+const plugin1 = new PubSubPlugin({ pubsub: sharedBus });
+const plugin2 = new PubSubPlugin({ expressionName: "customPublish", pubsub: sharedBus });
+
+// Both plugins route events through sharedBus
+sharedBus.subscribe("myEvent", (event, data) => { /* ... */ });
+```
+
+#### Swift
+
+```swift
+let sharedBus = TinyPubSub()
+
+let plugin1 = PubSubPlugin([], pubsub: sharedBus)
+let plugin2 = PubSubPlugin([], options: PubSubPluginOptions(expressionName: "customPublish"), pubsub: sharedBus)
+
+// After the player is started and the plugins are set up, subscribe/publish directly:
+let token = sharedBus.subscribe(eventName: "myEvent") { event, data in /* ... */ }
+sharedBus.unsubscribe(token: token ?? "")
+```
+
+#### Kotlin
+
+```kotlin
+val sharedBus = TinyPubSub()
+
+val plugin1 = PubSubPlugin(sharedPubSub = sharedBus)
+val plugin2 = PubSubPlugin(Config("customPublish"), sharedPubSub = sharedBus)
+
+sharedBus.subscribe("myEvent") { event, data -> /* ... */ }
+```
+
 ### Convenience Methods for `AnyType`
 
 Added `as<T>(_:)` convenience method and `AnyType` (`anyDictionary`) subscripting for type-safe value extraction:
