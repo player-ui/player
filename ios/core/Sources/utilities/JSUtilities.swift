@@ -64,10 +64,10 @@ public class JSUtilities {
 internal extension JSContext {
     func error<E>(for error: E) -> JSValue? where E: Error, E: JSConvertibleError {
         let errObj = objectForKeyedSubscript("Error").construct(withArguments: [error.jsDescription])
-        if let e = error as? ErrorWithMetadata, let err = errObj {
-            err.setValue(e.type, forProperty: "type")
-            err.setValue(e.severity?.rawValue, forProperty: "severity")
-            if let metadata = e.metadata {
+        if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj {
+            err.setValue(errorWithMetadata.type, forProperty: "type")
+            err.setValue(errorWithMetadata.severity?.rawValue, forProperty: "severity")
+            if let metadata = errorWithMetadata.metadata {
                 err.setValue(metadata, forProperty: "metadata")
             }
         }
