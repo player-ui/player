@@ -3,14 +3,14 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "dependencies": {
-    "@player-ui/types-provider-plugin": "workspace:*"
+    "@player-ui/types-provider-plugin": "workspace:^"
   },
   "peerDependencies": {
-    "@player-ui/player": "workspace:*"
+    "@player-ui/player": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/partial-match-registry": "workspace:*",
-    "@player-ui/asset-transform-plugin": "workspace:*",
-    "@player-ui/make-flow": "workspace:*"
+    "@player-ui/partial-match-registry": "workspace:^",
+    "@player-ui/asset-transform-plugin": "workspace:^",
+    "@player-ui/make-flow": "workspace:^"
   }
 }

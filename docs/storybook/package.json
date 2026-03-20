@@ -3,18 +3,18 @@
   "private": true,
   "version": "0.0.0-PLACEHOLDER",
   "dependencies": {
-    "@player-ui/common-types-plugin": "workspace:*",
-    "@player-ui/make-flow": "workspace:*",
-    "@player-ui/reference-assets-plugin": "workspace:*",
-    "@player-ui/reference-assets-plugin-react": "workspace:*",
-    "@player-ui/data-change-listener-plugin": "workspace:*",
-    "@player-ui/computed-properties-plugin": "workspace:*",
-    "@player-ui/reference-assets-plugin-components": "workspace:*",
-    "@player-ui/mocks": "workspace:*",
-    "@player-ui/react": "workspace:*",
-    "@player-ui/storybook": "workspace:*",
-    "@player-ui/expression-plugin": "workspace:*",
-    "@player-ui/async-node-plugin": "workspace:*",
-    "@player-ui/player": "workspace:*"
+    "@player-ui/common-types-plugin": "workspace:^",
+    "@player-ui/make-flow": "workspace:^",
+    "@player-ui/reference-assets-plugin": "workspace:^",
+    "@player-ui/reference-assets-plugin-react": "workspace:^",
+    "@player-ui/data-change-listener-plugin": "workspace:^",
+    "@player-ui/computed-properties-plugin": "workspace:^",
+    "@player-ui/reference-assets-plugin-components": "workspace:^",
+    "@player-ui/mocks": "workspace:^",
+    "@player-ui/react": "workspace:^",
+    "@player-ui/storybook": "workspace:^",
+    "@player-ui/expression-plugin": "workspace:^",
+    "@player-ui/async-node-plugin": "workspace:^",
+    "@player-ui/player": "workspace:^"
   }
 }
