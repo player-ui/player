@@ -62,13 +62,13 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
 
     /**
      Constructs the PubSub Plugin in the given context.
-     If a shared `TinyPubSub` was provided its context is set here, which creates the underlying
+     If a shared `TinyPubSub` was provided it is initialized here, creating the underlying
      JS TinyPubSub instance (if not already created) before the plugin constructor runs.
      - parameters:
         - context: The context to load the plugin into
      */
     override public func setup(context: JSContext) {
-        sharedPubSub?.context = context
+        sharedPubSub?.setup(context: context)
         super.setup(context: context)
         for subscription in eventSubscriptions {
             subscribe(eventName: subscription.0, callback: subscription.1)

@@ -21,31 +21,32 @@ class TinyPubSubTests: XCTestCase {
 
     // MARK: - Initialization
 
-    func testContextAssignmentCreatesJSInstance() {
-        let bus = TinyPubSub()
-        XCTAssertNil(bus.jsValue, "jsValue should be nil before context is assigned")
-
-        bus.context = makeContext()
-        XCTAssertNotNil(bus.jsValue, "jsValue should be set after context is assigned")
+    func testInitWithContextCreatesJSInstance() {
+        let bus = TinyPubSub(context: makeContext())
+        XCTAssertNotNil(bus.jsValue, "jsValue should be set after init(context:)")
     }
 
-    func testSecondContextAssignmentIsIgnored() {
+    func testInitWithoutContextLeavesJSInstanceNil() {
+        let bus = TinyPubSub()
+        XCTAssertNil(bus.jsValue, "jsValue should be nil before setup(context:) is called")
+    }
+
+    func testSetupIsIdempotent() {
         let bus = TinyPubSub()
         let context1 = makeContext()
         let context2 = makeContext()
 
-        bus.context = context1
+        bus.setup(context: context1)
         let first = bus.jsValue
 
-        bus.context = context2
-        XCTAssertTrue(bus.jsValue === first, "jsValue should not change after the first assignment")
+        bus.setup(context: context2)
+        XCTAssertTrue(bus.jsValue === first, "jsValue should not change after the first setup")
     }
 
     // MARK: - Subscribe / Publish
 
     func testSubscribeAndPublishString() {
-        let bus = TinyPubSub()
-        bus.context = makeContext()
+        let bus = TinyPubSub(context: makeContext())
 
         let expectation = XCTestExpectation(description: "string event received")
         bus.subscribe(eventName: "test") { _, data in
@@ -60,7 +61,7 @@ class TinyPubSubTests: XCTestCase {
 
     func testSubscribeBeforeContextIsIgnored() {
         let bus = TinyPubSub()
-        // No context assigned yet — subscribe should not crash and should return nil
+        // No context yet — subscribe should not crash and should return nil
         let token = bus.subscribe(eventName: "test") { _, _ in XCTFail("should not be called") }
         XCTAssertNil(token)
     }
@@ -68,8 +69,7 @@ class TinyPubSubTests: XCTestCase {
     // MARK: - Unsubscribe
 
     func testUnsubscribeStopsEvents() {
-        let bus = TinyPubSub()
-        bus.context = makeContext()
+        let bus = TinyPubSub(context: makeContext())
 
         var callCount = 0
         let token = bus.subscribe(eventName: "test") { _, _ in callCount += 1 }

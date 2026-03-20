@@ -11,43 +11,58 @@ import PlayerUI
 /**
  A handle to a JavaScript TinyPubSub instance that can be shared across multiple PubSubPlugin instances.
 
- Assign a `JSContext` to this object (or pass it to a `PubSubPlugin` which will do so automatically)
- to create the underlying JS TinyPubSub instance. Subscribe and publish calls made before a context
- is assigned are silently ignored.
+ Create with a `JSContext` for immediate use, or create without one and pass to a `PubSubPlugin`
+ which will initialize it automatically during setup. Subscribe and publish calls made before the
+ instance is initialized are silently ignored.
 
  ```swift
- // Standalone usage — assign a context directly:
- let sharedBus = TinyPubSub()
- sharedBus.context = someContext   // creates the JS TinyPubSub immediately
+ // Standalone usage — provide a context at init:
+ let sharedBus = TinyPubSub(context: someContext)
 
- // Plugin usage — the plugin assigns the context for you:
+ // Plugin usage — the plugin initializes the shared bus for you:
  let sharedBus = TinyPubSub()
  let plugin1 = PubSubPlugin([], pubsub: sharedBus)
  let plugin2 = PubSubPlugin([], options: PubSubPluginOptions(expressionName: "customPublish"), pubsub: sharedBus)
  ```
  */
 public class TinyPubSub {
-    /// Reference to the underlying JS TinyPubSub instance. Populated once a context is assigned.
+    /// Reference to the underlying JS TinyPubSub instance. Set during initialization.
     internal var jsValue: JSValue?
 
     /**
-     The JS context in which this TinyPubSub instance lives.
-     Setting this property loads the PubSubPlugin native bundle (if not already loaded) and
-     constructs the JS TinyPubSub instance. Subsequent assignments are ignored once the instance
-     has been created.
+     Creates a TinyPubSub instance and immediately constructs the underlying JS object
+     in the given context.
+     - parameters:
+        - context: The JS context in which the TinyPubSub instance will live
      */
-    public var context: JSContext? {
-        didSet {
-            guard let jsContext = context, jsValue == nil else { return }
-            if let url = ResourceUtilities.urlForFile(name: "PubSubPlugin.native", ext: "js", bundle: Bundle.module),
-               let jsString = try? String(contentsOf: url, encoding: .utf8) {
-                jsContext.evaluateScript(jsString)
-            }
-            jsValue = jsContext.evaluateScript("new PubSubPlugin.TinyPubSub()")
-        }
+    public init(context: JSContext) {
+        initialize(in: context)
     }
 
+    /**
+     Creates an uninitialized TinyPubSub handle. Pass this to a `PubSubPlugin` and it will
+     initialize the underlying JS instance when the plugin is set up.
+     */
     public init() {}
+
+    /**
+     Initializes the underlying JS TinyPubSub instance in the given context. Called automatically
+     by `PubSubPlugin` during setup. Subsequent calls are no-ops.
+     - parameters:
+        - context: The JS context in which to create the TinyPubSub instance
+     */
+    internal func setup(context: JSContext) {
+        guard jsValue == nil else { return }
+        initialize(in: context)
+    }
+
+    private func initialize(in context: JSContext) {
+        if let url = ResourceUtilities.urlForFile(name: "PubSubPlugin.native", ext: "js", bundle: Bundle.module),
+           let jsString = try? String(contentsOf: url, encoding: .utf8) {
+            context.evaluateScript(jsString)
+        }
+        jsValue = context.evaluateScript("new PubSubPlugin.TinyPubSub()")
+    }
 
     /**
      Subscribe to an event on the shared bus.
