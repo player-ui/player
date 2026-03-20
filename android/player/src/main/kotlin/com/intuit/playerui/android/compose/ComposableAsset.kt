@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
@@ -24,9 +25,12 @@ import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
+import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import com.intuit.playerui.core.player.state.inProgressState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base class for assets that render using Jetpack Compose.
@@ -53,7 +57,19 @@ public abstract class ComposableAsset<Data>(
     @Composable
     public fun compose(data: Data? = null) {
         val data: Data? by produceState(initialValue = data, key1 = this) {
-            value = getData()
+            try {
+                value = getData()
+            } catch (error: Throwable) {
+                if (error is CancellationException) {
+                    throw error
+                }
+
+                player.inProgressState?.controllers?.error?.captureError(
+                    AssetRenderException(assetContext, "Error fetching data while rendering asset. See cause for details", error),
+                    ErrorTypes.RENDER,
+                )
+                null
+            }
         }
 
         data?.let {
@@ -82,9 +98,12 @@ public abstract class ComposableAsset<Data>(
         styles: AssetStyle? = null,
         tag: String? = null,
     ) {
-        val assetTag = tag ?: asset.id
-        val containerModifier = Modifier.testTag(assetTag) then modifier
-        assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
+        val containerModifier = Modifier.testTag(tag ?: asset.id) then modifier
+        var context = assetContext.withContext(LocalContext.current)
+        if (tag != null) {
+            context = context.withTag(tag)
+        }
+        context.build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(

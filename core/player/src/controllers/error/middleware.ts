@@ -1,12 +1,16 @@
 import type { BindingInstance } from "../../binding";
-import type {
+import {
   BatchSetTransaction,
   DataModelImpl,
   DataModelMiddleware,
   DataModelOptions,
+  LocalModel,
   Updates,
 } from "../../data";
 import type { Logger } from "../../logger";
+
+const isErrorBinding = (binding: BindingInstance): boolean =>
+  binding.asArray()[0] === "errorState";
 
 /**
  * Middleware that prevents external writes to errorState
@@ -17,6 +21,8 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
 
   private logger?: Logger;
   private writeSymbol: symbol;
+  // Internal model for error state to avoid data serialization
+  private dataModel: LocalModel = new LocalModel();
 
   constructor(options: { logger?: Logger; writeSymbol: symbol }) {
     this.logger = options.logger;
@@ -28,41 +34,39 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl,
   ): Updates {
-    // Check if this write is authorized by comparing the write symbols
-    if (options?.writeSymbol === this.writeSymbol) {
-      return next?.set(transaction, options) ?? [];
-    }
-
     // Filter out any writes to errorState
     const filteredTransaction: BatchSetTransaction = [];
-    const blockedBindings: BindingInstance[] = [];
+    const errorTransaction: BatchSetTransaction = [];
 
-    transaction.forEach(([binding, value]) => {
-      const path = binding.asString();
+    transaction.forEach((transaction) => {
+      const [binding] = transaction;
+      const targetArray = isErrorBinding(binding)
+        ? errorTransaction
+        : filteredTransaction;
 
-      // Block writes to errorState namespace
-      if (path === "errorState" || path.startsWith("errorState.")) {
-        blockedBindings.push(binding);
-        this.logger?.warn(
-          `[ErrorStateMiddleware] Blocked write to protected path: ${path}`,
-        );
-      } else {
-        filteredTransaction.push([binding, value]);
-      }
+      targetArray.push(transaction);
     });
 
     // Process allowed writes
-    const validResults = next?.set(filteredTransaction, options) ?? [];
+    const nonErrorResults = next?.set(filteredTransaction, options) ?? [];
 
-    // Return no-op updates for blocked paths
-    const blockedResults: Updates = blockedBindings.map((binding) => ({
-      binding,
-      oldValue: next?.get(binding, options),
-      newValue: next?.get(binding, options), // Keep old value
-      force: false,
-    }));
+    const errorResults =
+      options?.writeSymbol === this.writeSymbol
+        ? this.dataModel.set(errorTransaction)
+        : errorTransaction.map((transaction) => {
+            const [binding] = transaction;
+            this.logger?.warn(
+              `[ErrorStateMiddleware] Blocked write to protected path: ${binding.asString()}`,
+            );
+            return {
+              binding,
+              oldValue: next?.get(binding, options),
+              newValue: next?.get(binding, options), // Keep old value
+              force: false,
+            };
+          });
 
-    return [...validResults, ...blockedResults];
+    return [...nonErrorResults, ...errorResults];
   }
 
   public get(
@@ -70,7 +74,9 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl,
   ): unknown {
-    return next?.get(binding, options);
+    return isErrorBinding(binding)
+      ? this.dataModel.get(binding)
+      : next?.get(binding, options);
   }
 
   public delete(
@@ -78,22 +84,18 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl,
   ): void {
-    // Check if this delete is authorized by comparing the write symbols
-    if (options?.writeSymbol === this.writeSymbol) {
+    if (!isErrorBinding(binding)) {
       next?.delete(binding, options);
       return;
     }
-
-    const path = binding.asString();
-
     // Block deletes to errorState namespace
-    if (path === "errorState" || path.startsWith("errorState.")) {
+    if (options?.writeSymbol !== this.writeSymbol) {
       this.logger?.warn(
-        `[ErrorStateMiddleware] Blocked delete of protected path: ${path}`,
+        `[ErrorStateMiddleware] Blocked delete of protected path: ${binding.asString()}`,
       );
       return;
     }
 
-    next?.delete(binding, options);
+    this.dataModel.delete(binding);
   }
 }

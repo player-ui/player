@@ -34,6 +34,7 @@ public struct ErrorTypes {
     public static let schema = "schema"
     public static let network = "network"
     public static let plugin = "plugin"
+    public static let render = "render"
 }
 
 /**
@@ -146,13 +147,15 @@ public class ErrorController: CreatedFromJSValue {
         severity: ErrorSeverity? = nil,
         metadata: [String: Any]? = nil
     ) -> JSValue? {
-        var args: [Any] = [
-            [
-                "message": error.localizedDescription,
-                "name": String(describing: type(of: error))
-            ] as [String: Any],
-            errorType
-        ]
+        var args: [Any] = []
+        
+        if let err = error as? JSConvertibleError & Error {
+            args.append(value.context.error(for: err) as Any)
+        } else {
+            args.append(value.context.error(for: PlayerError.unknownResponse(error)) as Any)
+        }
+        
+        args.append(errorType)
         
         if let severity = severity {
             args.append(severity.rawValue)

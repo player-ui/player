@@ -1,9 +1,17 @@
 package com.intuit.playerui.android.asset
 
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
+import com.intuit.playerui.core.error.ErrorSeverity
+import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.PlayerExceptionMetadata
+import kotlinx.serialization.Serializable
 
-class AssetRenderException : PlayerException {
+@Serializable(ThrowableSerializer::class)
+class AssetRenderException :
+    PlayerException,
+    PlayerExceptionMetadata {
     private var _assetParentPath: List<AssetContext> = emptyList()
     var assetParentPath: List<AssetContext>
         get() = _assetParentPath
@@ -28,6 +36,16 @@ Caused by: ${exception.message}
             """.trimMargin()
         }
         initialMessage = "$errorMessage\nException occurred in asset with id '${rootAsset.id}' of type '${rootAsset.type}"
+        this.message = initialMessage
         this.rootAsset = rootAsset
     }
+
+    override val type: String
+        get() = ErrorTypes.RENDER
+    override val severity: ErrorSeverity?
+        get() = ErrorSeverity.ERROR
+    override val metadata: Map<String, Any?>?
+        get() = mapOf(
+            "assetId" to rootAsset.asset.id,
+        )
 }

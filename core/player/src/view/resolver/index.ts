@@ -12,8 +12,9 @@ import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
 import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
-import type { Resolve } from "./types";
+import { ResolverStage, type Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
+import { ResolverError } from "./ResolverError";
 
 export * from "./types";
 export * from "./utils";
@@ -252,36 +253,44 @@ export class Resolver {
     nodeChanges: Set<Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
-
     dependencyModel.trackSubset("core");
     const depModelWithParser = withContext(
       withParser(dependencyModel, this.options.parseBinding),
     );
 
-    const resolveOptions = this.hooks.resolveOptions.call(
-      {
-        ...options,
-        data: {
-          ...options.data,
-          model: depModelWithParser,
-        },
-        evaluate: (exp) =>
-          this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
-        node,
+    let resolveOptions: Resolve.NodeResolveOptions = {
+      ...options,
+      data: {
+        ...options.data,
+        model: depModelWithParser,
       },
+      evaluate: (exp) =>
+        this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
       node,
-    );
+    };
+
+    try {
+      resolveOptions = this.hooks.resolveOptions.call(resolveOptions, node);
+    } catch (err: unknown) {
+      throw new ResolverError(err, ResolverStage.ResolveOptions, node);
+    }
 
     const previousResult = this.getPreviousResult(node);
     const previousDeps = previousResult?.dependencies;
 
     const isChanged = nodeChanges.has(node);
     const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
-    const shouldUseLastValue = this.hooks.skipResolve.call(
-      !dataChanged && !isChanged,
-      node,
-      resolveOptions,
-    );
+    let shouldUseLastValue = !dataChanged && !isChanged;
+
+    try {
+      shouldUseLastValue = this.hooks.skipResolve.call(
+        shouldUseLastValue,
+        node,
+        resolveOptions,
+      );
+    } catch (err: unknown) {
+      throw new ResolverError(err, ResolverStage.SkipResolve, node);
+    }
 
     if (previousResult && shouldUseLastValue) {
       const update = {
@@ -325,7 +334,11 @@ export class Resolver {
           resolvedASTLocal.values.forEach(handleChildNode);
         }
 
-        this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
+        try {
+          this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
+        } catch (err: unknown) {
+          throw new ResolverError(err, ResolverStage.AfterNodeUpdate, node);
+        }
       };
 
       // Point the root of the cached node to the new resolved node.
@@ -338,16 +351,20 @@ export class Resolver {
 
     // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
     // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
-    const clonedNode: Node.Node = {
+    let resolvedAST: Node.Node = {
       ...this.cloneNode(node),
       parent: partiallyResolvedParent,
     };
-    const resolvedAST = this.hooks.beforeResolve.call(
-      clonedNode,
-      resolveOptions,
-    ) ?? {
-      type: NodeType.Empty,
-    };
+    try {
+      resolvedAST = this.hooks.beforeResolve.call(
+        resolvedAST,
+        resolveOptions,
+      ) ?? {
+        type: NodeType.Empty,
+      };
+    } catch (err: unknown) {
+      throw new ResolverError(err, ResolverStage.BeforeResolve, node);
+    }
 
     resolvedAST.parent = partiallyResolvedParent;
 
@@ -355,11 +372,16 @@ export class Resolver {
 
     this.ASTMap.set(resolvedAST, node);
 
-    let resolved = this.hooks.resolve.call(
-      undefined,
-      resolvedAST,
-      resolveOptions,
-    );
+    let resolved: any = undefined;
+    try {
+      resolved = this.hooks.resolve.call(
+        undefined,
+        resolvedAST,
+        resolveOptions,
+      );
+    } catch (err: unknown) {
+      throw new ResolverError(err, ResolverStage.Resolve, node);
+    }
 
     let updated = !dequal(previousResult?.value, resolved);
 
@@ -449,11 +471,15 @@ export class Resolver {
       resolved = previousResult?.value;
     }
 
-    resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
-      ...resolveOptions,
-      getDependencies: (scope?: "core" | "children") =>
-        dependencyModel.getDependencies(scope),
-    });
+    try {
+      resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
+        ...resolveOptions,
+        getDependencies: (scope?: "core" | "children") =>
+          dependencyModel.getDependencies(scope),
+      });
+    } catch (err: unknown) {
+      throw new ResolverError(err, ResolverStage.AfterResolve, node);
+    }
 
     const update: NodeUpdate = {
       node: resolvedAST,
@@ -465,7 +491,11 @@ export class Resolver {
       ]),
     };
 
-    this.hooks.afterNodeUpdate.call(node, rawParent, update);
+    try {
+      this.hooks.afterNodeUpdate.call(node, rawParent, update);
+    } catch (err: unknown) {
+      throw new ResolverError(err, ResolverStage.AfterNodeUpdate, node);
+    }
     cacheUpdate.set(node, update);
 
     return update;

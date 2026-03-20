@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 
 export type SubscribeID = number;
@@ -77,6 +77,7 @@ export class Subscribe<T> {
     this.callbacks.forEach((c) => c(val));
   }
 
+  private lastId: number = 0;
   /**
    * Subscribe to updates
    */
@@ -87,7 +88,7 @@ export class Subscribe<T> {
       initializeWithPreviousValue?: boolean;
     },
   ): SubscribeID {
-    const id = this.callbacks.size;
+    const id = this.lastId++;
     this.callbacks.set(id, callback);
 
     if (
@@ -193,4 +194,56 @@ export function useSubscribedState<T>(subscriber: Subscribe<T>): T | undefined {
   );
 
   return state;
+}
+
+type SubOptions = {
+  initializeWithPreviousValue?: boolean;
+};
+
+type UnsubFunction = (id: SubscribeID) => void;
+
+type SubFunction<T> = (
+  callback: (arg: T | undefined, unsubscribe: () => void) => void,
+  options?: SubOptions,
+) => SubscribeID;
+
+export type ReactSubscriber<T> = {
+  subscribe: SubFunction<T>;
+  unsubscribe: UnsubFunction;
+};
+
+/** Hook to manage subscriptions within a react component. Any subscriptions setup using the subscribe callback will be unsubscribed on unmount. */
+export function useSubscriber<T>(subscriber: Subscribe<T>): ReactSubscriber<T> {
+  const subscriptions = React.useMemo<Set<SubscribeID>>(
+    () => new Set<SubscribeID>(),
+    [],
+  );
+  React.useEffect(() => {
+    return () => {
+      for (const subId of subscriptions.values()) {
+        subscriber.remove(subId);
+      }
+    };
+  }, [subscriptions]);
+
+  const unsubscribe = useCallback<UnsubFunction>((id) => {
+    subscriptions.delete(id);
+    subscriber.remove(id);
+  }, []);
+
+  const subscribe = useCallback<SubFunction<T>>((callback, options) => {
+    let id: SubscribeID | undefined = undefined;
+    const unsub = () => {
+      if (id !== undefined) {
+        unsubscribe(id);
+      }
+    };
+    id = subscriber.add((arg: T | undefined) => {
+      callback(arg, unsub);
+    }, options);
+    subscriptions.add(id);
+    return id;
+  }, []);
+
+  return { subscribe, unsubscribe };
 }

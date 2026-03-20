@@ -4,24 +4,32 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
+import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 /** Severity levels for errors */
+@Serializable
 public enum class ErrorSeverity(
     public val value: String,
 ) {
     /** Cannot continue, flow must end */
+    @SerialName("fatal")
     FATAL("fatal"),
 
     /** Standard error, may allow recovery */
+    @SerialName("error")
     ERROR("error"),
 
     /** Non-blocking, logged for telemetry */
+    @SerialName("warning")
     WARNING("warning"),
 }
 
@@ -37,6 +45,7 @@ public object ErrorTypes {
     public const val SCHEMA: String = "schema"
     public const val NETWORK: String = "network"
     public const val PLUGIN: String = "plugin"
+    public const val RENDER: String = "render"
 }
 
 /**
@@ -47,26 +56,29 @@ public class PlayerErrorInfo internal constructor(
     override val node: Node,
 ) : NodeWrapper {
     /** Nested error object containing message and name */
-    private val error: Node? by NodeSerializableField(Node.serializer().nullable)
+    private val error: Throwable? by NodeSerializableField(ThrowableSerializer().nullable)
 
     /** The error message */
     public val message: String
-        get() = error?.getString("message") ?: ""
+        get() = error?.message ?: ""
 
     /** The error name */
     public val name: String
-        get() = error?.getString("name") ?: ""
+        get() = if (error == null) "" else (error!!::class.simpleName ?: "")
 
     /** Error category */
     public val errorType: String by NodeSerializableField(String.serializer()) { "" }
 
     /** Impact level */
-    public val severity: ErrorSeverity?
-        get() = node.getString("severity")?.let { ErrorSeverity.valueOf(it.uppercase()) }
+    public val severity: ErrorSeverity? by NodeSerializableField(ErrorSeverity.serializer().nullable)
 
     /** Additional metadata */
-    public val metadata: Map<String, Any?>?
-        get() = node.getObject("metadata") as? Map<String, Any?>
+    public val metadata: Map<String, Any?>? by NodeSerializableField(
+        MapSerializer(
+            String.serializer(),
+            GenericSerializer(),
+        ).nullable,
+    )
 
     internal object Serializer : NodeWrapperSerializer<PlayerErrorInfo>(::PlayerErrorInfo)
 }
@@ -99,22 +111,15 @@ public class ErrorController internal constructor(
         errorType: String,
         severity: ErrorSeverity? = null,
         metadata: Map<String, Any?>? = null,
-    ): Node? {
-        val errorObj = mapOf(
-            "message" to error.message,
-            "name" to error::class.simpleName,
-        )
-
-        return when {
-            severity != null && metadata != null ->
-                captureError?.invoke(errorObj, errorType, severity.value, metadata)
-            severity != null ->
-                captureError?.invoke(errorObj, errorType, severity.value)
-            metadata != null ->
-                captureError?.invoke(errorObj, errorType, null, metadata)
-            else ->
-                captureError?.invoke(errorObj, errorType)
-        }
+    ): Node? = when {
+        severity != null && metadata != null ->
+            captureError?.invoke(error, errorType, severity.value, metadata)
+        severity != null ->
+            captureError?.invoke(error, errorType, severity.value)
+        metadata != null ->
+            captureError?.invoke(error, errorType, null, metadata)
+        else ->
+            captureError?.invoke(error, errorType)
     }
 
     /**

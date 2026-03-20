@@ -10,32 +10,16 @@ import type {
   ViewPlugin,
   Resolver,
   Resolve,
-  ViewController,
 } from "@player-ui/player";
 import { AsyncSeriesBailHook, SyncBailHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
+import { AsyncNodeError } from "./AsyncNodeError";
+import { AsyncNodeInfo, AsyncPluginContext } from "./internal-types";
+import { getNodeFromError } from "./utils";
 
 export * from "./types";
 export * from "./transform";
 export * from "./createAsyncTransform";
-
-/** Object type for storing data related to a single `apply` of the `AsyncNodePluginPlugin`
- * This object should be setup once per ViewInstance to keep any cached info just for that view to avoid conflicts of shared async node ids across different view states.
- */
-type AsyncPluginContext = {
-  /** Map of async node id to resolved content */
-  nodeResolveCache: Map<string, Node.Node>;
-  /** The view instance this context is attached to. */
-  view: ViewInstance;
-  /** The view controller this context is attached to. */
-  viewController: ViewController;
-  /** Map of async node id to promises being used to resolve them */
-  inProgressNodes: Set<string>;
-  /** Map of async node ids to the original node they represent.
-   * In some cases, async nodes are transformed into from other node types so the original reference is needed in order to trigger an update on the view when the async node changes.
-   */
-  originalNodeCache: Map<string, Set<Node.Node>>;
-};
 
 export interface AsyncNodePluginOptions {
   /** A set of plugins to load  */
@@ -142,10 +126,10 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     node: Node.Async,
     context: AsyncPluginContext,
     result: any,
-    options: Resolve.NodeResolveOptions,
+    parseFunction?: (content: any) => Node.Node | null,
   ) {
     let parsedNode =
-      options.parseNode && result ? options.parseNode(result) : undefined;
+      parseFunction && result ? parseFunction(result) : undefined;
 
     if (parsedNode && node.onValueReceived) {
       parsedNode = node.onValueReceived(parsedNode);
@@ -168,22 +152,41 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     context: AsyncPluginContext,
     newNode?: Node.Node | null,
   ) {
-    const { nodeResolveCache, viewController, originalNodeCache } = context;
-    if (nodeResolveCache.get(node.id) !== newNode) {
-      nodeResolveCache.set(node.id, newNode ? newNode : node);
-      const originalNode = originalNodeCache.get(node.id) ?? new Set([node]);
-      viewController.updateViewAST(originalNode);
+    const { asyncNodeCache: asyncNodeInfo, viewController } = context;
+    const entry = asyncNodeInfo.get(node.id);
+    if (!entry) {
+      throw new Error("Failed to update async content. Cache entry not found");
+    }
+    if (entry.resolvedContent !== newNode) {
+      entry.resolvedContent = newNode ? newNode : entry.asyncNode;
+      viewController.updateViewAST(entry.updateNodes);
     }
   }
 
   private hasValidMapping(
+    cacheEntry: AsyncNodeInfo,
+  ): cacheEntry is Required<AsyncNodeInfo> {
+    return (
+      cacheEntry.resolvedContent !== undefined &&
+      cacheEntry.resolvedContent !== cacheEntry.asyncNode
+    );
+  }
+
+  private getOrCreateAsyncNodeCacheEntry(
     node: Node.Async,
     context: AsyncPluginContext,
-  ): boolean {
-    const { nodeResolveCache } = context;
-    return (
-      nodeResolveCache.has(node.id) && nodeResolveCache.get(node.id) !== node
-    );
+  ): AsyncNodeInfo {
+    const { asyncNodeCache: asyncNodeInfo } = context;
+    let entry = asyncNodeInfo.get(node.id);
+    if (!entry) {
+      entry = {
+        asyncNode: node,
+        updateNodes: new Set(),
+      };
+      asyncNodeInfo.set(node.id, entry);
+    }
+
+    return entry;
   }
 
   /**
@@ -193,17 +196,32 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    * @param view
    */
   applyResolver(resolver: Resolver, context: AsyncPluginContext): void {
+    const { assetIdCache } = context;
+    resolver.hooks.afterNodeUpdate.tap(this.name, (original, _, update) => {
+      if (
+        update.node.type !== NodeType.Asset &&
+        update.node.type !== NodeType.View
+      ) {
+        return;
+      }
+
+      assetIdCache.set(update.value.id, original);
+    });
+
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
       if (!this.isAsync(node)) {
         return node === null ? node : this.resolveAsyncChildren(node, context);
       }
+
+      const entry = this.getOrCreateAsyncNodeCacheEntry(node, context);
+
       if (options.node) {
-        context.originalNodeCache.set(node.id, new Set([options.node]));
+        entry.updateNodes = new Set([options.node]);
+        context.generatedByMap.set(options.node, node.id);
       }
 
-      const resolvedNode = context.nodeResolveCache.get(node.id);
-      if (resolvedNode !== undefined) {
-        return this.resolveAsyncChildren(resolvedNode, context);
+      if (entry.resolvedContent !== undefined) {
+        return this.resolveAsyncChildren(entry.resolvedContent, context);
       }
 
       if (context.inProgressNodes.has(node.id)) {
@@ -236,15 +254,18 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       let index = 0;
       while (index < node.values.length) {
         const childNode = node.values[index];
-        if (
-          childNode?.type !== NodeType.Async ||
-          !this.hasValidMapping(childNode, context)
-        ) {
+        if (childNode?.type !== NodeType.Async) {
+          index++;
+          continue;
+        }
+        const entry = this.getOrCreateAsyncNodeCacheEntry(childNode, context);
+
+        if (!this.hasValidMapping(entry)) {
           index++;
           continue;
         }
 
-        const mappedNode = context.nodeResolveCache.get(childNode.id)!;
+        const mappedNode = entry.resolvedContent;
         const nodeSet = new Set<Node.Node>();
         if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
           mappedNode.values.forEach((v: Node.Node) => {
@@ -261,17 +282,23 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           mappedNode.parent = node;
           nodeSet.add(mappedNode);
         }
-        context.originalNodeCache.set(childNode.id, nodeSet);
+        entry.updateNodes = nodeSet;
+        for (const n of nodeSet) {
+          context.generatedByMap.set(n, childNode.id);
+        }
       }
     } else if ("children" in node) {
       node.children?.forEach((c) => {
         // Similar to above, using a while loop lets us handle when async nodes produce more async nodes.
-        while (
-          c.value.type === NodeType.Async &&
-          this.hasValidMapping(c.value, context)
-        ) {
-          const mappedNode = context.nodeResolveCache.get(c.value.id)!;
-          context.originalNodeCache.set(c.value.id, new Set([mappedNode]));
+        while (c.value.type === NodeType.Async) {
+          const entry = this.getOrCreateAsyncNodeCacheEntry(c.value, context);
+          if (!this.hasValidMapping(entry)) {
+            break;
+          }
+
+          const mappedNode = entry.resolvedContent;
+          entry.updateNodes = new Set([mappedNode]);
+          context.generatedByMap.set(mappedNode, c.value.id);
           c.value = mappedNode;
           c.value.parent = node;
         }
@@ -290,35 +317,31 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const result = await this.basePlugin?.hooks.onAsyncNode.call(
         node,
         (result) => {
-          this.parseNodeAndUpdate(node, context, result, options);
+          this.parseNodeAndUpdate(node, context, result, options.parseNode);
         },
       );
 
       // Stop tracking before the next update is triggered
       context.inProgressNodes.delete(node.id);
-      this.parseNodeAndUpdate(node, context, result, options);
+      this.parseNodeAndUpdate(node, context, result, options.parseNode);
     } catch (e: unknown) {
-      const error = e instanceof Error ? e : new Error(String(e));
-      const result = this.basePlugin?.hooks.onAsyncNodeError.call(error, node);
+      const cause = e instanceof Error ? e : new Error(String(e));
+      const playerState = this.basePlugin?.getPlayerInstance()?.getState();
 
-      if (result === undefined) {
-        const playerState = this.basePlugin?.getPlayerInstance()?.getState();
-
-        if (playerState?.status === "in-progress") {
-          playerState.fail(error);
-        }
-
+      if (playerState?.status !== "in-progress") {
+        options.logger?.warn(
+          "[AsyncNodePlugin]: An error occured during async node resolution, but the player instance is no londer running. Exception: ",
+          cause,
+        );
         return;
       }
 
-      options.logger?.error(
-        "Async node handling failed and resolved with a fallback. Error:",
-        error,
+      const error = new AsyncNodeError(
+        node,
+        "An error occured during async node resolution. See cause for details.",
+        cause,
       );
-
-      // Stop tracking before the next update is triggered
-      context.inProgressNodes.delete(node.id);
-      this.parseNodeAndUpdate(node, context, result, options);
+      playerState.controllers.error.captureError(error, error.type);
     }
   }
 
@@ -385,15 +408,97 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
   }
 
   applyPlayer(player: Player): void {
+    // TODO: Need a better mechanism for storing the current context.
+    let currentContext: AsyncPluginContext | undefined = undefined;
+    let parser: Parser | undefined = undefined;
+
+    player.hooks.errorController.tap("async", (errorController) => {
+      errorController.hooks.onError.tap("async", (playerError) => {
+        if (currentContext === undefined) {
+          return undefined;
+        }
+
+        /** Try to handle the error using the onAsyncNodeError hook. Returns true if new content is provided. */
+        const tryHandleError = (asyncNode: Node.Async): boolean => {
+          if (this.basePlugin === undefined) {
+            player.logger.warn(
+              `[AsyncNodePlugin]: No plugin detected. Error handling will fail`,
+            );
+          }
+
+          let result: any = undefined;
+          result = this.basePlugin?.hooks.onAsyncNodeError.call(
+            playerError.error,
+            asyncNode,
+          );
+
+          if (result === undefined) {
+            return false;
+          }
+
+          player.logger?.warn(
+            "[AsyncNodePlugin]: Async node handling failed and resolved with a fallback. Cause:",
+            playerError.error.message,
+          );
+
+          // Stop tracking before the next update is triggered
+          currentContext!.inProgressNodes.delete(asyncNode.id);
+          this.parseNodeAndUpdate(
+            asyncNode,
+            currentContext!,
+            result,
+            parser?.parseObject.bind(parser),
+          );
+
+          return true;
+        };
+
+        let node = getNodeFromError(playerError, currentContext);
+        // If the node is an async node try, to handle errors with it first.
+        if (node?.type === NodeType.Async && tryHandleError(node)) {
+          return true;
+        }
+
+        // Loop through the nodes to see if something is generated by something else. Continue until the error is handled or there are no more nodes to check
+        while (node !== undefined) {
+          const generatedBy = currentContext.generatedByMap.get(node);
+          if (generatedBy) {
+            const entry = currentContext.asyncNodeCache.get(generatedBy);
+
+            if (!entry) {
+              node = node.parent;
+              continue;
+            }
+
+            const { asyncNode } = entry;
+
+            // Don't return false when the error isn't handled to allow for cases where one async is generated by another. Give different nodes a chance to try to recover from the error.
+            if (tryHandleError(asyncNode)) {
+              return true;
+            }
+          }
+
+          node = node.parent;
+        }
+
+        return undefined;
+      });
+    });
+
     player.hooks.viewController.tap("async", (viewController) => {
       viewController.hooks.view.tap("async", (view) => {
+        view.hooks.parser.tap(this.name, (p) => {
+          parser = p;
+        });
         const context: AsyncPluginContext = {
-          nodeResolveCache: new Map(),
           inProgressNodes: new Set(),
           view,
           viewController,
-          originalNodeCache: new Map(),
+          generatedByMap: new Map(),
+          assetIdCache: new Map(),
+          asyncNodeCache: new Map(),
         };
+        currentContext = context;
 
         view.hooks.resolver.tap("async", (resolver) => {
           this.applyResolver(resolver, context);

@@ -4,6 +4,7 @@ import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
+import { isErrorWithMetadata, makeJsonStringifyReplacer } from "./utils";
 
 /**
  * Private symbol used to authorize ErrorController's writes to errorState
@@ -88,7 +89,17 @@ export class ErrorController {
       errorType,
       severity,
       metadata,
+      skipped: false,
     };
+
+    if (isErrorWithMetadata(error)) {
+      playerError.errorType = error.type;
+      playerError.severity = error.severity ?? playerError.severity;
+      playerError.metadata = {
+        ...playerError.metadata,
+        ...error.metadata,
+      };
+    }
 
     // Add to history
     this.errorHistory.push(playerError);
@@ -98,7 +109,14 @@ export class ErrorController {
 
     this.options.logger.debug(
       `[ErrorController] Captured error: ${error.message}`,
-      { errorType, severity, metadata },
+      JSON.stringify(
+        {
+          errorType: playerError.errorType,
+          severity: playerError.severity,
+          metadata: playerError.metadata,
+        },
+        makeJsonStringifyReplacer(),
+      ),
     );
 
     // Notify listeners and check if navigation should be skipped
@@ -106,6 +124,7 @@ export class ErrorController {
     const shouldSkip = this.hooks.onError.call(playerError) ?? false;
 
     if (shouldSkip) {
+      playerError.skipped = true;
       this.options.logger.debug(
         "[ErrorController] Error state navigation skipped by plugin",
       );
@@ -132,6 +151,11 @@ export class ErrorController {
       this.options.logger.warn(
         "[ErrorController] No active flow instance for error navigation",
       );
+      return;
+    }
+
+    if (!flowInstance.hasTransitionForError(playerError.errorType)) {
+      this.options.fail(playerError.error);
       return;
     }
 
