@@ -18,14 +18,12 @@ import com.intuit.playerui.android.registry.RegistryPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.format
+import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.playerui.core.constants.ConstantsController
-import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
-import com.intuit.playerui.core.player.GetCoroutineFunction
 import com.intuit.playerui.core.player.HeadlessPlayer
-import com.intuit.playerui.core.player.HeadlessPlayerRuntimeConfig
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.CompletedState
@@ -67,7 +65,7 @@ public class AndroidPlayer private constructor(
     public constructor(
         plugins: List<Plugin>,
         config: Config = Config(),
-    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), realConfig = config))
+    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config))
 
     /**
      * Allow the [AndroidPlayer] to be built on top of a pre-existing
@@ -355,19 +353,7 @@ public class AndroidPlayer private constructor(
 
     public data class Config(
         override var debuggable: Boolean = false,
-        // TODO: Find an alternative to changing the type here or improve the API to make a little more sense
-        override var coroutineExceptionHandler: GetCoroutineFunction? = { player ->
-            CoroutineExceptionHandler { _, throwable ->
-                player.inProgressState?.controllers?.error?.captureError(throwable, ErrorTypes.RENDER)
-                    ?: player.logger.error(
-                        "Exception caught in Player scope: ${throwable.message}",
-                        throwable.stackTrace
-                            .joinToString("\n") {
-                                "\tat $it"
-                            }.replaceFirst("\tat ", "\n"),
-                    )
-            }
-        },
+        override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
         override var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000,
-    ) : HeadlessPlayerRuntimeConfig()
+    ) : PlayerRuntimeConfig()
 }

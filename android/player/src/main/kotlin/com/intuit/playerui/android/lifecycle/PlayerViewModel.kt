@@ -207,9 +207,9 @@ public open class PlayerViewModel(
         }
     }
 
-    public fun fail(throwable: Throwable) {
+    public fun fail(cause: Throwable) {
         player.inProgressState?.controllers?.error?.captureError(
-            throwable,
+            cause,
             ErrorTypes.RENDER,
         )
     }

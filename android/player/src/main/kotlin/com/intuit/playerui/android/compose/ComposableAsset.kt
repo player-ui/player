@@ -98,10 +98,12 @@ public abstract class ComposableAsset<Data>(
         styles: AssetStyle? = null,
         tag: String? = null,
     ) {
-        val assetTag = tag ?: asset.id
-        val containerModifier = Modifier.testTag(assetTag) then modifier
-        // TODO: Conditionally call withTag only if tag is provided
-        assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
+        val containerModifier = Modifier.testTag(tag ?: asset.id) then modifier
+        var context = assetContext.withContext(LocalContext.current)
+        if (tag != null) {
+            context = context.withTag(tag)
+        }
+        context.build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
