@@ -6,9 +6,9 @@ module(
 bazel_dep(name = "rules_player")
 archive_override(
   module_name = "rules_player",
-  strip_prefix = "rules_player-2.2.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.1.tar.gz"],
-  integrity = "sha256-vRyADsmF6vA865X9euZw5Z4KnGgpht5qzaa/vLxSkYQ="
+  strip_prefix = "rules_player-2.2.3",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.3.tar.gz"],
+  integrity = "sha256-+8W4qKFiv8zQy+NyXcWqULo49VqwTuf/DIMg2ikwvho="
 )
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
@@ -35,14 +35,14 @@ register_toolchains("@local_shell_config//:local_sh_toolchain")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
+bazel_dep(name = "rules_xcodeproj", version = "3.4.1")
 bazel_dep(name = "rules_shell", version = "0.5.0")
-bazel_dep(name = "rules_apple", version = "4.1.0", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "apple_support", version = "1.22.0", repo_name = "build_bazel_apple_support")
-bazel_dep(name = "rules_swift", version = "2.9.0")
+bazel_dep(name = "rules_apple", version = "4.3.3", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "apple_support", version = "2.1.0", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_swift", version = "3.4.1")
 bazel_dep(name = "gazelle", version = "0.42.0", repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_swift_package_manager", version = "1.0.0")
-bazel_dep(name = "swiftlint", version = "0.59.1", repo_name = "SwiftLint")
+bazel_dep(name = "rules_swift_package_manager", version = "1.11.1")
+bazel_dep(name = "swiftlint", version = "0.63.0", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
