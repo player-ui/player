@@ -1,5 +1,5 @@
 import { createDSLStory } from "@player-ui/storybook";
-import { Meta } from "@storybook/react-webpack5";
+import { Meta } from "@storybook/react-vite";
 
 const meta: Meta = {
   title: "Reference Assets/ChatMessage",
@@ -10,6 +10,6 @@ export default meta;
 export const Basic = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/mocks/chat-message/chat-message-basic.tsx"
+      "@player-ui/mocks/chat-message/chat-message-basic.tsx?raw"
     ),
 );

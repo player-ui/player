@@ -20,10 +20,7 @@ deps = [
     ":node_modules/@player-ui/expression-plugin",
     ":node_modules/@player-ui/player",
     "//:node_modules/typescript",
-    "//:node_modules/@babel/preset-typescript",
-    "//:node_modules/@babel/preset-env",
-    "//:node_modules/@babel/preset-react",
-    "//:node_modules/@storybook/react-webpack5",
+    "//:node_modules/@storybook/react-vite",
     "//:node_modules/@storybook/addon-docs",
     "//:node_modules/@storybook/icons",
     "//:node_modules/@types/react-redux",
@@ -39,18 +36,14 @@ deps = [
     "//:node_modules/esbuild-wasm",
     "//:node_modules/@devtools-ds/table",
     "//:node_modules/dlv",
-    "//:node_modules/ts-loader",
     "//:node_modules/tslib",
-    "//:node_modules/raw-loader",
     "//:node_modules/react",
     "//:node_modules/react-dom",
     "//:node_modules/storybook",
     "//:node_modules/@vitest/mocker",
-    "//:node_modules/@storybook/addon-webpack5-compiler-babel",
     "//:typings",
     "tsconfig.json",
     "package.json",
-    "babel.config.json",
 ]
 
 storybook_bin.storybook(
@@ -64,7 +57,6 @@ storybook_bin.storybook(
         "--output-dir",
         "./storybook",
         "--debug",
-        # "--debug-webpack",  # enable to debug webpack compilation issues
         "--disable-telemetry",
     ],
     chdir = package_name(),

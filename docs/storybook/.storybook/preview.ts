@@ -1,4 +1,4 @@
-import type { Preview } from "@storybook/react-webpack5";
+import type { Preview } from "@storybook/react-vite";
 import { PlayerDecorator } from "@player-ui/storybook";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
