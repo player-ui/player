@@ -3,12 +3,12 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "peerDependencies": {
-    "@player-ui/player": "workspace:*"
+    "@player-ui/player": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/make-flow": "workspace:*"
+    "@player-ui/make-flow": "workspace:^"
   },
   "dependencies": {
-    "@player-ui/expression-plugin": "workspace:*"
+    "@player-ui/expression-plugin": "workspace:^"
   }
 }

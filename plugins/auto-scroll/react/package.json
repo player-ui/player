@@ -3,14 +3,14 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.tsx",
   "devDependencies": {
-    "@player-ui/types": "workspace:*",
-    "@player-ui/make-flow": "workspace:*",
-    "@player-ui/asset-transform-plugin": "workspace:*",
-    "@player-ui/common-types-plugin": "workspace:*",
-    "@player-ui/reference-assets-plugin-react": "workspace:*",
-    "@player-ui/reference-assets-plugin": "workspace:*"
+    "@player-ui/types": "workspace:^",
+    "@player-ui/make-flow": "workspace:^",
+    "@player-ui/asset-transform-plugin": "workspace:^",
+    "@player-ui/common-types-plugin": "workspace:^",
+    "@player-ui/reference-assets-plugin-react": "workspace:^",
+    "@player-ui/reference-assets-plugin": "workspace:^"
   },
   "peerDependencies": {
-    "@player-ui/react": "workspace:*"
+    "@player-ui/react": "workspace:^"
   }
 }
