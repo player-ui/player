@@ -161,6 +161,8 @@ export class ExternalActionPlugin implements PlayerPlugin {
    */
   private registerHandlers(player: Player): void {
     for (const [state, handler] of this.handlers) {
+      // Runtime check for 'ref' property is necessary despite TypeScript constraint because
+      // the Swift bridge allows improperly formatted objects to bypass TypeScript validation.
       // We log this here and not in the constructor because the Logger is not yet available in the constructor.
       if (!state.ref) {
         player.logger.warn(`An external action match is missing the 'ref' property. This handler will be ignored. Match: ${JSON.stringify(state)}`);
