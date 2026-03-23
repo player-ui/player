@@ -18,6 +18,7 @@ import { ResolverError } from "./ResolverError";
 
 export * from "./types";
 export * from "./utils";
+export * from "./ResolverError";
 
 interface NodeUpdate extends Resolve.ResolvedNode {
   /** A flag to track if a node has changed since the last resolution */

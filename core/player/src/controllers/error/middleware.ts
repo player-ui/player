@@ -58,10 +58,12 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
             this.logger?.warn(
               `[ErrorStateMiddleware] Blocked write to protected path: ${binding.asString()}`,
             );
+
+            const oldValue = next?.get(binding, options);
             return {
               binding,
-              oldValue: next?.get(binding, options),
-              newValue: next?.get(binding, options), // Keep old value
+              oldValue,
+              newValue: oldValue, // Keep old value
               force: false,
             };
           });
