@@ -4,9 +4,24 @@ import {
   ExtendedPlayerPlugin,
   NodeType,
   Player,
+  Node,
 } from "@player-ui/player";
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import { send } from "./send";
+
+const isInChatDemo = (node: Node.Node) => {
+  if (
+    node.parent?.parent?.type === NodeType.View &&
+    node.parent.parent.value.id === "chat-view"
+  ) {
+    return true;
+  }
+
+  return (
+    node.parent?.parent?.type === NodeType.Asset &&
+    node.parent.parent.value.id.startsWith("collection-async-chat-demo")
+  );
+};
 
 const createContentFromMessage = (message: string, id: string): any => ({
   asset: {
@@ -98,11 +113,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
 
     asyncNodePlugin.hooks.onAsyncNode.tap(this.name, (node) => {
       // Ensure this is only used on the chat-ui.tsx mock to prevent the promise from setting up during tests.
-      if (
-        (node.parent?.parent?.type !== NodeType.Asset &&
-          node.parent?.parent?.type !== NodeType.View) ||
-        !node.parent.parent.value.id.startsWith("collection-async-chat-demo")
-      ) {
+      if (!isInChatDemo(node)) {
         return Promise.resolve(undefined);
       }
 
