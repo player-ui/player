@@ -10,7 +10,7 @@ export const isErrorWithMetadata = (
     return false;
   }
 
-  // 2. "severity" property is optional. If presesnt, must be a string within the set of severity options
+  // 2. "severity" property is optional. If present, must be a string within the set of severity options
   if (
     "severity" in error &&
     (typeof error.severity !== "string" || !SEVERITY_SET.has(error.severity))
