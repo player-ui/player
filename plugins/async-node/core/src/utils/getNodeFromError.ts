@@ -2,7 +2,7 @@ import { PlayerError, Node, ErrorTypes } from "@player-ui/player";
 import { AsyncPluginContext } from "../internal-types";
 import { isAsyncPlayerError } from "./isAsyncPlayerError";
 
-/** Get the AST Node related to a specific error if avaiable. */
+/** Get the AST Node related to a specific error if available. */
 export const getNodeFromError = (
   playerError: PlayerError,
   context: AsyncPluginContext,
