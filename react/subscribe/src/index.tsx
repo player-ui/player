@@ -203,7 +203,7 @@ type SubOptions = {
 type UnsubFunction = (id: SubscribeID) => void;
 
 type SubFunction<T> = (
-  callback: (arg: T | undefined, unsubscribe: () => void) => void,
+  callback: (arg: T | undefined) => void,
   options?: SubOptions,
 ) => SubscribeID;
 
@@ -232,15 +232,7 @@ export function useSubscriber<T>(subscriber: Subscribe<T>): ReactSubscriber<T> {
   }, []);
 
   const subscribe = useCallback<SubFunction<T>>((callback, options) => {
-    let id: SubscribeID | undefined = undefined;
-    const unsub = () => {
-      if (id !== undefined) {
-        unsubscribe(id);
-      }
-    };
-    id = subscriber.add((arg: T | undefined) => {
-      callback(arg, unsub);
-    }, options);
+    const id = subscriber.add(callback, options);
     subscriptions.add(id);
     return id;
   }, []);
