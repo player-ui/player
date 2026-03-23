@@ -1,5 +1,5 @@
 import { describe, it, beforeEach, expect, vitest } from "vitest";
-import { ErrorStateMiddleware } from "../middleware";
+import { ERROR_BINDING_PREFIX, ErrorStateMiddleware } from "../middleware";
 import { BindingInstance, BindingParser } from "../../../binding";
 import type {
   BatchSetTransaction,
@@ -52,7 +52,7 @@ describe("ErrorStateMiddleware", () => {
 
   describe("set", () => {
     it("should not write to the base data model", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
       pipelineModel.set([[binding, { message: "test" }]], {
         writeSymbol,
       });
@@ -61,7 +61,7 @@ describe("ErrorStateMiddleware", () => {
       expect(baseDataModel.get(binding)).toBeUndefined();
     });
     it("should block writes to errorState without writeSymbol", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
       const updates = pipelineModel.set([[binding, { message: "test" }]]);
 
       // Should not write to base model
@@ -80,7 +80,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should block writes to nested errorState paths", () => {
-      const binding = parser.parse("errorState.message");
+      const binding = parser.parse(`${ERROR_BINDING_PREFIX}.message`);
       pipelineModel.set([[binding, "test message"]]);
 
       expect(pipelineModel.get(binding)).toBeUndefined();
@@ -102,7 +102,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should allow writes when authorized with writeSymbol", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
 
       const updates = pipelineModel.set([[binding, { message: "test" }]], {
         writeSymbol: writeSymbol,
@@ -115,7 +115,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should block writes with wrong writeSymbol", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
       const wrongSymbol = Symbol("wrong-auth");
 
       pipelineModel.set([[binding, { message: "test" }]], {
@@ -127,7 +127,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should handle mixed transactions with blocked and allowed paths", () => {
-      const errorBinding = parser.parse("errorState");
+      const errorBinding = parser.parse(ERROR_BINDING_PREFIX);
       const fooBinding = parser.parse("foo");
 
       const updates = pipelineModel.set([
@@ -153,7 +153,7 @@ describe("ErrorStateMiddleware", () => {
 
   describe("get", () => {
     it("should not read error state from the base model", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
 
       // Set value directly on base model
       baseDataModel.set([[binding, { message: "test" }]]);
@@ -162,7 +162,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should read without needing any permissions", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
       pipelineModel.set([[binding, { message: "test" }]], { writeSymbol });
 
       const value = pipelineModel.get(binding);
@@ -172,7 +172,7 @@ describe("ErrorStateMiddleware", () => {
 
   describe("delete", () => {
     it("should block deletes to errorState without writeSymbol", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
 
       // Set value first
       pipelineModel.set([[binding, { message: "test" }]], { writeSymbol });
@@ -187,7 +187,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should allow deletes when authorized with writeSymbol", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
 
       // Set value first
       pipelineModel.set([[binding, { message: "test" }]], { writeSymbol });
@@ -199,7 +199,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should block deletes with wrong writeSymbol", () => {
-      const binding = parser.parse("errorState");
+      const binding = parser.parse(ERROR_BINDING_PREFIX);
       const wrongSymbol = Symbol("wrong-auth");
 
       // Set value first
@@ -223,7 +223,7 @@ describe("ErrorStateMiddleware", () => {
     });
 
     it("should allow deletes to nested errorState paths when authorized", () => {
-      const binding = parser.parse("errorState.nested.path");
+      const binding = parser.parse(`${ERROR_BINDING_PREFIX}.nested.path`);
 
       // Set value first
       pipelineModel.set([[binding, "test"]], { writeSymbol });

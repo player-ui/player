@@ -9,8 +9,11 @@ import {
 } from "../../data";
 import type { Logger } from "../../logger";
 
+/** Top-level key for all error information. */
+export const ERROR_BINDING_PREFIX = "errorState";
+
 const isErrorBinding = (binding: BindingInstance): boolean =>
-  binding.asArray()[0] === "errorState";
+  binding.asArray()[0] === ERROR_BINDING_PREFIX;
 
 /**
  * Middleware that prevents external writes to errorState
