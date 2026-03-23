@@ -1,0 +1,22 @@
+{
+  "name": "@player-ui/skills",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Claude Code skills installer for Player-UI development",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "player-ui-skills": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.0",
+    "commander": "^12.0.0"
+  }
+}
