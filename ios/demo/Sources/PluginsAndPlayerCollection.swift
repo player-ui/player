@@ -109,12 +109,17 @@ public struct PluginsAndPlayerCollection: View {
             }
         }
 
-        let externalActionPlugin =  ExternalActionPlugin(handler: { state, options, transition in
-            guard state.ref == "test-1" else { return transition("Prev") }
-            let transitionValue = options.data.get(binding: "transitionValue") as? String
-            options.expression.evaluate("{{foo}} = 'bar'")
-            transition(transitionValue ?? "Next")
-        })
+        let externalActionPlugin = ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { state, options, transition in
+                    print("PluginsAndPlayerCollection External State triggered")
+                    let transitionValue = options.data.get(binding: "transitionValue") as? String
+                    options.expression.evaluate("{{foo}} = 'bar'")
+                    transition(transitionValue ?? "Next")
+                }
+            )
+        ])
 
         return ForEach(sections, id: \.title) { section in
             Section {

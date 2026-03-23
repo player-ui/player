@@ -14,8 +14,11 @@ export type ExternalStateHandler = (
   options: InProgressState["controllers"],
 ) => string | undefined | Promise<string | undefined>;
 
-type ExternalActionMatch = Partial<NavigationFlowExternalState> &
-  Pick<NavigationFlowExternalState, "ref">;
+// Require "ref" property while making all others optional
+// The explicit { ref: string } overrides any index signature leniency
+type ExternalActionMatch = {
+  ref: string;
+} & Partial<NavigationFlowExternalState>;
 
 /**
  * A plugin to handle external action states
@@ -69,7 +72,7 @@ export class ExternalActionPlugin implements PlayerPlugin {
 
   apply(player: Player): void {
     const isFirstInstance = this.createRegistry(player);
-    this.registerHandlers();
+    this.registerHandlers(player);
 
     // Only the first instance should tap the hooks to avoid redundant taps
     if (!isFirstInstance) {
@@ -156,8 +159,13 @@ export class ExternalActionPlugin implements PlayerPlugin {
    * If a handler with the same specificity already exists, it will be replaced
    * and a debug log will be emitted (accessible via player.logger.debug).
    */
-  private registerHandlers(): void {
+  private registerHandlers(player: Player): void {
     for (const [state, handler] of this.handlers) {
+      // We log this here and not in the constructor because the Logger is not yet available in the constructor.
+      if (!state.ref) {
+        player.logger.warn(`An external action match is missing the 'ref' property. This handler will be ignored. Match: ${JSON.stringify(state)}`);
+        continue;
+      }
       // Registry will handle keeping only the last handler for each state
       this.registry?.set(state, handler);
     }

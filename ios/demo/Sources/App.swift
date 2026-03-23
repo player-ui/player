@@ -44,9 +44,14 @@ struct MainView: View {
         CommonTypesPlugin(),
         ExpressionPlugin(),
         CommonExpressionsPlugin(),
-        ExternalActionPlugin(handler: { _, _, _ in
-            print("external state")
-        }),
+        ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref":"test-1"],
+                handler: { _, _, _ in
+                    print("MainView External State triggered")
+                }
+            )
+        ]),
         MetricsPlugin { timing, render, flow in
             print(timing as Any)
             print(render as Any)

@@ -481,3 +481,64 @@ describe("edge cases", () => {
     await started;
   });
 });
+
+describe("Type Safety", () => {
+  test("handlers with invalid matches (no ref) should not be triggered at runtime", async () => {
+    const invalidHandler1Called = vitest.fn();
+    const invalidHandler2Called = vitest.fn();
+    const validHandlerCalled = vitest.fn();
+    const warnSpy = vitest.fn();
+
+    const player = new Player({
+      plugins: [
+        new ExternalActionPlugin([
+          // Invalid match - empty object (TypeScript error suppressed for testing)
+          // @ts-expect-error - testing runtime behavior with invalid match
+          [{}, () => {
+            invalidHandler1Called();
+            return "Next";
+          }],
+          // Invalid match - missing ref (TypeScript error suppressed for testing)
+          // @ts-expect-error - testing runtime behavior with invalid match
+          [{ testProperty: "testValue" }, () => {
+            invalidHandler2Called();
+            return "Next";
+          }],
+          // Valid match - has ref
+          [{ ref: "test-1" }, () => {
+            validHandlerCalled();
+            return "Next";
+          }],
+        ]),
+      ],
+      logger: {
+        trace: vitest.fn(),
+        debug: vitest.fn(),
+        info: vitest.fn(),
+        warn: warnSpy,
+        error: vitest.fn(),
+      },
+    });
+
+    const completed = await player.start(externalFlow as Flow);
+
+    // Warnings should have been logged for handlers with invalid matches (2 warnings)
+    expect(warnSpy).toHaveBeenCalledTimes(2);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("An external action match is missing the 'ref' property")
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("This handler will be ignored")
+    );
+
+    // The handlers with invalid matches should NOT have been called
+    expect(invalidHandler1Called).not.toHaveBeenCalled();
+    expect(invalidHandler2Called).not.toHaveBeenCalled();
+    
+    // The valid handler should have been called
+    expect(validHandlerCalled).toHaveBeenCalledTimes(1);
+    
+    // Flow should complete successfully using the valid handler
+    expect(completed.endState.outcome).toBe("FWD");
+  });
+});

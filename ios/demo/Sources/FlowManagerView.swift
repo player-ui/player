@@ -35,15 +35,22 @@ public struct FlowManagerView: View {
                             MetricsPlugin { (render, _, flow) in
                                 print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
                             },
-                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
-
-                                return AnyView(
-                                    Text("External State")
-                                        .onDisappear {
-                                            transition("Next")
-                                        }
+                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+                                ExternalStateViewModifierHandler(
+                                    match: ["ref":"test-1"],
+                                    handler: { (state, _, transition) in
+                                        return AnyView(
+                                            Text("External State")
+                                                .onAppear {
+                                                    print("Managed Player External State triggered")
+                                                }
+                                                .onDisappear {
+                                                    transition("Next")
+                                                }
+                                        )
+                                    }
                                 )
-                            }
+                            ])
                         ],
                         flowManager: ConstantFlowManager(flowSequence),
                         onComplete: { _ in

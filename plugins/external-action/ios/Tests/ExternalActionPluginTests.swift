@@ -50,15 +50,20 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin { (state, _, handler) in
-            XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
-            XCTAssertEqual(state.ref, "test-1")
-            // Test out subscript fetching additional properties
-            let extra: String? = state.extraProperty
-            XCTAssertEqual(extra, "extraValue")
-            handlerExpectation.fulfill()
-            handler("Next")
-        }
+        let plugin = ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { (state, _, handler) in
+                    XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
+                    XCTAssertEqual(state.ref, "test-1")
+                    // Test out subscript fetching additional properties
+                    let extra: String? = state.extraProperty
+                    XCTAssertEqual(extra, "extraValue")
+                    handlerExpectation.fulfill()
+                    handler("Next")
+                }
+            )
+        ])
         let player = HeadlessPlayerImpl(plugins: [plugin])
 
         player.start(flow: json) { (result) in
@@ -109,10 +114,15 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin { (_, _, _) in
-            handlerExpectation.fulfill()
-            throw PlayerError.jsConversionFailure
-        }
+        let plugin = ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { (_, _, _) in
+                    handlerExpectation.fulfill()
+                    throw PlayerError.jsConversionFailure
+                }
+            )
+        ])
         let player = HeadlessPlayerImpl(plugins: [plugin])
 
         player.start(flow: json) { (result) in
@@ -171,17 +181,22 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin { (state, _, handler) in
-            XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
-            XCTAssertEqual(state.ref, "test-1")
-            if let param: [String: Any] = state.param {
-                XCTAssertEqual(param["name"] as? String, "ctg/pmec")
-            } else {
-                XCTFail("param was not a dictionary")
-            }
-            handlerExpectation.fulfill()
-            handler("Next")
-        }
+        let plugin = ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { (state, _, handler) in
+                    XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
+                    XCTAssertEqual(state.ref, "test-1")
+                    if let param: [String: Any] = state.param {
+                        XCTAssertEqual(param["name"] as? String, "ctg/pmec")
+                    } else {
+                        XCTFail("param was not a dictionary")
+                    }
+                    handlerExpectation.fulfill()
+                    handler("Next")
+                }
+            )
+        ])
         let player = HeadlessPlayerImpl(plugins: [plugin])
 
         player.start(flow: json) { (result) in
@@ -232,12 +247,17 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin { (_, _, handler) in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                handlerExpectation.fulfill()
-                handler("Next")
-            }
-        }
+        let plugin = ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { (_, _, handler) in
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                        handlerExpectation.fulfill()
+                        handler("Next")
+                    }
+                }
+            )
+        ])
         let player = HeadlessPlayerImpl(plugins: [plugin])
 
         player.start(flow: json) { (result) in
@@ -288,19 +308,24 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin { (_, options, handler) in
-            XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Next")
+        let plugin = ExternalActionPlugin(handlers: [
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { (_, options, handler) in
+                    XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Next")
 
-            // Test expression evaluation
+                    // Test expression evaluation
 
-            options.expression.evaluate("{{transitionValue}} = 'Prev'")
-            XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Prev")
+                    options.expression.evaluate("{{transitionValue}} = 'Prev'")
+                    XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Prev")
 
-            options.expression.evaluate(["{{transitionValue}} = 'Previous'", "{{transitionValue}} = 'Next'"])
-            XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Next")
-            handlerExpectation.fulfill()
-            handler("Next")
-        }
+                    options.expression.evaluate(["{{transitionValue}} = 'Previous'", "{{transitionValue}} = 'Next'"])
+                    XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Next")
+                    handlerExpectation.fulfill()
+                    handler("Next")
+                }
+            )
+        ])
         let player = HeadlessPlayerImpl(plugins: [plugin])
 
         player.start(flow: json) { (result) in
@@ -314,5 +339,77 @@ class ExternalActionPluginTests: XCTestCase {
         }
 
         wait(for: [handlerExpectation, completionExpectation], timeout: 1)
+    }
+    
+    func testExternalStateHandlingWithSpecificity() {
+        let json = """
+        {
+          "id": "test-flow",
+          "data": {
+            "transitionValue": "Next"
+          },
+          "navigation": {
+            "BEGIN": "FLOW_1",
+            "FLOW_1": {
+              "startState": "EXT_1",
+              "EXT_1": {
+                "state_type": "EXTERNAL",
+                "ref": "test-1",
+                "transitions": {
+                  "Next": "END_FWD",
+                  "Prev": "END_BCK"
+                },
+                "extraProperty": "extraValue"
+              },
+              "END_FWD": {
+                "state_type": "END",
+                "outcome": "FWD"
+              },
+              "END_BCK": {
+                "state_type": "END",
+                "outcome": "BCK"
+              }
+            }
+          }
+        }
+        """
+
+        let lessSpecificExpectation = XCTestExpectation(description: "less specific handler should not be called")
+        lessSpecificExpectation.isInverted = true
+        let moreSpecificExpectation = XCTestExpectation(description: "more specific handler called")
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        
+        let plugin = ExternalActionPlugin(handlers: [
+            // Less specific - only matches ref
+            ExternalStateHandler(
+                match: ["ref": "test-1"],
+                handler: { (_, _, handler) in
+                    lessSpecificExpectation.fulfill()
+                    handler("Prev")
+                }
+            ),
+            // More specific - matches ref and extraProperty
+            ExternalStateHandler(
+                match: ["ref": "test-1", "extraProperty": "extraValue"],
+                handler: { (_, _, handler) in
+                    moreSpecificExpectation.fulfill()
+                    handler("Next")
+                }
+            )
+        ])
+        let player = HeadlessPlayerImpl(plugins: [plugin])
+
+        player.start(flow: json) { (result) in
+            switch result {
+            case .success(let state):
+                // More specific handler should have been called, returning "Next" -> outcome "FWD"
+                XCTAssertEqual(state.endState?.outcome, "FWD")
+                completionExpectation.fulfill()
+            case .failure:
+                XCTFail("flow failed")
+            }
+        }
+
+        wait(for: [moreSpecificExpectation, lessSpecificExpectation, completionExpectation], timeout: 1)
     }
 }

@@ -5,6 +5,28 @@ import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIExternalActionPlugin
 
+public struct ExternalStateViewModifierHandler {
+    public typealias Match = [String: Any]
+    
+    /**
+     The handler function to run when an external state is transitioned to
+     - parameters:
+        - state: The state object that represents the external state
+        - options: An object containing the dataModel instance and evaluate function
+        - transition: A completion handler that takes a string to transition with
+     - returns: A view to show as content by the ViewModifier
+     */
+    public typealias Handler = (NavigationFlowExternalState, PlayerControllers, @escaping (String) -> Void) throws -> AnyView
+    
+    public let match: Match
+    public let handler: Handler
+    
+    public init(match: Match, handler: @escaping Handler) {
+        self.match = match
+        self.handler = handler
+    }
+}
+
 /**
  A variation on `ExternalActionPlugin` for `SwiftUIPlayer` that applies a ViewModifier to SwiftUIPlayer content when in an external state
  */
@@ -17,26 +39,16 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
     /// The current state if player is in an EXTERNAL state
     @Published public var state: NavigationFlowExternalState?
 
-    /**
-     The handler function to run when an external state is transitioned to
-     - parameters:
-        - state: The state object that represents the external state
-        - options: An object containing the dataModel instance and evaluate function
-        - transition: A completion handler that takes a string to transition with
-     - returns: A view to show as content by the ViewModifier
-     */
-    public typealias ExternalStateViewModifierHandler = (NavigationFlowExternalState, PlayerControllers, @escaping (String) -> Void) throws -> AnyView
-
-    private var handler: ExternalStateViewModifierHandler?
+    private var handlers: [ExternalStateViewModifierHandler]
 
     /**
      Construct a plugin to handle external states
      - parameters:
-        - handler: the function to call when an external state is transitioned to
+        - handlers: array of handlers with matchers and handler functions
      */
-    public convenience init(handler: @escaping ExternalStateViewModifierHandler) {
-        self.init(fileName: "ExternalActionPlugin.native", pluginName: "ExternalActionPlugin.ExternalActionPlugin")
-        self.handler = handler
+    public init(handlers: [ExternalStateViewModifierHandler]) {
+        self.handlers = handlers
+        super.init(fileName: "ExternalActionPlugin.native", pluginName: "ExternalActionPlugin.ExternalActionPlugin")
     }
 
     open func apply<P>(player: P) where P: HeadlessPlayer {
@@ -67,32 +79,41 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
      - returns: An array of arguments to construct the plugin
      */
     override open func getArguments() -> [Any] {
-        let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
-            guard
-                let context = self?.context,
-                let controllers = PlayerControllers(from: options),
-                let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
-                    self?.isExternalState = true
-                    let state = NavigationFlowExternalState(state)
-                    self?.state = state
-                    do {
-                        self?.content = try self?.handler?(state, controllers) { transition in
-                            resolve(transition)
-                            withAnimation {
-                                self?.isExternalState = false
-                                self?.state = nil
+        guard let context = context else { return [] }
+        
+        // Convert handlers to array of tuples [match, callback]
+        let jsHandlers = handlers.map { handler in
+            let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
+                guard
+                    let context = self?.context,
+                    let controllers = PlayerControllers(from: options),
+                    let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
+                        self?.isExternalState = true
+                        let state = NavigationFlowExternalState(state)
+                        self?.state = state
+                        do {
+                            self?.content = try handler.handler(state, controllers) { transition in
+                                resolve(transition)
+                                withAnimation {
+                                    self?.isExternalState = false
+                                    self?.state = nil
+                                }
+                                self?.content = nil
                             }
-                            self?.content = nil
+                        } catch {
+                            reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                         }
-                    } catch {
-                        reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
-                    }
-                })
-            else { return nil }
-            return promise
+                    })
+                else { return nil }
+                return promise
+            }
+            
+            let jsMatch = JSValue(object: handler.match, in: context)
+            let jsCallback = JSValue(object: callback, in: context)
+            return [jsMatch, jsCallback]
         }
-        let jsCallback = JSValue(object: callback, in: context) as Any
-        return [jsCallback]
+        
+        return [jsHandlers]
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
