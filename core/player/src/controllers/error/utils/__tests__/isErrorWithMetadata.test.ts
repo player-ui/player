@@ -106,7 +106,7 @@ describe("isErrorWithMetadata", () => {
     }),
   ];
   it.each(badMetadataCases)(
-    "should return false if meatadata is not an object",
+    "should return false if metadata is not an object",
     (err) => {
       expect(isErrorWithMetadata(err)).toBe(false);
     },
