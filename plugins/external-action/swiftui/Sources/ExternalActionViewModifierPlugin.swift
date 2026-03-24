@@ -117,6 +117,10 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
                                 self?.content = nil
                             }
                         } catch {
+                            // Reset state when handler throws
+                            self?.isExternalAction = false
+                            self?.state = nil
+                            self?.content = nil
                             reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                         }
                     })

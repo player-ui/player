@@ -15,6 +15,7 @@ import ViewInspector
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUISwiftUI
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUIExternalActionPlugin
 @testable import PlayerUIExternalActionViewModifierPlugin
 
 // swiftlint:disable type_body_length force_try
@@ -60,7 +61,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
         let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
-            ExternalActionViewModifierHandler(
+            .init(
                 match: ["ref": "test-1"],
                 handler: { (state, _, transition) in
                     XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
@@ -164,7 +165,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
         let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
-            ExternalActionViewModifierHandler(
+            .init(
                 match: ["ref": "test-1"],
                 handler: { (state, _, transition) in
                     XCTAssertEqual(state.transitions, ["Next": "VIEW_1", "Prev": "END_BCK"])
@@ -249,7 +250,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         ViewHosting.expel()
     }
 
-    func skiptestExternalActionHandlingThrowsError() throws {
+    func testExternalActionHandlingThrowsError() throws {
         let json = """
         {
           "id": "test-flow",
@@ -285,7 +286,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
-            ExternalActionViewModifierHandler(
+            .init(
                 match: ["ref": "test-1"],
                 handler: { (_, _, _) in
                     handlerExpectation.fulfill()
@@ -359,7 +360,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
 
         let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
             // Less specific - only matches ref
-            ExternalActionViewModifierHandler(
+            .init(
                 match: ["ref": "test-1"],
                 handler: { (_, _, transition) in
                     lessSpecificExpectation.fulfill()
@@ -372,7 +373,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
                 }
             ),
             // More specific - matches ref and extraProperty
-            ExternalActionViewModifierHandler(
+            .init(
                 match: ["ref": "test-1", "extraProperty": "extraValue"],
                 handler: { (_, _, transition) in
                     moreSpecificExpectation.fulfill()
@@ -424,7 +425,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
     func testInitThrowsErrorWhenHandlerMissingRef() {
         // Test that initializer throws when a handler match is missing the 'ref' key
         XCTAssertThrowsError(try ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
-            ExternalActionViewModifierHandler(
+            .init(
                 match: ["extraProperty": "value"],
                 handler: { _, _, _ in
                     return AnyView(Text("Should not be called"))

@@ -26,9 +26,9 @@ public struct PluginsAndPlayerCollection: View {
     /**
      Initializes and loads flows
      - parameters:
-        - plugins: Plugins to add to Player instance that is created
-        - sections: The `[FlowSection]` to display
-        - padding: Padding around the AssetFlowView
+     - plugins: Plugins to add to Player instance that is created
+     - sections: The `[FlowSection]` to display
+     - padding: Padding around the AssetFlowView
      */
     public init(
         plugins: [NativePlugin],
@@ -59,7 +59,7 @@ public struct PluginsAndPlayerCollection: View {
                     )
                     .padding(padding)
                 }.accessibility(identifier: "Reuse already loaded flow")
-                
+
                 NavigationLink("Simple Flows") {
                     FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
                         .padding(padding)
@@ -109,8 +109,8 @@ public struct PluginsAndPlayerCollection: View {
             }
         }
 
-        let externalActionPlugin = ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
+        let externalActionPlugin = try? ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { state, options, transition in
                     print("PluginsAndPlayerCollection External State triggered")
@@ -125,19 +125,23 @@ public struct PluginsAndPlayerCollection: View {
             Section {
                 ForEach(section.flows, id: \.name) { flow in
                     NavigationLink(flow.name) {
-                        AssetFlowView(flow: flow.flow, plugins: plugins + [externalActionPlugin, beaconPlugin, pubsubPlugin], completion: completion(result:))
-                            .padding(padding)
-                            .navigationBarTitle(Text(flow.name))
-                            .modifier(
-                                AlertViewModifier(
-                                    alertPresented: $alertPresented,
-                                    pubsubEventName: $beaconAndPubsubInfo,
-                                    completionMessage: $completionMessage)
-                            )
-                            .onDisappear {
-                                // clear tracked beacons and pub sub info
-                                $beaconAndPubsubInfo.wrappedValue = ""
-                            }
+                        AssetFlowView(
+                            flow: flow.flow,
+                            plugins: (plugins + [externalActionPlugin, beaconPlugin, pubsubPlugin]).compactMap { $0 },
+                            completion: completion(result:)
+                        )
+                        .padding(padding)
+                        .navigationBarTitle(Text(flow.name))
+                        .modifier(
+                            AlertViewModifier(
+                                alertPresented: $alertPresented,
+                                pubsubEventName: $beaconAndPubsubInfo,
+                                completionMessage: $completionMessage)
+                        )
+                        .onDisappear {
+                            // clear tracked beacons and pub sub info
+                            $beaconAndPubsubInfo.wrappedValue = ""
+                        }
                     }
                     .accessibility(identifier: "\(section.title) \(flow.name)")
                 }
@@ -166,7 +170,7 @@ public struct PluginsAndPlayerCollection: View {
                 )
         }
     }
-
+    
     func completion(result: Result<CompletedState, PlayerError>) {
         $alertPresented.wrappedValue = true
         switch result {

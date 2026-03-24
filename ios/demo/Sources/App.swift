@@ -44,14 +44,6 @@ struct MainView: View {
         CommonTypesPlugin(),
         ExpressionPlugin(),
         CommonExpressionsPlugin(),
-        ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
-                match: ["ref":"test-1"],
-                handler: { _, _, _ in
-                    print("MainView External State triggered")
-                }
-            )
-        ]),
         MetricsPlugin { timing, render, flow in
             print(timing as Any)
             print(render as Any)
@@ -63,7 +55,18 @@ struct MainView: View {
         TransitionPlugin(popTransition: .pop),
         BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
         SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
-    ]
+    ] + [
+        try? ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
+                match: ["ref":"test-1"],
+                handler: { _, _, _ in
+                    print("MainView External State triggered")
+                }
+            )
+        ])
+    ].compactMap { $0 }
+
+
     var body: some View {
         SegmentControlView(
             plugins: plugins,
