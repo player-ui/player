@@ -111,13 +111,11 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
                             do {
                                 self?.content = try handler.handler(state, controllers) { transition in
                                     resolve(transition)
-                                    Task { @MainActor in
-                                        withAnimation {
-                                            self?.isExternalAction = false
-                                            self?.state = nil
-                                        }
-                                        self?.content = nil
+                                    withAnimation {
+                                        self?.isExternalAction = false
+                                        self?.state = nil
                                     }
+                                    self?.content = nil
                                 }
                             } catch {
                                 // Reset state when handler throws
