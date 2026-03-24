@@ -56,15 +56,16 @@ struct MainView: View {
         BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
         SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ] + [
-        try? ExternalActionPlugin(handlers: [
+        // swiftlint:disable:next force_try
+        try! ExternalActionPlugin(handlers: [
             ExternalActionHandler(
-                match: ["ref":"test-1"],
+                match: ["ref": "test-1"],
                 handler: { _, _, _ in
                     print("MainView External State triggered")
                 }
             )
         ])
-    ].compactMap { $0 }
+    ]
 
 
     var body: some View {

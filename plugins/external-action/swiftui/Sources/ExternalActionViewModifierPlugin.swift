@@ -7,7 +7,7 @@ import PlayerUIExternalActionPlugin
 
 public struct ExternalActionViewModifierHandler {
     public typealias Match = [String: Any]
-    
+
     /**
      The handler function to run when an external state is transitioned to
      - parameters:
@@ -21,10 +21,10 @@ public struct ExternalActionViewModifierHandler {
         PlayerControllers,
         @escaping (String) -> Void
     ) throws -> AnyView
-    
+
     public let match: Match
     public let handler: Handler
-    
+
     public init(match: Match, handler: @escaping Handler) {
         self.match = match
         self.handler = handler
@@ -104,24 +104,28 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
                     let context = self?.context,
                     let controllers = PlayerControllers(from: options),
                     let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
-                        self?.isExternalAction = true
-                        let state = NavigationFlowExternalState(state)
-                        self?.state = state
-                        do {
-                            self?.content = try handler.handler(state, controllers) { transition in
-                                resolve(transition)
-                                withAnimation {
-                                    self?.isExternalAction = false
-                                    self?.state = nil
+                        Task { @MainActor in
+                            self?.isExternalAction = true
+                            let state = NavigationFlowExternalState(state)
+                            self?.state = state
+                            do {
+                                self?.content = try handler.handler(state, controllers) { transition in
+                                    resolve(transition)
+                                    Task { @MainActor in
+                                        withAnimation {
+                                            self?.isExternalAction = false
+                                            self?.state = nil
+                                        }
+                                        self?.content = nil
+                                    }
                                 }
+                            } catch {
+                                // Reset state when handler throws
+                                self?.isExternalAction = false
+                                self?.state = nil
                                 self?.content = nil
+                                reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                             }
-                        } catch {
-                            // Reset state when handler throws
-                            self?.isExternalAction = false
-                            self?.state = nil
-                            self?.content = nil
-                            reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                         }
                     })
                 else { return nil }
@@ -183,9 +187,14 @@ public struct ExternalActionSheetModifier: ExternalActionViewModifier {
 
 // MARK: ViewInspector
 extension View {
-    func inspectableSheet<Sheet>(isPresented: Binding<Bool>, onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Sheet
+    func inspectableSheet<Sheet>(
+        isPresented: Binding<Bool>,
+        onDismiss: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping () -> Sheet
     ) -> some View where Sheet: View {
-        return self.modifier(InspectableSheet(isPresented: isPresented, onDismiss: onDismiss, popupBuilder: content))
+        return self.modifier(
+            InspectableSheet(isPresented: isPresented, onDismiss: onDismiss, popupBuilder: content)
+        )
     }
 }
 

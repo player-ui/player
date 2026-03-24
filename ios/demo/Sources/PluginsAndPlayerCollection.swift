@@ -109,10 +109,11 @@ public struct PluginsAndPlayerCollection: View {
             }
         }
 
-        let externalActionPlugin = try? ExternalActionPlugin(handlers: [
+        // swiftlint:disable:next force_try
+        let externalActionPlugin = try! ExternalActionPlugin(handlers: [
             ExternalActionHandler(
                 match: ["ref": "test-1"],
-                handler: { state, options, transition in
+                handler: { _, options, transition in
                     print("PluginsAndPlayerCollection External State triggered")
                     let transitionValue = options.data.get(binding: "transitionValue") as? String
                     options.expression.evaluate("{{foo}} = 'bar'")

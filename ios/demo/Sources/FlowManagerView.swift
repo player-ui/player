@@ -72,10 +72,11 @@ public struct FlowManagerView: View {
         }.navigationBarTitle(Text(navTitle))
     }
 
-    private let externalActionPlugin = try? ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+    // swiftlint:disable:next force_try
+    private let externalActionPlugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
         .init(
             match: ["ref": "test-1"],
-            handler: { (state, _, transition) in
+            handler: { _, _, transition in
                 return AnyView(
                     Text("External State")
                         .onAppear {

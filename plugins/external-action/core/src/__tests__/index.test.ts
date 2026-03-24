@@ -533,10 +533,14 @@ describe("Type Safety", () => {
 
     // Warnings should have been logged for handlers with invalid matches (2 warnings)
     expect(warnSpy).toHaveBeenCalledTimes(2);
-    expect(warnSpy).toHaveBeenCalledWith(
+    // First warning for empty object match
+    expect(warnSpy).toHaveBeenNthCalledWith(
+      1,
       "An external action match is missing the 'ref' property. This handler will be ignored. Match: {}",
     );
-    expect(warnSpy).toHaveBeenCalledWith(
+    // Second warning for match without ref
+    expect(warnSpy).toHaveBeenNthCalledWith(
+      2,
       'An external action match is missing the \'ref\' property. This handler will be ignored. Match: {"testProperty":"testValue"}',
     );
 
