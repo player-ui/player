@@ -233,18 +233,6 @@ export class ReactPlayer {
       /** capture error and return true or false to represent if we are recovering from the error or not. */
       const captureError = React.useCallback(
         (err: Error) => {
-          setErrorSubId((prev) => {
-            // Don't sub more than once.
-            if (prev !== undefined) {
-              return prev;
-            }
-
-            // subscribe and remember id.
-            return subscribe(clearErrorTracking, {
-              initializeWithPreviousValue: false,
-            });
-          });
-
           // If player isn't in progress we can't actually render anything so render errors are irrelevant.
           const playerState = this.player.getState();
           if (playerState.status !== "in-progress") {
@@ -261,14 +249,38 @@ export class ReactPlayer {
             return currentError;
           }
 
-          const { skipped } = playerState.controllers.error.captureError(
-            err,
-            ErrorTypes.RENDER,
-          );
+          let isRecovering = false;
+          setErrorSubId((prev) => {
+            // subscribe only if no subscription available.
+            // Needs to happen before capture error to ensure error recovery isn't missed
+            const subId =
+              prev === undefined
+                ? subscribe(clearErrorTracking, {
+                    initializeWithPreviousValue: false,
+                  })
+                : prev;
 
-          trackedErrors.current.set(err, skipped);
+            // Get skipped state after trying to capture.
+            const playerError = playerState.controllers.error.captureError(
+              err,
+              ErrorTypes.RENDER,
+            );
+            isRecovering = playerError.skipped;
+            trackedErrors.current.set(err, isRecovering);
 
-          return skipped;
+            // If we can't recover from the error, avoid updating state to stay in error boundary
+            if (!isRecovering) {
+              // Unsub if not previously subbed since we don't need to reset the view
+              if (subId !== prev) {
+                unsubscribe(subId);
+              }
+              return prev;
+            }
+
+            return subId;
+          });
+
+          return isRecovering;
         },
         [errorSubId],
       );
