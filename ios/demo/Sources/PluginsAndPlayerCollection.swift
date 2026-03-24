@@ -91,44 +91,13 @@ public struct PluginsAndPlayerCollection: View {
     }
 
     var pluginFlows: some View {
-        let pubsubPlugin = PubSubPlugin([("some-event", { (eventName, eventData) in
-            $alertPresented.wrappedValue = true
-
-            switch eventData {
-            case .string(data: let string):
-                $beaconAndPubsubInfo.wrappedValue += "Published: `\(eventName)` with message: `\(string)` \n"
-            default: break
-            }
-        })])
-
-        let beaconPlugin =  BeaconPlugin<DefaultBeacon> { beaconStruct in
-            $alertPresented.wrappedValue = true
-            let encoder = JSONEncoder()
-            if let data = try? encoder.encode(beaconStruct), let jsonString = String(data: data, encoding: .utf8) {
-                $beaconAndPubsubInfo.wrappedValue += "Beacon: \(jsonString) \n"
-            }
-        }
-
-        // swiftlint:disable:next force_try
-        let externalActionPlugin = try! ExternalActionPlugin(handlers: [
-            ExternalActionHandler(
-                match: ["ref": "test-1"],
-                handler: { _, options, transition in
-                    print("PluginsAndPlayerCollection External State triggered")
-                    let transitionValue = options.data.get(binding: "transitionValue") as? String
-                    options.expression.evaluate("{{foo}} = 'bar'")
-                    transition(transitionValue ?? "Next")
-                }
-            )
-        ])
-
-        return ForEach(sections, id: \.title) { section in
+        ForEach(sections, id: \.title) { section in
             Section {
                 ForEach(section.flows, id: \.name) { flow in
                     NavigationLink(flow.name) {
                         AssetFlowView(
                             flow: flow.flow,
-                            plugins: (plugins + [externalActionPlugin, beaconPlugin, pubsubPlugin]).compactMap { $0 },
+                            plugins: plugins + throwingPlugins + [beaconPlugin, pubsubPlugin],
                             completion: completion(result:)
                         )
                         .padding(padding)
@@ -171,7 +140,7 @@ public struct PluginsAndPlayerCollection: View {
                 )
         }
     }
-    
+
     func completion(result: Result<CompletedState, PlayerError>) {
         $alertPresented.wrappedValue = true
         switch result {
@@ -185,5 +154,48 @@ public struct PluginsAndPlayerCollection: View {
 
             completionMessage = "\(errorState.error)"
         }
+    }
+
+    var pubsubPlugin: PubSubPlugin {
+        .init([("some-event", { (eventName, eventData) in
+            $alertPresented.wrappedValue = true
+
+            switch eventData {
+            case .string(data: let string):
+                $beaconAndPubsubInfo.wrappedValue += "Published: `\(eventName)` with message: `\(string)` \n"
+            default: break
+            }
+        })])
+    }
+
+    var beaconPlugin : BeaconPlugin<DefaultBeacon> {
+        .init { beaconStruct in
+            $alertPresented.wrappedValue = true
+            let encoder = JSONEncoder()
+            if let data = try? encoder.encode(beaconStruct), let jsonString = String(data: data, encoding: .utf8) {
+                $beaconAndPubsubInfo.wrappedValue += "Beacon: \(jsonString) \n"
+            }
+        }
+    }
+
+    var throwingPlugins: [NativePlugin] {
+        var plugins: [NativePlugin] = []
+        do {
+            let externalActionPlugin = try ExternalActionPlugin(handlers: [
+                ExternalActionHandler(
+                    match: ["ref": "test-1"],
+                    handler: { _, options, transition in
+                        print("PluginsAndPlayerCollection External State triggered")
+                        let transitionValue = options.data.get(binding: "transitionValue") as? String
+                        options.expression.evaluate("{{foo}} = 'bar'")
+                        transition(transitionValue ?? "Next")
+                    }
+                )
+            ])
+            plugins.append(externalActionPlugin)
+        } catch {
+            fatalError("Failed to create ExternalActionPlugin: \(error)")
+        }
+        return plugins
     }
 }
