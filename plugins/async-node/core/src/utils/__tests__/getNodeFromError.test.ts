@@ -9,8 +9,8 @@ import {
   PlayerError,
   PlayerErrorMetadata,
 } from "@player-ui/player";
-import { AsyncPluginContext } from "../../internal-types";
-import { ASYNC_ERROR_TYPE } from "../../AsyncNodeError";
+import { AsyncNodeInfo, AsyncPluginContext } from "../../internal-types";
+import { ASYNC_ERROR_TYPE, AsyncNodeError } from "../../AsyncNodeError";
 
 vi.mock("../isAsyncPlayerError");
 
@@ -37,13 +37,27 @@ const createPlayerError = (
   severity: ErrorSeverity.ERROR,
 });
 
-const createContext = (): AsyncPluginContext => ({
+const createPlayerErrorForError = (
+  error: Error & PlayerErrorMetadata,
+): PlayerError => ({
+  error,
+  errorType: error.type,
+  metadata: error.metadata,
+  severity: error.severity,
+  skipped: false,
+});
+
+const createContext = (
+  baseContext?: Partial<AsyncPluginContext>,
+): AsyncPluginContext => ({
   assetIdCache: new Map(),
   asyncNodeCache: new Map(),
   generatedByMap: new Map(),
   inProgressNodes: new Set(),
+  originalParentMap: new Map(),
   view: {} as any,
   viewController: {} as any,
+  ...baseContext,
 });
 
 describe("getNodeFromError", () => {
@@ -153,38 +167,57 @@ describe("getNodeFromError", () => {
       expect(result).toBeUndefined();
     });
 
-    const undefinedNodeMetadata = [undefined, {}, { node: undefined }];
-    it.each(undefinedNodeMetadata)(
-      "should return undefined if the node from the error is undefined",
-      (metadata) => {
-        vi.mocked(isAsyncPlayerError).mockReturnValue(true);
-        const result = getNodeFromError(
-          createPlayerError(ASYNC_ERROR_TYPE, metadata),
-          createContext(),
-        );
-
-        expect(result).toBeUndefined();
-      },
-    );
-
-    it("should return the node from the metadata if it's avaialble", () => {
+    it("should return undefined if the node from the error is undefined", () => {
       vi.mocked(isAsyncPlayerError).mockReturnValue(true);
       const result = getNodeFromError(
-        createPlayerError(ASYNC_ERROR_TYPE, {
-          node: {
-            type: NodeType.Value,
-            value: {
-              prop: "value",
-            },
-          },
-        }),
+        createPlayerError(ASYNC_ERROR_TYPE, undefined),
         createContext(),
       );
 
+      expect(result).toBeUndefined();
+    });
+
+    it("should return the node the asyncNodeCache if an id matches", () => {
+      vi.mocked(isAsyncPlayerError).mockReturnValue(true);
+      const cacheEntry: AsyncNodeInfo = {
+        asyncNode: {
+          type: NodeType.Async,
+          id: "test-id",
+          value: {
+            type: NodeType.Value,
+            value: {
+              prop: "value cached",
+            },
+          },
+        },
+        updateNodes: new Set(),
+      };
+      const result = getNodeFromError(
+        createPlayerErrorForError(
+          new AsyncNodeError({
+            type: NodeType.Async,
+            id: "test-id",
+            value: {
+              type: NodeType.Value,
+              value: {
+                prop: "value",
+              },
+            },
+          }),
+        ),
+        createContext({
+          asyncNodeCache: new Map([["test-id", cacheEntry]]),
+        }),
+      );
+
       expect(result).toStrictEqual({
-        type: NodeType.Value,
+        type: NodeType.Async,
+        id: "test-id",
         value: {
-          prop: "value",
+          type: NodeType.Value,
+          value: {
+            prop: "value cached",
+          },
         },
       });
     });

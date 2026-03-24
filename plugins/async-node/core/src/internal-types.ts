@@ -25,4 +25,6 @@ export type AsyncPluginContext = {
   assetIdCache: Map<string, Node.Node>;
   /** Maps nodes to the async id that generated them. */
   generatedByMap: Map<Node.Node, string>;
+  /** Map to track the original parent of nodes that were flattened into another. This is needed to track which async nodes actually generated these nodes. */
+  originalParentMap: Map<Node.Node, Node.Node>;
 };

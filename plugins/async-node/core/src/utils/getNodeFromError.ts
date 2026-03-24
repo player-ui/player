@@ -25,8 +25,9 @@ export const getNodeFromError = (
     }
   }
 
-  if (isAsyncPlayerError(playerError)) {
-    return playerError.metadata?.node;
+  if (isAsyncPlayerError(playerError) && playerError.metadata !== undefined) {
+    // Use the node from the cache to ensure it is the latest version of the async node from the resolver
+    return context.asyncNodeCache.get(playerError.metadata.node.id)?.asyncNode;
   }
 
   return undefined;

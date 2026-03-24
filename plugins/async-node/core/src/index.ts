@@ -271,6 +271,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           mappedNode.values.forEach((v: Node.Node) => {
             v.parent = node;
             nodeSet.add(v);
+            context.originalParentMap.set(v, childNode);
           });
           node.values = [
             ...node.values.slice(0, index),
@@ -453,6 +454,20 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           return true;
         };
 
+        const getNextNode = (node: Node.Node): Node.Node | undefined => {
+          const parent =
+            currentContext?.originalParentMap.get(node) ?? node.parent;
+
+          if (!parent) {
+            return undefined;
+          }
+
+          // asyncNodeCache has current asyncNode reference more up to date with what's happening in the resolver. Sometimes AsyncNodeError has old references so this helps us move up the tree more accurately
+          return this.isAsync(parent)
+            ? currentContext?.asyncNodeCache.get(parent.id)?.asyncNode
+            : parent;
+        };
+
         let node = getNodeFromError(playerError, currentContext);
         // If the node is an async node try, to handle errors with it first.
         if (node?.type === NodeType.Async && tryHandleError(node)) {
@@ -466,7 +481,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
             const entry = currentContext.asyncNodeCache.get(generatedBy);
 
             if (!entry) {
-              node = node.parent;
+              node = getNextNode(node);
               continue;
             }
 
@@ -478,7 +493,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
             }
           }
 
-          node = node.parent;
+          node = getNextNode(node);
         }
 
         return undefined;
@@ -497,6 +512,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           generatedByMap: new Map(),
           assetIdCache: new Map(),
           asyncNodeCache: new Map(),
+          originalParentMap: new Map(),
         };
         currentContext = context;
 
