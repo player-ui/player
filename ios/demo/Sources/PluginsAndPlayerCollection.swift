@@ -26,9 +26,9 @@ public struct PluginsAndPlayerCollection: View {
     /**
      Initializes and loads flows
      - parameters:
-     - plugins: Plugins to add to Player instance that is created
-     - sections: The `[FlowSection]` to display
-     - padding: Padding around the AssetFlowView
+        - plugins: Plugins to add to Player instance that is created
+        - sections: The `[FlowSection]` to display
+        - padding: Padding around the AssetFlowView
      */
     public init(
         plugins: [NativePlugin],
