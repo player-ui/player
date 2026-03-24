@@ -335,7 +335,7 @@ describe("ReferenceAssetsPlugin", () => {
         expect(asyncHookTap).toHaveBeenCalledTimes(2);
       });
 
-      let state = player.getState();
+      const state = player.getState();
 
       expect(state.status).toBe("in-progress");
       // resolve the second async node by targeting it by id
