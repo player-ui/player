@@ -3,7 +3,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import React, { Suspense, type ComponentType } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ReactPlayer, type ReactPlayerPlugin } from "../player";
-import { Asset, InProgressState, NotStartedState } from "@player-ui/player";
+import { Asset } from "@player-ui/player";
 import { makeFlow } from "@player-ui/make-flow";
 
 type ErrorViewProps = Asset<"throwing"> & {

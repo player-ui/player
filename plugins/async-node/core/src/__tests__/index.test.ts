@@ -21,8 +21,8 @@ import {
 } from "../index";
 import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
+import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import { AsyncNodeError } from "../AsyncNodeError";
-import { ExpressionPlugin } from "../../../../expression/core/src";
 
 const transform: BeforeTransformFunction = createAsyncTransform({
   transformAssetType: "chat-message",
