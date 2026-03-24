@@ -27,7 +27,7 @@ import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Pending
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Running
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.lifecycle.fail
-import com.intuit.playerui.core.bridge.PlayerRuntimeException
+import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import kotlinx.coroutines.CancellationException
@@ -108,12 +108,8 @@ public abstract class PlayerFragment :
                                 is Error -> onError(it)
                                 is Done -> onDone(it)
                             }
-                        } catch (exception: PlayerRuntimeException) {
-                            // If the runtime is released async (via viewModel.destroy()), swallow runtime exceptions
-                            if (!playerViewModel.player.player.runtime.isReleased()) {
-                                // otherwise, rethrow
-                                throw exception
-                            }
+                        } catch (exception: PlayerRuntimeReleasedException) {
+                            // If the runtime is released async (via viewModel.destroy()), swallow runtime exception
                         }
                     }.launchIn(this + Dispatchers.Default)
 
