@@ -13,9 +13,10 @@ import JavaScriptCore
 @testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIExternalActionPlugin
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length force_try
 class ExternalActionPluginTests: XCTestCase {
-    func testExternalStateHandling() {
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandling() {
         let json = """
         {
           "id": "test-flow",
@@ -50,8 +51,8 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
+        let plugin = try! ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { (state, _, handler) in
                     XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
@@ -79,7 +80,8 @@ class ExternalActionPluginTests: XCTestCase {
         wait(for: [handlerExpectation, completionExpectation], timeout: 1)
     }
 
-    func testExternalStateHandlingThrowsError() {
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandlingThrowsError() {
         let json = """
         {
           "id": "test-flow",
@@ -114,8 +116,8 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
+        let plugin = try! ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { (_, _, _) in
                     handlerExpectation.fulfill()
@@ -138,7 +140,8 @@ class ExternalActionPluginTests: XCTestCase {
     }
 
     // swiftlint:disable function_body_length
-    func testExternalStateHandlingComplexState() {
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandlingComplexState() {
         let json = """
         {
           "id": "test-flow",
@@ -181,8 +184,8 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
+        let plugin = try! ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { (state, _, handler) in
                     XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
@@ -212,7 +215,7 @@ class ExternalActionPluginTests: XCTestCase {
         wait(for: [handlerExpectation, completionExpectation], timeout: 2)
     }
 
-    func testExternalStateHandlingWithDelay() {
+    func testExternalActionHandlingWithDelay() {
         let json = """
         {
           "id": "test-flow",
@@ -247,8 +250,8 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
+        let plugin = try! ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { (_, _, handler) in
                     DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
@@ -273,7 +276,7 @@ class ExternalActionPluginTests: XCTestCase {
         wait(for: [handlerExpectation, completionExpectation], timeout: 5)
     }
 
-    func testExternalStateHandlingOptions() {
+    func testExternalActionHandlingOptions() {
         let json = """
         {
           "id": "test-flow",
@@ -308,8 +311,8 @@ class ExternalActionPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionPlugin(handlers: [
-            ExternalStateHandler(
+        let plugin = try! ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { (_, options, handler) in
                     XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Next")
@@ -340,8 +343,9 @@ class ExternalActionPluginTests: XCTestCase {
 
         wait(for: [handlerExpectation, completionExpectation], timeout: 1)
     }
-    
-    func testExternalStateHandlingWithSpecificity() {
+
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandlingWithSpecificity() {
         let json = """
         {
           "id": "test-flow",
@@ -378,10 +382,10 @@ class ExternalActionPluginTests: XCTestCase {
         lessSpecificExpectation.isInverted = true
         let moreSpecificExpectation = XCTestExpectation(description: "more specific handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        
-        let plugin = ExternalActionPlugin(handlers: [
+
+        let plugin = try! ExternalActionPlugin(handlers: [
             // Less specific - only matches ref
-            ExternalStateHandler(
+            ExternalActionHandler(
                 match: ["ref": "test-1"],
                 handler: { (_, _, handler) in
                     lessSpecificExpectation.fulfill()
@@ -389,7 +393,7 @@ class ExternalActionPluginTests: XCTestCase {
                 }
             ),
             // More specific - matches ref and extraProperty
-            ExternalStateHandler(
+            ExternalActionHandler(
                 match: ["ref": "test-1", "extraProperty": "extraValue"],
                 handler: { (_, _, handler) in
                     moreSpecificExpectation.fulfill()
@@ -411,5 +415,29 @@ class ExternalActionPluginTests: XCTestCase {
         }
 
         wait(for: [moreSpecificExpectation, lessSpecificExpectation, completionExpectation], timeout: 1)
+    }
+
+    func testInitThrowsErrorWhenHandlerMissingRef() {
+        // Test that initializer throws when a handler match is missing the 'ref' key
+        XCTAssertThrowsError(try ExternalActionPlugin(handlers: [
+            ExternalActionHandler(
+                match: ["extraProperty": "value"],
+                handler: { (_, _, handler) in
+                    handler("Next")
+                }
+            )
+        ])) { error in
+            guard let pluginError = error as? ExternalActionPluginError else {
+                XCTFail("Expected ExternalActionPluginError but got \(type(of: error))")
+                return
+            }
+
+            if case .matchMissingRef(let match) = pluginError {
+                XCTAssertNil(match["ref"])
+                XCTAssertEqual(match["extraProperty"] as? String, "value")
+            } else {
+                XCTFail("Expected matchMissingRef error")
+            }
+        }
     }
 }

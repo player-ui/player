@@ -37,7 +37,7 @@ public struct FlowManagerView: View {
                             },
                             ExternalActionViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
                                 ExternalStateViewModifierHandler(
-                                    match: ["ref":"test-1"],
+                                    match: ["ref": "test-1"],
                                     handler: { (state, _, transition) in
                                         return AnyView(
                                             Text("External State")

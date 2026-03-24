@@ -493,22 +493,31 @@ describe("Type Safety", () => {
       plugins: [
         new ExternalActionPlugin([
           // Invalid match - empty object (TypeScript error suppressed for testing)
-          // @ts-expect-error - testing runtime behavior with invalid match
-          [{}, () => {
-            invalidHandler1Called();
-            return "Next";
-          }],
+          [
+            // @ts-expect-error - testing runtime behavior with invalid match
+            {},
+            () => {
+              invalidHandler1Called();
+              return "Next";
+            },
+          ],
           // Invalid match - missing ref (TypeScript error suppressed for testing)
-          // @ts-expect-error - testing runtime behavior with invalid match
-          [{ testProperty: "testValue" }, () => {
-            invalidHandler2Called();
-            return "Next";
-          }],
+          [
+            // @ts-expect-error - testing runtime behavior with invalid match
+            { testProperty: "testValue" },
+            () => {
+              invalidHandler2Called();
+              return "Next";
+            },
+          ],
           // Valid match - has ref
-          [{ ref: "test-1" }, () => {
-            validHandlerCalled();
-            return "Next";
-          }],
+          [
+            { ref: "test-1" },
+            () => {
+              validHandlerCalled();
+              return "Next";
+            },
+          ],
         ]),
       ],
       logger: {
@@ -525,19 +534,19 @@ describe("Type Safety", () => {
     // Warnings should have been logged for handlers with invalid matches (2 warnings)
     expect(warnSpy).toHaveBeenCalledTimes(2);
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("An external action match is missing the 'ref' property")
+      "An external action match is missing the 'ref' property. This handler will be ignored. Match: {}",
     );
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("This handler will be ignored")
+      'An external action match is missing the \'ref\' property. This handler will be ignored. Match: {"testProperty":"testValue"}',
     );
 
     // The handlers with invalid matches should NOT have been called
     expect(invalidHandler1Called).not.toHaveBeenCalled();
     expect(invalidHandler2Called).not.toHaveBeenCalled();
-    
+
     // The valid handler should have been called
     expect(validHandlerCalled).toHaveBeenCalledTimes(1);
-    
+
     // Flow should complete successfully using the valid handler
     expect(completed.endState.outcome).toBe("FWD");
   });

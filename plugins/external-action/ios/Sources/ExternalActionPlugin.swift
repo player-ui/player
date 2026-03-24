@@ -10,7 +10,18 @@ import JavaScriptCore
 
 import PlayerUI
 
-public struct ExternalStateHandler {
+public enum ExternalActionPluginError: LocalizedError {
+    case matchMissingRef(match: [String: Any])
+
+    public var errorDescription: String? {
+        switch self {
+        case .matchMissingRef(let match):
+            return "The key/match (\(match)) must contain a 'ref' key."
+        }
+    }
+}
+
+public struct ExternalActionHandler {
     public typealias Match = [String: Any]
 
     /**
@@ -21,7 +32,11 @@ public struct ExternalStateHandler {
         - transition: A completion handler that takes a string to transition with.
             This completion handler lets the user transition at an appropriate time.
      */
-    public typealias Handler = (NavigationFlowExternalState, PlayerControllers, @escaping (String) -> Void) throws -> Void
+    public typealias Handler = (
+        NavigationFlowExternalState,
+        PlayerControllers,
+        @escaping (String) -> Void
+    ) throws -> Void
 
     public let match: Match
     public let handler: Handler
@@ -36,14 +51,20 @@ public struct ExternalStateHandler {
  This plugin is for registering a handler for EXTERNAL states
  */
 public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
-    private var handlers: [ExternalStateHandler]
+    private var handlers: [ExternalActionHandler]
 
     /**
-     Construct a plugin to handle external states
+     Construct a plugin to handle external states. Every match/key must include a `ref`.
      - parameters:
-        - handlers: array of handlers with matchers and handler functions
+        - handlers: array of handlers with matchers and handler functions.
      */
-    public init(handlers: [ExternalStateHandler]) {
+    public init(handlers: [ExternalActionHandler]) throws {
+        try handlers.forEach { handler in
+            let match = handler.match
+            if match["ref"] == nil {
+                throw ExternalActionPluginError.matchMissingRef(match: match)
+            }
+        }
         self.handlers = handlers
         super.init(
             fileName: "ExternalActionPlugin.native",
@@ -52,8 +73,9 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
     }
 
     /**
-     Retrieves the arguments for constructing this plugin, this is necessary because the arguments need to be supplied after
-     construction of the swift object, once the context has been provided
+     Retrieves the arguments for constructing this plugin.
+     This is necessary because the arguments need to be supplied after construction of the swift object,
+     once the context has been provided.
      - returns: An array of arguments to construct the plugin
      */
     override public func getArguments() -> [Any] {
@@ -81,7 +103,7 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
             let jsCallback = JSValue(object: callback, in: context)
             return [jsMatch, jsCallback]
         }
-        
+
         return [jsHandlers]
     }
 
