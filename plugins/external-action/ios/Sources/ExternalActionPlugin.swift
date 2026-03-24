@@ -11,7 +11,7 @@ import JavaScriptCore
 import PlayerUI
 
 public enum ExternalActionPluginError: LocalizedError {
-    case matchMissingRef(match: [String: Any])
+    case matchMissingRef(match: [String: Any?])
 
     public var errorDescription: String? {
         switch self {
@@ -22,7 +22,9 @@ public enum ExternalActionPluginError: LocalizedError {
 }
 
 public struct ExternalActionHandler {
-    public typealias Match = [String: Any]
+    /// Map of properties to match against external states.
+    /// Must include "ref" key.
+    public typealias Match = [String: Any?]
 
     /**
      The handler function to run when an external state is transitioned to

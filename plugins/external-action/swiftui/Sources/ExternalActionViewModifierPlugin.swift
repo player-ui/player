@@ -6,7 +6,9 @@ import PlayerUISwiftUI
 import PlayerUIExternalActionPlugin
 
 public struct ExternalActionViewModifierHandler {
-    public typealias Match = [String: Any]
+    /// Map of properties to match against external states.
+    /// Must include "ref" key.
+    public typealias Match = [String: Any?]
 
     /**
      The handler function to run when an external state is transitioned to
