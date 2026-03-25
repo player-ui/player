@@ -16,15 +16,19 @@ import org.junit.jupiter.api.Test
 
 private inline fun currentStackTrace() = Exception().stackTrace
 
-private class ExceptionWithMetadata(message: String, cause: Throwable? = null) : PlayerException(message, cause), PlayerExceptionMetadata {
+private class ExceptionWithMetadata(
+    message: String,
+    cause: Throwable? = null,
+) : PlayerException(message, cause),
+    PlayerExceptionMetadata {
     override val type: String
-    get() = "TestError"
+        get() = "TestError"
     override val severity: ErrorSeverity?
-    get() = ErrorSeverity.ERROR
+        get() = ErrorSeverity.ERROR
     override val metadata: Map<String, Any?>?
-    get() = mapOf(
-        "testProperty" to "testValue",
-    )
+        get() = mapOf(
+            "testProperty" to "testValue",
+        )
 }
 
 // TODO: This should be a core [RuntimeTest]
@@ -114,7 +118,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
                     .encodeToRuntimeValue(
                         SerializableStackTraceElement.serializer(),
                         serializableStackTraceElement,
-                    ).jsEquals(error.getArray("stackTrace").getObject(0))
+                    ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
 
             assertEquals(ErrorSeverity.ERROR.value, error.get("severity"))

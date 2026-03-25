@@ -15,7 +15,11 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import kotlin.test.currentStackTrace
 
-private class ExceptionWithMetadata(message: String, cause: Throwable? = null) : PlayerException(message, cause), PlayerExceptionMetadata {
+private class ExceptionWithMetadata(
+    message: String,
+    cause: Throwable? = null,
+) : PlayerException(message, cause),
+    PlayerExceptionMetadata {
     override val type: String
         get() = "TestError"
     override val severity: ErrorSeverity?
@@ -130,7 +134,10 @@ internal class ThrowableSerializerTest : HermesTest() {
 
         Assertions.assertEquals(ErrorSeverity.ERROR.value, error.getProperty(runtime, "severity").asString(runtime))
         Assertions.assertEquals("TestError", error.getProperty(runtime, "type").asString(runtime))
-        Assertions.assertEquals("testValue", error.getPropertyAsObject(runtime, "metadata").getProperty(runtime, "testProperty").asString(runtime))
+        Assertions.assertEquals(
+            "testValue",
+            error.getPropertyAsObject(runtime, "metadata").getProperty(runtime, "testProperty").asString(runtime),
+        )
     }
 
     @Test
