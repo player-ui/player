@@ -12,10 +12,10 @@ import kotlinx.serialization.Serializable
 public open class ReadOnlyDataController internal constructor(
     override val node: Node,
 ) : NodeWrapper {
-    private val get: Invokable<Any?>? by NodeSerializableFunction()
+    private val get: Invokable<Any?> by NodeSerializableFunction()
 
     /** Retrieve the value at the given [binding] */
-    public fun get(binding: Binding): Any? = get?.invoke(binding)
+    public fun get(binding: Binding): Any? = get.invoke(binding)
 
     /**
      * Serializer that picks the concrete type based on whether the underlying JS object
@@ -34,4 +34,4 @@ public open class ReadOnlyDataController internal constructor(
 }
 
 /** Convenience helper to [ReadOnlyDataController.get] the entire data model */
-public fun ReadOnlyDataController.get(): Map<String, Any?> = get("") as? Map<String, Any?> ?: emptyMap()
+public fun ReadOnlyDataController.get(): Map<String, Any?> = get("") as Map<String, Any?> ?: emptyMap()
