@@ -27,7 +27,9 @@ export function loadConfig(): McpConfig {
 
   return {
     maxDependencyDepth: Number.isNaN(rawDepth) ? 2 : rawDepth,
-    overviewMaxLength: Number.isNaN(rawOverviewLength) ? 300 : rawOverviewLength,
+    overviewMaxLength: Number.isNaN(rawOverviewLength)
+      ? 300
+      : rawOverviewLength,
     cacheMaxSize: Number.isNaN(rawCacheSize) ? 50 : rawCacheSize,
     enablePerformanceLogging: process.env.MCP_ENABLE_PERF_LOG === "true",
   };
