@@ -11,7 +11,6 @@ import type { Command } from "commander";
 
 import { getAllSkills } from "../lib/skills.js";
 import { installSkillFiles } from "../lib/installer.js";
-import { getSkillInstallPath } from "../lib/paths.js";
 import type { InstallScope } from "../lib/paths.js";
 
 /**

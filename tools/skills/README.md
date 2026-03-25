@@ -106,10 +106,10 @@ The installer reads `name` and `description` from the front matter. The `version
 
 ## Adding a New Skill
 
-1. Create a new directory under `skills/`:
+1. Create a new directory under `catalog/`:
 
    ```
-   skills/my-new-skill/
+   catalog/my-new-skill/
      SKILL.md
    ```
 

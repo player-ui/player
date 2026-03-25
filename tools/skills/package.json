@@ -9,7 +9,7 @@
   },
   "files": [
     "dist",
-    "skills",
+    "catalog",
     "README.md"
   ],
   "publishConfig": {

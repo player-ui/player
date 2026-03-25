@@ -1,5 +1,5 @@
-import { copyFile, mkdir, rm } from "fs/promises";
-import { join } from "path";
+import { copyFile, mkdir, rm } from "node:fs/promises";
+import { join } from "node:path";
 import type { InstallScope } from "./paths.js";
 import type { SkillMeta } from "./skills.js";
 import { getSkillInstallPath } from "./paths.js";

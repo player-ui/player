@@ -9,11 +9,14 @@ const { mockMkdir, mockCopyFile, mockRm, mockGetSkillInstallPath } = vi.hoisted(
   }),
 );
 
-vi.mock("fs/promises", () => ({
-  mkdir: mockMkdir,
-  copyFile: mockCopyFile,
-  rm: mockRm,
-}));
+vi.mock("node:fs/promises", () => {
+  const mock = {
+    mkdir: mockMkdir,
+    copyFile: mockCopyFile,
+    rm: mockRm,
+  };
+  return { ...mock, default: mock };
+});
 
 vi.mock("../../src/lib/paths.js", () => ({
   getSkillInstallPath: mockGetSkillInstallPath,
@@ -40,7 +43,7 @@ describe("installSkillFiles", () => {
       recursive: true,
     });
     expect(mockCopyFile).toHaveBeenCalledWith(
-      "/bundled/skills/create-core-plugin/SKILL.md",
+      "/bundled/catalog/create-core-plugin/SKILL.md",
       "/dest/create-core-plugin/SKILL.md",
     );
   });

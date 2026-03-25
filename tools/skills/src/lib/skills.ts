@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "fs";
 import { fileURLToPath } from "url";
-import { join } from "path";
+import { dirname, join } from "path";
 
 export interface SkillMeta {
   id: string;
@@ -31,14 +31,16 @@ export function parseSkillFrontmatter(content: string): {
 }
 
 /**
- * Returns the absolute path to the bundled skills directory.
+ * Returns the absolute path to the bundled catalog directory.
  * Resolves relative to the current module so it works both in source
- * (src/lib/skills.ts → ../../skills) and in the bundle (dist/index.mjs → ../skills).
+ * (src/lib/skills.ts → ../../catalog) and in the bundle (dist/index.mjs → ../catalog).
  */
 export function getSkillsDir(): string {
-  // From dist/index.mjs the URL is file://.../dist/index.mjs
-  // ../skills resolves to .../skills — correct for both local dev and npm install
-  return fileURLToPath(new URL("../../skills", import.meta.url));
+  const metaUrl = import.meta.url;
+  const currentDir = metaUrl.startsWith("file://")
+    ? dirname(fileURLToPath(metaUrl))
+    : dirname(metaUrl);
+  return join(currentDir, "..", "..", "catalog");
 }
 
 /**

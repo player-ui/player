@@ -13,8 +13,8 @@ js_pipeline(
     srcs = glob(["src/**/*", "__tests__/**/*"]),
     tsconfig = "tsconfig.json",
     create_package_json_args = {"custom_entrypoints": True},
-    include_packaging_targets = glob(["skills/**/*"]),
-    test_deps = ["//:vitest_config"] + glob(["skills/**/*"]),
+    include_packaging_targets = glob(["catalog/**/*"]),
+    test_deps = ["//:vitest_config"] + glob(["catalog/**/*"]),
     deps = [
         ":node_modules/@clack/prompts",
         ":node_modules/commander",
