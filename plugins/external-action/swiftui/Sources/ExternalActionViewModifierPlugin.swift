@@ -8,7 +8,7 @@ import PlayerUIExternalActionPlugin
 public struct ExternalActionViewModifierHandler {
     /// Map of properties to match against external states.
     /// Must include "ref" key.
-    public typealias Match = [String: Any?]
+    public typealias Match = [String: Any]
 
     /**
      The handler function to run when an external state is transitioned to
