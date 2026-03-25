@@ -240,7 +240,7 @@ Key types exported from `@player-ui/react` (in addition to all re-exports from `
 
 ### Basic Player Setup
 
-```typescript
+```tsx
 const App = () => {
   const { reactPlayer, playerState } = useReactPlayer({
     plugins: [new ReferenceAssetsPlugin()]
@@ -255,7 +255,7 @@ const App = () => {
 
 ### Multi-Flow with ManagedPlayer
 
-```typescript
+```tsx
 const manager: FlowManager = {
   async next(prevResult) {
     if (!prevResult) return { value: await fetchFlow1() };
@@ -295,7 +295,7 @@ Later registrations override earlier ones for the same match key. More specific 
 
 Use `usePlayer()` hook to access the Player instance, then use controllers as documented in `@player-ui/player`:
 
-```typescript
+```tsx
 const MyAsset = (props: MyAssetProps) => {
   const player = usePlayer();
   const handleClick = () => {
@@ -311,7 +311,7 @@ const MyAsset = (props: MyAssetProps) => {
 
 ### Wrapping Root Component
 
-```typescript
+```tsx
 reactPlayer.hooks.webComponent.tap('wrapper', (Comp) => {
   return (props) => (
     <ThemeProvider><Comp {...props} /></ThemeProvider>
@@ -365,7 +365,7 @@ Waterfall hook — each tap wraps previous. `webComponent` wraps the outermost s
 
 ## Testing
 
-```typescript
+```tsx
 // Mock PlayerContext for custom asset tests
 const mockPlayer = {
   getState: () => ({ status: 'in-progress', controllers: { data: { set: vi.fn() } } }),

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getPackage } from "../../../src/tools/get-package.js";
-import { ValidationError, PackageNotFoundError } from "../../../src/errors.js";
+import { PackageNotFoundError } from "../../../src/errors.js";
 import type { Metadata } from "../../../src/loader.js";
 import * as loader from "../../../src/loader.js";
 
@@ -50,10 +50,6 @@ describe("getPackage", () => {
   beforeEach(() => {
     vi.mocked(loader.loadMetadata).mockResolvedValue(mockMetadata);
   });
-  it("should throw ValidationError when package name is empty", async () => {
-    await expect(getPackage({ package: "" })).rejects.toThrow(ValidationError);
-  });
-
   it("should load knowledge without dependencies when includeDependencies is false", async () => {
     const mockKnowledgeMap = new Map([
       ["@player-ui/types", "# @player-ui/types\n\nType definitions"],

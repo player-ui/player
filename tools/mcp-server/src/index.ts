@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createRequire } from "module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -19,6 +20,9 @@ import {
 } from "./validation.js";
 import { getCategories } from "./loader.js";
 import { getLogger } from "./logger.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
 
 const logger = getLogger();
 
@@ -118,7 +122,7 @@ export async function buildToolDefinitions(): Promise<Tool[]> {
 const server = new McpServer(
   {
     name: "player-ui-mcp-server",
-    version: "0.1.0",
+    version,
   },
   {
     capabilities: {

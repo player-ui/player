@@ -1,5 +1,5 @@
 import { loadMetadata, loadKnowledgeWithDependencies } from "../loader.js";
-import { ValidationError, PackageNotFoundError } from "../errors.js";
+import { PackageNotFoundError } from "../errors.js";
 import { getConfig } from "../config.js";
 
 export interface GetPackageArgs {
@@ -13,10 +13,6 @@ export interface GetPackageArgs {
  */
 export async function getPackage(args: GetPackageArgs): Promise<string> {
   const { package: packageName, includeDependencies = true } = args;
-
-  if (!packageName) {
-    throw new ValidationError("Package name is required", "package");
-  }
 
   const metadata = await loadMetadata();
   if (!metadata.packages[packageName]) {

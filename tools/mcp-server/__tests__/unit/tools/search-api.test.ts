@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { searchApi } from "../../../src/tools/search-api.js";
-import { ValidationError } from "../../../src/errors.js";
 import * as loader from "../../../src/loader.js";
 
 // Mock the loader module
@@ -9,10 +8,6 @@ vi.mock("../../../src/loader.js", () => ({
 }));
 
 describe("searchApi", () => {
-  it("should throw ValidationError when query is empty", async () => {
-    await expect(searchApi({ query: "" })).rejects.toThrow(ValidationError);
-  });
-
   it("should search with default scope", async () => {
     const mockResults = [
       {

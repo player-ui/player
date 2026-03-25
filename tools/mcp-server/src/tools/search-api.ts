@@ -1,5 +1,4 @@
 import { searchPackages } from "../loader.js";
-import { ValidationError } from "../errors.js";
 
 export interface SearchApiArgs {
   query: string;
@@ -12,10 +11,6 @@ export interface SearchApiArgs {
  */
 export async function searchApi(args: SearchApiArgs): Promise<string> {
   const { query, scope = "all" } = args;
-
-  if (!query) {
-    throw new ValidationError("Query is required", "query");
-  }
 
   const results = await searchPackages(query, scope);
 
