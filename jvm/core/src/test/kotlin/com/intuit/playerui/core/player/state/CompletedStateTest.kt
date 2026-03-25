@@ -2,12 +2,11 @@ package com.intuit.playerui.core.player.state
 
 import com.intuit.playerui.core.NodeBaseTest
 import com.intuit.playerui.core.bridge.Invokable
-import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.data.DataController
-import com.intuit.playerui.core.data.DataModelWithParser
+import com.intuit.playerui.core.data.ReadOnlyDataController
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.core.player.PlayerFlowStatus
 import io.mockk.every
@@ -16,6 +15,7 @@ import io.mockk.mockk
 import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -27,9 +27,6 @@ internal class CompletedStateTest : NodeBaseTest() {
     private val controllerState by lazy {
         ControllerState(node)
     }
-
-    @MockK
-    private lateinit var mockDataModel: Node
 
     @MockK
     private lateinit var format: RuntimeFormat<*>
@@ -45,10 +42,8 @@ internal class CompletedStateTest : NodeBaseTest() {
         every { node.getObject("controllers") } returns node
         every { node.getSerializable<Any>("controllers", any()) } returns controllerState
         every { node.getObject("data") } returns node
-        every { node.getSerializable<Any>("data", any()) } returns DataController(node)
+        every { node.getSerializable<Any>("data", any()) } returns ReadOnlyDataController(node)
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
-        every { node.getSerializable("dataModel", DataModelWithParser.serializer()) } returns DataModelWithParser(node)
-        every { node.getObject("dataModel") } returns mockDataModel
         every { node.getObject("flow") } returns null
         every { node.nativeReferenceEquals(any()) } returns false
     }
@@ -70,6 +65,9 @@ internal class CompletedStateTest : NodeBaseTest() {
 
     @Test
     fun dataModel() {
-        assertNotNull(completedState.dataModel)
+        val dataModel = completedState.dataModel
+        assertNotNull(dataModel)
+        // Completed state must expose a ReadOnlyDataController, not a mutable DataController
+        assertTrue(dataModel !is DataController, "CompletedState.dataModel must not be a mutable DataController")
     }
 }
