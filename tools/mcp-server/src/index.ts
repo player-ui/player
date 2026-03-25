@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { createRequire } from "module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -21,8 +20,7 @@ import {
 import { getCategories } from "./loader.js";
 import { getLogger } from "./logger.js";
 
-const require = createRequire(import.meta.url);
-const { version } = require("../package.json") as { version: string };
+const version = "0.0.0-PLACEHOLDER";
 
 const logger = getLogger();
 
