@@ -169,32 +169,11 @@ export class FlowInstance {
   }
 
   /** Check if the flow has a transition for the given error type in its current state. */
-  public hasTransitionForError(errorType: string): boolean {
-    if (this.lookupInMap(this.flow.errorTransitions, errorType) !== undefined) {
-      return true;
-    }
-
-    if (!this.currentState || this.currentState.value.state_type === "END") {
-      return false;
-    }
-
-    return (
-      this.lookupInMap(this.currentState.value.errorTransitions, errorType) !==
-      undefined
-    );
-  }
-
-  /**
-   * Navigate using errorTransitions map.
-   * Tries node-level first, then falls back to flow-level.
-   * Bypasses validation hooks and expression resolution.
-   * @throws Error if errorTransitions references a non-existent state
-   */
-  public errorTransition(errorType: string): void {
+  public getErrorTransitionState(errorType: string): string | undefined {
     // Can't navigate from END state
     if (this.currentState?.value.state_type === "END") {
       this.log?.warn("Cannot error transition from END state");
-      return;
+      return undefined;
     }
 
     // Try node-level errorTransitions (only if we have a current state)
@@ -214,7 +193,7 @@ export class FlowInstance {
           this.log?.debug(
             `Error transition (node-level) from ${this.currentState.name} to ${nodeState} using ${errorType}`,
           );
-          return this.pushHistory(nodeState);
+          return nodeState;
         }
       }
     }
@@ -233,14 +212,29 @@ export class FlowInstance {
         this.log?.debug(
           `Error transition (flow-level) to ${flowState} using ${errorType}${this.currentState ? ` from ${this.currentState.name}` : ""}`,
         );
-        return this.pushHistory(flowState);
+        return flowState;
       }
     }
 
-    // No match found
-    this.log?.warn(
-      `No errorTransition found for ${errorType} (checked node and flow level)`,
-    );
+    return undefined;
+  }
+
+  /**
+   * Navigate using errorTransitions map.
+   * Tries node-level first, then falls back to flow-level.
+   * Bypasses validation hooks and expression resolution.
+   * @throws Error if errorTransitions references a non-existent state
+   */
+  public errorTransition(errorType: string): void {
+    const transitionState = this.getErrorTransitionState(errorType);
+    if (transitionState === undefined) {
+      this.log?.warn(
+        `No errorTransition found for ${errorType} (checked node and flow level)`,
+      );
+      return;
+    }
+
+    this.pushHistory(transitionState);
   }
 
   public transition(

@@ -154,7 +154,9 @@ export class ErrorController {
       return;
     }
 
-    if (!flowInstance.hasTransitionForError(playerError.errorType)) {
+    if (
+      flowInstance.getErrorTransitionState(playerError.errorType) === undefined
+    ) {
       this.options.fail(playerError.error);
       return;
     }

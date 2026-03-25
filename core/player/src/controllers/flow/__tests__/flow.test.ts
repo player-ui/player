@@ -604,7 +604,7 @@ describe("errorTransition", () => {
   });
 });
 
-describe("hasTransitionForError", () => {
+describe("getErrorTransitionState", () => {
   test("should return true when the error exists", () => {
     const flow = new FlowInstance("flow", {
       startState: "View1",
@@ -623,7 +623,7 @@ describe("hasTransitionForError", () => {
       },
     });
 
-    expect(flow.hasTransitionForError("init")).toBe(true);
+    expect(flow.getErrorTransitionState("init")).toBe("ErrorView");
   });
 
   test("should return false when the error does not exist", () => {
@@ -644,6 +644,6 @@ describe("hasTransitionForError", () => {
       },
     });
 
-    expect(flow.hasTransitionForError("not-init")).toBe(false);
+    expect(flow.getErrorTransitionState("not-init")).toBe(undefined);
   });
 });
