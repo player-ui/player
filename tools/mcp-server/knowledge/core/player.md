@@ -14,21 +14,23 @@ Main entry point and orchestrator. Manages flow lifecycle from start to completi
 
 ### Controllers (Separation of Concerns)
 
-Five specialized controllers manage distinct responsibilities:
+Seven specialized controllers manage distinct responsibilities:
 
 - **DataController**: Manages data model with get/set/delete operations. Supports formatted vs raw values, middleware pipeline, reactive updates
 - **FlowController**: Executes navigation state machine. Handles state transitions, subflow invocation, flow stack management. Owns FlowInstance per navigation flow
 - **ViewController**: Manages view rendering and updates. Resolves view AST via plugin pipeline, tracks binding dependencies for reactive re-resolution
 - **ValidationController**: Multi-phase validation system. Coordinates schema validations and cross-field rules, manages validation triggers (see `@player-ui/types` for trigger/severity/blocking semantics)
 - **SchemaController**: Central registry for data types, formatters, and validators. Provides type information for bindings
+- **ExpressionEvaluator**: Parses and evaluates the Player expression language. Manages custom functions, operators, and temporary variables
+- **BindingParser**: Parses raw binding strings/arrays into `BindingInstance` objects. Handles dynamic segments via data model lookups and expression evaluation
 
 All controllers accessible during InProgressState via `state.controllers`.
 
-**Controller Creation Order** (during `start()`):
+**Hook Firing Order** (during `start()`):
 
-`FlowController → BindingParser → SchemaController → ValidationController → DataController → ExpressionEvaluator → ViewController`
+`flowController → bindingParser → schema → validationController → expressionEvaluator → dataController → viewController`
 
-This order matters for plugins: taps on later controllers can safely reference earlier controllers (e.g., a DataController tap can use SchemaController).
+This is the order hooks fire, which is what matters for plugins: taps on later hooks can safely reference controllers from earlier hooks. Note that DataController is _created_ before ExpressionEvaluator, but `hooks.dataController` fires _after_ `hooks.expressionEvaluator`. This means a plugin tapping `dataController` can safely use the expression evaluator, but not vice versa.
 
 **Controller Lifecycle:**
 
@@ -66,13 +68,13 @@ Plugins applied in array order during construction. Later plugins can wrap/overr
 
 **Conflict Resolution:**
 
-| Mechanism | Behavior |
-|---|---|
-| Expression functions | Last registration wins (same name) |
-| Validators | Last registration wins (same type) |
-| Data middleware | All execute in pipeline order (compose) |
-| Formatters | Last registration wins (same type) |
-| Hook taps | Execute in tap order; waterfall hooks pass modified values through chain |
+| Mechanism            | Behavior                                                                 |
+| -------------------- | ------------------------------------------------------------------------ |
+| Expression functions | Last registration wins (same name)                                       |
+| Validators           | Last registration wins (same type)                                       |
+| Data middleware      | All execute in pipeline order (compose)                                  |
+| Formatters           | Last registration wins (same type)                                       |
+| Hook taps            | Execute in tap order; waterfall hooks pass modified values through chain |
 
 **Anti-patterns:** Plugins with circular dependencies. Plugins modifying Player state outside hooks. Registering same validator/expression name multiple times unintentionally.
 
@@ -81,9 +83,18 @@ Plugins applied in array order during construction. Later plugins can wrap/overr
 Player maintains explicit state through `getState()`:
 
 - **NotStartedState**: Initial state, no flow loaded
-- **InProgressState**: Flow executing, controllers available
-- **CompletedState**: Flow finished successfully, readonly data access
-- **ErrorState**: Flow failed with error
+- **InProgressState**: Flow executing, controllers available. Also exposes:
+  - `controllers` — all seven controllers (see above)
+  - `flow` — the original Flow JSON
+  - `flowResult` — `Promise<FlowResult>` that resolves on completion
+  - `fail(error: Error)` — abort the flow from the host platform
+  - `logger` — Logger instance for the current player
+- **CompletedState**: Flow finished successfully. Extends `FlowResult`:
+  - `data` — serialized final data model (from `DataController.serialize()`)
+  - `endState` — `NavigationFlowEndState` with `outcome` string
+  - `controllers.data` — `ReadOnlyDataController` (reads still work; `set`/`delete` log errors and no-op)
+  - `flow` — the original Flow JSON
+- **ErrorState**: Flow failed with error (`error` property)
 
 State transitions fire hooks — use `hooks.state` to observe. Each flow gets unique ref symbol for tracking.
 
@@ -93,7 +104,7 @@ Centralized data storage with binding-based access (see `@player-ui/types` for b
 
 - **Middleware pipeline**: Intercept get/set/delete operations via `DataModelMiddleware`
 - **Formatted vs raw values**: Display transformation separate from storage
-- **Default values**: Auto-populate on first read (side effect: writes to model)
+- **Default values**: Returned on `get()` when value is undefined (from schema `default`). Not written to model on read; written silently only when a binding is first tracked by the validation system during view load
 - **Validation integration**: Schema controller validates during set operations
 - **Update batching**: Multiple sets fire single update event
 
@@ -119,19 +130,30 @@ ViewPlugins tap into Parser hooks (`onParseObject`, `onCreateASTNode`, `parseNod
 
 ### Expression Evaluator
 
-Executes expressions defined in `@player-ui/types`. Runtime adds custom function registration, variable management, and async evaluation.
+Executes expressions defined in `@player-ui/types`. Runtime adds custom function registration, temporary variable management (`setExpressionVariable`/`getExpressionVariable` — cleared on each `afterTransition`), and async evaluation. Variables are reset after each navigation transition. Expressions can also assign directly to bindings (`{{path}} = value`) or use modification operators (`{{count}} += 1`).
 
-**Built-in Expression Functions** (registered by DefaultExpPlugin and FlowExpPlugin):
+**Built-in Expression Functions** (baked into ExpressionEvaluator):
 
-| Function | Purpose |
-|---|---|
-| `setDataVal(binding, value)` | Write to data model |
-| `getDataVal(binding)` | Read from data model |
-| `deleteDataVal(binding)` | Delete from data model |
-| `conditional(cond, trueVal, falseVal)` | Ternary helper |
-| `waitFor(expression)` | Await async expression |
-| `format(binding)` | Get formatted value |
-| `log(...)` / `debug(...)` | Console output |
+| Function                                    | Purpose                                              |
+| ------------------------------------------- | ---------------------------------------------------- |
+| `setDataVal(binding, value)`                | Write to data model                                  |
+| `getDataVal(binding)`                       | Read from data model                                 |
+| `deleteDataVal(binding)`                    | Delete from data model                               |
+| `conditional(cond, trueVal, falseVal)`      | Ternary helper (lazy — only evaluates chosen branch) |
+| `waitFor(expression)` / `await(expression)` | Wrap async result as Awaitable (async context only)  |
+
+**Functions from DefaultExpPlugin:**
+
+| Function                    | Purpose                                                      |
+| --------------------------- | ------------------------------------------------------------ |
+| `format(value, formatName)` | Format a value using a named formatter from SchemaController |
+| `log(...)`                  | Log args via player logger (info level)                      |
+| `debug(...)`                | Log args via player logger (debug level)                     |
+| `eval(expression)`          | Evaluate a nested expression string                          |
+
+**FlowExpPlugin** does not register expression functions — it evaluates `onStart`/`onEnd` lifecycle expressions on flow and state nodes.
+
+**Built-in Operators**: Arithmetic (`+`, `-`, `*`, `/`, `%`), comparison (`==`, `!=`, `>`, `>=`, `<`, `<=`, `===`, `!==`), logical (`&&`, `||`, `!`), bitwise (`&`, `|`), assignment (`=`, `+=`, `-=`). Ternary (`? :`) also supported. Expressions can assign to bindings: `{{foo.bar}} = 42` or `{{count}} += 1`.
 
 ### Logger
 
@@ -168,20 +190,20 @@ new Player(config?: {
 
 **Hooks** (via `player.hooks`):
 
-| Hook | Type | Purpose |
-|---|---|---|
-| `flowController` | SyncHook | FlowController created |
-| `viewController` | SyncHook | ViewController created |
-| `view` | SyncHook | New ViewInstance resolved |
-| `expressionEvaluator` | SyncHook | ExpressionEvaluator created |
-| `dataController` | SyncHook | DataController created |
-| `schema` | SyncHook | SchemaController created |
-| `validationController` | SyncHook | ValidationController created |
-| `bindingParser` | SyncHook | BindingParser created |
-| `state` | SyncHook | State transition occurred |
-| `onStart` | SyncHook | Flow started |
-| `onEnd` | SyncHook | Flow ended |
-| `resolveFlowContent` | SyncWaterfallHook | Mutate flow JSON before execution |
+| Hook                   | Type              | Purpose                           |
+| ---------------------- | ----------------- | --------------------------------- |
+| `flowController`       | SyncHook          | FlowController created            |
+| `viewController`       | SyncHook          | ViewController created            |
+| `view`                 | SyncHook          | New ViewInstance resolved         |
+| `expressionEvaluator`  | SyncHook          | ExpressionEvaluator created       |
+| `dataController`       | SyncHook          | DataController created            |
+| `schema`               | SyncHook          | SchemaController created          |
+| `validationController` | SyncHook          | ValidationController created      |
+| `bindingParser`        | SyncHook          | BindingParser created             |
+| `state`                | SyncHook          | State transition occurred         |
+| `onStart`              | SyncHook          | Flow started                      |
+| `onEnd`                | SyncHook          | Flow ended                        |
+| `resolveFlowContent`   | SyncWaterfallHook | Mutate flow JSON before execution |
 
 ### DataController
 
@@ -191,14 +213,14 @@ new Player(config?: {
 - `set(transaction: RawSetTransaction, options?: DataModelOptions): Updates` — Write data (batch)
 - `delete(binding: BindingLike, options?: DataModelOptions): void` — Remove data
 - `serialize(): object` — Export current data model
-- `makeReadOnly(): void` — Prevent further writes
+- `makeReadOnly(): ReadOnlyDataController` — Returns a read-only wrapper (reads work; set/delete log errors and no-op)
 
 **DataModelOptions**:
 
 - `formatted?: boolean` — Get/set formatted values (vs raw)
 - `includeInvalid?: boolean` — Include data failing validation
 - `ignoreDefaultValue?: boolean` — Don't auto-populate defaults
-- `silent?: boolean` — Skip view update notifications
+- `silent?: boolean` — Defer view update scheduling (bindings merge into pending updates but no microtask is scheduled; next non-silent update includes them)
 
 **Transaction formats**:
 
@@ -209,28 +231,63 @@ new Player(config?: {
 
 ### FlowController
 
+**Key Properties**:
+
+- `current?: FlowInstance` — The currently active FlowInstance
+
 **Key Methods**:
 
-- `start(): Promise<NavigationFlowEndState>` — Begin flow state machine
-- `transition(stateTransition: string, options?: TransitionOptions): void` — Navigate to state
+- `start(): Promise<NavigationFlowEndState>` — Begin flow state machine from `navigation.BEGIN`
+- `transition(stateTransition: string, options?: TransitionOptions): void` — Navigate to next state
+
+**TransitionOptions**:
+
+- `force?: boolean` — Bypass `skipTransition` hook (skips validation checks). Use for programmatic navigation that must succeed.
 
 **Hooks**: `flow` (SyncHook — fires when new FlowInstance created)
 
 Manages navigation stack for nested flows. Automatically handles FLOW state type (subflows).
 
+**Navigation State Types**:
+
+| State Type     | Behavior                                                                                  |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| `VIEW`         | Renders a view (`ref` → view id). User interaction triggers transitions.                  |
+| `END`          | Terminal state with `outcome` string. Resolves the flow promise.                          |
+| `ACTION`       | Evaluates `exp` synchronously; return value selects a key in `transitions`                |
+| `ASYNC_ACTION` | Evaluates `exp` asynchronously; with `await: true`, waits for result before transitioning |
+| `FLOW`         | Invokes a sub-flow by `ref`; child flow's END `outcome` selects the parent transition     |
+| `EXTERNAL`     | Defers to the host platform for transition resolution                                     |
+
+**Wildcard Transitions**: If no specific transition key matches, `"*"` is used as fallback. Always define `"*"` as a catch-all when the exact transition values are unknown.
+
+**Lifecycle Expressions**: Navigation flows support `onStart` and `onEnd` expressions (evaluated by `FlowExpPlugin`). Individual states also support `onStart` (evaluated when entering the state via `resolveTransitionNode`) and `onEnd` (evaluated when leaving via `beforeTransition`).
+
 ### FlowInstance
 
-Each navigation flow gets a FlowInstance. Critical hooks for controlling navigation:
+Each navigation flow gets a FlowInstance. Access via `flowController.current` or through `flowController.hooks.flow`.
 
-| Hook | Type | Purpose |
-|---|---|---|
-| `skipTransition` | SyncBailHook | Block transition (return true to skip) — used by validation |
-| `beforeTransition` | SyncWaterfallHook | Transform target state before transition |
-| `resolveTransitionNode` | SyncWaterfallHook | Transform resolved transition node |
-| `transition` | SyncHook | After transition completes |
-| `afterTransition` | SyncHook | Post-transition side effects (e.g., action execution) |
-| `onStart` / `onEnd` | SyncHook | Flow instance lifecycle |
-| `beforeStart` | SyncBailHook | Transform flow before start |
+**Key Properties**:
+
+- `id: string` — The flow identifier (key from `navigation`)
+- `currentState?: NamedState` — Current state (`{ name: string, value: NavigationFlowState }`)
+
+**Key Methods**:
+
+- `start(): Promise<NavigationFlowEndState>` — Start the state machine
+- `transition(transitionValue: string, options?: TransitionOptions): void` — Trigger a transition
+
+Critical hooks for controlling navigation:
+
+| Hook                    | Type              | Purpose                                                     |
+| ----------------------- | ----------------- | ----------------------------------------------------------- |
+| `skipTransition`        | SyncBailHook      | Block transition (return true to skip) — used by validation |
+| `beforeTransition`      | SyncWaterfallHook | Transform target state before transition                    |
+| `resolveTransitionNode` | SyncWaterfallHook | Transform resolved transition node                          |
+| `transition`            | SyncHook          | After transition completes                                  |
+| `afterTransition`       | SyncHook          | Post-transition side effects (e.g., action execution)       |
+| `onStart` / `onEnd`     | SyncHook          | Flow instance lifecycle                                     |
+| `beforeStart`           | SyncBailHook      | Transform flow before start                                 |
 
 Access via FlowController hook:
 
@@ -324,6 +381,10 @@ All operations return new instances (immutable).
 
 **ExpressionHandler signature**: `(context: ExpressionContext, ...args) => R` with optional `resolveParams: boolean`
 
+### ConstantsController
+
+Available on `player.constantsController` (persists across flows, unlike other controllers). Provides shared constants accessible to validation, view resolution, and other subsystems. Useful for injecting environment-level values that don't belong in flow data.
+
 ## Common Usage Patterns
 
 ### Starting a Flow
@@ -332,11 +393,15 @@ All operations return new instances (immutable).
 const player = new Player({ plugins: [myPlugin] });
 player.hooks.state.tap("my-app", (state) => {
   if (state.status === "in-progress") {
-    // Access state.controllers.data, .flow, .view, .schema, .validation
+    // Access state.controllers.data, .flow, .view, .schema, .validation,
+    // .expression, .binding
   }
 });
 const result = await player.start(flowJSON);
-// result is CompletedState with readonly data access
+// result is CompletedState:
+//   result.data — serialized final data model
+//   result.endState.outcome — the END state outcome string
+//   result.controllers.data.get("user.name") — read-only data access
 ```
 
 Controllers only available during in-progress. Don't access before flow starts.
@@ -375,7 +440,7 @@ const name = data.get("user.name"); // raw value
 const phone = data.get("user.phone", { formatted: true }); // formatted
 ```
 
-Setting formatted values requires a deformatter registered in SchemaController. `{ silent: true }` prevents view updates — use for intermediate calculations only.
+Setting formatted values requires a deformatter registered in SchemaController. `{ silent: true }` defers view update scheduling — changed bindings accumulate and resolve on the next non-silent update.
 
 ### Custom Expression Functions
 
@@ -430,7 +495,7 @@ This waterfall hook runs before controller creation — useful for injecting dat
 
 ### Hook System
 
-12+ hook points for extension. Controller creation hooks fire in creation order (see above). Hooks use Tapable patterns:
+12+ hook points for extension. Controller hooks fire in a specific order during `start()` (see Hook Firing Order above). Hooks use Tapable patterns:
 
 - **SyncHook**: Fire-and-forget notification
 - **SyncWaterfallHook**: Each tap transforms and passes value to next
@@ -462,7 +527,7 @@ Data model supports `DataModelMiddleware` for intercepting get/set/delete. Middl
 
 4. **BindingInstance immutability**: Operations like `parent()`, `descendent()` return new instances — they don't mutate.
 
-5. **View updates during silent sets**: `data.set(transaction, { silent: true })` prevents view updates. Use for intermediate calculations only.
+5. **View updates during silent sets**: `data.set(transaction, { silent: true })` defers (not skips) view updates — changed bindings accumulate and resolve on the next non-silent update. Use for intermediate calculations only.
 
 6. **Navigation transition errors**: Calling `transition()` before flow starts or after completion throws. Ensure FlowController has an active flow.
 
@@ -476,14 +541,14 @@ Data model supports `DataModelMiddleware` for intercepting get/set/delete. Middl
 
 Tap into controller hooks to observe runtime behavior:
 
-| Debug Goal | Hook Path | Callback Args |
-|---|---|---|
-| Expression errors | `expressionEvaluator` → `onError` | `(error, expression)` |
-| Binding reads | `dataController` → `onGet` | `(binding, value)` |
-| Data writes | `dataController` → `onSet` | `(updates)` |
-| State changes | `state` | `(playerFlowState)` |
-| Navigation | `flowController` → `flow` → `transition` | `(to, from)` |
-| Validation | `validationController` → `onAddValidation` | `(validation)` |
+| Debug Goal        | Hook Path                                  | Callback Args         |
+| ----------------- | ------------------------------------------ | --------------------- |
+| Expression errors | `expressionEvaluator` → `onError`          | `(error, expression)` |
+| Binding reads     | `dataController` → `onGet`                 | `(binding, value)`    |
+| Data writes       | `dataController` → `onSet`                 | `(updates)`           |
+| State changes     | `state`                                    | `(playerFlowState)`   |
+| Navigation        | `flowController` → `flow` → `transition`   | `(to, from)`          |
+| Validation        | `validationController` → `onAddValidation` | `(validation)`        |
 
 **Canonical tap pattern:**
 
@@ -516,7 +581,10 @@ player.hooks.dataController.tap("debug", (dc) => {
 - `/core/player/src/view/view.ts` — ViewInstance and ViewPlugin
 - `/core/player/src/data/index.ts` — Data model middleware system
 - `/core/player/src/string-resolver/index.ts` — String binding/expression resolution
-- `/core/player/src/plugins/flow-exp-plugin.ts` — FlowExpPlugin (built-in)
+- `/core/player/src/plugins/default-exp-plugin.ts` — DefaultExpPlugin (built-in: format, log, debug, eval)
+- `/core/player/src/plugins/flow-exp-plugin.ts` — FlowExpPlugin (built-in: flow/state lifecycle expressions)
+- `/core/player/src/expressions/evaluator-functions.ts` — Default expression functions (setDataVal, getDataVal, etc.)
+- `/core/player/src/controllers/data/utils.ts` — ReadOnlyDataController
 
 ## Performance Considerations
 

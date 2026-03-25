@@ -33,9 +33,9 @@ JVM-JS boundary abstraction enabling typed access to JS objects.
 **NodeWrapper:** Kotlin interface exposing `val node: Node`. Almost all Player APIs implement NodeWrapper — they're thin Kotlin facades delegating to underlying JS implementations. Common pattern:
 
 ```kotlin
-interface DataController : NodeWrapper {
-    val node: Node  // References JS DataController object
-    fun get(binding: String): Any?  // Delegates to JS via node
+class DataController(override val node: Node) : NodeWrapper {
+    fun get(binding: Binding): Any?  // Delegates to JS via node
+    fun set(data: Map<String, Any?>)
 }
 ```
 
@@ -47,7 +47,7 @@ Use `NodeSerializableField` and `NodeSerializableFunction` delegates to access N
 2. **Flow:** `completable.asFlow().collect { result -> ... }`
 3. **Callback:** `completable.onComplete { result: Result<T> -> ... }`
 
-Completable is **cold** — doesn't start execution until consumed. Multiple subscriptions allowed. Differs from JS Promise semantics (no automatic chaining, explicit consumption required).
+When returned from `player.start()`, the underlying flow **starts immediately** in the JS runtime — the Completable wraps an already-executing JS promise. The consumption model (`await`/`onComplete`/`asFlow`) determines how you **observe** the result, not whether execution begins. Always subscribe to handle completion or errors.
 
 **Promise:** Wraps JS promises from the runtime. Convert to Completable via `toCompletable(serializer)` for JVM-friendly async handling.
 
@@ -106,23 +106,55 @@ Extension mechanism based on `@intuit/hooks` library (Tapable pattern). Player e
 - `flowController` — New FlowController created
 - `dataController` — New DataController created
 - `viewController` — ViewController created or updated
-- `view` — New View resolved
+- `view` — New View resolved (equivalent to `viewController.hooks.view`)
 - `expressionEvaluator` — ExpressionEvaluator created
 - `validationController` — ValidationController created
-- `onStart` — Flow started
-- `onEnd` — Flow ended (Completed or Error)
+- `onStart` — Flow started (provides `Flow` metadata)
 
-**Controller-specific hooks:** Access via chaining. Example:
+Note: `onEnd` does **not** exist on `Player.Hooks`. Flow-level start/end hooks live on `FlowInstance.Hooks` (see below).
+
+**Controller-specific hooks:** Access via chaining through Player hooks. Example:
 
 ```kotlin
-player.hooks.dataController.tap("my-plugin") { dataController ->
-    dataController.hooks.onUpdate.tap("my-plugin") { updates ->
-        // React to data changes
+player.hooks.viewController.tap("my-plugin") { viewController ->
+    viewController?.hooks?.view?.tap("my-plugin") { view ->
+        view?.hooks?.onUpdate?.tap("my-plugin") { asset ->
+            // React to view updates
+        }
     }
 }
 ```
 
-Tap syntax: `hook.tap(name: String, callback)` — name used for debugging.
+**Important:** JVM controller wrappers are "limited definitions" — not all JS-side hooks are exposed. `DataController` on JVM has **no hooks property** (only `get`/`set`). Use `viewController` and `flowController` hooks for observation.
+
+Tap syntax: `hook.tap(name: String, callback)` — name used for debugging. Anonymous `tap { }` also supported (uses call-site stack trace as name).
+
+**FlowController hooks** (via `flowController.hooks`):
+
+- `flow` — `NodeSyncHook1<FlowInstance>` — Fires when a flow instance is active
+
+**FlowInstance hooks** (via `flowController.hooks.flow` → `flowInstance.hooks`):
+
+- `onStart` — Flow instance started
+- `onEnd` — Flow instance ended
+- `beforeTransition` — Waterfall hook to manipulate flow-node before transition calculation
+- `skipTransition` — Bail hook to intercept and block a transition
+- `resolveTransitionNode` — Waterfall hook to manipulate the calculated target flow-node
+- `transition` — Fires when transitioning from one `NamedState` to another
+- `afterTransition` — Fires after a transition completes (provides `FlowInstance`)
+
+**ViewController hooks** (via `viewController.hooks`):
+
+- `view` — `NodeSyncHook1<View>` — Fires before view resolution
+
+**View hooks** (via `view.hooks`):
+
+- `onUpdate` — `NodeSyncHook1<Asset>` — Fires when the view's resolved asset tree updates
+- `resolver` — `NodeSyncHook1<Resolver>` — Fires when the resolver is created
+
+**TapableLogger hooks** (via `player.logger.hooks`):
+
+- `trace`, `debug`, `info`, `warn`, `error` — `SyncHook1<Array<Any?>>` — Tap to intercept log messages at each level
 
 ## API Surface
 
@@ -131,48 +163,91 @@ Tap syntax: `hook.tap(name: String, callback)` — name used for debugging.
 **Constructor:**
 
 ```kotlin
+@ExperimentalPlayerApi
 HeadlessPlayer(
     plugins: List<Plugin>,
+    explicitRuntime: Runtime<*>? = null,
+    source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig()
 )
 ```
 
+Vararg convenience constructor also available: `HeadlessPlayer(pluginA, pluginB, config = config)`.
+
 **Key Methods:**
 
 - `start(flow: String): Completable<CompletedState>` — Execute flow JSON string, returns async result
-- `release()` — Free runtime resources, transition to ReleasedState (terminal)
+- `start(flow: Node): Completable<CompletedState>` — Execute flow from a pre-parsed Node
+- `release()` — Free runtime resources, transition to ReleasedState (terminal, idempotent)
 
 **Key Properties:**
 
 - `state: PlayerFlowState` — Current lifecycle state (read-only)
 - `hooks: Player.Hooks` — Hook system access
-- `scope: CoroutineScope` — Coroutine scope tied to player lifecycle
-- `logger: TapableLogger` — Logging interface
+- `scope: CoroutineScope` — Coroutine scope tied to player lifecycle (delegates to runtime scope)
+- `logger: TapableLogger` — Logging interface with tapable hooks
+- `constantsController: ConstantsController` — Access to Player constants
+- `runtime: Runtime<*>` — Underlying JS runtime (for advanced use)
 
 ### Controllers (via InProgressState.controllers)
 
-**DataController:**
+`ControllerState` properties: `data`, `view`, `validation`, `expression`, `flow`.
+
+**DataController** (`controllers.data`):
 
 - `get(binding: String): Any?` — Read data at binding path
-- `set(transactions: Map<String, Any?>)` — Write data (batch updates)
-- `set(transactions: List<List<Any?>>)` — Alternative transaction format
+- `get(): Map<String, Any?>` — Extension: read entire data model
+- `set(data: Map<String, Any?>)` — Write data (batch updates)
+- `set(transaction: List<List<Any?>>)` — Alternative transaction format
+- `set(vararg transactions: Pair<Binding, Any?>)` — Extension: convenience vararg pairs
 
-**FlowController:**
+**FlowController** (`controllers.flow`):
 
-- `transition(stateName: String)` — Navigate to named state
+- `transition(state: String, options: TransitionOptions? = null)` — Navigate to named state
 - `current: FlowInstance?` — Current flow instance with hooks
+- `hooks: FlowController.Hooks` — Access to `flow` hook (`NodeSyncHook1<FlowInstance>`)
 
-**ViewController:**
+`TransitionOptions` enables `ForceTransition` to skip validation during transitions.
+
+**ViewController** (`controllers.view`):
 
 - `currentView: View?` — Currently rendered view
+- `hooks: ViewController.Hooks` — Access to `view` hook (`NodeSyncHook1<View>`)
 
-**ValidationController:**
+**ValidationController** (`controllers.validation`):
 
-- `validate(options: ValidationProviderOptions?): ValidationResponse` — Trigger validation
+- `validateView(): ValidationInfo` — Get validation status and any blocking validations for the current view
 
-**ExpressionController:**
+**ExpressionController** (`controllers.expression`):
 
-- `evaluate(expression: String): Any?` — Evaluate expression synchronously
+- `evaluate(expressions: List<String>): Any?` — Evaluate expressions, return result of last one
+- `evaluate(expression: String): Any?` — Extension: evaluate single expression
+- `evaluate(vararg expressions: String): Any?` — Extension: evaluate vararg expressions
+- `evaluate(expression: Expression): Any?` — Extension: evaluate `Expression` sealed type
+
+### InProgressState Extensions
+
+Convenience extension properties and methods on `InProgressState`:
+
+- `currentView: View?` — Shorthand for `controllers.view.currentView`
+- `lastViewUpdate: Asset?` — Last resolved asset from current view
+- `currentFlowState: NamedState?` — Current state in the flow FSM
+- `dataModel: DataController` — Shorthand for `controllers.data`
+- `flowResult: Completable<FlowResult?>` — Async result available when flow completes
+- `fail(error: Throwable)` — Programmatically fail the current flow
+- `fail(message: String)` — Extension: fail with a `PlayerException` wrapping the message
+
+### Player State Extensions
+
+Convenience safe-cast extension properties on `Player`:
+
+- `player.inProgressState: InProgressState?`
+- `player.completedState: CompletedState?`
+- `player.errorState: ErrorState?`
+- `player.notStartedState: NotStartedState?`
+- `player.releasedState: ReleasedState?`
+
+These avoid manual `as?` casts when checking player state.
 
 ### Bridge Types
 
@@ -333,8 +408,8 @@ val player = HeadlessPlayer(listOf(AnalyticsPlugin()))
 
 **Considerations:**
 
-- Completable is cold — doesn't start until consumed (unlike hot observables)
-- `await()` throws on failure — wrap in try-catch or use `Result<T>` handling
+- The flow starts immediately when `start()` is called — `await()`/`onComplete()`/`asFlow()` control how you observe the result
+- `await()` throws on failure (wraps `ErrorState.error` as `PlayerException`) — wrap in try-catch or use `Result<T>` handling
 - Multiple subscriptions allowed (each gets same result)
 - Flow completion signals end of flow execution
 
@@ -418,6 +493,12 @@ class FlowViewModel : ViewModel() {
 
 - **Embedded runtime** (J2V8 or Hermes): JavaScript execution engine loaded via service loader. Not a direct dependency — runtime implementation selected at runtime based on classpath.
 
+## Opt-in Annotations
+
+**`@ExperimentalPlayerApi`:** Marks APIs that may change in future releases. Required opt-in for: `HeadlessPlayer` primary constructor, `Player.subScope()`, `start(flow: URL)` overload, and `start(flow, onComplete)` convenience overload. Use `@OptIn(ExperimentalPlayerApi::class)` at call site or module level.
+
+**`@InternalPlayerApi`:** Marks APIs strictly intended for internal Player framework use. Not for external consumers. Using these APIs may break without notice across versions.
+
 ## Integration Points
 
 ### Plugin System
@@ -432,17 +513,21 @@ Applied during HeadlessPlayer construction in order: RuntimePlugin → JSPluginW
 
 ### Hook System
 
-Player exposes 8+ lifecycle hooks via `player.hooks`. Controllers expose additional hooks (DataController.onUpdate, FlowController.flow, etc.). Tap hooks in PlayerPlugin.apply() to observe or modify behavior.
+Player exposes 8 lifecycle hooks via `player.hooks`. Controllers with hooks on JVM: `FlowController.hooks.flow`, `ViewController.hooks.view`, `View.hooks.onUpdate`/`resolver`. Note: JVM `DataController` has no hooks (limited bridge). Tap hooks in `PlayerPlugin.apply()` to observe or modify behavior.
 
 Hook tapping pattern:
 
 ```kotlin
-player.hooks.controllerName.tap("plugin-name") { controller ->
-    controller.hooks.eventName.tap("plugin-name") { event ->
-        // Handle event
+player.hooks.viewController.tap("plugin-name") { viewController ->
+    viewController?.hooks?.view?.tap("plugin-name") { view ->
+        view?.hooks?.onUpdate?.tap("plugin-name") { asset ->
+            // Handle resolved asset updates
+        }
     }
 }
 ```
+
+Logger hooks are also tapable via `player.logger.hooks` for custom log routing, or use `player.logger.addHandler(loggerPlugin)` to wire all levels at once.
 
 ### Bridge Layer
 
@@ -450,11 +535,13 @@ Extend NodeWrapper to wrap custom JS objects. Use NodeSerializableField/NodeSeri
 
 ### CoroutineScope
 
-Player provides `player.scope` tied to flow lifecycle. Use for flow-scoped coroutines that should cancel when flow completes or player releases. Scope uses SupervisorJob — individual child failures don't cancel entire scope.
+Player provides `player.scope` tied to player lifecycle (delegates to the runtime scope). Use for player-scoped coroutines that should cancel when the player releases. Scope inherits runtime's dispatcher and `CoroutineExceptionHandler`.
+
+`@ExperimentalPlayerApi` extension `Player.subScope(context)` creates a child scope with its own `SupervisorJob` — cancellable independently while inheriting parent context (dispatcher, exception handler).
 
 ### Logging
 
-TapableLogger discovered via service loader (LoggerPlugin implementations). Tap logger hooks for custom log routing. Default console logger included if no explicit logger provided.
+TapableLogger discovered via service loader (LoggerPlugin implementations). Tap individual log-level hooks (`player.logger.hooks.trace`, `.debug`, `.info`, `.warn`, `.error`) or use `player.logger.addHandler(loggerPlugin)` to wire all levels at once. Explicit `LoggerPlugin` instances in the plugin list take priority; additional loggers discovered via `ServiceLoader` are merged unless their type is already present.
 
 ## Common Pitfalls
 
@@ -533,17 +620,17 @@ Android: Release in ViewModel.onCleared() or lifecycle observer.
 
 **Fix:** Order plugins by dependency. Place RuntimePlugin implementations first, JSPluginWrapper next, PlayerPlugin last. Within each category, place dependent plugins after their dependencies.
 
-### 6. Completable Not Consumed
+### 6. Ignoring Completable Result
 
-**Mistake:** `player.start(flow)` without `await()`, `asFlow()`, or `onComplete()` — flow appears to not start
+**Mistake:** `player.start(flow)` without `await()`, `asFlow()`, or `onComplete()` — errors silently swallowed
 
-**Why it happens:** Completable is cold — doesn't begin execution until consumed. Simply calling `start()` doesn't trigger flow.
+**Why it happens:** The flow **does** start immediately when `start()` is called. However, without subscribing to the Completable, you have no way to observe completion, handle errors, or know when the flow finishes.
 
-**Fix:** Always consume Completable:
+**Fix:** Always subscribe to the Completable to handle the result:
 
 ```kotlin
-player.start(flow).await()                // Coroutine
-player.start(flow).onComplete { ... }      // Callback
+player.start(flow).await()                // Coroutine — throws on error
+player.start(flow).onComplete { ... }      // Callback — Result<CompletedState>
 player.start(flow).asFlow().collect { }    // Flow
 ```
 
@@ -566,12 +653,20 @@ Or confine Player to single thread via `newSingleThreadContext()`.
 
 ## Reference Files
 
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/player/Player.kt` — Abstract Player interface
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/player/HeadlessPlayer.kt` — Concrete implementation, plugin application
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/player/state/PlayerFlowState.kt` — State machine definitions
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/bridge/Completable.kt` — Async result wrapper
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/player/Player.kt` — Abstract Player class, Hooks interface
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/player/HeadlessPlayer.kt` — Concrete implementation, plugin application order
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/player/state/PlayerFlowState.kt` — State sealed hierarchy, ControllerState, InProgressState extensions
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/bridge/Completable.kt` — Async result wrapper interface
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/bridge/Promise.kt` — JS Promise bridge, toCompletable conversion
 - `/jvm/core/src/main/kotlin/com/intuit/playerui/core/bridge/NodeWrapper.kt` — Bridge pattern interface
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/data/DataController.kt` — Data model access
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/flow/FlowController.kt` — State machine navigation
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/plugins/PlayerPlugin.kt` — Plugin interface
-- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/logger/TapableLogger.kt` — Logging system
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/data/DataController.kt` — Data model access (limited JVM bridge, no hooks)
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/flow/FlowController.kt` — Flow state machine navigation, FlowController.Hooks
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/flow/FlowInstance.kt` — Flow instance with navigation lifecycle hooks
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/flow/Transition.kt` — Transition interface, TransitionOptions
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/expressions/ExpressionEvaluator.kt` — ExpressionEvaluator interface and ExpressionController class
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/view/ViewController.kt` — View controller with hooks
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/validation/ValidationController.kt` — Validation controller (validateView)
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/plugins/PlayerPlugin.kt` — PlayerPlugin interface
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/plugins/RuntimePlugin.kt` — RuntimePlugin interface
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/plugins/JSPluginWrapper.kt` — JS plugin bridge interface
+- `/jvm/core/src/main/kotlin/com/intuit/playerui/core/logger/TapableLogger.kt` — Logging system with tapable hooks

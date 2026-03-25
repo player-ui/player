@@ -18,11 +18,11 @@ A Flow is a self-contained application specification that Player executes. This 
       "id": "view-1",
       "type": "view-type",
       // ... asset properties (platform-agnostic UI)
-    }
+    },
   ],
   "schema": {
     "ROOT": {
-      "myData": { "type": "MyDataType" }
+      "myData": { "type": "MyDataType" },
     },
     "MyDataType": {
       "name": { "type": "StringType", "validation": [{ "type": "required" }] },
@@ -30,15 +30,15 @@ A Flow is a self-contained application specification that Player executes. This 
         "type": "StringType",
         "validation": [
           { "type": "required", "trigger": "navigation", "blocking": true },
-          { "type": "email", "trigger": "change", "severity": "error" }
+          { "type": "email", "trigger": "change", "severity": "error" },
         ],
-        "format": { "type": "email" }
+        "format": { "type": "email" },
       },
-      "age": { "type": "IntegerType", "default": 0 }
-    }
+      "age": { "type": "IntegerType", "default": 0 },
+    },
   },
   "data": {
-    "myData": { "name": "initial value" }
+    "myData": { "name": "initial value" },
   },
   "navigation": {
     "BEGIN": "FLOW_1",
@@ -47,23 +47,23 @@ A Flow is a self-contained application specification that Player executes. This 
       "VIEW_step1": {
         "state_type": "VIEW",
         "ref": "view-1",
-        "transitions": { "next": "ACTION_check", "prev": "END_dismiss" }
+        "transitions": { "next": "ACTION_check", "prev": "END_dismiss" },
       },
       "ACTION_check": {
         "state_type": "ACTION",
         "exp": "@myData.age@ >= 18 ? 'adult' : 'minor'",
-        "transitions": { "adult": "VIEW_step2", "minor": "END_underage" }
+        "transitions": { "adult": "VIEW_step2", "minor": "END_underage" },
       },
       "VIEW_step2": {
         "state_type": "VIEW",
         "ref": "view-2",
-        "transitions": { "next": "END_done" }
+        "transitions": { "next": "END_done" },
       },
       "END_done": { "state_type": "END", "outcome": "done" },
       "END_dismiss": { "state_type": "END", "outcome": "dismiss" },
-      "END_underage": { "state_type": "END", "outcome": "underage" }
-    }
-  }
+      "END_underage": { "state_type": "END", "outcome": "underage" },
+    },
+  },
 }
 ```
 
@@ -83,14 +83,14 @@ Assets are platform-agnostic — the same asset JSON renders across React, iOS, 
 
 Defines how users move through the flow. Each state has an explicit `state_type`:
 
-| State Type       | Purpose                                       | Key Properties                       |
-|------------------|-----------------------------------------------|--------------------------------------|
-| `VIEW`           | Render a view to the user                     | `ref` (view id), `transitions`       |
-| `ACTION`         | Evaluate expression synchronously             | `exp`, `transitions` (return → key)  |
-| `ASYNC_ACTION`   | Evaluate expression, optionally await result  | `exp`, `await: boolean`, `transitions` |
-| `END`            | Terminal state                                | `outcome` (how flow ended)           |
-| `EXTERNAL`       | Pause for host app to trigger transition      | `ref`, `transitions`                 |
-| `FLOW`           | Invoke a sub-flow                             | `ref` (flow id), `transitions`       |
+| State Type     | Purpose                                      | Key Properties                         |
+| -------------- | -------------------------------------------- | -------------------------------------- |
+| `VIEW`         | Render a view to the user                    | `ref` (view id), `transitions`         |
+| `ACTION`       | Evaluate expression synchronously            | `exp`, `transitions` (return → key)    |
+| `ASYNC_ACTION` | Evaluate expression, optionally await result | `exp`, `await: boolean`, `transitions` |
+| `END`          | Terminal state                               | `outcome` (how flow ended)             |
+| `EXTERNAL`     | Pause for host app to trigger transition     | `ref`, `transitions`                   |
+| `FLOW`         | Invoke a sub-flow                            | `ref` (flow id), `transitions`         |
 
 Navigation is deterministic — each state's transitions are an explicit `{ transitionName: nextStateName }` map. Lifecycle hooks (`onStart`/`onEnd`) run at both flow and state levels.
 
@@ -98,14 +98,14 @@ Navigation is deterministic — each state's transitions are an explicit `{ tran
 
 String-based reference to a location in the data model.
 
-| Syntax                          | Meaning                              |
-|---------------------------------|--------------------------------------|
-| `"user.name"`                   | Simple path                          |
-| `"items[0]"`                    | Array index access                   |
-| `"items[]"`                     | Append to array                      |
-| `"items[{{selectedKey}}]"`      | Dynamic key (nested binding)         |
-| `"items[status='active']"`      | Conditional/query access             |
-| `"{{user.name}}"`               | Template syntax for string interpolation |
+| Syntax                     | Meaning                                  |
+| -------------------------- | ---------------------------------------- |
+| `"user.name"`              | Simple path                              |
+| `"items[0]"`               | Array index access                       |
+| `"items[]"`                | Append to array                          |
+| `"items[{{selectedKey}}]"` | Dynamic key (nested binding)             |
+| `"items[status='active']"` | Conditional/query access                 |
+| `"{{user.name}}"`          | Template syntax for string interpolation |
 
 Bindings create reactive connections — when underlying data changes, views update automatically. In flow JSON, use template syntax `{{binding}}` for string interpolation within values. The bare form `user.name` is the binding itself; `{{user.name}}` embeds it in a string context.
 
@@ -133,22 +133,28 @@ Type system for the data model. Structured as:
 {
   "schema": {
     "ROOT": {
-      "person": { "type": "PersonType" }
+      "person": { "type": "PersonType" },
     },
     "PersonType": {
       "name": {
         "type": "StringType",
         "validation": [
-          { "type": "required", "message": "Name is required", "severity": "error", "trigger": "navigation", "blocking": true }
-        ]
+          {
+            "type": "required",
+            "message": "Name is required",
+            "severity": "error",
+            "trigger": "navigation",
+            "blocking": true,
+          },
+        ],
       },
       "phone": {
         "type": "PhoneType",
         "format": { "type": "phone" },
-        "default": ""
-      }
-    }
-  }
+        "default": "",
+      },
+    },
+  },
 }
 ```
 
@@ -156,15 +162,15 @@ Type system for the data model. Structured as:
 
 Validation rules (`Validation.Reference`) control:
 
-| Property        | Values / Type                        | Behavior                                                |
-|-----------------|--------------------------------------|---------------------------------------------------------|
-| `type`          | string                               | Validator name (looked up in registry)                  |
-| `message`       | string (optional)                    | Override default error message                          |
-| `severity`      | `"error"` \| `"warning"`            | Errors block; warnings informational                    |
-| `trigger`       | `"load"` \| `"change"` \| `"navigation"` | When validation first activates                    |
-| `blocking`      | `true` \| `false` \| `"once"`       | Whether to block navigation (`true` default for errors) |
-| `displayTarget` | `"field"` \| `"section"` \| `"page"` | Where error renders in UI                              |
-| `dataTarget`    | `"formatted"` \| `"deformatted"`    | Which value representation to validate against          |
+| Property        | Values / Type                            | Behavior                                                |
+| --------------- | ---------------------------------------- | ------------------------------------------------------- |
+| `type`          | string                                   | Validator name (looked up in registry)                  |
+| `message`       | string (optional)                        | Override default error message                          |
+| `severity`      | `"error"` \| `"warning"`                 | Errors block; warnings informational                    |
+| `trigger`       | `"load"` \| `"change"` \| `"navigation"` | When validation first activates                         |
+| `blocking`      | `true` \| `false` \| `"once"`            | Whether to block navigation (`true` default for errors) |
+| `displayTarget` | `"field"` \| `"section"` \| `"page"`     | Where error renders in UI                               |
+| `dataTarget`    | `"formatted"` \| `"deformatted"`         | Which value representation to validate against          |
 
 **Cross-field validations** (`Validation.CrossfieldReference`) live on the `View`, not in Schema. They add a `ref` binding to associate the validation with a specific field.
 
@@ -178,9 +184,12 @@ Conditional rendering for assets. Two types with distinct evaluation behavior:
 ```jsonc
 {
   "staticSwitch": [
-    { "case": "@user.type@ == 'admin'", "asset": { "id": "admin-view", "type": "admin-panel" } },
-    { "case": true, "asset": { "id": "default-view", "type": "basic-panel" } }
-  ]
+    {
+      "case": "@user.type@ == 'admin'",
+      "asset": { "id": "admin-view", "type": "admin-panel" },
+    },
+    { "case": true, "asset": { "id": "default-view", "type": "basic-panel" } },
+  ],
 }
 ```
 
@@ -202,22 +211,22 @@ Maps an array in the data model to an array of objects/assets. Enables dynamic l
         "asset": {
           "id": "item-{{_index_}}",
           "type": "list-item",
-          "binding": "items[{{_index_}}].value"
-        }
+          "binding": "items[{{_index_}}].value",
+        },
       },
-      "dynamic": false
-    }
-  ]
+      "dynamic": false,
+    },
+  ],
 }
 ```
 
-| Property    | Purpose                                                    |
-|-------------|-------------------------------------------------------------|
-| `data`      | Binding to source array                                     |
-| `value`     | Template for each item — `{{_index_}}` is current iteration index |
-| `output`    | Property name to store results on parent                    |
+| Property    | Purpose                                                                 |
+| ----------- | ----------------------------------------------------------------------- |
+| `data`      | Binding to source array                                                 |
+| `value`     | Template for each item — `{{_index_}}` is current iteration index       |
+| `output`    | Property name to store results on parent                                |
 | `dynamic`   | `false` (default): evaluated once. `true`: re-evaluated on data changes |
-| `placement` | `"append"` (default) or `"prepend"` relative to existing elements |
+| `placement` | `"append"` (default) or `"prepend"` relative to existing elements       |
 
 Use `dynamic: true` only when the source array changes at runtime (add/remove/reorder). Static templates are cached for performance.
 
@@ -225,9 +234,11 @@ Use `dynamic: true` only when the source array changes at runtime (add/remove/re
 
 ### Flow & View
 
-- `Flow<T>`: Top-level payload — `{ id, views?, schema?, data?, navigation }`
-- `View<T>`: Asset extended with optional `validation?: CrossfieldReference[]`
+- `Flow<T>`: Top-level payload — `{ id, views?, schema?, data?, navigation, [key]: unknown }`
+- `View<T>`: Conditional type — adds optional `validation?: CrossfieldReference[]` to `T` unless `T` already declares it
 - `FlowResult`: Completion data — `{ endState: NavigationFlowEndState, data? }`
+
+Many core types (`Asset`, `Flow`, `NavigationFlowViewState`, `NavigationFlowEndState`, `NavigationFlowExternalState`, `Schema.DataType`, `Validation.Reference`, `Formatting.Reference`) include `[key: string]: unknown` index signatures, allowing custom additional properties beyond the declared ones.
 
 ### Assets
 
@@ -235,14 +246,18 @@ Use `dynamic: true` only when the source array changes at runtime (add/remove/re
 - `AssetWrapper<T>`: Container — `{ asset: T }`
 - `AssetWrapperOrSwitch<T>`: Union — exactly one of `asset`, `staticSwitch`, or `dynamicSwitch`
 - `AssetBinding`: Asset with `binding: Binding` property
-- `Switch<T>`: Array of `SwitchCase<T>` — `{ asset: T, case: Expression | true }[]`
+- `SwitchCase<T>`: `{ asset: T, case: Expression | true }` — single conditional branch
+- `Switch<T>`: `SwitchCase<T>[]` — ordered array of conditional branches
 - `StaticSwitch<T>`: `{ staticSwitch: Switch<T> }`
 - `DynamicSwitch<T>`: `{ dynamicSwitch: Switch<T> }`
+- `AssetSwitch<T>`: `StaticSwitch<T> | DynamicSwitch<T>` — union of both switch variants
 
 ### Navigation
 
 - `Navigation`: `{ BEGIN: string } & Record<string, string | NavigationFlow>`
 - `NavigationFlow`: `{ startState, onStart?, onEnd?, [stateName]: NavigationFlowState }`
+- `NavigationBaseState<T>`: Base for all states — `{ state_type: T, onStart?, onEnd?, _comment? }`. END extends this directly
+- `NavigationFlowTransitionableState<T>`: Extends base with `transitions: NavigationFlowTransition`. VIEW, ACTION, ASYNC_ACTION, EXTERNAL, FLOW extend this
 - `NavigationFlowViewState`: `{ state_type: "VIEW", ref, transitions, attributes? }`
 - `NavigationFlowActionState`: `{ state_type: "ACTION", exp, transitions }`
 - `NavigationFlowAsyncActionState`: `{ state_type: "ASYNC_ACTION", exp, await: boolean, transitions }`
@@ -252,7 +267,7 @@ Use `dynamic: true` only when the source array changes at runtime (add/remove/re
 - `NavigationFlowState`: Union of all six state types
 - `NavigationFlowTransition`: `Record<string, string>` — transition name to state name
 
-All transitionable states share: `onStart?`, `onEnd?` lifecycle hooks (Expression | ExpressionObject).
+All navigation states (including END) share optional `onStart?`, `onEnd?` lifecycle hooks (`Expression | ExpressionObject`). Only transitionable states (VIEW, ACTION, ASYNC_ACTION, EXTERNAL, FLOW) have `transitions`. All states also accept `_comment?: string` for inline documentation in Flow JSON.
 
 ### Data Model & Bindings
 
@@ -274,11 +289,12 @@ All transitionable states share: `onStart?`, `onEnd?` lifecycle hooks (Expressio
 - `Schema.RecordType`: DataType with `isRecord: boolean` (mutually exclusive with ArrayType)
 - `Schema.ArrayType`: DataType with `isArray: boolean` (mutually exclusive with RecordType)
 - `Schema.DataTypes`: `DataType | RecordType | ArrayType`
+- `Language.DataTypeRef`: `{ type: string }` — minimal type reference used in schema property definitions
 
 ### Validation & Formatting
 
 - `Validation.Reference`: `{ type, message?, severity?, trigger?, blocking?, displayTarget?, dataTarget? }`
-- `Validation.CrossfieldReference`: Reference with `ref?: Binding` (dataTarget always deformatted)
+- `Validation.CrossfieldReference`: Reference & `{ ref?: Binding, dataTarget?: never }` — cross-field validations cannot specify a dataTarget
 - `Validation.Severity`: `"error" | "warning"`
 - `Validation.Trigger`: `"navigation" | "change" | "load"`
 - `Validation.DisplayTarget`: `"page" | "section" | "field"`
@@ -358,7 +374,7 @@ None. This is the foundation package — all other Player UI packages depend on 
 
 8. **Expression array return value**: In `["stmt1", "stmt2", "result"]`, only the last element is the return value. Earlier elements are side-effect statements.
 
-9. **ASYNC_ACTION requires explicit `await: true`**: Without it, the promise is NOT awaited and the state transitions immediately.
+9. **ASYNC_ACTION requires explicit `await: true`**: Without it, the runtime calls `transition(String(result))` immediately. For a Promise, `String(promise)` yields `"[object Promise]"` which won't match named transition keys — it falls through to `transitions["*"]` if present. Always set `await: true` for async expressions, and define a `"*"` catch-all transition as a safety net.
 
 10. **Schema defaults have side effects**: Reading a binding with a schema-defined `default` automatically WRITES that default to the data model.
 
