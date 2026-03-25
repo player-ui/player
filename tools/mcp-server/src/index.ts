@@ -20,7 +20,9 @@ import {
 import { getCategories } from "./loader.js";
 import { getLogger } from "./logger.js";
 
-const version = "0.0.0-PLACEHOLDER";
+declare const __VERSION__: string;
+const version =
+  typeof __VERSION__ !== "undefined" ? __VERSION__ : "0.0.0-PLACEHOLDER";
 
 const logger = getLogger();
 

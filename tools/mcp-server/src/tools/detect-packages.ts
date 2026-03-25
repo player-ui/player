@@ -90,8 +90,12 @@ export async function detectPackages(
           /## Overview\n\n([\s\S]*?)(?=\n## |$)/,
         );
         const overview = overviewMatch
-          ? overviewMatch[1].substring(0, config.overviewMaxLength).trim() +
-            "..."
+          ? (() => {
+              const full = overviewMatch[1].trim();
+              return full.length > config.overviewMaxLength
+                ? full.substring(0, config.overviewMaxLength) + "..."
+                : full;
+            })()
           : "No overview available.";
 
         response += `### ${pkg}\n${overview}\n\n`;

@@ -39,7 +39,7 @@ export class LRUCache<T> {
   }
 
   has(key: string): boolean {
-    return this.get(key) !== null;
+    return this.cache.has(key);
   }
 
   clear(): void {

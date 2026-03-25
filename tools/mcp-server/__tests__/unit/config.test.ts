@@ -82,11 +82,10 @@ describe("Config", () => {
     });
 
     describe("Invalid Environment Variables", () => {
-      it("should handle non-numeric MCP_MAX_DEPTH", () => {
+      it("should fall back to default for non-numeric MCP_MAX_DEPTH", () => {
         process.env.MCP_MAX_DEPTH = "not-a-number";
         const config = loadConfig();
-        // parseInt returns NaN for invalid input
-        expect(config.maxDependencyDepth).toBeNaN();
+        expect(config.maxDependencyDepth).toBe(2);
       });
 
       it("should handle negative numbers", () => {

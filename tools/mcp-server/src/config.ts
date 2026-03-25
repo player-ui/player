@@ -18,10 +18,17 @@ export interface McpConfig {
  * Load configuration from environment variables with sensible defaults
  */
 export function loadConfig(): McpConfig {
+  const rawDepth = parseInt(process.env.MCP_MAX_DEPTH || "2", 10);
+  const rawOverviewLength = parseInt(
+    process.env.MCP_OVERVIEW_LENGTH || "300",
+    10,
+  );
+  const rawCacheSize = parseInt(process.env.MCP_CACHE_MAX_SIZE || "50", 10);
+
   return {
-    maxDependencyDepth: parseInt(process.env.MCP_MAX_DEPTH || "2", 10),
-    overviewMaxLength: parseInt(process.env.MCP_OVERVIEW_LENGTH || "300", 10),
-    cacheMaxSize: parseInt(process.env.MCP_CACHE_MAX_SIZE || "50", 10),
+    maxDependencyDepth: Number.isNaN(rawDepth) ? 2 : rawDepth,
+    overviewMaxLength: Number.isNaN(rawOverviewLength) ? 300 : rawOverviewLength,
+    cacheMaxSize: Number.isNaN(rawCacheSize) ? 50 : rawCacheSize,
     enablePerformanceLogging: process.env.MCP_ENABLE_PERF_LOG === "true",
   };
 }

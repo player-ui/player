@@ -112,20 +112,22 @@ describe("LRUCache", () => {
       expect(cache.get("a")).toBe("updated");
     });
 
-    it("should promote on has() check", () => {
+    it("should not promote on has() check", () => {
       const cache = new LRUCache<string>(3);
       cache.set("a", "1");
       cache.set("b", "2");
       cache.set("c", "3");
 
-      // has() promotes "a"
+      // has() should NOT promote "a"
       expect(cache.has("a")).toBe(true);
 
-      // "b" is now LRU
+      // "a" is still LRU, so adding a new entry should evict "a"
       cache.set("d", "4");
 
-      expect(cache.get("b")).toBeNull();
-      expect(cache.get("a")).toBe("1");
+      expect(cache.get("a")).toBeNull();
+      expect(cache.get("b")).toBe("2");
+      expect(cache.get("c")).toBe("3");
+      expect(cache.get("d")).toBe("4");
     });
   });
 
