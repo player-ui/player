@@ -37,24 +37,38 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
     /// Additional options for the PubSubPlugin
     private var options: PubSubPluginOptions?
 
+    /// An external shared TinyPubSub instance, if provided
+    private var sharedPubSub: TinyPubSub?
+
     /**
      Constructs a PubSubPlugin
      - parameters:
-        - eventNames: The event names to subscribe to
-        - eventReceived: A callback to receive events
+        - subscriptions: Event name / callback pairs to register
+        - options: Additional options such as a custom expression name
+        - pubsub: An optional shared `TinyPubSub` instance. When provided, this plugin
+                  will use it as its event bus instead of creating a new one, allowing
+                  multiple plugins (or plugins on different players) to share events.
      */
-    public convenience init(_ subscriptions: [PubSubSubscription], options: PubSubPluginOptions? = nil) {
+    public convenience init(
+        _ subscriptions: [PubSubSubscription],
+        options: PubSubPluginOptions? = nil,
+        pubsub: TinyPubSub? = nil
+    ) {
         self.init(fileName: "PubSubPlugin.native", pluginName: "PubSubPlugin.PubSubPlugin")
         eventSubscriptions = subscriptions
         self.options = options
+        self.sharedPubSub = pubsub
     }
 
     /**
-    Constructs the PubSub Plugin in the given context
-    - parameters:
-       - context: The context to load the plugin into
-    */
+     Constructs the PubSub Plugin in the given context.
+     If a shared `TinyPubSub` was provided it is initialized here, creating the underlying
+     JS TinyPubSub instance (if not already created) before the plugin constructor runs.
+     - parameters:
+        - context: The context to load the plugin into
+     */
     override public func setup(context: JSContext) {
+        sharedPubSub?.setup(context: context)
         super.setup(context: context)
         for subscription in eventSubscriptions {
             subscribe(eventName: subscription.0, callback: subscription.1)
@@ -62,8 +76,14 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
     }
 
     public override func getArguments() -> [Any] {
-        guard let name = self.options?.expressionName else { return [] }
-        return [["expressionName": name]]
+        var config: [String: Any] = [:]
+        if let name = options?.expressionName {
+            config["expressionName"] = name
+        }
+        if let pubsubValue = sharedPubSub?.jsValue {
+            config["pubsub"] = pubsubValue
+        }
+        return config.isEmpty ? [] : [config]
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {

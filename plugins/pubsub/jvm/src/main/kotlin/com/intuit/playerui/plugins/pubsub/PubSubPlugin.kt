@@ -12,13 +12,26 @@ import kotlinx.serialization.Serializable
 /** Core plugin wrapper providing pub-sub support to the JVM player */
 public class PubSubPlugin(
     public val config: Config? = null,
+    public val sharedPubSub: TinyPubSub? = null,
 ) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     override fun apply(runtime: Runtime<*>) {
-        config?.let {
-            runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
-            runtime.add("pubsubConfig", config)
-            instance = runtime.buildInstance("(new $name(pubsubConfig))")
-        } ?: super.apply(runtime)
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+
+        val pubSubVarName = sharedPubSub?.getOrCreate(runtime)
+
+        instance = when {
+            pubSubVarName != null && config != null -> {
+                runtime.add("pubsubConfig", config)
+                runtime.buildInstance("(new $name({...pubsubConfig, pubsub: $pubSubVarName}))")
+            }
+            pubSubVarName != null ->
+                runtime.buildInstance("(new $name({pubsub: $pubSubVarName}))")
+            config != null -> {
+                runtime.add("pubsubConfig", config)
+                runtime.buildInstance("(new $name(pubsubConfig))")
+            }
+            else -> runtime.buildInstance()
+        }
     }
 
     /**
