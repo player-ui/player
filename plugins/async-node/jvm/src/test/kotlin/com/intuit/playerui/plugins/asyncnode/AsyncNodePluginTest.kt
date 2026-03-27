@@ -4,8 +4,6 @@ import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.Node
-import com.intuit.playerui.core.bridge.getInvokable
-import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
@@ -203,12 +201,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
             throw Exception("This is an error message from onAsyncNode")
         }
 
-        val refPlugin = ReferenceAssetsPlugin()
-        refPlugin.apply(runtime)
-        if (player is HeadlessPlayer) {
-            val invokable = (player as HeadlessPlayer).node.getInvokable<Unit>("registerPlugin")
-            invokable?.invoke(refPlugin.node)
-        }
         val err = assertThrows<JSErrorException> {
             runBlockingTest {
                 player.start(chatMessageContent).await()
@@ -220,7 +212,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
     @TestTemplate
     fun `async node error hook catches and gracefully handles the error`() = runBlockingTest {
-        setupPlayer(listOf(AsyncNodePlugin()))
         plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
             throw Exception("This is an error message from onAsyncNode")
         }
@@ -235,13 +226,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
                     ),
                 ),
             )
-        }
-        // TODO: Remove this. Need to make sure the tests don't rely on the reference assets plugin since it can change but shouldn't impact AsyncNodePlugin tests
-        val refPlugin = ReferenceAssetsPlugin()
-        refPlugin.apply(runtime)
-        if (player is HeadlessPlayer) {
-            val invokable = (player as HeadlessPlayer).node.getInvokable<Unit>("registerPlugin")
-            invokable?.invoke(refPlugin.node)
         }
 
         var count = 0

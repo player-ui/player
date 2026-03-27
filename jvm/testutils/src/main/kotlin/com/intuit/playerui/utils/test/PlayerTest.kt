@@ -29,12 +29,8 @@ public abstract class PlayerTest :
     }
 
     /** Helper method for setting a [player] with configurable [plugins] and [runtime] */
-    public fun setupPlayer(
-        plugins: List<Plugin> = this.plugins,
-        runtime: Runtime<*> = this.runtime,
-        includeThisInPlugins: Boolean = true,
-    ) {
-        val allPlugins = if (includeThisInPlugins) plugins + this else plugins
+    public fun setupPlayer(plugins: List<Plugin> = this.plugins, runtime: Runtime<*> = this.runtime) {
+        val allPlugins = if (plugins.contains(this)) plugins else plugins + this
         player = HeadlessPlayer(allPlugins, runtime, config = runtime.config)
     }
 }

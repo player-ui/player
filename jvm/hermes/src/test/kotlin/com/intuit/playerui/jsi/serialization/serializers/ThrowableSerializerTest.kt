@@ -20,14 +20,11 @@ private class ExceptionWithMetadata(
     cause: Throwable? = null,
 ) : PlayerException(message, cause),
     PlayerExceptionMetadata {
-    override val type: String
-        get() = "TestError"
-    override val severity: ErrorSeverity?
-        get() = ErrorSeverity.ERROR
-    override val metadata: Map<String, Any?>?
-        get() = mapOf(
-            "testProperty" to "testValue",
-        )
+    override val type: String = "TestError"
+    override val severity: ErrorSeverity = ErrorSeverity.ERROR
+    override val metadata: Map<String, Any?> = mapOf(
+        "testProperty" to "testValue",
+    )
 }
 
 // TODO: This should be a core [RuntimeTest]

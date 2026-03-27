@@ -27,6 +27,10 @@ class AssetRenderException :
     val initialMessage: String
     override var message: String = ""
 
+    override val type: String = ErrorTypes.RENDER
+    override val severity: ErrorSeverity = ErrorSeverity.ERROR
+    override val metadata: Map<String, Any?>
+
     internal constructor(rootAsset: AssetContext, message: String, exception: Throwable? = null) : super(message, exception) {
         val errorMessage = if (exception == null) {
             message
@@ -38,14 +42,8 @@ Caused by: ${exception.message}
         initialMessage = "$errorMessage\nException occurred in asset with id '${rootAsset.id}' of type '${rootAsset.type}"
         this.message = initialMessage
         this.rootAsset = rootAsset
-    }
-
-    override val type: String
-        get() = ErrorTypes.RENDER
-    override val severity: ErrorSeverity?
-        get() = ErrorSeverity.ERROR
-    override val metadata: Map<String, Any?>?
-        get() = mapOf(
-            "assetId" to rootAsset.asset.id,
+        this.metadata = mapOf(
+            "assetId" to this.rootAsset.asset.id,
         )
+    }
 }

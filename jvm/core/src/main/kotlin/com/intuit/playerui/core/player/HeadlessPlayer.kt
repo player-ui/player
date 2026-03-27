@@ -96,7 +96,6 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         coroutineExceptionHandler =
             config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
                 if (state !is ReleasedState) {
-                    logger.error("[HeadlessPlayer]: Error has been found")
                     inProgressState?.controllers?.error?.captureError(throwable, ErrorTypes.RENDER) ?: logger.error(
                         "Exception caught in Player scope: ${throwable.message}",
                         throwable.stackTrace

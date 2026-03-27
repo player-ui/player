@@ -1,6 +1,7 @@
 package com.intuit.playerui.core.bridge.serialization.serializers
 
 import com.intuit.playerui.core.bridge.JSErrorException
+import com.intuit.playerui.core.bridge.JSErrorExceptionWithMetadata
 import com.intuit.playerui.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeDecoder
 import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeEncoder
@@ -122,7 +123,11 @@ public class ThrowableSerializer : KSerializer<Throwable> {
             } else {
                 val error = decoder.requireNodeDecoder().decodeNode()
                 stackTrace = decodeStackTraceFromStack(error.getString("stack"))
-                JSErrorException(error, type = type ?: "", severity = severity, metadata = metadata)
+                if (type === null) {
+                    JSErrorException(error)
+                } else {
+                    JSErrorExceptionWithMetadata(error, type = type, severity = severity, metadata = metadata)
+                }
             }.apply { setStackTrace(stackTrace) }
         }
     }
