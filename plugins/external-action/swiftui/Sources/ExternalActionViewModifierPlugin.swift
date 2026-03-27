@@ -106,7 +106,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
                     let context = self?.context,
                     let controllers = PlayerControllers(from: options),
                     let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
-                        Task { @MainActor in
+                        let updateUI: () -> Void = {
                             self?.isExternalAction = true
                             let state = NavigationFlowExternalState(state)
                             self?.state = state
@@ -126,6 +126,12 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
                                 self?.content = nil
                                 reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                             }
+                        }
+
+                        if Thread.isMainThread {
+                            updateUI()
+                        } else {
+                            DispatchQueue.main.sync(execute: updateUI)
                         }
                     })
                 else { return nil }
