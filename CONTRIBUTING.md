@@ -29,7 +29,7 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
   <tbody>
     <tr>
       <td>MacOS</td>
-      <td>Sequoia 15.5</td>
+      <td>Sequoia (15)</td>
       <td>Update via System Settings. Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.</td>
     </tr>
     <tr>
@@ -49,7 +49,7 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
     </tr>
     <tr>
       <td><a href="https://developer.apple.com/download/all/">Xcode</a></td>
-      <td>16.3 or 16.4</td>
+      <td>26.1.- 26.2</td>
       <td>Download from Apple. Having this <b>exact</b> Xcode version is extremely important.
       Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.
       </td>
