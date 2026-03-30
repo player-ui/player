@@ -50,7 +50,7 @@ import java.net.URL
  */
 @Suppress("ktlint:standard:annotation") // To prevent class from being double indented
 public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public constructor(
-    override val plugins: List<Plugin>,
+    plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
@@ -71,6 +71,9 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     ) : this(plugins.toList(), explicitRuntime, config = explicitRuntime.config)
 
     private val player: Node
+
+    private val _plugins: MutableList<Plugin> = plugins.toMutableList()
+    override val plugins: List<Plugin> get() = _plugins
 
     override val node: Node by ::player
 
@@ -190,6 +193,20 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         if (!runtime.isReleased()) {
             hooks.state.call(HashMap(), arrayOf(ReleasedState))
             runtime.release()
+        }
+    }
+
+    /** Register and apply a [Plugin] to this player after instantiation. */
+    public fun registerPlugin(plugin: Plugin) {
+        _plugins.add(plugin)
+        when (plugin) {
+            is RuntimePlugin -> {
+                plugin.apply(runtime)
+                if (plugin is JSPluginWrapper) {
+                    player.getInvokable<Unit>("registerPlugin")!!.invoke(plugin.instance)
+                }
+            }
+            is PlayerPlugin -> plugin.apply(this)
         }
     }
 

@@ -154,10 +154,19 @@ export class ReactPlayer {
 
   /** Register and apply [Plugin] if one with the same symbol is not already registered. */
   public registerPlugin(plugin: ReactPlayerPlugin): void {
-    if (!plugin.applyReact) return;
+    if (plugin.apply) {
+      this.player.registerPlugin(plugin as PlayerPlugin);
+    }
 
-    plugin.applyReact(this);
-    this.options.plugins?.push(plugin);
+    if (plugin.applyReact) {
+      plugin.applyReact(this);
+    }
+
+    if (!this.options.plugins) {
+      this.options.plugins = [];
+    }
+
+    this.options.plugins.push(plugin);
   }
 
   /**
