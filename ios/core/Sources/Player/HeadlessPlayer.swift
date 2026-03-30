@@ -225,6 +225,17 @@ public extension HeadlessPlayer {
         jsPlayerReference?.invokeMethod("registerPlugin", withArguments: [plugin.pluginRef as Any])
     }
 
+    /// Registers a NativePlugin with player after instantiation
+    /// For JSBasePlugin instances, delegates to the typed overload; for other NativePlugins, calls apply directly
+    /// - Parameter plugin: The plugin to register
+    func registerPlugin(_ plugin: NativePlugin) {
+        if let jsPlugin = plugin as? JSBasePlugin {
+            registerPlugin(jsPlugin)
+        } else {
+            plugin.apply(player: self)
+        }
+    }
+
     /**
      Starts Player for the given flow
      - parameters:

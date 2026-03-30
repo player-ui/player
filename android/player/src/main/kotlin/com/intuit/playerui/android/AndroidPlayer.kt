@@ -48,7 +48,7 @@ public typealias AndroidPlayerConfig = AndroidPlayer.Config
  */
 public class AndroidPlayer private constructor(
     public val player: HeadlessPlayer,
-    override val plugins: List<Plugin> = player.plugins,
+    plugins: List<Plugin> = player.plugins,
 ) : Player() {
     /** Convenience constructor to provide vararg style [plugins] parameter */
     public constructor(
@@ -89,6 +89,9 @@ public class AndroidPlayer private constructor(
         player,
         (plugins.toList() + player.plugins).distinct(),
     )
+
+    private val _plugins: MutableList<Plugin> = plugins.toMutableList()
+    override val plugins: List<Plugin> get() = _plugins
 
     override val logger: TapableLogger by player::logger
 
@@ -297,6 +300,16 @@ public class AndroidPlayer private constructor(
         clearCaches()
         player.release()
         hooks.release.call()
+    }
+
+    /** Register and apply a [Plugin] to this player after instantiation. */
+    public fun registerPlugin(plugin: Plugin) {
+        _plugins.add(plugin)
+        if (plugin is AndroidPlayerPlugin) {
+            plugin.apply(this)
+        } else {
+            player.registerPlugin(plugin)
+        }
     }
 
     // TODO: Do we even need context as a param anymore?
