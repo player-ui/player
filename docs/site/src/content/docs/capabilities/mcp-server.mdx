@@ -1,0 +1,227 @@
+---
+title: MCP Server
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+The `@player-ui/mcp-server` package is a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that provides AI assistants with access to Player UI's knowledge system. It enables tools like Claude Code, Cursor, and Codex to understand Player UI packages, APIs, and patterns.
+
+## Installation
+
+### From npm
+
+```bash
+pnpm i -g @player-ui/mcp-server
+```
+
+### From source
+
+```bash
+# In the Player UI monorepo (uses Bazel)
+bazel build //tools/mcp-server:@player-ui/mcp-server
+```
+
+## Configuration
+
+Add the MCP server to your AI assistant's configuration:
+
+<Tabs>
+<TabItem label="Claude Code">
+Add to `.claude/config.json`:
+
+```json
+{
+  "mcpServers": {
+    "player-ui": {
+      "command": "npx",
+      "args": ["@player-ui/mcp-server"]
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem label="Cursor">
+Add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "player-ui": {
+      "command": "npx",
+      "args": ["@player-ui/mcp-server"]
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem label="Local Development">
+Point to the built output:
+
+```json
+{
+  "mcpServers": {
+    "player-ui": {
+      "command": "node",
+      "args": ["/path/to/player/tools/mcp-server/dist/index.mjs"]
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## MCP Tools
+
+The server exposes four tools for AI assistants to query Player UI knowledge.
+
+### player_get_package
+
+Retrieve comprehensive knowledge for a specific Player UI package.
+
+**Parameters:**
+
+- `package` (required): Package name (e.g., `@player-ui/player`)
+- `includeDependencies` (optional): Include dependency knowledge (default: `true`)
+
+**Returns:** Markdown document containing core concepts, API surface, usage patterns, integration points, common pitfalls, and reference file paths.
+
+```typescript
+// Example: Get knowledge for @player-ui/react
+player_get_package({
+  package: "@player-ui/react",
+  includeDependencies: true,
+});
+```
+
+When `includeDependencies: true`, knowledge for direct and transitive dependencies (depth 2) is automatically included. For example, `@player-ui/react` includes knowledge for `@player-ui/player` and `@player-ui/types`.
+
+### player_search_api
+
+Search for packages by concept, API name, or keyword.
+
+**Parameters:**
+
+- `query` (required): Search term (e.g., "validation", "hooks", "data binding")
+- `scope` (optional): Limit to category: `"all"`, `"core"`, `"platform"` (default: `"all"`)
+
+**Returns:** List of matching packages with name, description, and match relevance.
+
+```typescript
+// Example: Search for validation-related packages
+player_search_api({
+  query: "validation",
+  scope: "core",
+});
+```
+
+Search matches are ranked by relevance: concept match (highest), name match, export match, tag match, description match (lowest).
+
+### player_detect_packages
+
+Auto-detect Player UI packages in a project by scanning `package.json`.
+
+**Parameters:**
+
+- `packageJsonPath` (optional): Path to package.json (default: `"package.json"`)
+
+**Returns:** List of detected Player UI packages with quick reference overviews.
+
+```typescript
+// Example: Detect packages in current directory
+player_detect_packages({
+  packageJsonPath: "package.json",
+});
+
+// Or in a subdirectory
+player_detect_packages({
+  packageJsonPath: "./my-app/package.json",
+});
+```
+
+Scans `dependencies`, `devDependencies`, and `peerDependencies`.
+
+### player_list_packages
+
+Browse all available Player UI packages with metadata.
+
+**Parameters:**
+
+- `category` (optional): Filter by category: `"all"`, `"core"`, `"platform"` (default: `"all"`)
+
+**Returns:** List of all packages grouped by category with descriptions, tags, key exports, dependencies, and estimated token counts.
+
+```typescript
+// Example: List all core packages
+player_list_packages({
+  category: "core",
+});
+```
+
+## Environment Variables
+
+Configure the MCP server behavior with environment variables:
+
+| Variable              | Default | Description                                    |
+| --------------------- | ------- | ---------------------------------------------- |
+| `MCP_MAX_DEPTH`       | `2`     | Maximum depth for loading package dependencies |
+| `MCP_OVERVIEW_LENGTH` | `300`   | Maximum characters for overview sections       |
+| `MCP_CACHE_MAX_SIZE`  | `50`    | Maximum entries in knowledge cache             |
+| `MCP_ENABLE_PERF_LOG` | `false` | Enable performance logging to stderr           |
+| `MCP_LOG_LEVEL`       | `INFO`  | Log level: `DEBUG`, `INFO`, `WARN`, or `ERROR` |
+
+**Example:**
+
+```bash
+# Increase cache size and disable dependency loading
+MCP_CACHE_MAX_SIZE=100 MCP_MAX_DEPTH=0 npx @player-ui/mcp-server
+```
+
+## Knowledge System
+
+The MCP server bundles optimized knowledge artifacts (~1500-3000 tokens each) located in `tools/mcp-server/knowledge/`. Each knowledge file includes:
+
+- **Overview**: Purpose and when to use the package
+- **Core Concepts**: Key abstractions and mental models
+- **API Surface**: Primary exports and interfaces
+- **Common Usage Patterns**: Pattern-based guidance
+- **Dependencies**: Relationship to other packages
+- **Integration Points**: Extension mechanisms
+- **Common Pitfalls**: Mistakes and edge cases
+- **Reference Files**: Source code locations
+
+## Error Codes
+
+The server uses structured errors for debugging:
+
+| Code                       | Description                                                     |
+| -------------------------- | --------------------------------------------------------------- |
+| `PACKAGE_NOT_FOUND`        | Package doesn't exist in knowledge system                       |
+| `VALIDATION_ERROR`         | Invalid arguments provided to tool                              |
+| `FILESYSTEM_ERROR`         | File operation failed                                           |
+| `PATH_TRAVERSAL`           | Security violation - attempted access outside allowed directory |
+| `METADATA_ERROR`           | Knowledge metadata is invalid                                   |
+| `KNOWLEDGE_ARTIFACT_ERROR` | Failed to load knowledge file                                   |
+| `PACKAGE_JSON_ERROR`       | Failed to parse package.json                                    |
+
+## Troubleshooting
+
+### "Package X not found in knowledge system"
+
+The package hasn't been documented yet. To add knowledge for more packages, see `tools/mcp-server/knowledge/README.md`.
+
+### "Failed to read package.json"
+
+Check the `packageJsonPath` parameter. The path is relative to the server's working directory (usually the project root).
+
+### Server not responding
+
+1. Check your MCP client logs for server errors
+2. Verify the server is built: `bazel build //tools/mcp-server:@player-ui/mcp-server`
+3. Test the server directly: `node dist/index.mjs` (should wait for input)
+
+### Wrong knowledge version
+
+Ensure the MCP server version matches your Player UI version. Knowledge is versioned with the monorepo.

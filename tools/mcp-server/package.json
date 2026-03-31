@@ -1,0 +1,11 @@
+{
+  "name": "@player-ui/mcp-server",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Model Context Protocol server for Player UI knowledge system",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "player-mcp": "./dist/index.mjs"
+  },
+  "files": ["dist", "knowledge", "README.md"]
+}

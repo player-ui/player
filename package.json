@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.0.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "@astrojs/starlight": "^0.35.2",
     "@astrojs/starlight-docsearch": "^0.3.0",
     "@astrojs/starlight-tailwind": "^3.0.1",
