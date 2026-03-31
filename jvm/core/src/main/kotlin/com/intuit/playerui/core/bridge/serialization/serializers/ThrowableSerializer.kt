@@ -123,7 +123,7 @@ public class ThrowableSerializer : KSerializer<Throwable> {
             } else {
                 val error = decoder.requireNodeDecoder().decodeNode()
                 stackTrace = decodeStackTraceFromStack(error.getString("stack"))
-                if (type === null) {
+                if (type == null) {
                     JSErrorException(error)
                 } else {
                     JSErrorExceptionWithMetadata(error, type = type, severity = severity, metadata = metadata)

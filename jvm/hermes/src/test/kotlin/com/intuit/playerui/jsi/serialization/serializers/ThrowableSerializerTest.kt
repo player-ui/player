@@ -63,7 +63,7 @@ internal class ThrowableSerializerTest : HermesTest() {
         exception as JSErrorExceptionWithMetadata
         Assertions.assertEquals("Error: hello", exception.message)
         Assertions.assertEquals(
-            """com.intuit.playerui.core.bridge.JSErrorException: Error: hello
+            """com.intuit.playerui.core.bridge.JSErrorExceptionWithMetadata: Error: hello
 """,
             exception.stackTraceToString(),
         )
