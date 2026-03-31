@@ -1,3 +1,67 @@
+# 0.15.2 (Mon Mar 30 2026)
+
+### Release Notes
+
+#### Use `workspace:^` for all internal workspace dependencies ([#804](https://github.com/player-ui/player/pull/804))
+
+Update core/react packages to use use peer versions for all internal player dependencies.
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#833](https://github.com/player-ui/player/pull/833) ([@intuit-svc](https://github.com/intuit-svc))
+- Refactor external action plugin [#832](https://github.com/player-ui/player/pull/832) ([@spentacular](https://github.com/spentacular))
+- catch runtime released exceptions from lifecycle callbacks [#764](https://github.com/player-ui/player/pull/764) ([@sugarmanz](https://github.com/sugarmanz))
+- Use `workspace:^` for all internal workspace dependencies [#804](https://github.com/player-ui/player/pull/804) ([@Copilot](https://github.com/Copilot) [@KetanReddy](https://github.com/KetanReddy) [@spentacular](https://github.com/spentacular))
+- Cancel stale-map polyfill animation on page transition [#826](https://github.com/player-ui/player/pull/826) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Fix: Compose android view must launch on main thread [#820](https://github.com/player-ui/player/pull/820) ([@A1shK](https://github.com/A1shK) [@kharrop](https://github.com/kharrop))
+- Removing docs-preview from forks [#824](https://github.com/player-ui/player/pull/824) ([@kharrop](https://github.com/kharrop))
+- Add Claude Code GitHub Workflow [#822](https://github.com/player-ui/player/pull/822) ([@spentacular](https://github.com/spentacular))
+- Use XLR pipeline for Common Types Plugin [#807](https://github.com/player-ui/player/pull/807) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add CLAUDE.md with guidelines for reporting and reviewing pull requests [#827](https://github.com/player-ui/player/pull/827) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 8
+
+- [@A1shK](https://github.com/A1shK)
+- [@Copilot](https://github.com/Copilot)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.2-next.3 (Mon Mar 30 2026)
+
+### Release Notes
+
+#### Use `workspace:^` for all internal workspace dependencies ([#804](https://github.com/player-ui/player/pull/804))
+
+Update core/react packages to use use peer versions for all internal player dependencies.
+
+---
+
+#### 🐛 Bug Fix
+
+- Refactor external action plugin [#832](https://github.com/player-ui/player/pull/832) ([@spentacular](https://github.com/spentacular))
+- catch runtime released exceptions from lifecycle callbacks [#764](https://github.com/player-ui/player/pull/764) ([@sugarmanz](https://github.com/sugarmanz))
+- Use `workspace:^` for all internal workspace dependencies [#804](https://github.com/player-ui/player/pull/804) ([@Copilot](https://github.com/Copilot) [@KetanReddy](https://github.com/KetanReddy) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 4
+
+- [@Copilot](https://github.com/Copilot)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.15.2-next.2 (Thu Mar 19 2026)
 
 #### 🐛 Bug Fix
