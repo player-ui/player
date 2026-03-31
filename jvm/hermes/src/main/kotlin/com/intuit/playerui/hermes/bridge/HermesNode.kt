@@ -62,18 +62,7 @@ public class HermesNode(
     override fun isEmpty(): Boolean = size == 0
 
     context(RuntimeThreadContext)
-    private fun getJSIValue(key: String): Value {
-        // `getProperty` may throw an NPE if the underlying JSI object/runtime is already released.
-        if (runtime.isReleased() || jsiObject.isReleased()) {
-            throw PlayerRuntimeException(runtime, "JSI object released while reading property \"$key\"")
-        }
-
-        return try {
-            jsiObject.getProperty(runtime, key)
-        } catch (e: NullPointerException) {
-            throw PlayerRuntimeException(runtime, "NullPointerException reading JSI property \"$key\"", e)
-        }
-    }
+    private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
 
     context(RuntimeThreadContext)
     private fun getJSIObject(key: String): Object? = getJSIValue(key)
@@ -91,7 +80,7 @@ public class HermesNode(
         ?.asFunction(runtime)
 
     override operator fun get(key: String): Any? = runtime.evaluateInJSThreadBlocking {
-        getJSIValue(key).handleValue(format)
+        jsiObject.getProperty(runtime, key).handleValue(format)
     }
 
     override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = runtime
