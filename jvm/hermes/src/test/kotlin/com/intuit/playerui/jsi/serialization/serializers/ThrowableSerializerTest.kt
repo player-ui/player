@@ -1,6 +1,6 @@
 package com.intuit.playerui.jsi.serialization.serializers
 
-import com.intuit.playerui.core.bridge.JSErrorException
+import com.intuit.playerui.core.bridge.JSErrorExceptionWithMetadata
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer.SerializableStackTraceElement
 import com.intuit.playerui.core.error.ErrorSeverity
@@ -59,8 +59,8 @@ internal class ThrowableSerializerTest : HermesTest() {
         error.asObject(runtime).setProperty(runtime, "metadata", Value.createFromJsonUtf8(runtime, "{\"testProperty\":\"testValue\"}"))
         val exception = format.decodeFromRuntimeValue(ThrowableSerializer(), error)
 
-        Assertions.assertTrue(exception is JSErrorException)
-        exception as JSErrorException
+        Assertions.assertTrue(exception is JSErrorExceptionWithMetadata)
+        exception as JSErrorExceptionWithMetadata
         Assertions.assertEquals("Error: hello", exception.message)
         Assertions.assertEquals(
             """com.intuit.playerui.core.bridge.JSErrorException: Error: hello
