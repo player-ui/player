@@ -20,8 +20,11 @@ public class PlayerRuntimeReleasedException private constructor(
     runtime: Runtime<*>,
 ) : PlayerRuntimeException(runtime, "Runtime object has been released!") {
     public companion object {
-        @InternalPlayerApi public fun Runtime<*>.ensureNotReleased() {
+        @InternalPlayerApi public suspend fun <T> Runtime<*>.ensureNotReleased(block: suspend () -> T): T = try {
+            block()
+        } catch (e: Throwable) {
             if (runtime.isReleased()) throw PlayerRuntimeReleasedException(this)
+            throw e
         }
     }
 }

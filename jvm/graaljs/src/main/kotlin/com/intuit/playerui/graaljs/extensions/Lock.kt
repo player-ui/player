@@ -15,14 +15,15 @@ import org.graalvm.polyglot.Value
  * NOTE: Suspend methods are non-blocking by convention.
  */
 internal suspend fun <T> Value.lock(timeout: Long = 5000, block: suspend Value.() -> T): T = withTimeout(timeout) {
-    context.runtime.ensureNotReleased()
-    val runtimeLock = context.runtime.lock
-    val alreadyHadLock = runtimeLock.isHeldByCurrentThread
-    try {
-        while (!runtimeLock.tryLock()) delay(50)
-        block()
-    } finally {
-        if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+    context.runtime.ensureNotReleased {
+        val runtimeLock = context.runtime.lock
+        val alreadyHadLock = runtimeLock.isHeldByCurrentThread
+        try {
+            while (!runtimeLock.tryLock()) delay(50)
+            block()
+        } finally {
+            if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+        }
     }
 }
 
@@ -33,14 +34,15 @@ internal suspend fun <T> Value.lock(timeout: Long = 5000, block: suspend Value.(
  * NOTE: Suspend methods are non-blocking by convention.
  */
 internal suspend fun <T> Context.lock(timeout: Long = 5000, block: suspend Context.() -> T): T = withTimeout(timeout) {
-    runtime.ensureNotReleased()
-    val runtimeLock = runtime.lock
-    val alreadyHadLock = runtimeLock.isHeldByCurrentThread
-    try {
-        while (!runtimeLock.tryLock()) delay(50)
-        block()
-    } finally {
-        if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+    runtime.ensureNotReleased {
+        val runtimeLock = runtime.lock
+        val alreadyHadLock = runtimeLock.isHeldByCurrentThread
+        try {
+            while (!runtimeLock.tryLock()) delay(50)
+            block()
+        } finally {
+            if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+        }
     }
 }
 
@@ -48,28 +50,18 @@ internal suspend fun <T> Context.lock(timeout: Long = 5000, block: suspend Conte
  * Blocking method to execute [block] on the Graal [Value]. This
  * will block the calling thread.
  */
-internal fun <T> Value.blockingLock(block: Value.() -> T): T {
-    context.runtime.ensureNotReleased()
-    return when {
-        context.runtime.lock.isHeldByCurrentThread -> block()
-        else -> runBlocking {
-            lock { block() }
-        }
-    }
+internal fun <T> Value.blockingLock(block: Value.() -> T): T = when {
+    context.runtime.lock.isHeldByCurrentThread -> block()
+    else -> runBlocking { context.runtime.ensureNotReleased { lock { block() } } }
 }
 
 /**
  * Blocking method to execute [block] on the Graal [Context]. This
  * will block the calling thread.
  */
-internal fun <T> Context.blockingLock(block: Context.() -> T): T {
-    runtime.ensureNotReleased()
-    return when {
-        runtime.lock.isHeldByCurrentThread -> block()
-        else -> runBlocking {
-            lock { block() }
-        }
-    }
+internal fun <T> Context.blockingLock(block: Context.() -> T): T = when {
+    runtime.lock.isHeldByCurrentThread -> block()
+    else -> runBlocking { runtime.ensureNotReleased { lock { block() } } }
 }
 
 /** Special [blockingLock] helper to guard against undefined values */
