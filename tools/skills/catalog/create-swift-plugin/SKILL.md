@@ -68,6 +68,8 @@ public class <PluginName>Plugin: NativePlugin {
     public var pluginName: String = "<PluginName>Plugin"
 
     public func apply<P: HeadlessPlayer>(player: P) {
+        // CoreHooks support unnamed taps (no `name:` parameter required),
+        // unlike SwiftUI hooks (SyncWaterfallHook/SyncBailHook) which require `name:`.
         player.hooks?.state.tap { state in
             // React to state changes
         }
@@ -89,7 +91,7 @@ The `NativePlugin` protocol requires:
 ```swift
 public func apply<P: HeadlessPlayer>(player: P) {
     guard let player = player as? SwiftUIPlayer else { return }
-    player.hooks?.view.tap { view in
+    player.hooks?.view.tap(name: pluginName) { view in
         // Wrap or modify the rendered view
         return view.environment(\.myCustomKey, myValue)
     }
@@ -282,7 +284,7 @@ Wrap or inject environment values into the rendered view:
 ```swift
 public func apply<P: HeadlessPlayer>(player: P) {
     guard let player = player as? SwiftUIPlayer else { return }
-    player.hooks?.view.tap { view in
+    player.hooks?.view.tap(name: pluginName) { view in
         return AnyView(view.environment(\.myKey, myValue))
     }
 }
@@ -301,9 +303,10 @@ public class <PluginName>Plugin: NativePlugin, ManagedPlayerPlugin {
 
     // Called by ManagedPlayer upon instantiation, before SwiftUIPlayer is created
     public func apply(_ model: ManagedPlayerViewModel) {
+        // Note: The exact return type and bail syntax depend on the SwiftHooks package API version.
+        // Consult the SyncBailHook documentation for the correct return convention.
         model.stateTransition.tap(name: pluginName) {
-            // Return a transition for loading state changes
-            .bail(PlayerViewTransition(transition: .opacity, animationCurve: .easeInOut))
+            PlayerViewTransition(transition: .opacity, animationCurve: .easeInOut)
         }
     }
 
@@ -383,10 +386,16 @@ import PlayerUISwiftUI
 struct ContentView: View {
     var body: some View {
         ManagedPlayer(
-            plugins: [<PluginName>Plugin(), TransitionPlugin(popTransition: .pop)],
+            plugins: [<PluginName>Plugin()],
             flowManager: myFlowManager,
             onComplete: { result in
                 // Handle final completion
+            },
+            fallback: { _ in
+                Text("Something went wrong")
+            },
+            loading: {
+                ProgressView("Loading...")
             }
         )
     }

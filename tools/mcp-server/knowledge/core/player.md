@@ -151,9 +151,9 @@ Executes expressions defined in `@player-ui/types`. Runtime adds custom function
 | `debug(...)`                | Log args via player logger (debug level)                     |
 | `eval(expression)`          | Evaluate a nested expression string                          |
 
-**FlowExpPlugin** does not register expression functions — it evaluates `onStart`/`onEnd` lifecycle expressions on flow and state nodes.
+**FlowExpPlugin** does not register expression functions — it evaluates flow-level `onStart`/`onEnd` lifecycle expressions and state-level `onStart` expressions. State-level `onEnd` expressions are evaluated by the Player core (in `player.ts`, inside the `beforeTransition` tap).
 
-**Built-in Operators**: Arithmetic (`+`, `-`, `*`, `/`, `%`), comparison (`==`, `!=`, `>`, `>=`, `<`, `<=`, `===`, `!==`), logical (`&&`, `||`, `!`), bitwise (`&`, `|`), assignment (`=`, `+=`, `-=`). Ternary (`? :`) also supported. Expressions can assign to bindings: `{{foo.bar}} = 42` or `{{count}} += 1`.
+**Built-in Operators**: Arithmetic (`+`, `-`, `*`, `/`, `%`), comparison (`==`, `!=`, `>`, `>=`, `<`, `<=`, `===`, `!==`), logical (`&&`, `||`, `!`), bitwise (`&`, `|`), unary (`-` negation, `+` numeric coercion, `!` logical not), assignment (`+=`, `-=`, `&=`, `|=`). Ternary (`? :`) also supported. Expressions can assign to bindings: `{{foo.bar}} = 42` or `{{count}} += 1`.
 
 ### Logger
 
@@ -322,8 +322,8 @@ View updates happen automatically on data changes via binding subscription.
 **Key Methods**:
 
 - `validateView(trigger: Validation.Trigger): void` — Validate current view
-- `forView(parseBinding): ValidationResponse` — Get validation interface for view
-- `getDataMiddleware(): DataModelMiddleware` — Middleware that validates on set
+- `forView(parser: BindingFactory): Resolve.Validation` — Get validation interface for view
+- `getDataMiddleware(): Array<DataModelMiddleware>` — Middleware that validates on set
 
 **Hooks**: `createValidatorRegistry`, `onAddValidation`, `onRemoveValidation`, `resolveValidationProviders`, `onTrackBinding`
 
@@ -375,7 +375,7 @@ All operations return new instances (immutable).
 - `addUnaryOperator(op: string, handler: UnaryOperator)` — Register unary operator
 - `setExpressionVariable(name: string, value: any)` — Set temporary variable
 - `getExpressionVariable(name: string): any` — Get temporary variable
-- `reset(): void` — Clear temporary variables
+- `reset(): void` — Clear parsed expression AST cache
 
 **Hooks**: `resolve`, `resolveOptions`, `beforeEvaluate` (all SyncWaterfallHook), `onError` (SyncBailHook — return true to swallow error)
 
@@ -440,7 +440,7 @@ const name = data.get("user.name"); // raw value
 const phone = data.get("user.phone", { formatted: true }); // formatted
 ```
 
-Setting formatted values requires a deformatter registered in SchemaController. `{ silent: true }` defers view update scheduling — changed bindings accumulate and resolve on the next non-silent update.
+Setting formatted values requires a deformatter registered in SchemaController.
 
 ### Custom Expression Functions
 
@@ -501,18 +501,6 @@ This waterfall hook runs before controller creation — useful for injecting dat
 - **SyncWaterfallHook**: Each tap transforms and passes value to next
 - **SyncBailHook**: First tap returning non-undefined value short-circuits
 
-### Controller Access
-
-During InProgressState, access all controllers via `state.controllers`:
-
-- `data` — DataController
-- `flow` — FlowController
-- `view` — ViewController
-- `schema` — SchemaController
-- `validation` — ValidationController
-- `expression` — ExpressionEvaluator
-- `binding` — BindingParser
-
 ### Middleware System
 
 Data model supports `DataModelMiddleware` for intercepting get/set/delete. Middleware composes as a pipeline — all registered middleware executes in order. `ValidationMiddleware` is built-in (shadow model for invalid values). Custom middleware via `PipelinedDataModel.addMiddleware()`.
@@ -541,14 +529,14 @@ Data model supports `DataModelMiddleware` for intercepting get/set/delete. Middl
 
 Tap into controller hooks to observe runtime behavior:
 
-| Debug Goal        | Hook Path                                  | Callback Args         |
-| ----------------- | ------------------------------------------ | --------------------- |
-| Expression errors | `expressionEvaluator` → `onError`          | `(error, expression)` |
-| Binding reads     | `dataController` → `onGet`                 | `(binding, value)`    |
-| Data writes       | `dataController` → `onSet`                 | `(updates)`           |
-| State changes     | `state`                                    | `(playerFlowState)`   |
-| Navigation        | `flowController` → `flow` → `transition`   | `(to, from)`          |
-| Validation        | `validationController` → `onAddValidation` | `(validation)`        |
+| Debug Goal        | Hook Path                                  | Callback Args                  |
+| ----------------- | ------------------------------------------ | ------------------------------ |
+| Expression errors | `expressionEvaluator` → `onError`          | `(error, expression)`          |
+| Binding reads     | `dataController` → `onGet`                 | `(binding, value)`             |
+| Data writes       | `dataController` → `onSet`                 | `(updates)`                    |
+| State changes     | `state`                                    | `(playerFlowState)`            |
+| Navigation        | `flowController` → `flow` → `transition`   | `(prevState, newCurrentState)` |
+| Validation        | `validationController` → `onAddValidation` | `(validation)`                 |
 
 **Canonical tap pattern:**
 

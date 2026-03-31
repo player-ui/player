@@ -46,7 +46,7 @@ Orchestrates multi-flow experiences with automatic flow chaining. Calls `manager
 
 Requires a Suspense boundary ancestor — the `ReactPlayer.Component` rendered inside calls `viewUpdateSubscription.suspend()`, which throws promises during view loading.
 
-**Error handling precedence**: If an error occurs: (1) if `fallbackComponent` is provided, renders it with `reset`/`retry`/`error` props; (2) else if `onError` is provided, calls it (does not throw); (3) else throws the error (requires an error boundary ancestor).
+**Error handling**: On error, `onError` callback fires unconditionally if provided (during state transition). For rendering: (1) if `fallbackComponent` is provided, it renders with `reset`/`retry`/`error` props; (2) else if `onError` is NOT provided, the error is thrown (requires error boundary ancestor); (3) else (`onError` provided but no `fallbackComponent`) the component renders `null`. Both `onError` and `fallbackComponent` can fire for the same error.
 
 **Cleanup**: On unmount or manager change while a flow is running, automatically calls `manager.terminate(serializedData)` with the current data model snapshot.
 
@@ -61,15 +61,15 @@ not_started → pending → loaded → running → completed → pending (next f
                                                     ↘ error
 ```
 
-| State         | Description                                                        |
-| ------------- | ------------------------------------------------------------------ |
-| `not_started` | Initial state, calls `manager.next()`                              |
-| `pending`     | Awaiting `manager.next()` response                                 |
-| `loaded`      | Flow received, not yet started                                     |
-| `running`     | Flow executing via `reactPlayer.start()`                           |
-| `completed`   | Flow finished, feeds result to `manager.next()` for chaining       |
-| `ended`       | Manager returned `{ done: true }`, triggers `onComplete`           |
-| `error`       | Any step failed, triggers `onError` or renders `fallbackComponent` |
+| State         | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| `not_started` | Initial state, calls `manager.next()`                        |
+| `pending`     | Awaiting `manager.next()` response                           |
+| `loaded`      | Flow received, not yet started                               |
+| `running`     | Flow executing via `reactPlayer.start()`                     |
+| `completed`   | Flow finished, feeds result to `manager.next()` for chaining |
+| `ended`       | Manager returned `{ done: true }`, triggers `onComplete`     |
+| `error`       | Any step failed — see error handling above                   |
 
 ### Subscribe System
 
@@ -129,7 +129,7 @@ new ReactPlayer(options?: {
 - `getPlayerVersion(): string` — current Player version
 - `getPlayerCommit(): string` — git commit of Player build
 - `findPlugin<T>(symbol): T | undefined` — find React plugin by symbol
-- `registerPlugin(plugin): void` — register plugin post-construction (**only calls `applyReact`**, NOT `apply`; returns early if plugin has no `applyReact`)
+- `registerPlugin(plugin): void` — register plugin post-construction (see Pitfall #7 for caveats)
 
 ### useReactPlayer Hook
 
@@ -243,12 +243,15 @@ Key types exported from `@player-ui/react` (in addition to all re-exports from `
 ```tsx
 const App = () => {
   const { reactPlayer, playerState } = useReactPlayer({
-    plugins: [new ReferenceAssetsPlugin()]
+    plugins: [new ReferenceAssetsPlugin()],
   });
 
-  React.useEffect(() => { reactPlayer.start(myFlow); }, []);
+  React.useEffect(() => {
+    reactPlayer.start(myFlow);
+  }, []);
 
-  if (playerState.status === "error") return <ErrorUI error={playerState.error} />;
+  if (playerState.status === "error")
+    return <ErrorUI error={playerState.error} />;
   return <reactPlayer.Component />;
 };
 ```
@@ -259,7 +262,8 @@ const App = () => {
 const manager: FlowManager = {
   async next(prevResult) {
     if (!prevResult) return { value: await fetchFlow1() };
-    if (prevResult.data.continue) return { value: await fetchFlow2(prevResult.data) };
+    if (prevResult.data.continue)
+      return { value: await fetchFlow2(prevResult.data) };
     return { done: true };
   },
   terminate(data) {
@@ -268,10 +272,13 @@ const manager: FlowManager = {
 };
 
 <Suspense fallback={<Loading />}>
-  <ManagedPlayer manager={manager} plugins={plugins}
-    onComplete={(state) => console.log('Done', state)}
-    fallbackComponent={ErrorScreen} />
-</Suspense>
+  <ManagedPlayer
+    manager={manager}
+    plugins={plugins}
+    onComplete={(state) => console.log("Done", state)}
+    fallbackComponent={ErrorScreen}
+  />
+</Suspense>;
 ```
 
 Use `prevResult.data` to pass state between flows. Throw in `next()` to trigger error boundary, or return `{ done: true }` to end gracefully. Implement `terminate` to save data when the component unmounts mid-flow.
@@ -300,9 +307,9 @@ const MyAsset = (props: MyAssetProps) => {
   const player = usePlayer();
   const handleClick = () => {
     const state = player?.getState();
-    if (state?.status === 'in-progress') {
-      state.controllers.data.set([['user.selection', props.value]]);
-      state.controllers.flow.transition('next');
+    if (state?.status === "in-progress") {
+      state.controllers.data.set([["user.selection", props.value]]);
+      state.controllers.flow.transition("next");
     }
   };
   return <button onClick={handleClick}>{props.label}</button>;
@@ -312,9 +319,11 @@ const MyAsset = (props: MyAssetProps) => {
 ### Wrapping Root Component
 
 ```tsx
-reactPlayer.hooks.webComponent.tap('wrapper', (Comp) => {
+reactPlayer.hooks.webComponent.tap("wrapper", (Comp) => {
   return (props) => (
-    <ThemeProvider><Comp {...props} /></ThemeProvider>
+    <ThemeProvider>
+      <Comp {...props} />
+    </ThemeProvider>
   );
 });
 ```
@@ -357,7 +366,7 @@ Waterfall hook — each tap wraps previous. `webComponent` wraps the outermost s
 
 11. **FlowManager next() rejection**: Unhandled rejections crash ManagedPlayer. Use try-catch or provide `fallbackComponent`.
 
-12. **ManagedPlayer error handling precedence**: `fallbackComponent` takes priority — renders with reset/retry/error. If absent, `onError` callback fires (no throw). If both absent, the error is thrown (needs error boundary ancestor).
+12. **ManagedPlayer error handling**: `onError` fires unconditionally if provided (during state transition). For rendering: `fallbackComponent` renders if present; else if no `onError` either, the error is thrown; else (`onError` only) the component renders `null` — which may cause a blank screen. Provide `fallbackComponent` for visible error recovery.
 
 13. **ManagedPlayer `terminate` on unmount**: When ManagedPlayer unmounts or manager changes while a flow runs, it calls `manager.terminate(data)` with serialized data. Implement `terminate` to save progress.
 
@@ -368,25 +377,29 @@ Waterfall hook — each tap wraps previous. `webComponent` wraps the outermost s
 ```tsx
 // Mock PlayerContext for custom asset tests
 const mockPlayer = {
-  getState: () => ({ status: 'in-progress', controllers: { data: { set: vi.fn() } } }),
-  hooks: { state: { tap: () => {} } }
+  getState: () => ({
+    status: "in-progress",
+    controllers: { data: { set: vi.fn() } },
+  }),
+  hooks: { state: { tap: () => {} } },
 };
 render(
   <PlayerContext.Provider value={{ player: mockPlayer }}>
     <MyCustomAsset label="Test" />
-  </PlayerContext.Provider>
+  </PlayerContext.Provider>,
 );
 
 // Test ManagedPlayer flow sequence
 const manager = {
-  next: vi.fn()
+  next: vi
+    .fn()
     .mockResolvedValueOnce({ value: flow1 })
     .mockResolvedValueOnce({ done: true }),
 };
 render(
   <Suspense fallback={<div>Loading</div>}>
     <ManagedPlayer manager={manager} onComplete={onComplete} plugins={[]} />
-  </Suspense>
+  </Suspense>,
 );
 await waitFor(() => expect(onComplete).toHaveBeenCalled());
 
@@ -396,7 +409,7 @@ registry.set({ type: "test" }, TestComponent);
 render(
   <AssetContext.Provider value={{ registry }}>
     <ReactAsset id="test-1" type="test" />
-  </AssetContext.Provider>
+  </AssetContext.Provider>,
 );
 ```
 

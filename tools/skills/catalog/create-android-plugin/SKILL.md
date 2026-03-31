@@ -53,21 +53,25 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 
 class <PluginName> : AndroidPlayerPlugin {
-    val name = "<PluginName>"
 
     override fun apply(androidPlayer: AndroidPlayer) {
         // Register assets
         androidPlayer.registerAsset("my-asset", ::MyAsset)
 
         // Access player hooks through the backing player
-        androidPlayer.player.hooks.state.tap(name) { state ->
+        androidPlayer.player.hooks.state.tap(pluginName) { state ->
             // React to state changes
         }
 
         // Access Android-specific hooks
-        androidPlayer.hooks.update.tap(name) { asset ->
+        androidPlayer.hooks.update.tap(pluginName) { asset ->
             // React to view updates
         }
+    }
+
+    private companion object {
+        // Convention: used as tap identifier for hooks (not an interface requirement)
+        private const val pluginName = "<PluginName>"
     }
 }
 ```
@@ -84,18 +88,22 @@ import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.plugins.PlayerPlugin
 
 class <PluginName> : PlayerPlugin {
-    val name = "<PluginName>"
 
     override fun apply(player: Player) {
-        player.hooks.state.tap(name) { state ->
+        player.hooks.state.tap(pluginName) { state ->
             if (state is ErrorState) {
                 // Handle error
             }
         }
 
-        player.hooks.flowController.tap(name) { fc ->
+        player.hooks.flowController.tap(pluginName) { fc ->
             // Access flow controller
         }
+    }
+
+    private companion object {
+        // Convention: used as tap identifier for hooks (not an interface requirement)
+        private const val pluginName = "<PluginName>"
     }
 }
 ```
@@ -105,6 +113,22 @@ The `AndroidPlayer` extends `Player`, so `AndroidPlayerPlugin` implementations a
 ### 3. JS-Backed Plugin (Wrapping a Core TypeScript Plugin)
 
 Loads a compiled JavaScript bundle and bridges hooks to Kotlin. Extend `JSScriptPluginWrapper`:
+
+**Minimal version** — relies on the default `apply` from `JSScriptPluginWrapper`, which loads the script and instantiates the plugin automatically:
+
+```kotlin
+import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
+
+class <PluginName> : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
+
+    private companion object {
+        private const val PLUGIN_NAME = "<PluginName>"
+        private const val BUNDLED_SOURCE_PATH = "<PluginName>.native.js"
+    }
+}
+```
+
+**Extended version** — overrides `apply` only to extract JS-side hooks after the default load + instantiation:
 
 ```kotlin
 import com.intuit.playerui.core.bridge.Node
@@ -121,9 +145,10 @@ class <PluginName> : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOU
     lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
-        instance = runtime.buildInstance("(new $name())")
+        // Perform the default load + instantiation first
+        super.apply(runtime)
 
+        // Then extract hooks from the JS plugin instance
         hooks = instance.getSerializable("hooks", Hooks.serializer())
             ?: throw PlayerException("$PLUGIN_NAME hooks not loaded correctly")
     }
@@ -246,11 +271,11 @@ Accessible via `player.hooks` on any `Player` (including through `androidPlayer.
 
 Additional hooks on `AndroidPlayer.Hooks` (accessible via `androidPlayer.hooks`):
 
-| Hook                             | Type                | Purpose                                            |
-| -------------------------------- | ------------------- | -------------------------------------------------- |
-| `context`                        | `SyncWaterfallHook` | Transform the Android `Context` used for rendering |
-| `update`                         | `SyncBailHook`      | Intercept asset view updates                       |
-| `compositionLocalProvidedValues` | `SyncHook`          | Provide Compose `CompositionLocal` values          |
+| Hook                             | Type                                                                | Purpose                                            |
+| -------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
+| `context`                        | `SyncWaterfallHook<(HookContext, Context) -> Context, Context>`     | Transform the Android `Context` used for rendering |
+| `update`                         | `SyncBailHook<(RenderableAsset?) -> BailResult<Unit>, Unit>`        | Intercept asset view updates                       |
+| `compositionLocalProvidedValues` | `SyncHook<(HookContext, (List<ProvidedValue<*>>) -> Unit) -> Unit>` | Provide Compose `CompositionLocal` values          |
 
 ---
 

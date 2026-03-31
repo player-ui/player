@@ -33,20 +33,20 @@ class MyPlugin implements PlayerPlugin {
 
 ## Top-Level Player Hooks
 
-| Hook                   | Tapable Type                       | Fires When                    | Common Use                               |
-| ---------------------- | ---------------------------------- | ----------------------------- | ---------------------------------------- |
-| `state`                | `SyncHook<[PlayerFlowState]>`      | Every state transition        | Gate logic on `status === "in-progress"` |
-| `flowController`       | `SyncHook<[FlowController]>`       | Flow controller created       | Capture reference for `transition()`     |
-| `viewController`       | `SyncHook<[ViewController]>`       | View controller created       | Tap into view lifecycle                  |
-| `view`                 | `SyncHook<[ViewInstance]>`         | Each new view                 | React to view changes                    |
-| `expressionEvaluator`  | `SyncHook<[ExpressionEvaluator]>`  | Evaluator created             | Register custom expression functions     |
-| `dataController`       | `SyncHook<[DataController]>`       | Data controller ready         | Tap format/deformat pipeline             |
-| `schema`               | `SyncHook<[SchemaController]>`     | Schema loaded                 | Extend type schema                       |
-| `validationController` | `SyncHook<[ValidationController]>` | Validation controller ready   | Add custom validators                    |
-| `bindingParser`        | `SyncHook<[BindingParser]>`        | Parser created                | Custom binding syntax                    |
-| `onStart`              | `SyncHook<[Flow]>`                 | After flow controller created | Inspect resolved flow content            |
-| `onEnd`                | `SyncHook<[]>`                     | Flow completes or fails       | Cleanup resources                        |
-| `resolveFlowContent`   | `SyncWaterfallHook<[Flow]>`        | Content resolution            | Transform flow JSON before processing    |
+| Hook                   | Tapable Type                               | Fires When                    | Common Use                               |
+| ---------------------- | ------------------------------------------ | ----------------------------- | ---------------------------------------- |
+| `state`                | `SyncHook<[PlayerFlowState]>`              | Every state transition        | Gate logic on `status === "in-progress"` |
+| `flowController`       | `SyncHook<[FlowController]>`               | Flow controller created       | Capture reference for `transition()`     |
+| `viewController`       | `SyncHook<[ViewController]>`               | View controller created       | Tap into view lifecycle                  |
+| `view`                 | `SyncHook<[ViewInstance]>`                 | Each new view                 | React to view changes                    |
+| `expressionEvaluator`  | `SyncHook<[ExpressionEvaluator]>`          | Evaluator created             | Register custom expression functions     |
+| `dataController`       | `SyncHook<[DataController]>`               | Data controller ready         | Tap format/deformat pipeline             |
+| `schema`               | `SyncHook<[SchemaController]>`             | Schema loaded                 | Extend type schema                       |
+| `validationController` | `SyncHook<[ValidationController]>`         | Validation controller ready   | Add custom validators                    |
+| `bindingParser`        | `SyncHook<[BindingParser]>`                | Parser created                | Custom binding syntax                    |
+| `onStart`              | `SyncHook<[Flow<Asset<string>>]>`          | After flow controller created | Inspect resolved flow content            |
+| `onEnd`                | `SyncHook<[]>`                             | Flow completes or fails       | Cleanup resources                        |
+| `resolveFlowContent`   | `SyncWaterfallHook<[Flow<Asset<string>>]>` | Content resolution            | Transform flow JSON before processing    |
 
 ---
 
@@ -104,11 +104,11 @@ view.hooks.resolver.tap(this.name, (resolver) => {
 
 Access via `view.hooks.parser`. The `Parser` instance has three hooks for controlling how view JSON is transformed into the AST:
 
-| Hook              | Tapable Type                                                                            | Fires When              | Common Use                    |
-| ----------------- | --------------------------------------------------------------------------------------- | ----------------------- | ----------------------------- |
-| `onParseObject`   | `SyncWaterfallHook<[object, NodeType]>`                                                 | Before parsing into AST | Pre-process raw view objects  |
-| `onCreateASTNode` | `SyncWaterfallHook<[Node.Node \| undefined \| null, object]>`                           | After AST node created  | Modify or replace AST nodes   |
-| `parseNode`       | `SyncBailHook<[obj, nodeType, parseOptions, childOptions?], Node.Node \| Node.Child[]>` | During node parsing     | Override default node parsing |
+| Hook              | Tapable Type                                                                                      | Fires When              | Common Use                    |
+| ----------------- | ------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------------- |
+| `onParseObject`   | `SyncWaterfallHook<[object, NodeType]>`                                                           | Before parsing into AST | Pre-process raw view objects  |
+| `onCreateASTNode` | `SyncWaterfallHook<[Node.Node \| undefined \| null, object]>`                                     | After AST node created  | Modify or replace AST nodes   |
+| `parseNode`       | `SyncBailHook<[obj, Node.ChildrenTypes, parseOptions, childOptions?], Node.Node \| Node.Child[]>` | During node parsing     | Override default node parsing |
 
 ```typescript
 view.hooks.parser.tap(this.name, (parser) => {
@@ -253,6 +253,7 @@ Access via `player.hooks.dataController`:
 | `format`              | `SyncWaterfallHook<[any, BindingInstance]>`          | Formatting a value for display       |
 | `deformat`            | `SyncWaterfallHook<[any, BindingInstance]>`          | Deformatting a value from user input |
 | `serialize`           | `SyncWaterfallHook<[any]>`                           | Serializing data for output          |
+| `resolve`             | `SyncWaterfallHook`                                  | Resolving data model path            |
 
 ```typescript
 player.hooks.dataController.tap(this.name, (dc) => {
@@ -326,6 +327,16 @@ Access via `player.hooks.validationController`:
 
 ---
 
+## FlowController Hooks
+
+Access via `player.hooks.flowController`:
+
+| Hook   | Tapable Type               | Fires When               |
+| ------ | -------------------------- | ------------------------ |
+| `flow` | `SyncHook<[FlowInstance]>` | New FlowInstance created |
+
+---
+
 ## Per-Flow Hook Pattern
 
 Many hooks fire once per `player.start()`. Avoid stale references:
@@ -346,16 +357,16 @@ apply(player: Player): void {
 
 The `FlowInstance` (received via `fc.hooks.flow`) exposes hooks for navigation lifecycle:
 
-| Hook                    | Tapable Type                                                    | Fires When                         |
-| ----------------------- | --------------------------------------------------------------- | ---------------------------------- |
-| `beforeStart`           | `SyncBailHook<[NavigationFlow], NavigationFlow>`                | Before flow navigation starts      |
-| `onStart`               | `SyncHook<[any]>`                                               | When the onStart node fires        |
-| `onEnd`                 | `SyncHook<[any]>`                                               | When the onEnd node fires          |
-| `skipTransition`        | `SyncBailHook<[NamedState \| undefined], boolean \| undefined>` | Return `true` to block transition  |
-| `beforeTransition`      | `SyncWaterfallHook<[NavigationFlowState, string]>`              | Modify flow node before transition |
-| `resolveTransitionNode` | `SyncWaterfallHook<[NavigationFlowState]>`                      | Modify resolved target node        |
-| `transition`            | `SyncHook<[NamedState \| undefined, NamedState]>`               | After a state transition occurs    |
-| `afterTransition`       | `SyncHook<[FlowInstance]>`                                      | Run actions after transition       |
+| Hook                    | Tapable Type                                                                        | Fires When                         |
+| ----------------------- | ----------------------------------------------------------------------------------- | ---------------------------------- |
+| `beforeStart`           | `SyncBailHook<[NavigationFlow], NavigationFlow>`                                    | Before flow navigation starts      |
+| `onStart`               | `SyncHook<[any]>`                                                                   | When the onStart node fires        |
+| `onEnd`                 | `SyncHook<[any]>`                                                                   | When the onEnd node fires          |
+| `skipTransition`        | `SyncBailHook<[NamedState \| undefined], boolean \| undefined>`                     | Return `true` to block transition  |
+| `beforeTransition`      | `SyncWaterfallHook<[Exclude<NavigationFlowState, NavigationFlowEndState>, string]>` | Modify flow node before transition |
+| `resolveTransitionNode` | `SyncWaterfallHook<[NavigationFlowState]>`                                          | Modify resolved target node        |
+| `transition`            | `SyncHook<[NamedState \| undefined, NamedState]>`                                   | After a state transition occurs    |
+| `afterTransition`       | `SyncHook<[FlowInstance]>`                                                          | Run actions after transition       |
 
 ```typescript
 player.hooks.flowController.tap(this.name, (fc) => {

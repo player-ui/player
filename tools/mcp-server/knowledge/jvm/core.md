@@ -12,13 +12,13 @@ Primary entry point and orchestrator for flow execution. `HeadlessPlayer` is a c
 
 **Lifecycle States** (sealed class hierarchy):
 
-| State             | Description                          | Controller Access             |
-| ----------------- | ------------------------------------ | ----------------------------- |
-| `NotStartedState` | Initial state before any flow starts | None                          |
-| `InProgressState` | Active flow execution                | Full access via `controllers` |
-| `CompletedState`  | Flow finished successfully           | Read-only data access         |
-| `ErrorState`      | Flow failed with exception           | None                          |
-| `ReleasedState`   | Terminal state after `release()`     | None                          |
+| State             | Description                          | Controller Access                                                                                                   |
+| ----------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `NotStartedState` | Initial state before any flow starts | None                                                                                                                |
+| `InProgressState` | Active flow execution                | Full access via `controllers`                                                                                       |
+| `CompletedState`  | Flow finished successfully           | `dataModel: DataModelWithParser`, `endState: NavigationFlowEndState`, `data: JsonElement` (controllers is internal) |
+| `ErrorState`      | Flow failed with exception           | None                                                                                                                |
+| `ReleasedState`   | Terminal state after `release()`     | None                                                                                                                |
 
 **Critical mental model:** Controllers only exist during `InProgressState`. Check `state is InProgressState` before accessing `controllers.data`, `controllers.flow`, etc. Attempting to access controllers in other states throws exceptions or returns null.
 
@@ -84,7 +84,7 @@ Three plugin types for extensibility:
 
 **RuntimePlugin:** Modify the JS runtime before Player instantiation. Use for injecting globals, configuring runtime behavior, or adding native bindings.
 
-**JSPluginWrapper:** Pass a JS plugin object to the Player constructor. Wraps existing JS plugins (from `@player-ui/` packages) for use in JVM.
+**JSPluginWrapper:** Wraps a JS plugin object. Extends `RuntimePlugin` and `NodeWrapper` — applied during the RuntimePlugin phase and also passed to the JS Player constructor.
 
 **PlayerPlugin:** Tap into Player hooks after instantiation. Primary extension mechanism. Implement `apply(player: Player)` to register hook listeners.
 
@@ -107,7 +107,7 @@ Extension mechanism based on `@intuit/hooks` library (Tapable pattern). Player e
 - `dataController` — New DataController created
 - `viewController` — ViewController created or updated
 - `view` — New View resolved (equivalent to `viewController.hooks.view`)
-- `expressionEvaluator` — ExpressionEvaluator created
+- `expressionEvaluator` — `NodeSyncHook1<ExpressionController>` — ExpressionController created
 - `validationController` — ValidationController created
 - `onStart` — Flow started (provides `Flow` metadata)
 
@@ -137,10 +137,10 @@ Tap syntax: `hook.tap(name: String, callback)` — name used for debugging. Anon
 
 - `onStart` — Flow instance started
 - `onEnd` — Flow instance ended
-- `beforeTransition` — Waterfall hook to manipulate flow-node before transition calculation
+- `beforeTransition` — `NodeSyncWaterfallHook2<NavigationFlowState, String>` — Waterfall hook to manipulate flow-node before transition calculation (receives state and transition value string)
 - `skipTransition` — Bail hook to intercept and block a transition
 - `resolveTransitionNode` — Waterfall hook to manipulate the calculated target flow-node
-- `transition` — Fires when transitioning from one `NamedState` to another
+- `transition` — `NodeSyncHook2<NamedState?, NamedState>` — Fires when transitioning from one NamedState to another (previous state is nullable for first transition)
 - `afterTransition` — Fires after a transition completes (provides `FlowInstance`)
 
 **ViewController hooks** (via `viewController.hooks`):
@@ -177,8 +177,11 @@ Vararg convenience constructor also available: `HeadlessPlayer(pluginA, pluginB,
 **Key Methods:**
 
 - `start(flow: String): Completable<CompletedState>` — Execute flow JSON string, returns async result
-- `start(flow: Node): Completable<CompletedState>` — Execute flow from a pre-parsed Node
 - `release()` — Free runtime resources, transition to ReleasedState (terminal, idempotent)
+
+**HeadlessPlayer-only methods:**
+
+- `start(flow: Node): Completable<CompletedState>` — Execute flow from a pre-parsed Node (not on abstract `Player` class)
 
 **Key Properties:**
 
@@ -237,6 +240,16 @@ Convenience extension properties and methods on `InProgressState`:
 - `fail(error: Throwable)` — Programmatically fail the current flow
 - `fail(message: String)` — Extension: fail with a `PlayerException` wrapping the message
 
+`InProgressState` also implements `Transition` and `ExpressionEvaluator` interfaces, so you can call `state.transition("Next")` and `state.evaluate(listOf("expression"))` directly without going through controllers.
+
+### CompletedState Properties
+
+Public properties on `CompletedState`:
+
+- `endState: NavigationFlowEndState` — The terminal state of the flow navigation
+- `data: JsonElement` — The final data model as a JSON element
+- `dataModel: DataModelWithParser` — The data model with parsing capabilities
+
 ### Player State Extensions
 
 Convenience safe-cast extension properties on `Player`:
@@ -263,7 +276,7 @@ These avoid manual `as?` casts when checking player state.
 
 **Promise:**
 
-- `toCompletable(serializer: KSerializer<T>): Completable<T?>` — Convert to Completable
+- `toCompletable(serializer: DeserializationStrategy<Expected>): Completable<Expected?>` — Convert to Completable
 
 ### Plugin Interfaces
 
@@ -285,7 +298,7 @@ interface RuntimePlugin : Plugin {
 }
 ```
 
-**JSPluginWrapper:** Wraps JS plugin Node (auto-applied to JS Player config)
+**JSPluginWrapper:** Wraps JS plugin Node. Extends `RuntimePlugin` and `NodeWrapper` — auto-applied to JS Player config during the RuntimePlugin phase.
 
 ### Hook Types
 
@@ -304,14 +317,13 @@ interface RuntimePlugin : Plugin {
 
 1. Construct HeadlessPlayer with desired plugins
 2. Call `start(flowJson)` with Flow JSON string
-3. Consume the returned `Completable<CompletedState>` via `await()`, `asFlow()`, or `onComplete()`
+3. Consume the returned `Completable<CompletedState>` (see Async Handling pattern)
 4. Access controllers during InProgressState via state hook
 
 **Considerations:**
 
 - `start()` is non-blocking — flow executes asynchronously
 - Controllers unavailable until state transitions to InProgressState
-- Use coroutine context for `await()` (suspending function)
 - Multiple flows can be started sequentially (previous must complete first)
 
 **Example pattern:**
@@ -333,10 +345,9 @@ player.release()
 
 **Approach:**
 
-1. Ensure state is InProgressState (check via type check or safe cast)
-2. Get DataController: `state.controllers.data`
-3. Use binding strings for get/set: `data.get("user.name")`, `data.set(mapOf("user.age" to 30))`
-4. Bindings support nested paths (`"person.address.zip"`) and array indices (`"items[0]"`)
+1. Get DataController: `state.controllers.data`
+2. Use binding strings for get/set: `data.get("user.name")`, `data.set(mapOf("user.age" to 30))`
+3. Bindings support nested paths (`"person.address.zip"`) and array indices (`"items[0]"`)
 
 **Considerations:**
 
@@ -501,31 +512,9 @@ class FlowViewModel : ViewModel() {
 
 ## Integration Points
 
-### Plugin System
-
-Three extension levels:
-
-- **RuntimePlugin**: Lowest level — modify JS runtime before Player creation. Use for native bindings, global injection, or runtime configuration.
-- **JSPluginWrapper**: Pass JS plugins to Player constructor. Bridge existing `@player-ui/*` plugins into JVM.
-- **PlayerPlugin**: Highest level — tap hooks after Player instantiation. Primary mechanism for custom logic.
-
-Applied during HeadlessPlayer construction in order: RuntimePlugin → JSPluginWrapper → PlayerPlugin.
-
 ### Hook System
 
 Player exposes 8 lifecycle hooks via `player.hooks`. Controllers with hooks on JVM: `FlowController.hooks.flow`, `ViewController.hooks.view`, `View.hooks.onUpdate`/`resolver`. Note: JVM `DataController` has no hooks (limited bridge). Tap hooks in `PlayerPlugin.apply()` to observe or modify behavior.
-
-Hook tapping pattern:
-
-```kotlin
-player.hooks.viewController.tap("plugin-name") { viewController ->
-    viewController?.hooks?.view?.tap("plugin-name") { view ->
-        view?.hooks?.onUpdate?.tap("plugin-name") { asset ->
-            // Handle resolved asset updates
-        }
-    }
-}
-```
 
 Logger hooks are also tapable via `player.logger.hooks` for custom log routing, or use `player.logger.addHandler(loggerPlugin)` to wire all levels at once.
 
@@ -626,13 +615,7 @@ Android: Release in ViewModel.onCleared() or lifecycle observer.
 
 **Why it happens:** The flow **does** start immediately when `start()` is called. However, without subscribing to the Completable, you have no way to observe completion, handle errors, or know when the flow finishes.
 
-**Fix:** Always subscribe to the Completable to handle the result:
-
-```kotlin
-player.start(flow).await()                // Coroutine — throws on error
-player.start(flow).onComplete { ... }      // Callback — Result<CompletedState>
-player.start(flow).asFlow().collect { }    // Flow
-```
+**Fix:** Always subscribe to the Completable to handle the result (see Async Handling pattern for consumption models).
 
 ### 7. Thread-Safety Assumptions
 

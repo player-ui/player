@@ -456,6 +456,9 @@ class <PluginName> : PlayerPlugin {
         // player.subScope() — child scope with its own SupervisorJob.
         // Inherits the dispatcher and exception handler but can be
         // cancelled independently without affecting the parent.
+        // Note: player.subScope() creates a child of the **player** scope
+        // (survives across flows). For per-flow scoping (cancelled on
+        // state change), use FlowScopePlugin instead (shown below).
         val childScope = player.subScope()
     }
 }
@@ -523,7 +526,7 @@ internal class <PluginName>Test : PlayerTest() {
 
 - `player` — a `HeadlessPlayer` instance, rebuilt before each test with your `plugins`
 - `runtime` — the JS `Runtime` for the current test template iteration
-- `simpleFlowString` — a basic flow JSON string for testing
+- `simpleFlowString` — a basic flow JSON string for testing (package-level val from test utilities, available in scope via `PlayerTest`)
 - `@TestTemplate` — runs the test once per available runtime
 
 ### Using `RuntimePluginTest` for JS-Backed Plugins
@@ -627,7 +630,9 @@ class Hooks internal constructor(override val node: Node) : NodeWrapper {
 
 ## Calling JS Methods from Kotlin
 
-Use `getInvokable` to call methods on the JS plugin instance:
+Use `getInvokable` to call methods on the JS plugin instance.
+
+> **Note:** The `getInvokable<R>("methodName")` overload that infers the return type via a type parameter alone is deprecated. The current API requires a `DeserializationStrategy<R>` parameter — use `getInvokable("methodName", serializer)` instead. The examples below use the legacy form for brevity; migrate to the serializer-based overload in new code.
 
 ```kotlin
 class <PluginName> : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {

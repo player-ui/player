@@ -162,15 +162,15 @@ Type system for the data model. Structured as:
 
 Validation rules (`Validation.Reference`) control:
 
-| Property        | Values / Type                            | Behavior                                                |
-| --------------- | ---------------------------------------- | ------------------------------------------------------- |
-| `type`          | string                                   | Validator name (looked up in registry)                  |
-| `message`       | string (optional)                        | Override default error message                          |
-| `severity`      | `"error"` \| `"warning"`                 | Errors block; warnings informational                    |
-| `trigger`       | `"load"` \| `"change"` \| `"navigation"` | When validation first activates                         |
-| `blocking`      | `true` \| `false` \| `"once"`            | Whether to block navigation (`true` default for errors) |
-| `displayTarget` | `"field"` \| `"section"` \| `"page"`     | Where error renders in UI                               |
-| `dataTarget`    | `"formatted"` \| `"deformatted"`         | Which value representation to validate against          |
+| Property        | Values / Type                            | Behavior                                                                               |
+| --------------- | ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| `type`          | string                                   | Validator name (looked up in registry)                                                 |
+| `message`       | string (optional)                        | Override default error message                                                         |
+| `severity`      | `"error"` \| `"warning"`                 | Errors block; warnings informational                                                   |
+| `trigger`       | `"load"` \| `"change"` \| `"navigation"` | When validation first activates                                                        |
+| `blocking`      | `true` \| `false` \| `"once"`            | Whether to block navigation (`true` default for errors, `'once'` default for warnings) |
+| `displayTarget` | `"field"` \| `"section"` \| `"page"`     | Where error renders in UI                                                              |
+| `dataTarget`    | `"formatted"` \| `"deformatted"`         | Which value representation to validate against                                         |
 
 **Cross-field validations** (`Validation.CrossfieldReference`) live on the `View`, not in Schema. They add a `ref` binding to associate the validation with a specific field.
 
@@ -238,7 +238,7 @@ Use `dynamic: true` only when the source array changes at runtime (add/remove/re
 - `View<T>`: Conditional type — adds optional `validation?: CrossfieldReference[]` to `T` unless `T` already declares it
 - `FlowResult`: Completion data — `{ endState: NavigationFlowEndState, data? }`
 
-Many core types (`Asset`, `Flow`, `NavigationFlowViewState`, `NavigationFlowEndState`, `NavigationFlowExternalState`, `Schema.DataType`, `Validation.Reference`, `Formatting.Reference`) include `[key: string]: unknown` index signatures, allowing custom additional properties beyond the declared ones.
+Many core types (`Asset`, `AssetWrapper`, `Flow`, `NavigationFlowViewState`, `NavigationFlowEndState`, `NavigationFlowExternalState`, `Schema.DataType`, `Validation.Reference`, `Formatting.Reference`) include `[key: string]: unknown` index signatures, allowing custom additional properties beyond the declared ones.
 
 ### Assets
 
@@ -255,8 +255,8 @@ Many core types (`Asset`, `Flow`, `NavigationFlowViewState`, `NavigationFlowEndS
 ### Navigation
 
 - `Navigation`: `{ BEGIN: string } & Record<string, string | NavigationFlow>`
-- `NavigationFlow`: `{ startState, onStart?, onEnd?, [stateName]: NavigationFlowState }`
-- `NavigationBaseState<T>`: Base for all states — `{ state_type: T, onStart?, onEnd?, _comment? }`. END extends this directly
+- `NavigationFlow`: `{ startState, onStart?, onEnd?, [key: string]: undefined | string | Expression | ExpressionObject | NavigationFlowState }`
+- `NavigationBaseState<T>`: Base for all states — `{ state_type: T, onStart?, onEnd?, _comment?, exp?: T extends "ACTION" | "ASYNC_ACTION" ? Expression : never }`. The conditional `exp` property uses TypeScript's conditional types to ensure only ACTION and ASYNC_ACTION states can carry an expression; all other state types resolve `exp` to `never`, providing compile-time safety against misplaced expressions. END extends this directly
 - `NavigationFlowTransitionableState<T>`: Extends base with `transitions: NavigationFlowTransition`. VIEW, ACTION, ASYNC_ACTION, EXTERNAL, FLOW extend this
 - `NavigationFlowViewState`: `{ state_type: "VIEW", ref, transitions, attributes? }`
 - `NavigationFlowActionState`: `{ state_type: "ACTION", exp, transitions }`

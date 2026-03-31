@@ -54,8 +54,8 @@ plugins/<plugin-name>/
   jvm/        # Kotlin JVM wrapper (loads .native.js via JSScriptPluginWrapper)
   ios/        # Swift base wrapper (loads .native.js via JSBasePlugin)
   swiftui/    # SwiftUI integration (depends on ios/)
-  android/    # Android/Compose layer (depends on jvm/)
-  mocks/      # Shared test mocks
+  android/    # Android/Compose layer (optional — depends on jvm/)
+  mocks/      # Shared test mocks (optional — few plugins need this)
 ```
 
 Each `core/` and `react/` subdirectory is its own npm package linked via `workspace:*` in the pnpm monorepo. JVM, iOS, SwiftUI, and Android subdirectories are built via Bazel.
@@ -163,8 +163,7 @@ import { <PluginName>Symbol } from "./symbols";
 
 export class <PluginName> implements PlayerPlugin {
   name = "<PluginName>";
-  static Symbol = <PluginName>Symbol;
-  public readonly symbol = <PluginName>.Symbol;
+  public readonly symbol = <PluginName>Symbol;
 
   apply(player: Player): void {
     // Core plugin logic — hook taps, expression registration, etc.
