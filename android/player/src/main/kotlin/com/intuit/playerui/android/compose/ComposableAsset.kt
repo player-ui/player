@@ -22,12 +22,14 @@ import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
+import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
+import kotlin.collections.emptyList
 
 /**
  * Base class for assets that render using Jetpack Compose.
@@ -90,6 +92,8 @@ public abstract class ComposableAsset<Data>(
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
+                    // Propagate XML styles to nested Compose → XML children via LocalContext.
+                    LocalContext provides LocalContext.current.overlayStyles(emptyList(), styles?.xmlStyles ?: emptyList()),
                 ) {
                     Box(containerModifier) {
                         compose()
@@ -109,17 +113,3 @@ public abstract class ComposableAsset<Data>(
         }
     }
 }
-
-// @Composable
-// fun RenderableAsset.compose(
-//     modifier: Modifier = Modifier,
-//     styles: AssetStyle? = null,
-//     tag: String? = null,
-// ) {
-//     assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
-//         when (this) {
-//             is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose(modifier = modifier) }
-//             else -> composeAndroidView(modifier, styles?.xmlStyles)
-//         }
-//     }
-// }
