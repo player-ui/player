@@ -24,6 +24,7 @@ test_deps = [
     artifact("androidx.test.espresso:espresso-intents"),
     artifact("androidx.test.ext:junit-ktx"),
     artifact("androidx.compose.ui:ui-test-junit4"),
+    artifact("com.google.guava:guava"),
 ]
 
 kt_android(
