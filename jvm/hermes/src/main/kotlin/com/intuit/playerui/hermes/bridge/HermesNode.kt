@@ -3,7 +3,6 @@ package com.intuit.playerui.hermes.bridge
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
