@@ -113,17 +113,20 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
                             do {
                                 self?.content = try handler.handler(state, controllers) { transition in
                                     resolve(transition)
-                                    withAnimation {
-                                        self?.isExternalAction = false
-                                        self?.state = nil
+                                    let resetWithAnimation: () -> Void = {
+                                        withAnimation {
+                                            self?.resetState()
+                                        }
                                     }
-                                    self?.content = nil
+                                    if Thread.isMainThread {
+                                        resetWithAnimation()
+                                    } else {
+                                        DispatchQueue.main.sync { resetWithAnimation() }
+                                    }
                                 }
                             } catch {
                                 // Reset state when handler throws
-                                self?.isExternalAction = false
-                                self?.state = nil
-                                self?.content = nil
+                                self?.resetState()
                                 reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                             }
                         }
@@ -144,6 +147,12 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModi
         }
 
         return [jsHandlers]
+    }
+
+    private func resetState() {
+        isExternalAction = false
+        state = nil
+        content = nil
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
