@@ -17,7 +17,6 @@ import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.plugins.coroutines.flowScope
 import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.start
-import com.intuit.playerui.utils.test.runBlockingTest
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
