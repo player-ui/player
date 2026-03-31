@@ -103,7 +103,8 @@ public class HermesNode(
 
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = runtime
         .evaluateInJSThreadBlocking {
-            getJSIValue(key).mapUndefinedToNull()
+            getJSIValue(key)
+                .mapUndefinedToNull()
                 ?.let { format.decodeFromRuntimeValue(deserializer, it) }
         }
 
