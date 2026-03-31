@@ -56,11 +56,14 @@ instrumented_test_deps = [
     artifact("io.mockk:mockk"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
     artifact("androidx.test:core"),
-    "//jvm:kotlin_serialization"
+    "//jvm:kotlin_serialization",
+    artifact("androidx.compose.ui:ui-test-junit4"),
+    artifact("androidx.compose.ui:ui-test-manifest"),
+    artifact("androidx.compose.foundation:foundation"),
 ]
 
 # TODO: Update this to be updated automatically instead of maintaining a list manually
-instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.ThrowingAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest']
+instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.ThrowingAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest', 'com.intuit.playerui.android.compose.ComposableAssetTest']
 
 kt_android(
     # TODO: Maybe rename to player-android
