@@ -23,7 +23,7 @@ public class PlayerRuntimeReleasedException private constructor(
         @InternalPlayerApi public suspend fun <T> Runtime<*>.ensureNotReleased(block: suspend () -> T): T {
             return try {
                 block()
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 if (runtime.isReleased()) throw PlayerRuntimeReleasedException(this)
                 throw e
             }

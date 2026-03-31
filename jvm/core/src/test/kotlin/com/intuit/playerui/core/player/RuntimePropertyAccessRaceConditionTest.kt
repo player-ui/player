@@ -1,22 +1,20 @@
 package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException
-import com.intuit.playerui.hermes.bridge.runtime.Hermes
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
+import com.intuit.playerui.utils.test.RuntimeTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import com.intuit.playerui.utils.test.simpleFlowString
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestTemplate
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-internal class HermesHeadlessPlayerStateRaceTest {
-    @Test
+internal class RuntimePropertyAccessRaceConditionTest : RuntimeTest() {
+    @TestTemplate
     fun `state reads during release should not crash`() = runBlockingTest(timeout = 30000) {
-        val runtime = Hermes.create()
         val player = HeadlessPlayer(
             runtime,
             ReferenceAssetsPlugin(),

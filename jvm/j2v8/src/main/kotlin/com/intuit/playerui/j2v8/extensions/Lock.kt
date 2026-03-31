@@ -3,7 +3,6 @@ package com.intuit.playerui.j2v8.extensions
 import com.eclipsesource.v8.V8Value
 import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException.Companion.ensureNotReleased
 import com.intuit.playerui.core.bridge.runtime.Runtime
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -11,7 +10,6 @@ import kotlinx.coroutines.withTimeout
 internal suspend fun <Context : V8Value, T> Context.evaluateInJSThread(runtime: Runtime<V8Value>, block: suspend Context.() -> T): T =
     withTimeout(runtime.config.timeout) {
         withContext(runtime.dispatcher) {
-            runtime.scope.ensureActive()
             runtime.ensureNotReleased { block() }
         }
     }
