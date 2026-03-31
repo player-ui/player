@@ -44,7 +44,7 @@ internal class RuntimePropertyAccessRaceConditionTest : RuntimeTest() {
 
         val releaser = thread(start = true, name = "player-releaser") {
             startLatch.await()
-            // Brief delay so readers are inside JSI calls before release fires.
+            // Brief delay so readers are inside JS calls before release fires.
             Thread.sleep(5)
             try {
                 player.release()
@@ -59,7 +59,7 @@ internal class RuntimePropertyAccessRaceConditionTest : RuntimeTest() {
         readers.forEach { it.join() }
         releaser.join()
 
-        // Any errors from racing with release should be PlayerRuntimeReleasedException, not raw NPEs.
+        // Any errors from racing with release should be wrapped with PlayerRuntimeReleasedException.
         val unexpectedErrors = errors.filter { it !is PlayerRuntimeReleasedException }
         assertTrue(unexpectedErrors.isEmpty(), "Unexpected errors: ${unexpectedErrors.map { "${it::class.simpleName}: ${it.message}" }}")
     }
