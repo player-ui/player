@@ -93,7 +93,7 @@ public abstract class ComposableAsset<Data>(
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
                     // Propagate XML styles to nested Compose → XML children via LocalContext.
-                    LocalContext provides LocalContext.current.overlayStyles(emptyList(), styles?.xmlStyles ?: emptyList())
+                    LocalContext provides LocalContext.current.overlayStyles(emptyList(), styles?.xmlStyles ?: emptyList()),
                 ) {
                     Box(containerModifier) {
                         compose()

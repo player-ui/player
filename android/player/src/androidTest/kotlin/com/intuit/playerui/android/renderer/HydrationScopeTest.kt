@@ -139,5 +139,4 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     private fun waitForCompleted(count: Int = 5, delay: Long = 500) {
         waitForCondition(count, delay) { completed }
     }
-
 }

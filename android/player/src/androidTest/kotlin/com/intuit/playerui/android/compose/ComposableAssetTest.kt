@@ -39,7 +39,6 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalPlayerApi::class)
 @RunWith(AndroidJUnit4::class)
 internal class ComposableAssetTest : BaseRenderableAssetTest() {
-
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -69,8 +68,7 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
     }
 
     @OptIn(InternalPlayerApi::class)
-    private fun resolveView(stub: View?) =
-        if (stub is AsyncViewStub) runBlocking { stub.awaitView() } else stub
+    private fun resolveView(stub: View?) = if (stub is AsyncViewStub) runBlocking { stub.awaitView() } else stub
 
     @Test
     fun `initView creates ComposeView with WRAP_CONTENT`() = runBlocking {
