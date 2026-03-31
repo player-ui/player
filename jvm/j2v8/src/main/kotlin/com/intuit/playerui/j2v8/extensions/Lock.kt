@@ -18,15 +18,13 @@ internal fun <Context : V8Value, T> Context.evaluateInJSThreadBlocking(
     runtime: Runtime<V8Value>,
     muteLog: Boolean = false,
     block: Context.() -> T,
-): T = runBlocking {
-    runtime.ensureNotReleased {
-        // if we're already on the dispatcher thread, DON'T BLOCK
-        if (this@evaluateInJSThreadBlocking.runtime.locker.hasLock()) {
-            block()
-        } else {
-            if (!muteLog) runtime.checkBlockingThread(Thread.currentThread())
-            evaluateInJSThread(runtime, block)
-        }
+): T {
+    // if we're already on the dispatcher thread, DON'T BLOCK
+    return if (this@evaluateInJSThreadBlocking.runtime.locker.hasLock()) {
+        block()
+    } else {
+        if (!muteLog) runtime.checkBlockingThread(Thread.currentThread())
+        runBlocking { runtime.ensureNotReleased { evaluateInJSThread(runtime, block) } }
     }
 }
 
