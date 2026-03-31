@@ -4,7 +4,6 @@ import com.intuit.playerui.utils.test.runBlockingTest
 import kotlinx.coroutines.delay
 import org.junit.Assert.assertTrue
 
-
 internal fun waitForCondition(
     count: Int = 5,
     delay: Long = 500,

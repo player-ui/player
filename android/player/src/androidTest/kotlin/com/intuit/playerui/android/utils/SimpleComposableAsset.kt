@@ -32,7 +32,6 @@ import kotlinx.serialization.json.Json
 internal class SimpleComposableAsset(
     assetContext: AssetContext,
 ) : ComposableAsset<Node>(assetContext, NodeSerializer()) {
-
     @Composable
     override fun content(data: Node) {
         Text(
@@ -59,7 +58,6 @@ internal class SimpleComposableAsset(
 internal class NestedComposableAsset(
     assetContext: AssetContext,
 ) : ComposableAsset<Node>(assetContext, NodeSerializer()) {
-
     val nested: RenderableAsset? = expand("nested")
 
     @Composable
@@ -104,7 +102,6 @@ internal class NestedComposableAsset(
 internal class TextStyleCapturingAsset(
     assetContext: AssetContext,
 ) : ComposableAsset<Node>(assetContext, NodeSerializer()) {
-
     @Composable
     override fun content(data: Node) {
         lastCapturedTextStyle = androidx.compose.material.LocalTextStyle.current
@@ -153,7 +150,6 @@ internal class ContextCapturingAsset(
 internal class StyledNestedComposableAsset(
     assetContext: AssetContext,
 ) : ComposableAsset<Node>(assetContext, NodeSerializer()) {
-
     val nested: RenderableAsset? = expand("nested")
 
     private val styles = object : AssetStyle {
