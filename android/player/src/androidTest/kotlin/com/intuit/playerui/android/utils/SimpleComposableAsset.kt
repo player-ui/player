@@ -3,7 +3,7 @@ package com.intuit.playerui.android.utils
 import android.content.Context
 import android.view.View
 import android.widget.TextView
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -64,7 +64,7 @@ internal class NestedComposableAsset(
 
     @Composable
     override fun content(data: Node) {
-        Column(modifier = Modifier.testTag("nested-compose")) {
+        Box(modifier = Modifier.testTag("nested-compose")) {
             Text(
                 text = data.getString("label") ?: "parent",
                 modifier = Modifier.testTag("nested-compose-label"),
@@ -163,7 +163,7 @@ internal class StyledNestedComposableAsset(
 
     @Composable
     override fun content(data: Node) {
-        Column(modifier = Modifier.testTag("styled-nested-compose")) {
+        Box(modifier = Modifier.testTag("styled-nested-compose")) {
             nested?.compose(styles = styles, tag = "styled-child-tag")
         }
     }

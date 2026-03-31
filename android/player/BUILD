@@ -59,7 +59,6 @@ instrumented_test_deps = [
     "//jvm:kotlin_serialization",
     artifact("androidx.compose.ui:ui-test-junit4"),
     artifact("androidx.compose.ui:ui-test-manifest"),
-    artifact("androidx.compose.foundation:foundation"),
 ]
 
 # TODO: Update this to be updated automatically instead of maintaining a list manually
