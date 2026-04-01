@@ -4,6 +4,7 @@ import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.utils.test.RuntimePluginTest
@@ -24,6 +25,15 @@ import org.junit.jupiter.api.TestTemplate
 
 internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
     override fun buildPlugin() = BeaconPlugin()
+
+    // BeaconPlugin.native.js externalizes @player-ui/player as a peer dep, so the
+    // Player global must be present before the plugin script loads.
+    override fun beforePlugin() {
+        val playerSource = this::class.java.classLoader
+            .getResource("core/player/dist/Player.native.js")!!
+            .readText()
+        runtime.load(ScriptContext(playerSource, "core/player/dist/Player.native.js"))
+    }
 
     @TestTemplate
     fun `registerHandler should be Unit`() {

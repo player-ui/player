@@ -5,6 +5,8 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.player.HeadlessPlayer
+import com.intuit.playerui.plugins.beacon.BeaconPlugin
+import com.intuit.playerui.plugins.checkpath.CheckPathPlugin
 import com.intuit.playerui.hermes.bridge.runtime.Hermes
 import com.intuit.playerui.j2v8.bridge.runtime.J2V8
 import kotlinx.coroutines.async
@@ -143,6 +145,12 @@ public open class BenchPlayerCreation : RuntimePerformance() {
         consumer.consume(HeadlessPlayer(explicitRuntime = runtime))
         runtime.release()
     }
+
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark public fun createHeadlessPlayerWithPlugins(consumer: Blackhole) {
+        consumer.consume(HeadlessPlayer(CheckPathPlugin(), BeaconPlugin(), explicitRuntime = runtime))
+        runtime.release()
+    }
 }
 
 public open class BenchPlayerFlow : RuntimePerformance() {
@@ -164,6 +172,72 @@ public open class BenchPlayerFlow : RuntimePerformance() {
     @Benchmark
     fun firstViewUpdate(consumer: Blackhole) {
         val player = HeadlessPlayer(explicitRuntime = setupRuntime())
+        val pending = player.scope.async {
+            suspendCoroutine {
+                player.hooks.viewController.tap { vc ->
+                    vc?.hooks?.view?.tap { v ->
+                        v?.hooks?.onUpdate?.tap { a ->
+                            it.resume(a)
+                        }
+                    }
+                }
+                player.start(flow)
+            }
+        }
+        runBlocking {
+            pending.await()
+        }
+        runtime.release()
+    }
+
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark
+    fun firstViewBeacon(consumer: Blackhole) {
+        val player = HeadlessPlayer(BeaconPlugin(), explicitRuntime = setupRuntime())
+        val pending = player.scope.async {
+            suspendCoroutine {
+                player.hooks.viewController.tap { vc ->
+                    vc?.hooks?.view?.tap { v ->
+                        v?.hooks?.onUpdate?.tap { a ->
+                            it.resume(a)
+                        }
+                    }
+                }
+                player.start(flow)
+            }
+        }
+        runBlocking {
+            pending.await()
+        }
+        runtime.release()
+    }
+
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark
+    fun firstViewCheckPath(consumer: Blackhole) {
+        val player = HeadlessPlayer(CheckPathPlugin(), explicitRuntime = setupRuntime())
+        val pending = player.scope.async {
+            suspendCoroutine {
+                player.hooks.viewController.tap { vc ->
+                    vc?.hooks?.view?.tap { v ->
+                        v?.hooks?.onUpdate?.tap { a ->
+                            it.resume(a)
+                        }
+                    }
+                }
+                player.start(flow)
+            }
+        }
+        runBlocking {
+            pending.await()
+        }
+        runtime.release()
+    }
+
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark
+    fun firstViewAllPlugins(consumer: Blackhole) {
+        val player = HeadlessPlayer(CheckPathPlugin(), BeaconPlugin(), explicitRuntime = setupRuntime())
         val pending = player.scope.async {
             suspendCoroutine {
                 player.hooks.viewController.tap { vc ->

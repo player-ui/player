@@ -14,8 +14,12 @@ import org.junit.jupiter.api.TestTemplate
 public abstract class RuntimePluginTest<Plugin : RuntimePlugin> : RuntimeTest() {
     protected lateinit var plugin: Plugin private set
 
+    /** Called before the plugin is built and applied. Override to set up runtime prerequisites. */
+    protected open fun beforePlugin() {}
+
     @BeforeEach
     protected fun setupPlugin() {
+        beforePlugin()
         setupPlugin(buildPlugin())
     }
 

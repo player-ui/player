@@ -85,11 +85,48 @@ export function createConfig(): ReturnType<typeof defineConfig> {
         "dist",
         bundleEntryName + ".native.js",
       );
+
+      const peerDeps = Object.keys(pkgJson.peerDependencies || {});
+
+      // Maps @player-ui peer dep package names to the global variable they expose
+      // in their native bundles (the native_bundle value in each package's BUILD file).
+      const nativeGlobals: Record<string, string> = {
+        "@player-ui/player": "Player",
+        "@player-ui/partial-match-registry": "Registry",
+      };
+
+      // Replaces peer dep imports with references to their runtime globals so they
+      // are not bundled into the native .js file.
+      const peerDepGlobalsPlugin = {
+        name: "peer-dep-globals",
+        setup(build: any) {
+          peerDeps.forEach((dep) => {
+            const globalName = nativeGlobals[dep];
+            if (!globalName) return;
+            const filter = new RegExp(
+              `^${dep.replace(/[/\\^$*+?.()|[\]{}]/g, "\\$&")}$`,
+            );
+            build.onResolve({ filter }, () => ({
+              path: dep,
+              namespace: "peer-dep-globals",
+            }));
+            build.onLoad(
+              { filter: /.*/, namespace: "peer-dep-globals" },
+              () => ({
+                contents: `module.exports = ${globalName}`,
+                loader: "js",
+              }),
+            );
+          });
+        },
+      };
+
       return [
         {
           ...defaultOptions,
           globalName: bundleEntryName,
           external: [],
+          esbuildPlugins: [peerDepGlobalsPlugin],
           define: {
             ...defaultOptions.define,
             "process.env.NODE_ENV": JSON.stringify("production"),
