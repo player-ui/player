@@ -6,7 +6,7 @@ import com.intuit.playerui.core.player.PlayerException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 
-public open class JSErrorException(
+public open class JSErrorException internal constructor(
     override val node: Node,
     cause: Throwable? = node.getSerializable("innerErrors", ListSerializer(ThrowableSerializer()))?.first(),
 ) : PlayerException(node.getString("message") ?: "", cause),

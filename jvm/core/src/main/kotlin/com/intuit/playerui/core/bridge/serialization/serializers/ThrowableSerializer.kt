@@ -13,6 +13,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -36,7 +37,7 @@ public class ThrowableSerializer : KSerializer<Throwable> {
         element("cause", defer { ThrowableSerializer().descriptor.nullable }, isOptional = true)
         element("type", String.serializer().descriptor.nullable, isOptional = true)
         element("severity", ErrorSeverity.serializer().descriptor.nullable, isOptional = true)
-        element("metadata", GenericSerializer().descriptor.nullable, isOptional = true)
+        element("metadata", MapSerializer(String.serializer(), GenericSerializer()).descriptor.nullable, isOptional = true)
     }
 
     override fun deserialize(decoder: Decoder): PlayerException {
@@ -108,8 +109,8 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                         7 -> metadata = decodeNullableSerializableElement(
                             descriptor,
                             7,
-                            GenericSerializer(),
-                        ) as? Map<String, Any>
+                            MapSerializer(String.serializer(), GenericSerializer()).nullable,
+                        )
 
                         CompositeDecoder.DECODE_DONE -> break
                         else -> error("Unexpected index: $index")
@@ -156,7 +157,12 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                 if (value is PlayerExceptionMetadata) {
                     encodeStringElement(descriptor, 5, value.type)
                     encodeNullableSerializableElement(descriptor, 6, String.serializer(), value.severity?.value)
-                    encodeNullableSerializableElement(descriptor, 7, GenericSerializer(), value.metadata)
+                    encodeNullableSerializableElement(
+                        descriptor,
+                        7,
+                        MapSerializer(String.serializer(), GenericSerializer()),
+                        value.metadata,
+                    )
                 }
             }
         }
