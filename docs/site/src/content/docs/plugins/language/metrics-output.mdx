@@ -1,0 +1,129 @@
+---
+title: Metrics Output Plugin
+---
+
+import { PackageManagers } from "starlight-package-managers";
+
+Generate a JSON file of metrics using `@player-tools/metrics-output-plugin`. The plugin consumes diagnostics from LSP plugins and produces a single JSON file with per-file metrics and optional project-level metadata.
+
+## Usage
+
+Install the plugin:
+
+<PackageManagers pkg="@player-tools/metrics-output-plugin" />
+
+### Basic Configuration
+
+Use `fileName` and `outputDir` to configure where the JSON file is written, and `rootProperties` to add top-level metadata.
+
+```js
+[
+  "@player-tools/metrics-output-plugin",
+  {
+    outputDir: "dist", // default: current dir
+    fileName: "metrics", // default: metrics
+    rootProperties: {
+      timestamp: new Date().toISOString(),
+    },
+  },
+];
+```
+
+### Stats and Features
+
+Specify per-file stats and features, which are aggregated each time the plugin is run:
+
+```js
+stats: {
+  // Extract numbers from diagnostic messages
+  complexity: extractFromDiagnostics(/Content complexity is (\d+)/, Number),
+  // Read symbol-tagged values
+  assets: (diagnostics) => extractByData(ASSET_COUNT_SYMBOL, diagnostics),
+},
+features: (diagnostics) => extractByData(SOURCE_TYPE_SYMBOL, diagnostics)
+```
+
+### Complete Example
+
+```js
+import {
+  extractFromDiagnostics,
+  extractByData,
+} from "@player-tools/metrics-output-plugin";
+
+export default {
+  plugins: [
+    // LSP plugins that produce diagnostics should come first
+    new ComplexityCheck({ maxWarningLevel: 1000 }),
+
+    // Metrics output consumes diagnostics and writes a single JSON file
+    [
+      "@player-tools/metrics-output-plugin",
+      {
+        outputDir: "dist",
+        fileName: "metrics",
+        stats: {
+          complexity: extractFromDiagnostics(
+            /Content complexity is (\d+)/,
+            Number,
+          ),
+          complexityThreshold: 1000,
+        },
+        rootProperties: {
+          timestamp: new Date().toISOString(),
+        },
+      },
+    ],
+  ],
+};
+```
+
+## Output Format
+
+The plugin produces a JSON file with per-file entries under `content[path/to/file]` and optional project-level `rootProperties`.
+
+```json
+{
+  "timestamp": "2025-08-20T12:34:56.789Z",
+  "content": {
+    "src/content/flow-1.json": {
+      "stats": {
+        "complexity": 1823,
+        "complexityThreshold": 1000
+      }
+    }
+  }
+}
+```
+
+## Writing LSP Plugins
+
+You can generate your own diagnostics that the metrics plugin can consume by creating custom plugins that emit symbol-tagged data.
+
+```ts
+export const ASSET_COUNT_SYMBOL = Symbol("asset-count");
+
+export class AssetCountPlugin {
+  name = "AssetCountPlugin";
+  apply(lsp) {
+    lsp.hooks.validate.tap(this.name, (doc) => {
+      const count = countAssets(doc);
+      return [
+        {
+          message: `Asset count: ${count}`,
+          severity: 3, // info
+          data: { [ASSET_COUNT_SYMBOL]: count },
+        },
+      ];
+    });
+  }
+}
+```
+
+Then consume it in your metrics config:
+
+```ts
+stats: {
+  assets: (diagnostics) => extractByData(ASSET_COUNT_SYMBOL, diagnostics),
+}
+```

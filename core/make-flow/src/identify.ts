@@ -8,7 +8,7 @@ export enum ObjType {
 }
 
 /** Try to identify any object as an Asset or Flow  */
-export default function identify(obj: object): ObjType {
+export function identify(obj: object): ObjType {
   if ("id" in obj && "type" in obj) {
     return ObjType.ASSET;
   }

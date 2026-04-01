@@ -1,3 +1,1828 @@
+# 0.15.2 (Mon Mar 30 2026)
+
+### Release Notes
+
+#### Use `workspace:^` for all internal workspace dependencies ([#804](https://github.com/player-ui/player/pull/804))
+
+Update core/react packages to use use peer versions for all internal player dependencies.
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#833](https://github.com/player-ui/player/pull/833) ([@intuit-svc](https://github.com/intuit-svc))
+- Refactor external action plugin [#832](https://github.com/player-ui/player/pull/832) ([@spentacular](https://github.com/spentacular))
+- catch runtime released exceptions from lifecycle callbacks [#764](https://github.com/player-ui/player/pull/764) ([@sugarmanz](https://github.com/sugarmanz))
+- Use `workspace:^` for all internal workspace dependencies [#804](https://github.com/player-ui/player/pull/804) ([@Copilot](https://github.com/Copilot) [@KetanReddy](https://github.com/KetanReddy) [@spentacular](https://github.com/spentacular))
+- Cancel stale-map polyfill animation on page transition [#826](https://github.com/player-ui/player/pull/826) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Fix: Compose android view must launch on main thread [#820](https://github.com/player-ui/player/pull/820) ([@A1shK](https://github.com/A1shK) [@kharrop](https://github.com/kharrop))
+- Removing docs-preview from forks [#824](https://github.com/player-ui/player/pull/824) ([@kharrop](https://github.com/kharrop))
+- Add Claude Code GitHub Workflow [#822](https://github.com/player-ui/player/pull/822) ([@spentacular](https://github.com/spentacular))
+- Use XLR pipeline for Common Types Plugin [#807](https://github.com/player-ui/player/pull/807) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add CLAUDE.md with guidelines for reporting and reviewing pull requests [#827](https://github.com/player-ui/player/pull/827) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 8
+
+- [@A1shK](https://github.com/A1shK)
+- [@Copilot](https://github.com/Copilot)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.2-next.3 (Mon Mar 30 2026)
+
+### Release Notes
+
+#### Use `workspace:^` for all internal workspace dependencies ([#804](https://github.com/player-ui/player/pull/804))
+
+Update core/react packages to use use peer versions for all internal player dependencies.
+
+---
+
+#### 🐛 Bug Fix
+
+- Refactor external action plugin [#832](https://github.com/player-ui/player/pull/832) ([@spentacular](https://github.com/spentacular))
+- catch runtime released exceptions from lifecycle callbacks [#764](https://github.com/player-ui/player/pull/764) ([@sugarmanz](https://github.com/sugarmanz))
+- Use `workspace:^` for all internal workspace dependencies [#804](https://github.com/player-ui/player/pull/804) ([@Copilot](https://github.com/Copilot) [@KetanReddy](https://github.com/KetanReddy) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 4
+
+- [@Copilot](https://github.com/Copilot)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.2-next.2 (Thu Mar 19 2026)
+
+#### 🐛 Bug Fix
+
+- Cancel stale-map polyfill animation on page transition [#826](https://github.com/player-ui/player/pull/826) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### 📝 Documentation
+
+- Add CLAUDE.md with guidelines for reporting and reviewing pull requests [#827](https://github.com/player-ui/player/pull/827) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.2-next.1 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Fix: Compose android view must launch on main thread [#820](https://github.com/player-ui/player/pull/820) ([@A1shK](https://github.com/A1shK) [@kharrop](https://github.com/kharrop))
+- Removing docs-preview from forks [#824](https://github.com/player-ui/player/pull/824) ([@kharrop](https://github.com/kharrop))
+- Add Claude Code GitHub Workflow [#822](https://github.com/player-ui/player/pull/822) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 3
+
+- [@A1shK](https://github.com/A1shK)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.1 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Release main [#823](https://github.com/player-ui/player/pull/823) ([@intuit-svc](https://github.com/intuit-svc))
+- Add beforeTransition hook to Flow and parity test [iOS] [#803](https://github.com/player-ui/player/pull/803) ([@bsatyani](https://github.com/bsatyani) [@spentacular](https://github.com/spentacular))
+- Fix flaky tests in ManagedPlayerUITest [#813](https://github.com/player-ui/player/pull/813) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- fix autoscroll issue due to stale scrollableMap [#815](https://github.com/player-ui/player/pull/815) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- HBC [#808](https://github.com/player-ui/player/pull/808) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- CI: Consolidate Test/Coverage Steps for JS/JVM targets [#810](https://github.com/player-ui/player/pull/810) ([@KetanReddy](https://github.com/KetanReddy))
+- Updated CollectionAsset to render the label [#811](https://github.com/player-ui/player/pull/811) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Snapshot API nested list recursive processing [#809](https://github.com/player-ui/player/pull/809) ([@brocollie08](https://github.com/brocollie08))
+- Publicize Node.snapshot API [#806](https://github.com/player-ui/player/pull/806) ([@brocollie08](https://github.com/brocollie08))
+- Cleanup Managed Player tests and remove async act [#795](https://github.com/player-ui/player/pull/795) ([@spentacular](https://github.com/spentacular))
+- Add Player Base Image for Codespaces [#800](https://github.com/player-ui/player/pull/800) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add guide to creating a CLI Preset [#801](https://github.com/player-ui/player/pull/801) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document guide to writing DSL Plugin and Player CLI Plugin [#792](https://github.com/player-ui/player/pull/792) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document `PlayerLanguageService` [#787](https://github.com/player-ui/player/pull/787) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@bsatyani](https://github.com/bsatyani)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.1-next.6 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Add beforeTransition hook to Flow and parity test [iOS] [#803](https://github.com/player-ui/player/pull/803) ([@bsatyani](https://github.com/bsatyani) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- [@bsatyani](https://github.com/bsatyani)
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.1-next.5 (Mon Mar 16 2026)
+
+#### 🐛 Bug Fix
+
+- Fix flaky tests in ManagedPlayerUITest [#813](https://github.com/player-ui/player/pull/813) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
+# 0.15.1-next.4 (Fri Mar 13 2026)
+
+#### 🐛 Bug Fix
+
+- fix autoscroll issue due to stale scrollableMap [#815](https://github.com/player-ui/player/pull/815) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 1
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.15.1-next.3 (Thu Mar 12 2026)
+
+#### 🐛 Bug Fix
+
+- HBC [#808](https://github.com/player-ui/player/pull/808) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- CI: Consolidate Test/Coverage Steps for JS/JVM targets [#810](https://github.com/player-ui/player/pull/810) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.15.1-next.2 (Tue Mar 10 2026)
+
+#### 🐛 Bug Fix
+
+- Updated CollectionAsset to render the label [#811](https://github.com/player-ui/player/pull/811) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
+# 0.15.1-next.1 (Wed Mar 04 2026)
+
+#### 🐛 Bug Fix
+
+- Snapshot API nested list recursive processing [#809](https://github.com/player-ui/player/pull/809) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.15.1-next.0 (Wed Feb 25 2026)
+
+#### 🐛 Bug Fix
+
+- Publicize Node.snapshot API [#806](https://github.com/player-ui/player/pull/806) ([@brocollie08](https://github.com/brocollie08))
+- Cleanup Managed Player tests and remove async act [#795](https://github.com/player-ui/player/pull/795) ([@spentacular](https://github.com/spentacular))
+- Add Player Base Image for Codespaces [#800](https://github.com/player-ui/player/pull/800) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add guide to creating a CLI Preset [#801](https://github.com/player-ui/player/pull/801) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document guide to writing DSL Plugin and Player CLI Plugin [#792](https://github.com/player-ui/player/pull/792) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document `PlayerLanguageService` [#787](https://github.com/player-ui/player/pull/787) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 4
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.15.0 (Tue Feb 10 2026)
+
+### Release Notes
+
+#### Remove async node tracking from core and rely on node-based caching ([#777](https://github.com/player-ui/player/pull/777))
+
+- Remove async node references from player core resolver.
+- Allow the resolver to update using node changes instead of just data changes
+- Add `markAsChanged` function to the `ViewController` to support triggering updates caused by node changes.
+- Update `AsyncNodePlugin` and `AsyncNodePluginPlugin` to make use of the above.
+- Fixed a bug causing assets loaded using the `AsyncNodePlugin` to crash on android
+
+#### Expand Docs on Using XLRs for Validations ([#784](https://github.com/player-ui/player/pull/784))
+
+Docs: Expanded content validation Docs
+
+#### Remove chakra/emotion and unused Storybook components ([#776](https://github.com/player-ui/player/pull/776))
+
+- Remove Chakra/Emotion dependencies in Storybook.
+
+#### feat(storybook): upgrade to version 10.1.4 ([#767](https://github.com/player-ui/player/pull/767))
+
+Upgraded Storybook from version `7.6.10` to latest `10.1.4`. Also fixed broken images within stories and initial value for dark mode for the editors.
+
+#### Add Back in Stamping for JavaScript Builds ([#761](https://github.com/player-ui/player/pull/761))
+
+Fix stamping in core/react builds for Player version and commit used to build the bundle
+
+#### Markdown handle empty ([#752](https://github.com/player-ui/player/pull/752))
+
+Add option to provide a handler for when where nothing is returned from the markdown mapping.
+
+#### Maintainance: Dependency Updates ([#745](https://github.com/player-ui/player/pull/745))
+
+Minor dependency updates to address security bulletins
+
+---
+
+#### 🚀 Enhancement
+
+- add asset render errors to each platform [#765](https://github.com/player-ui/player/pull/765) ([@tmarmer](https://github.com/tmarmer))
+- feat(storybook): upgrade to version 10.1.4 [#767](https://github.com/player-ui/player/pull/767) ([@dtychshenko](https://github.com/dtychshenko))
+- Markdown handle empty [#752](https://github.com/player-ui/player/pull/752) ([@shahabdsh](https://github.com/shahabdsh) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Release main [#799](https://github.com/player-ui/player/pull/799) ([@intuit-svc](https://github.com/intuit-svc))
+- fix ios player not detecting view change when same flow reloads [#796](https://github.com/player-ui/player/pull/796) ([@nancywu1](https://github.com/nancywu1))
+- Fix: CI Timeout During Docs Build [#794](https://github.com/player-ui/player/pull/794) ([@kharrop](https://github.com/kharrop))
+- Remove async node tracking from core and rely on node-based caching [#777](https://github.com/player-ui/player/pull/777) ([@tmarmer](https://github.com/tmarmer))
+- Expand Docs on Using XLRs for Validations [#784](https://github.com/player-ui/player/pull/784) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- Remove chakra/emotion and unused Storybook components [#776](https://github.com/player-ui/player/pull/776) ([@KetanReddy](https://github.com/KetanReddy))
+- fix tests with broken context mocks in android/player [#774](https://github.com/player-ui/player/pull/774) ([@tmarmer](https://github.com/tmarmer))
+- fix(react-player): expose viewUpdateSubscription to render alt comp's [#762](https://github.com/player-ui/player/pull/762) ([@dtychshenko](https://github.com/dtychshenko))
+- Add Back in Stamping for JavaScript Builds [#761](https://github.com/player-ui/player/pull/761) ([@KetanReddy](https://github.com/KetanReddy))
+- Turn verbose back on for publishing while pipeline is unstable [#759](https://github.com/player-ui/player/pull/759) ([@KetanReddy](https://github.com/KetanReddy))
+- Set timeout of publish stage to 40m [#758](https://github.com/player-ui/player/pull/758) ([@KetanReddy](https://github.com/KetanReddy))
+- add full checkout for both stages and remove all contribs from auto [#757](https://github.com/player-ui/player/pull/757) ([@spentacular](https://github.com/spentacular))
+- fix circle checkout to not use blobless [#756](https://github.com/player-ui/player/pull/756) ([@spentacular](https://github.com/spentacular))
+- Maintainance: Dependency Updates [#745](https://github.com/player-ui/player/pull/745) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Docs: Plugin Architecture/Hooks + Landing Page Fix [#780](https://github.com/player-ui/player/pull/780) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 8
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Shahab Deljoo ([@shahabdsh](https://github.com/shahabdsh))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.0-next.8 (Tue Feb 10 2026)
+
+#### 🐛 Bug Fix
+
+- fix ios player not detecting view change when same flow reloads [#796](https://github.com/player-ui/player/pull/796) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.15.0-next.7 (Tue Feb 03 2026)
+
+#### 🐛 Bug Fix
+
+- Fix: CI Timeout During Docs Build [#794](https://github.com/player-ui/player/pull/794) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 1
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
+# 0.15.0-next.6 (Thu Jan 29 2026)
+
+### Release Notes
+
+#### Remove async node tracking from core and rely on node-based caching ([#777](https://github.com/player-ui/player/pull/777))
+
+- Remove async node references from player core resolver.
+- Allow the resolver to update using node changes instead of just data changes
+- Add `markAsChanged` function to the `ViewController` to support triggering updates caused by node changes.
+- Update `AsyncNodePlugin` and `AsyncNodePluginPlugin` to make use of the above.
+- Fixed a bug causing assets loaded using the `AsyncNodePlugin` to crash on android
+
+---
+
+#### 🐛 Bug Fix
+
+- Remove async node tracking from core and rely on node-based caching [#777](https://github.com/player-ui/player/pull/777) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.0-next.5 (Thu Jan 29 2026)
+
+### Release Notes
+
+#### Expand Docs on Using XLRs for Validations ([#784](https://github.com/player-ui/player/pull/784))
+
+Docs: Expanded content validation Docs
+
+---
+
+#### 🐛 Bug Fix
+
+- Expand Docs on Using XLRs for Validations [#784](https://github.com/player-ui/player/pull/784) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+
+#### 📝 Documentation
+
+- Docs: Plugin Architecture/Hooks + Landing Page Fix [#780](https://github.com/player-ui/player/pull/780) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.15.0-next.4 (Fri Jan 16 2026)
+
+### Release Notes
+
+#### Remove chakra/emotion and unused Storybook components ([#776](https://github.com/player-ui/player/pull/776))
+
+- Remove Chakra/Emotion dependencies in Storybook.
+
+---
+
+#### 🚀 Enhancement
+
+- add asset render errors to each platform [#765](https://github.com/player-ui/player/pull/765) ([@tmarmer](https://github.com/tmarmer))
+
+#### 🐛 Bug Fix
+
+- Remove chakra/emotion and unused Storybook components [#776](https://github.com/player-ui/player/pull/776) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.0-next.3 (Sun Dec 21 2025)
+
+### Release Notes
+
+#### feat(storybook): upgrade to version 10.1.4 ([#767](https://github.com/player-ui/player/pull/767))
+
+Upgraded Storybook from version `7.6.10` to latest `10.1.4`. Also fixed broken images within stories and initial value for dark mode for the editors.
+
+---
+
+#### 🚀 Enhancement
+
+- feat(storybook): upgrade to version 10.1.4 [#767](https://github.com/player-ui/player/pull/767) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### 🐛 Bug Fix
+
+- fix tests with broken context mocks in android/player [#774](https://github.com/player-ui/player/pull/774) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 2
+
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.0-next.2 (Mon Dec 01 2025)
+
+#### 🐛 Bug Fix
+
+- fix(react-player): expose viewUpdateSubscription to render alt comp's [#762](https://github.com/player-ui/player/pull/762) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### Authors: 1
+
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+
+---
+
+# 0.15.0-next.1 (Fri Nov 21 2025)
+
+### Release Notes
+
+#### Add Back in Stamping for JavaScript Builds ([#761](https://github.com/player-ui/player/pull/761))
+
+Fix stamping in core/react builds for Player version and commit used to build the bundle
+
+---
+
+#### 🐛 Bug Fix
+
+- Add Back in Stamping for JavaScript Builds [#761](https://github.com/player-ui/player/pull/761) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.15.0-next.0 (Thu Nov 13 2025)
+
+### Release Notes
+
+#### Markdown handle empty ([#752](https://github.com/player-ui/player/pull/752))
+
+Add option to provide a handler for when where nothing is returned from the markdown mapping.
+
+#### Maintainance: Dependency Updates ([#745](https://github.com/player-ui/player/pull/745))
+
+Minor dependency updates to address security bulletins
+
+---
+
+#### 🚀 Enhancement
+
+- Markdown handle empty [#752](https://github.com/player-ui/player/pull/752) ([@shahabdsh](https://github.com/shahabdsh) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Turn verbose back on for publishing while pipeline is unstable [#759](https://github.com/player-ui/player/pull/759) ([@KetanReddy](https://github.com/KetanReddy))
+- Set timeout of publish stage to 40m [#758](https://github.com/player-ui/player/pull/758) ([@KetanReddy](https://github.com/KetanReddy))
+- add full checkout for both stages and remove all contribs from auto [#757](https://github.com/player-ui/player/pull/757) ([@spentacular](https://github.com/spentacular))
+- fix circle checkout to not use blobless [#756](https://github.com/player-ui/player/pull/756) ([@spentacular](https://github.com/spentacular))
+- Maintainance: Dependency Updates [#745](https://github.com/player-ui/player/pull/745) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Shahab Deljoo ([@shahabdsh](https://github.com/shahabdsh))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.14.1 (Mon Nov 03 2025)
+
+### Release Notes
+
+#### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
+
+#### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+- Fix: Only call context.unload if we are in a loading state not when its in loaded state
+
+#### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
+
+All default exports have been replaced with named exports across core packages, plugins, and React components. 
+
+Affected packages:
+- `@player-ui/make-flow`: identify function
+- `@player-ui/partial-match-registry`: createObjectMatcher function
+- `@player-ui/player`: Logger classes and view plugins
+- `@player-ui/react`: ReactPlayer component and OnUpdatePlugin
+- `@player-ui/metrics-plugin`: MetricsCorePlugin class
+- `@player-ui/auto-scroll-manager-plugin-react`: scrollIntoViewWithOffset
+
+#### Fix Broken Links in Doc Site ([#737](https://github.com/player-ui/player/pull/737))
+
+Fix a handful of broken links on the doc site
+
+#### Codecov Bundle Analysis for JS Targets ([#736](https://github.com/player-ui/player/pull/736))
+
+Upload JS bundle size analysis to codecov
+
+#### Adding docs-preview workflow, Canary release PR comments ([#720](https://github.com/player-ui/player/pull/720))
+
+This PR contains a few docs-related quality of life improvements, details below:
+
+- Adds a **pr-comment workflow** that supports command-triggered PR comments - including: `/canary`, `/docs`
+- Adds a **docs preview workflow** that is triggered when a collaborator adds a comment including `/docs`, similar to our `/canary` workflow. This workflow will push static docs files to https://github.com/player-ui/player-ui.github.io and publish a URL that includes PR docs changes. 
+- Adds a **pr-closed workflow** that will run when a PR is either closed manually or merged, which will automatically clean up the pr folder in the https://github.com/player-ui/player-ui.github.io. This workflow can be expanded on in the future if needed.
+- Adds a PR comment that includes Canary release information after the "/canary" workflow is done and a new release becomes available, making it more clear to users which version is tied to when the command was run.
+- Updated full release job to be dependent on docs build success
+- Updated maybe_release to depend on android tests as well
+
+#### export soloader from hermes ([#733](https://github.com/player-ui/player/pull/733))
+
+Export `com.facebook.soloader:soloader` from `hermes` artifacts
+
+#### replace parallel hook with series hook in async node ([#718](https://github.com/player-ui/player/pull/718))
+
+- make the `onAsyncNode` hook of `AsyncNodePlugin` an `AsyncSeriesBailHook` to allow taps to return `undefined` in order to skip resolving the node.
+- Remove `asyncNode` hook from `AsyncNodePluginPlugin` because it never gets called or tapped.
+
+#### allow for arrays of expressions in reference action asset dsl ([#726](https://github.com/player-ui/player/pull/726))
+
+- Extend type on `Action` dsl component props to allow for `exp` to be an array of expressions.
+
+#### fix caching issues with resolved async nodes. ([#716](https://github.com/player-ui/player/pull/716))
+
+- fix an issue where resolving async nodes directly would sometimes not track correctly for the purpose of invalidating the cache.
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#751](https://github.com/player-ui/player/pull/751) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS ManagedPlayer only call unload in loading state [#749](https://github.com/player-ui/player/pull/749) ([@nancywu1](https://github.com/nancywu1))
+- enable logs during cache check for android tests [#747](https://github.com/player-ui/player/pull/747) ([@sugarmanz](https://github.com/sugarmanz))
+- Improve PNPM security for installing packages [#729](https://github.com/player-ui/player/pull/729) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- refactor: replace default exports with named exports [#732](https://github.com/player-ui/player/pull/732) ([@dtychshenko](https://github.com/dtychshenko))
+- Add docs for consuming Swift package [#739](https://github.com/player-ui/player/pull/739) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Update codeowners [#743](https://github.com/player-ui/player/pull/743) ([@spentacular](https://github.com/spentacular))
+- Lowercase URLs for docs preview [#741](https://github.com/player-ui/player/pull/741) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Codecov Bundle Analysis for JS Targets [#736](https://github.com/player-ui/player/pull/736) ([@KetanReddy](https://github.com/KetanReddy))
+- Adding docs-preview workflow, Canary release PR comments [#720](https://github.com/player-ui/player/pull/720) ([@kharrop](https://github.com/kharrop))
+- add asyncnodeplugin to podspec and package.swift [#734](https://github.com/player-ui/player/pull/734) ([@nancywu1](https://github.com/nancywu1) [@spentacular](https://github.com/spentacular))
+- export soloader from hermes [#733](https://github.com/player-ui/player/pull/733) ([@sugarmanz](https://github.com/sugarmanz))
+- replace parallel hook with series hook in async node [#718](https://github.com/player-ui/player/pull/718) ([@tmarmer](https://github.com/tmarmer))
+- allow for arrays of expressions in reference action asset dsl [#726](https://github.com/player-ui/player/pull/726) ([@tmarmer](https://github.com/tmarmer))
+- fix caching issues with resolved async nodes. [#716](https://github.com/player-ui/player/pull/716) ([@tmarmer](https://github.com/tmarmer))
+
+#### 📝 Documentation
+
+- Fix Broken Links in Doc Site [#737](https://github.com/player-ui/player/pull/737) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 9
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.1-next.7 (Mon Nov 03 2025)
+
+### Release Notes
+
+#### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
+
+#### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+- Fix: Only call context.unload if we are in a loading state not when its in loaded state
+
+#### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
+
+All default exports have been replaced with named exports across core packages, plugins, and React components. 
+
+Affected packages:
+- `@player-ui/make-flow`: identify function
+- `@player-ui/partial-match-registry`: createObjectMatcher function
+- `@player-ui/player`: Logger classes and view plugins
+- `@player-ui/react`: ReactPlayer component and OnUpdatePlugin
+- `@player-ui/metrics-plugin`: MetricsCorePlugin class
+- `@player-ui/auto-scroll-manager-plugin-react`: scrollIntoViewWithOffset
+
+---
+
+#### 🐛 Bug Fix
+
+- iOS ManagedPlayer only call unload in loading state [#749](https://github.com/player-ui/player/pull/749) ([@nancywu1](https://github.com/nancywu1))
+- enable logs during cache check for android tests [#747](https://github.com/player-ui/player/pull/747) ([@sugarmanz](https://github.com/sugarmanz))
+- Improve PNPM security for installing packages [#729](https://github.com/player-ui/player/pull/729) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- refactor: replace default exports with named exports [#732](https://github.com/player-ui/player/pull/732) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### Authors: 6
+
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.14.1-next.4 (Fri Oct 24 2025)
+
+#### 🐛 Bug Fix
+
+- add asyncnodeplugin to podspec and package.swift [#734](https://github.com/player-ui/player/pull/734) ([@nancywu1](https://github.com/nancywu1) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.14.1-next.3 (Thu Oct 23 2025)
+
+### Release Notes
+
+#### export soloader from hermes ([#733](https://github.com/player-ui/player/pull/733))
+
+Export `com.facebook.soloader:soloader` from `hermes` artifacts
+
+---
+
+#### 🐛 Bug Fix
+
+- export soloader from hermes [#733](https://github.com/player-ui/player/pull/733) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
+# 0.14.1-next.2 (Thu Oct 16 2025)
+
+### Release Notes
+
+#### replace parallel hook with series hook in async node ([#718](https://github.com/player-ui/player/pull/718))
+
+- make the `onAsyncNode` hook of `AsyncNodePlugin` an `AsyncSeriesBailHook` to allow taps to return `undefined` in order to skip resolving the node.
+- Remove `asyncNode` hook from `AsyncNodePluginPlugin` because it never gets called or tapped.
+
+---
+
+#### 🐛 Bug Fix
+
+- replace parallel hook with series hook in async node [#718](https://github.com/player-ui/player/pull/718) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.1-next.1 (Wed Oct 08 2025)
+
+### Release Notes
+
+#### allow for arrays of expressions in reference action asset dsl ([#726](https://github.com/player-ui/player/pull/726))
+
+- Extend type on `Action` dsl component props to allow for `exp` to be an array of expressions.
+
+---
+
+#### 🐛 Bug Fix
+
+- allow for arrays of expressions in reference action asset dsl [#726](https://github.com/player-ui/player/pull/726) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.1-next.0 (Fri Oct 03 2025)
+
+### Release Notes
+
+#### fix caching issues with resolved async nodes. ([#716](https://github.com/player-ui/player/pull/716))
+
+- fix an issue where resolving async nodes directly would sometimes not track correctly for the purpose of invalidating the cache.
+
+---
+
+#### 🐛 Bug Fix
+
+- fix caching issues with resolved async nodes. [#716](https://github.com/player-ui/player/pull/716) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.0 (Mon Sep 15 2025)
+
+### Release Notes
+
+#### Remove support for J2V8 on Android ([#712](https://github.com/player-ui/player/pull/712))
+
+With the [Android 15 16 KB page size requirement](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html), Android Player is dropping support for [J2V8](https://github.com/eclipsesource/J2V8) as it fails to meet those requirements. It will no longer be a transitive dependency, requiring the desired runtime module to be declared explicitly as a dependency of the app.
+
+For example, [Hermes](https://github.com/facebook/hermes) is now the recommended runtime for Android Player use cases, and can be configured simply via including the dependency:
+```kotlin
+dependencies {
+    implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
+}
+```
+
+#### add asyncNodePosition to createAsyncTransform options ([#714](https://github.com/player-ui/player/pull/714))
+
+- Added `asyncNodePosition` as an option to `createAsyncTransform`. This lets user choose if the generated async node goes to the top or bottom of the generated multi-node.
+
+#### update createAsyncTransform to allow for different node types ([#708](https://github.com/player-ui/player/pull/708))
+
+- Update the `createAsyncTransform` util to consider different incoming node types coming from `getNestedAsset` option. Originally, this assumed that it would always be an `asset` node type and would asset-wrap the node, but to allow for some additional flexibility, the following rules are applied:
+  - Asset nodes and Applicability nodes with a value that is an asset node get asset wrapped like before.
+  - multi-nodes have their values spread into the initialized multi-node to keep the structure flat
+  - everything else gets added to the initialized multi-node as-is.
+
+#### Migrate to Bazel 8 ([#700](https://github.com/player-ui/player/pull/700))
+
+- Update to Bazel 8
+- Android SDK/NDK now only needed for Android targets
+  - Applicable to CI and local development
+- Coverage for JVM modules
+- Updated `just` commands and documentation
+
+#### improve async node flattening and apply resolver cache to async nodes ([#694](https://github.com/player-ui/player/pull/694))
+
+- Simplify async node flattening to just check for multi-nodes inside multi-nodes after async nodes are resolved.
+- Introduce async node id cache in the resolver to allow async nodes to be marked as dirty and limit scope of resolver update to the specific node and use cache for the rest of the update.
+
+#### support boolean values in binding queries ([#703](https://github.com/player-ui/player/pull/703))
+
+- Update binding parser to allow for boolean value nodes
+- Only use boolean values in query values as parts of the path should always be strings or numbers
+
+---
+
+#### 🚀 Enhancement
+
+- Remove support for J2V8 on Android [#712](https://github.com/player-ui/player/pull/712) ([@sugarmanz](https://github.com/sugarmanz))
+- improve async node flattening and apply resolver cache to async nodes [#694](https://github.com/player-ui/player/pull/694) ([@tmarmer](https://github.com/tmarmer))
+
+#### 🐛 Bug Fix
+
+- Release main [#722](https://github.com/player-ui/player/pull/722) ([@intuit-svc](https://github.com/intuit-svc))
+- Release main [#721](https://github.com/player-ui/player/pull/721) ([@intuit-svc](https://github.com/intuit-svc))
+- add asyncNodePosition to createAsyncTransform options [#714](https://github.com/player-ui/player/pull/714) ([@tmarmer](https://github.com/tmarmer))
+- Fix Android publishing [#715](https://github.com/player-ui/player/pull/715) ([@sugarmanz](https://github.com/sugarmanz))
+- Docs: Adding pages for complexity and metrics plugins, fixing redirects, restoring getting-started content [#707](https://github.com/player-ui/player/pull/707) ([@kharrop](https://github.com/kharrop))
+- update createAsyncTransform to allow for different node types [#708](https://github.com/player-ui/player/pull/708) ([@tmarmer](https://github.com/tmarmer))
+- Migrate to Bazel 8 [#700](https://github.com/player-ui/player/pull/700) ([@sugarmanz](https://github.com/sugarmanz) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- Document common iOS Cache error and how to fix it [#706](https://github.com/player-ui/player/pull/706) ([@KVSRoyal](https://github.com/KVSRoyal))
+- support boolean values in binding queries [#703](https://github.com/player-ui/player/pull/703) ([@tmarmer](https://github.com/tmarmer))
+
+#### ⚠️ Pushed to `main`
+
+- fix docs build ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Supplement Android + JVM platform documentation [#719](https://github.com/player-ui/player/pull/719) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 6
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.0-next.5 (Mon Sep 15 2025)
+
+#### 🐛 Bug Fix
+
+- Release main [#721](https://github.com/player-ui/player/pull/721) ([@intuit-svc](https://github.com/intuit-svc))
+
+#### ⚠️ Pushed to `main`
+
+- fix docs build ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Supplement Android + JVM platform documentation [#719](https://github.com/player-ui/player/pull/719) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 2
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
+# 0.14.0-next.4 (Mon Sep 08 2025)
+
+### Release Notes
+
+#### Remove support for J2V8 on Android ([#712](https://github.com/player-ui/player/pull/712))
+
+With the [Android 15 16 KB page size requirement](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html), Android Player is dropping support for [J2V8](https://github.com/eclipsesource/J2V8) as it fails to meet those requirements. It will no longer be a transitive dependency, requiring the desired runtime module to be declared explicitly as a dependency of the app.
+
+For example, [Hermes](https://github.com/facebook/hermes) is now the recommended runtime for Android Player use cases, and can be configured simply via including the dependency:
+```kotlin
+dependencies {
+    implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
+}
+```
+
+---
+
+#### 🚀 Enhancement
+
+- Remove support for J2V8 on Android [#712](https://github.com/player-ui/player/pull/712) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
+# 0.14.0-next.3 (Thu Sep 04 2025)
+
+### Release Notes
+
+#### add asyncNodePosition to createAsyncTransform options ([#714](https://github.com/player-ui/player/pull/714))
+
+- Added `asyncNodePosition` as an option to `createAsyncTransform`. This lets user choose if the generated async node goes to the top or bottom of the generated multi-node.
+
+---
+
+#### 🐛 Bug Fix
+
+- add asyncNodePosition to createAsyncTransform options [#714](https://github.com/player-ui/player/pull/714) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.0-next.2 (Fri Aug 29 2025)
+
+#### 🐛 Bug Fix
+
+- Fix Android publishing [#715](https://github.com/player-ui/player/pull/715) ([@sugarmanz](https://github.com/sugarmanz))
+- Docs: Adding pages for complexity and metrics plugins, fixing redirects, restoring getting-started content [#707](https://github.com/player-ui/player/pull/707) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
+# 0.14.0-next.1 (Thu Aug 28 2025)
+
+### Release Notes
+
+#### update createAsyncTransform to allow for different node types ([#708](https://github.com/player-ui/player/pull/708))
+
+- Update the `createAsyncTransform` util to consider different incoming node types coming from `getNestedAsset` option. Originally, this assumed that it would always be an `asset` node type and would asset-wrap the node, but to allow for some additional flexibility, the following rules are applied:
+  - Asset nodes and Applicability nodes with a value that is an asset node get asset wrapped like before.
+  - multi-nodes have their values spread into the initialized multi-node to keep the structure flat
+  - everything else gets added to the initialized multi-node as-is.
+
+#### Migrate to Bazel 8 ([#700](https://github.com/player-ui/player/pull/700))
+
+- Update to Bazel 8
+- Android SDK/NDK now only needed for Android targets
+  - Applicable to CI and local development
+- Coverage for JVM modules
+- Updated `just` commands and documentation
+
+---
+
+#### 🐛 Bug Fix
+
+- update createAsyncTransform to allow for different node types [#708](https://github.com/player-ui/player/pull/708) ([@tmarmer](https://github.com/tmarmer))
+- Migrate to Bazel 8 [#700](https://github.com/player-ui/player/pull/700) ([@sugarmanz](https://github.com/sugarmanz) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- Document common iOS Cache error and how to fix it [#706](https://github.com/player-ui/player/pull/706) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 4
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.0-next.0 (Fri Aug 15 2025)
+
+### Release Notes
+
+#### improve async node flattening and apply resolver cache to async nodes ([#694](https://github.com/player-ui/player/pull/694))
+
+- Simplify async node flattening to just check for multi-nodes inside multi-nodes after async nodes are resolved.
+- Introduce async node id cache in the resolver to allow async nodes to be marked as dirty and limit scope of resolver update to the specific node and use cache for the rest of the update.
+
+#### support boolean values in binding queries ([#703](https://github.com/player-ui/player/pull/703))
+
+- Update binding parser to allow for boolean value nodes
+- Only use boolean values in query values as parts of the path should always be strings or numbers
+
+---
+
+#### 🚀 Enhancement
+
+- improve async node flattening and apply resolver cache to async nodes [#694](https://github.com/player-ui/player/pull/694) ([@tmarmer](https://github.com/tmarmer))
+
+#### 🐛 Bug Fix
+
+- support boolean values in binding queries [#703](https://github.com/player-ui/player/pull/703) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0 (Wed Aug 13 2025)
+
+### Release Notes
+
+#### update reference assets to support chat-ui demo from core plugin ([#702](https://github.com/player-ui/player/pull/702))
+
+- Update core reference assets plugin to handle chat-ui mock across platforms, including setup the async node plugin at the core level
+
+#### add option to report unused disable directives in eslint ([#697](https://github.com/player-ui/player/pull/697))
+
+- add `linterOptions.reportUnusedDisableDirectives: "error"` to eslint config
+
+#### Docs: Updating Astro/Starlight, PageFind, Sidebar Enhancements ([#698](https://github.com/player-ui/player/pull/698))
+
+Updating Astro and Starlight to support linkable headers and other features, updating pagefind to support search enhancements, and updated sidebar navigation to simplify logic and highlight getting started.
+
+#### track inProgressNodes to prevent duplicate async processes ([#693](https://github.com/player-ui/player/pull/693))
+
+- fix an issue where promises generated by `onAsyncNode` could be generated multiple times if a view update caused the same async node to get resolved again before the promise completed.
+
+#### update core async node plugins to catch and handle errors ([#666](https://github.com/player-ui/player/pull/666))
+
+- Update the `AsyncNodePlugin` to include a new hook `onAsyncNodeError` for catching errors triggered when resolving async nodes.
+- Not using the hook or failing to return fallback content will allow the error to bubble up and fail the player state.
+- Fix cyclic deps between `//plugins/async-node/core` and `//plugins/reference-assets/core`
+- Scope the content cache on the `async-node` to the view that generated it to prevent re-use of the cache across views, flows or player instances.
+
+#### Build Tweaks ([#685](https://github.com/player-ui/player/pull/685))
+
+- Update codecov and android orb to latest
+- Run iOS lint as a separate parallel step
+- Remove rosetta and JDK install from mac stage
+
+#### Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times ([#691](https://github.com/player-ui/player/pull/691))
+
+Fix Issue with awaited `ASYNC_ACTION` state's expressions being fired multiple times if the Previous State was as `ACTION` state by deferring the awaited execution results rather than handling them in an async tap
+
+#### add bench test for streaming player ([#680](https://github.com/player-ui/player/pull/680))
+
+- Add initial bench test to async-node plugin
+- Add step to run bench tests in `just` and in CI.
+
+#### remove DefaultViewPlugins and move implementation into ViewController ([#689](https://github.com/player-ui/player/pull/689))
+
+- Remove `DefaultViewPlugins` and add all plugins it uses into the `ViewController`
+- Add and export types for the hooks on the `ViewController` and `ViewInstance`
+
+#### Async Expression Support ([#649](https://github.com/player-ui/player/pull/649))
+
+Adds experimental support for asynchronous expressions within Player.  This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable. 
+
+The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await`  expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
+
+#### Fixes for manager becoming stale ([#683](https://github.com/player-ui/player/pull/683))
+
+Updates to the React Managed Player to ensure updates to the `manager` terminate the running instance and start a brand new instance.
+
+---
+
+#### 🚀 Enhancement
+
+- update core async node plugins to catch and handle errors [#666](https://github.com/player-ui/player/pull/666) ([@tmarmer](https://github.com/tmarmer) [@KetanReddy](https://github.com/KetanReddy))
+- Async Expression Support [#649](https://github.com/player-ui/player/pull/649) ([@adierkens](https://github.com/adierkens) [@rafbcampos](https://github.com/rafbcampos) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Release main [#704](https://github.com/player-ui/player/pull/704) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS: calling onupdate in main thread [#701](https://github.com/player-ui/player/pull/701) ([@nancywu1](https://github.com/nancywu1) [@tmarmer](https://github.com/tmarmer) [@intuit-svc](https://github.com/intuit-svc))
+- update reference assets to support chat-ui demo from core plugin [#702](https://github.com/player-ui/player/pull/702) ([@tmarmer](https://github.com/tmarmer))
+- add option to report unused disable directives in eslint [#697](https://github.com/player-ui/player/pull/697) ([@tmarmer](https://github.com/tmarmer) [@KetanReddy](https://github.com/KetanReddy))
+- Docs: Updating Astro/Starlight, PageFind, Sidebar Enhancements [#698](https://github.com/player-ui/player/pull/698) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- track inProgressNodes to prevent duplicate async processes [#693](https://github.com/player-ui/player/pull/693) ([@tmarmer](https://github.com/tmarmer))
+- fix: import queueMicrotask [#696](https://github.com/player-ui/player/pull/696) ([@sugarmanz](https://github.com/sugarmanz))
+- Fix iOS Build Stage [#695](https://github.com/player-ui/player/pull/695) ([@KetanReddy](https://github.com/KetanReddy))
+- Build Tweaks [#685](https://github.com/player-ui/player/pull/685) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times [#691](https://github.com/player-ui/player/pull/691) ([@KetanReddy](https://github.com/KetanReddy))
+- add bench test for streaming player [#680](https://github.com/player-ui/player/pull/680) ([@tmarmer](https://github.com/tmarmer))
+- remove DefaultViewPlugins and move implementation into ViewController [#689](https://github.com/player-ui/player/pull/689) ([@tmarmer](https://github.com/tmarmer))
+- fix iOS ManagedPlayerViewModel memory leak [#688](https://github.com/player-ui/player/pull/688) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Fixes for manager becoming stale [#683](https://github.com/player-ui/player/pull/683) ([@spentacular](https://github.com/spentacular))
+- update codeowners file with teams [#682](https://github.com/player-ui/player/pull/682) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 10
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.7 (Wed Aug 13 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: calling onupdate in main thread [#701](https://github.com/player-ui/player/pull/701) ([@nancywu1](https://github.com/nancywu1) [@tmarmer](https://github.com/tmarmer) [@intuit-svc](https://github.com/intuit-svc))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.6 (Fri Aug 08 2025)
+
+### Release Notes
+
+#### update reference assets to support chat-ui demo from core plugin ([#702](https://github.com/player-ui/player/pull/702))
+
+- Update core reference assets plugin to handle chat-ui mock across platforms, including setup the async node plugin at the core level
+
+#### add option to report unused disable directives in eslint ([#697](https://github.com/player-ui/player/pull/697))
+
+- add `linterOptions.reportUnusedDisableDirectives: "error"` to eslint config
+
+---
+
+#### 🐛 Bug Fix
+
+- update reference assets to support chat-ui demo from core plugin [#702](https://github.com/player-ui/player/pull/702) ([@tmarmer](https://github.com/tmarmer))
+- add option to report unused disable directives in eslint [#697](https://github.com/player-ui/player/pull/697) ([@tmarmer](https://github.com/tmarmer) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.5 (Thu Jul 31 2025)
+
+### Release Notes
+
+#### Docs: Updating Astro/Starlight, PageFind, Sidebar Enhancements ([#698](https://github.com/player-ui/player/pull/698))
+
+Updating Astro and Starlight to support linkable headers and other features, updating pagefind to support search enhancements, and updated sidebar navigation to simplify logic and highlight getting started.
+
+---
+
+#### 🐛 Bug Fix
+
+- Docs: Updating Astro/Starlight, PageFind, Sidebar Enhancements [#698](https://github.com/player-ui/player/pull/698) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.13.0-next.4 (Wed Jul 30 2025)
+
+### Release Notes
+
+#### track inProgressNodes to prevent duplicate async processes ([#693](https://github.com/player-ui/player/pull/693))
+
+- fix an issue where promises generated by `onAsyncNode` could be generated multiple times if a view update caused the same async node to get resolved again before the promise completed.
+
+---
+
+#### 🐛 Bug Fix
+
+- track inProgressNodes to prevent duplicate async processes [#693](https://github.com/player-ui/player/pull/693) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.3 (Mon Jul 28 2025)
+
+### Release Notes
+
+#### update core async node plugins to catch and handle errors ([#666](https://github.com/player-ui/player/pull/666))
+
+- Update the `AsyncNodePlugin` to include a new hook `onAsyncNodeError` for catching errors triggered when resolving async nodes.
+- Not using the hook or failing to return fallback content will allow the error to bubble up and fail the player state.
+- Fix cyclic deps between `//plugins/async-node/core` and `//plugins/reference-assets/core`
+- Scope the content cache on the `async-node` to the view that generated it to prevent re-use of the cache across views, flows or player instances.
+
+#### Build Tweaks ([#685](https://github.com/player-ui/player/pull/685))
+
+- Update codecov and android orb to latest
+- Run iOS lint as a separate parallel step
+- Remove rosetta and JDK install from mac stage
+
+---
+
+#### 🚀 Enhancement
+
+- update core async node plugins to catch and handle errors [#666](https://github.com/player-ui/player/pull/666) ([@tmarmer](https://github.com/tmarmer) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- fix: import queueMicrotask [#696](https://github.com/player-ui/player/pull/696) ([@sugarmanz](https://github.com/sugarmanz))
+- Fix iOS Build Stage [#695](https://github.com/player-ui/player/pull/695) ([@KetanReddy](https://github.com/KetanReddy))
+- Build Tweaks [#685](https://github.com/player-ui/player/pull/685) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.2 (Thu Jul 24 2025)
+
+### Release Notes
+
+#### Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times ([#691](https://github.com/player-ui/player/pull/691))
+
+Fix Issue with awaited `ASYNC_ACTION` state's expressions being fired multiple times if the Previous State was as `ACTION` state by deferring the awaited execution results rather than handling them in an async tap
+
+#### add bench test for streaming player ([#680](https://github.com/player-ui/player/pull/680))
+
+- Add initial bench test to async-node plugin
+- Add step to run bench tests in `just` and in CI.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times [#691](https://github.com/player-ui/player/pull/691) ([@KetanReddy](https://github.com/KetanReddy))
+- add bench test for streaming player [#680](https://github.com/player-ui/player/pull/680) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.1 (Wed Jul 16 2025)
+
+### Release Notes
+
+#### remove DefaultViewPlugins and move implementation into ViewController ([#689](https://github.com/player-ui/player/pull/689))
+
+- Remove `DefaultViewPlugins` and add all plugins it uses into the `ViewController`
+- Add and export types for the hooks on the `ViewController` and `ViewInstance`
+
+---
+
+#### 🐛 Bug Fix
+
+- remove DefaultViewPlugins and move implementation into ViewController [#689](https://github.com/player-ui/player/pull/689) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.0 (Wed Jul 16 2025)
+
+### Release Notes
+
+#### Async Expression Support ([#649](https://github.com/player-ui/player/pull/649))
+
+Adds experimental support for asynchronous expressions within Player.  This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable. 
+
+The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await`  expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
+
+---
+
+#### 🚀 Enhancement
+
+- Async Expression Support [#649](https://github.com/player-ui/player/pull/649) ([@adierkens](https://github.com/adierkens) [@rafbcampos](https://github.com/rafbcampos) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- fix iOS ManagedPlayerViewModel memory leak [#688](https://github.com/player-ui/player/pull/688) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 4
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+
+---
+
+# 0.12.1-next.0 (Fri Jul 11 2025)
+
+### Release Notes
+
+#### Fixes for manager becoming stale ([#683](https://github.com/player-ui/player/pull/683))
+
+Updates to the React Managed Player to ensure updates to the `manager` terminate the running instance and start a brand new instance.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fixes for manager becoming stale [#683](https://github.com/player-ui/player/pull/683) ([@spentacular](https://github.com/spentacular))
+- update codeowners file with teams [#682](https://github.com/player-ui/player/pull/682) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0 (Thu Jul 10 2025)
+
+### Release Notes
+
+#### Fix default-view-plugin sort order ([#679](https://github.com/player-ui/player/pull/679))
+
+Change how `player.hooks.view` `call` is handled to ensure tap order comes from default plugins first.
+
+#### Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default ([#676](https://github.com/player-ui/player/pull/676))
+
+- Revert #639 for performance reasons
+- `AsyncHydrationTrackerPlugin` is now a default `AndroidPlayerPlugin`
+
+#### fix issues with react 18 suspense ([#670](https://github.com/player-ui/player/pull/670))
+
+- Fix dependencies using React 17 in Player
+- Fix `Suspense` staying triggered via `useEffect` callbacks
+- Convert `useSubscribedState` to use `useSyncExternalStore` instead of `useEffect` for callbacks
+
+#### feat(common-expressions): add substr and split string functions ([#671](https://github.com/player-ui/player/pull/671))
+
+Added `substr` and `split` functions to common expressions plugin that mirror their javascript implementation
+
+#### Fix transforms on assets with `applicability` ([#668](https://github.com/player-ui/player/pull/668))
+
+Move `AssetTransformCorePlugin` application after `applicability` and `switch` view plugins to ensure transforms properly apply to conditional assets.
+
+#### Updated docs, platform param ([#660](https://github.com/player-ui/player/pull/660))
+
+Updated contributing docs to include information around how the docs site is generated, re-added platform param capability so that the URL updates based on platform tab, updated team page.
+
+#### Export Underlying Expressions from Common Expression Plugin ([#657](https://github.com/player-ui/player/pull/657))
+
+Update Common Expressions Plugin to export underlying functions to allow them to be converted to DSL functions as well as export them as XLRs for consumption by the XLR SDK.
+
+---
+
+#### 🚀 Enhancement
+
+- Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default [#676](https://github.com/player-ui/player/pull/676) ([@sugarmanz](https://github.com/sugarmanz))
+- Renew hydration scope, wrap composableAsset and apply the modifiers to all assets through the compose call [#630](https://github.com/player-ui/player/pull/630) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08) [@nancywu1](https://github.com/nancywu1))
+
+#### 🐛 Bug Fix
+
+- Release main [#681](https://github.com/player-ui/player/pull/681) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix default-view-plugin sort order [#679](https://github.com/player-ui/player/pull/679) ([@spentacular](https://github.com/spentacular))
+- fix issues with react 18 suspense [#670](https://github.com/player-ui/player/pull/670) ([@spentacular](https://github.com/spentacular))
+- Revert "Fix/react 18 cleanup" [#675](https://github.com/player-ui/player/pull/675) ([@spentacular](https://github.com/spentacular))
+- Fix/react 18 cleanup [#674](https://github.com/player-ui/player/pull/674) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+- feat(common-expressions): add substr and split string functions [#671](https://github.com/player-ui/player/pull/671) ([@tusharagrawa](https://github.com/tusharagrawa) [@KetanReddy](https://github.com/KetanReddy))
+- Update Mac Build Executor to use M4 Pro Medium over M2 Pro Medium [#673](https://github.com/player-ui/player/pull/673) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix transforms on assets with `applicability` [#668](https://github.com/player-ui/player/pull/668) ([@sugarmanz](https://github.com/sugarmanz))
+- Updated docs, platform param [#660](https://github.com/player-ui/player/pull/660) ([@kharrop](https://github.com/kharrop))
+- Central Portal Migration [#662](https://github.com/player-ui/player/pull/662) ([@sugarmanz](https://github.com/sugarmanz))
+- Prebuild Publishing Targets to Miinimize Chances of Releases Breaking [#650](https://github.com/player-ui/player/pull/650) ([@KetanReddy](https://github.com/KetanReddy))
+- Export Underlying Expressions from Common Expression Plugin [#657](https://github.com/player-ui/player/pull/657) ([@KetanReddy](https://github.com/KetanReddy))
+- Compose compile only [#642](https://github.com/player-ui/player/pull/642) ([@brocollie08](https://github.com/brocollie08))
+- remove new line at end of VERSION file [#659](https://github.com/player-ui/player/pull/659) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 9
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Tushar Agrawal ([@tusharagrawa](https://github.com/tusharagrawa))
+
+---
+
+# 0.12.0-next.10 (Thu Jul 10 2025)
+
+### Release Notes
+
+#### Fix default-view-plugin sort order ([#679](https://github.com/player-ui/player/pull/679))
+
+Change how `player.hooks.view` `call` is handled to ensure tap order comes from default plugins first.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix default-view-plugin sort order [#679](https://github.com/player-ui/player/pull/679) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0-next.9 (Thu Jul 10 2025)
+
+### Release Notes
+
+#### Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default ([#676](https://github.com/player-ui/player/pull/676))
+
+- Revert #639 for performance reasons
+- `AsyncHydrationTrackerPlugin` is now a default `AndroidPlayerPlugin`
+
+---
+
+#### 🚀 Enhancement
+
+- Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default [#676](https://github.com/player-ui/player/pull/676) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
+# 0.12.0-next.8 (Tue Jul 08 2025)
+
+### Release Notes
+
+#### fix issues with react 18 suspense ([#670](https://github.com/player-ui/player/pull/670))
+
+- Fix dependencies using React 17 in Player
+- Fix `Suspense` staying triggered via `useEffect` callbacks
+- Convert `useSubscribedState` to use `useSyncExternalStore` instead of `useEffect` for callbacks
+
+---
+
+#### 🐛 Bug Fix
+
+- fix issues with react 18 suspense [#670](https://github.com/player-ui/player/pull/670) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0-next.7 (Mon Jul 07 2025)
+
+#### 🐛 Bug Fix
+
+- Revert "Fix/react 18 cleanup" [#675](https://github.com/player-ui/player/pull/675) ([@spentacular](https://github.com/spentacular))
+- Fix/react 18 cleanup [#674](https://github.com/player-ui/player/pull/674) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0-next.6 (Mon Jul 07 2025)
+
+### Release Notes
+
+#### feat(common-expressions): add substr and split string functions ([#671](https://github.com/player-ui/player/pull/671))
+
+Added `substr` and `split` functions to common expressions plugin that mirror their javascript implementation
+
+---
+
+#### 🐛 Bug Fix
+
+- feat(common-expressions): add substr and split string functions [#671](https://github.com/player-ui/player/pull/671) ([@tusharagrawa](https://github.com/tusharagrawa) [@KetanReddy](https://github.com/KetanReddy))
+- Update Mac Build Executor to use M4 Pro Medium over M2 Pro Medium [#673](https://github.com/player-ui/player/pull/673) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Tushar Agrawal ([@tusharagrawa](https://github.com/tusharagrawa))
+
+---
+
+# 0.12.0-next.5 (Tue Jun 24 2025)
+
+### Release Notes
+
+#### Fix transforms on assets with `applicability` ([#668](https://github.com/player-ui/player/pull/668))
+
+Move `AssetTransformCorePlugin` application after `applicability` and `switch` view plugins to ensure transforms properly apply to conditional assets.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix transforms on assets with `applicability` [#668](https://github.com/player-ui/player/pull/668) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
+# 0.12.0-next.4 (Wed Jun 18 2025)
+
+### Release Notes
+
+#### Updated docs, platform param ([#660](https://github.com/player-ui/player/pull/660))
+
+Updated contributing docs to include information around how the docs site is generated, re-added platform param capability so that the URL updates based on platform tab, updated team page.
+
+---
+
+#### 🐛 Bug Fix
+
+- Updated docs, platform param [#660](https://github.com/player-ui/player/pull/660) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 1
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
+# 0.12.0-next.3 (Tue Jun 10 2025)
+
+#### 🐛 Bug Fix
+
+- Central Portal Migration [#662](https://github.com/player-ui/player/pull/662) ([@sugarmanz](https://github.com/sugarmanz))
+- Prebuild Publishing Targets to Miinimize Chances of Releases Breaking [#650](https://github.com/player-ui/player/pull/650) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.12.0-next.2 (Wed Jun 04 2025)
+
+### Release Notes
+
+#### Export Underlying Expressions from Common Expression Plugin ([#657](https://github.com/player-ui/player/pull/657))
+
+Update Common Expressions Plugin to export underlying functions to allow them to be converted to DSL functions as well as export them as XLRs for consumption by the XLR SDK.
+
+---
+
+#### 🐛 Bug Fix
+
+- Export Underlying Expressions from Common Expression Plugin [#657](https://github.com/player-ui/player/pull/657) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.12.0-next.1 (Mon Jun 02 2025)
+
+#### 🐛 Bug Fix
+
+- Compose compile only [#642](https://github.com/player-ui/player/pull/642) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.12.0-next.0 (Wed May 28 2025)
+
+#### 🚀 Enhancement
+
+- Renew hydration scope, wrap composableAsset and apply the modifiers to all assets through the compose call [#630](https://github.com/player-ui/player/pull/630) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08) [@nancywu1](https://github.com/nancywu1))
+
+#### 🐛 Bug Fix
+
+- remove new line at end of VERSION file [#659](https://github.com/player-ui/player/pull/659) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.11.2 (Thurs May 22 2025)
+### Release Notes
+
+#### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
+
+fix CheckPathPlugin throws error with chained AsyncNode
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+- fix: CheckPathPlugin throws error with chained AsyncNode [#621](https://github.com/player-ui/player/pull/621) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08))
+- Async node structure reorg [#623](https://github.com/player-ui/player/pull/623) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.11.2-next.1 (Wed May 21 2025)
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.11.2-next.0 (Tue May 20 2025)
+
+### Release Notes
+
+#### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
+
+fix CheckPathPlugin throws error with chained AsyncNode
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- fix: CheckPathPlugin throws error with chained AsyncNode [#621](https://github.com/player-ui/player/pull/621) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08))
+- Async node structure reorg [#623](https://github.com/player-ui/player/pull/623) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.11.1 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#652](https://github.com/player-ui/player/pull/652) ([@intuit-svc](https://github.com/intuit-svc))
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.1-next.0 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0 (Mon May 12 2025)
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+#### Template ordering ([#614](https://github.com/player-ui/player/pull/614))
+
+Adds support so that content authors can pass in `placement: "append" | "prepend"` to templates so that they can specify the order they should expand in relation to non-template data when everything is transformed into JSON.
+
+This logic works for both static and dynamic templates.
+
+#### Async node constructor consistency ([#618](https://github.com/player-ui/player/pull/618))
+
+Have consistent `AsyncNodePlugin` constructor api across all platforms allowing both tapping the handler to `onAsyncNode` hook after initializing `asyncNodePlugin` and initializing `asyncNodePlugin` with handlers
+
+#### Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade ([#632](https://github.com/player-ui/player/pull/632))
+
+Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE` flag to avoid Java `localeCompare` implementation. Change log for React Native from [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0781) to [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0742)
+
+#### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
+
+Doc site: 
+- Fix dark mode styling of next button on landing page demo
+- Fix missing favicon
+- Add more custom styling
+- Close #574 
+- Close #493
+
+#### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
+
+- Add new storybook for chat
+- Allow pass in custom plugins for DSL stories
+- fix flatten issue
+
+---
+
+#### 🚀 Enhancement
+
+- Template ordering [#614](https://github.com/player-ui/player/pull/614) ([@kharrop](https://github.com/kharrop) [@KetanReddy](https://github.com/KetanReddy))
+- Jetpack Compose [#609](https://github.com/player-ui/player/pull/609) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#647](https://github.com/player-ui/player/pull/647) ([@intuit-svc](https://github.com/intuit-svc))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+- Fully disable cache for forked builds [#645](https://github.com/player-ui/player/pull/645) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix name of forked bazelrc job [#643](https://github.com/player-ui/player/pull/643) ([@KetanReddy](https://github.com/KetanReddy))
+- Asset deprecation [#639](https://github.com/player-ui/player/pull/639) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+- Bazel 6.5 [#641](https://github.com/player-ui/player/pull/641) ([@brocollie08](https://github.com/brocollie08))
+- Use Readonly Key for Forked Builds [#638](https://github.com/player-ui/player/pull/638) ([@KetanReddy](https://github.com/KetanReddy))
+- remove runtime specification [#634](https://github.com/player-ui/player/pull/634) ([@brocollie08](https://github.com/brocollie08))
+- move renderIntoPlayerCanvas onto the correct thread [#633](https://github.com/player-ui/player/pull/633) ([@brocollie08](https://github.com/brocollie08))
+- Async node constructor consistency [#618](https://github.com/player-ui/player/pull/618) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy))
+- Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade [#632](https://github.com/player-ui/player/pull/632) ([@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy))
+- a bit of docs for building hermes libs [#629](https://github.com/player-ui/player/pull/629) ([@brocollie08](https://github.com/brocollie08))
+- Update Bazel Docker Image [#620](https://github.com/player-ui/player/pull/620) ([@brocollie08](https://github.com/brocollie08))
+- Doc Site Updates [#615](https://github.com/player-ui/player/pull/615) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- chat ui storybook [#611](https://github.com/player-ui/player/pull/611) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- enable blocking logs by default [#613](https://github.com/player-ui/player/pull/613) ([@brocollie08](https://github.com/brocollie08))
+- Expose FlowInstance afterTransition hook for jvm [#610](https://github.com/player-ui/player/pull/610) ([@mrigankmg](https://github.com/mrigankmg))
+- iOS: expose onStart hook [#612](https://github.com/player-ui/player/pull/612) ([@nancywu1](https://github.com/nancywu1))
+- iOS: expose metrics plugin hooks [#607](https://github.com/player-ui/player/pull/607) ([@nancywu1](https://github.com/nancywu1))
+- Update CODEOWNERS File [#608](https://github.com/player-ui/player/pull/608) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Merge branch 'fix-version-stamping' of github.com:adierkens/player into docs-analytics [#637](https://github.com/player-ui/player/pull/637) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 9
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.11.0-next.5 (Thu May 08 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+- Fully disable cache for forked builds [#645](https://github.com/player-ui/player/pull/645) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix name of forked bazelrc job [#643](https://github.com/player-ui/player/pull/643) ([@KetanReddy](https://github.com/KetanReddy))
+- Asset deprecation [#639](https://github.com/player-ui/player/pull/639) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+- Bazel 6.5 [#641](https://github.com/player-ui/player/pull/641) ([@brocollie08](https://github.com/brocollie08))
+- Use Readonly Key for Forked Builds [#638](https://github.com/player-ui/player/pull/638) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Merge branch 'fix-version-stamping' of github.com:adierkens/player into docs-analytics [#637](https://github.com/player-ui/player/pull/637) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 4
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0-next.4 (Wed Apr 30 2025)
+
+### Release Notes
+
+#### Template ordering ([#614](https://github.com/player-ui/player/pull/614))
+
+Adds support so that content authors can pass in `placement: "append" | "prepend"` to templates so that they can specify the order they should expand in relation to non-template data when everything is transformed into JSON.
+
+This logic works for both static and dynamic templates.
+
+---
+
+#### 🚀 Enhancement
+
+- Template ordering [#614](https://github.com/player-ui/player/pull/614) ([@kharrop](https://github.com/kharrop) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- remove runtime specification [#634](https://github.com/player-ui/player/pull/634) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.3 (Thu Apr 17 2025)
 
 #### 🐛 Bug Fix

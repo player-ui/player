@@ -40,7 +40,7 @@ new SwitchPlugin(options).applyParser(parser);
 new MultiNodePlugin().applyParser(parser);
 
 const initialView = {
-  _comment: "Insert your View's AST here",
+  _comment: "Insert your content here",
   id: "view",
   type: "info",
   title: {

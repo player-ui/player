@@ -13,14 +13,14 @@ import kotlinx.coroutines.withTimeout
 
 /** [PlayerPlugin] that converts view updates to a [ReceiveChannel] and provides functionality for waiting for an update */
 public class UpdatesPlugin : PlayerPlugin {
-
     private val _updates: Channel<Asset?> = Channel()
 
     public val updates: ReceiveChannel<Asset?> by ::_updates
 
-    /** Block until a *new* update is received or the [timeout] is reached */
-    @JvmOverloads public fun waitForUpdates(timeout: Long = 500): Asset? = runBlocking {
+    /** Block until a *new* update is received or the [timeout] is reached after [action] is completed. [action] should be a function that triggers the player update (ex. data update) */
+    @JvmOverloads public fun waitForUpdates(timeout: Long = 500, action: () -> Unit = {}): Asset? = runBlocking {
         flush()
+        action()
         withTimeout(timeout) {
             updates.receive()
         }
@@ -51,4 +51,8 @@ public class UpdatesPlugin : PlayerPlugin {
 
 public val Player.updatesPlugin: UpdatesPlugin? get() = findPlugin()
 
-@JvmOverloads public fun Player.waitForUpdates(timeout: Long = 500): Asset? = updatesPlugin?.waitForUpdates(timeout)
+/** Block until a *new* update is received or the [timeout] is reached after [action] is completed. [action] should be a function that triggers the player update (ex. data update) */
+@JvmOverloads public fun Player.waitForUpdates(timeout: Long = 500, action: () -> Unit = {}): Asset? = updatesPlugin?.waitForUpdates(
+    timeout,
+    action,
+)

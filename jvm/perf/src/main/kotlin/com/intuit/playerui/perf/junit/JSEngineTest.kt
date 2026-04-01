@@ -7,7 +7,6 @@ import java.util.logging.Logger
 
 /** JUnit 5 based [RuntimeTest] extension for measuring time to complete tests */
 public abstract class JSEngineTest : RuntimeTest() {
-
     public val logger: Logger = Logger.getLogger("JSEngineTest")
 
     public lateinit var testInfo: TestInfo

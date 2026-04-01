@@ -146,7 +146,7 @@ export interface NavigationBaseState<T extends string> extends CommentBase {
    * TS gets really confused with both the ActionState and the onStart state both declaring the `exp` property
    * So this explicity says there should never be an exp prop on a state node that's not of type 'ACTION'
    */
-  exp?: T extends "ACTION" ? Expression : never;
+  exp?: T extends "ACTION" | "ASYNC_ACTION" ? Expression : never;
 }
 
 /** A generic state that can transition to another state */
@@ -195,6 +195,19 @@ export interface NavigationFlowActionState
   exp: Expression;
 }
 
+/** Action states execute an expression to determine the next state to transition to */
+export interface NavigationFlowAsyncActionState
+  extends NavigationFlowTransitionableState<"ASYNC_ACTION"> {
+  /**
+   * An expression to execute.
+   * The return value determines the transition to take
+   */
+  exp: Expression;
+
+  /** Whether the expression(s) should be awaited before transitioning */
+  await: boolean;
+}
+
 /**
  * External Flow states represent states in the FSM that can't be resolved internally in Player.
  * The flow will wait for the embedded application to manage moving to the next state via a transition
@@ -218,6 +231,7 @@ export type NavigationFlowState =
   | NavigationFlowEndState
   | NavigationFlowFlowState
   | NavigationFlowActionState
+  | NavigationFlowAsyncActionState
   | NavigationFlowExternalState;
 
 /** The data at the end of a flow */
@@ -254,9 +268,11 @@ export interface Template<ValueType = unknown, Key extends string = string> {
    * If it already exists, values are appended to the end.
    */
   output: Key;
+
+  /** Specifies the template placement in relation to existing elements*/
+  placement?: "prepend" | "append";
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /**
  * The Schema organizes all content related to Data and it's types
  */
@@ -323,7 +339,6 @@ export declare namespace Schema {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /** Namespace to wrap up core functionality to be used by the Language Service */
 export declare namespace Language {
   /**
@@ -335,7 +350,6 @@ export declare namespace Language {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /** A spot for formatting */
 export declare namespace Formatting {
   /** A reference to a specific formatter */
@@ -348,7 +362,6 @@ export declare namespace Formatting {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /** A space for all thing validation */
 export declare namespace Validation {
   /**

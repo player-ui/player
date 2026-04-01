@@ -21,14 +21,12 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider
  */
 @ExtendWith(RuntimeContextProvider::class)
 public abstract class RuntimeTest {
-
     public var runtime: Runtime<*> = runtimeFactory.create()
 
     public val format: RuntimeFormat<Any?> get() = runtime.format as RuntimeFormat<Any?>
 }
 
 private class RuntimeContextProvider : TestTemplateInvocationContextProvider {
-
     override fun supportsTestTemplate(context: ExtensionContext) = true
 
     override fun provideTestTemplateInvocationContexts(context: ExtensionContext) = runtimeContainers
@@ -36,13 +34,18 @@ private class RuntimeContextProvider : TestTemplateInvocationContextProvider {
         .stream()
 }
 
-private class RuntimeContext(val context: ExtensionContext, val runtimeContainer: PlayerRuntimeContainer) : TestTemplateInvocationContext {
+private class RuntimeContext(
+    val context: ExtensionContext,
+    val runtimeContainer: PlayerRuntimeContainer,
+) : TestTemplateInvocationContext {
     override fun getDisplayName(invocationIndex: Int): String = "[$runtimeContainer] ${context.requiredTestMethod.name}"
+
     override fun getAdditionalExtensions(): MutableList<Extension> = mutableListOf(RuntimeSetterExtension(runtimeContainer))
 }
 
-private class RuntimeSetterExtension(val runtimeContainer: PlayerRuntimeContainer) : BeforeEachCallback {
-
+private class RuntimeSetterExtension(
+    val runtimeContainer: PlayerRuntimeContainer,
+) : BeforeEachCallback {
     override fun beforeEach(context: ExtensionContext) {
         val runtimeTestInstance = context.requiredTestInstance as RuntimeTest
         // TODO: Maybe provide a way configure runtime?

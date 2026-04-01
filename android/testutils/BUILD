@@ -1,34 +1,35 @@
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_player//kotlin:defs.bzl", "lint")
-load("@build_constants//:constants.bzl", "VERSION")
-load("//jvm:defs.bzl", "distribution")
-load(":deps.bzl", "main_deps")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("//android:defs.bzl", "kt_android")
 
-kt_android_library(
-    name = "testutils_android",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.playerui.android.testutils",
-    manifest = ":src/main/AndroidManifest.xml",
-    deps = main_deps,
+main_exports = [
+    "//android/player",
+    "//jvm/utils",
+
+    artifact("junit:junit"),
+]
+
+main_deps = main_exports + [
+    "//plugins/common-types/jvm",
+    "//plugins/pending-transaction/jvm",
+    "//plugins/reference-assets/android",
+
+    artifact("androidx.test:core"),
+    artifact("androidx.test:runner"),
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+]
+
+kt_android(
+    name = "testutils",
+    main_deps = main_deps,
 )
 
-android_library(
-    name = "testutils",
-    custom_package = "com.intuit.playerui.android.testutils",
-    manifest = ":src/main/AndroidManifest.xml",
-    tags = ["maven_coordinates=com.intuit.playerui.android:testutils:aar:%s" % VERSION],
+# For use locally, to automatically pull in the *singular* configured runtime that should be tested against
+kt_jvm_library(
+    name = "with-runtime",
     visibility = ["//visibility:public"],
-    exports = [":testutils_android"],
-    deps = main_deps,
-)
-
-distribution(
-    name = "testutils",
-    maven_coordinates = "com.intuit.playerui.android:testutils:%s" % VERSION,
-)
-
-lint(
-    name = "testutils",
-    srcs = glob(["src/main/**/*.kt"]),
-    lint_config = "//jvm:lint_config",
+    exports = [
+        ":testutils",
+        "//jvm/hermes:hermes-host",
+    ],
 )

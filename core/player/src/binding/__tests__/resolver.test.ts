@@ -11,14 +11,17 @@ export const testModel = {
       {
         name: "ginger",
         type: "dog",
+        isDog: true,
       },
       {
         name: "daisy",
         type: "dog",
+        isDog: true,
       },
       {
         name: "frodo",
         type: "cat",
+        isDog: false,
       },
       "other",
     ],
@@ -33,6 +36,8 @@ export const testCases: Array<[string, string]> = [
   ["foo.pets[01].name", "foo.pets.1.name"],
   ['foo.pets[name = "frodo"].type', "foo.pets.2.type"],
   ['foo.pets["name" = "sprinkles"].type', "foo.pets.4.type"],
+  ['foo.pets["isDog" = false].type', "foo.pets.2.type"],
+  ['foo.pets["isDog" = true].type', "foo.pets.0.type"],
 ];
 
 test.each(testCases)("Resolving binding: %s", (binding, expectedResolved) => {

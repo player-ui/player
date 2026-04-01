@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class ViewHooksTest : NodeBaseTest() {
-
     private val onUpdate by lazy {
         NodeSyncHook1(node, Asset.serializer())
     }

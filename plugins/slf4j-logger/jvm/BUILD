@@ -1,5 +1,17 @@
+load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//plugins:defs.bzl", "kt_player_plugin")
-load(":deps.bzl", "main_deps", "main_exports", "test_deps")
+
+main_exports = [
+    "//jvm/core",
+]
+
+main_deps = main_exports + [
+    artifact("org.slf4j:slf4j-api"),
+]
+
+test_deps = [
+    artifact("ch.qos.logback:logback-classic"),
+]
 
 kt_player_plugin(
     name = "slf4j-logger",

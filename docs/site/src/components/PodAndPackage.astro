@@ -1,0 +1,43 @@
+---
+// Custom component that makes it easier to change the usage docs for all the plugins.
+// This component adds docs for how to leverage a PlayerUI plugin via CocoaPods and
+// Swift Package Manager.
+
+import {Code} from "@astrojs/starlight/components";
+
+const product = Astro.props.product;
+
+// For CocoaPods
+const podSpec = `pod 'PlayerUI/${product}'`;
+const podImport = `import PlayerUI`;
+
+// For Swift Package Manager
+const spmTarget = `
+.target(
+    name: "MyApp",
+    dependencies: [
+        .product(name: "PlayerUI${product}", package: "playerui-swift-package"),
+    ]
+)`;
+const spmImport = `import PlayerUI${product}`;
+---
+
+<h3>CocoaPods</h3>
+
+<p>Add the subspec to your <code>Podfile</code>.</p>
+
+<Code code={podSpec} lang="ruby" />
+
+<p>In your Swift file, import the pod. Only one import is needed for all PlayerUI pods.</p>
+
+<Code code={podImport} lang="swift" />
+
+<h3>Swift Package Manager</h3>
+
+<p>Add the product to the appropriate target's dependencies in your <code>Package.swift</code>.</p>
+
+<Code code={spmTarget} lang="swift" />
+
+<p>In your Swift file, import the sub-package. A different import is needed for each PlayerUI sub-package.</p>
+
+<Code code={spmImport} lang="swift" />

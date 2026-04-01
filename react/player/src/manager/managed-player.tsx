@@ -1,4 +1,5 @@
 import React from "react";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import type {
   FlowManager,
   ManagedPlayerProps,
@@ -20,10 +21,7 @@ interface ManagedPlayerStateKey {
   _key: symbol;
 }
 
-export interface StateChangeCallback {
-  /** Trigger for state changes */
-  onState: (s: ManagedPlayerState) => void;
-}
+export type StateChangeCallback = (state?: ManagedPlayerState) => void;
 
 /**
  * An object to store the state of the managed player
@@ -59,7 +57,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -75,7 +73,7 @@ class ManagedState {
   }
 
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +83,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -106,7 +104,9 @@ class ManagedState {
   private async setState(state: ManagedPlayerState) {
     this.state = state;
     this.callbacks.forEach((c) => {
-      c.onState(state);
+      if (c && typeof c === "function") {
+        c(this.state);
+      }
     });
 
     const { manager, reactPlayer, playerConfig } = state.context;
@@ -208,6 +208,12 @@ const managedPlayerStateMachines = new WeakMap<
   ManagedState
 >();
 
+function createKey(): ManagedPlayerStateKey {
+  return {
+    _key: Symbol("managed-player"),
+  };
+}
+
 /** Creates an x-state state machine that persists when this component is no longer renders (due to Suspense) */
 export const usePersistentStateMachine = (options: {
   /** the flow manager to use */
@@ -218,30 +224,91 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
-}) => {
-  const keyRef = React.useRef<ManagedPlayerStateKey>({
-    _key: Symbol("managed-player"),
-  });
+}): { managedState: ManagedState; state?: ManagedPlayerState } => {
+  const mounted = React.useRef(false);
+  const previousManager = React.useRef(options.manager);
+  const keyRef = React.useRef<ManagedPlayerStateKey>(createKey());
+  const managedStateRef = React.useRef(
+    new ManagedState({ middleware: options.middleware }),
+  );
 
-  const managedState =
-    managedPlayerStateMachines.get(keyRef.current) ??
-    new ManagedState({ middleware: options.middleware });
-  managedPlayerStateMachines.set(keyRef.current, managedState);
-  const [state, setState] = React.useState(managedState.state);
+  if (!mounted.current) {
+    managedPlayerStateMachines.set(keyRef.current, managedStateRef.current);
+    mounted.current = true;
+  }
 
-  React.useEffect(() => {
-    const unsub = managedState.addListener({
-      onState: (s) => {
-        setState(s);
-      },
-    });
+  if (previousManager.current !== options.manager) {
+    const oldManagedState = managedPlayerStateMachines.get(keyRef.current);
 
-    if (managedState.state === undefined) {
-      managedState.start(options);
+    /**
+     * We have to handle terminate here as well as the useEffect in the
+     * ManagedPlayer since it won't have the instance of the previous manager
+     */
+    if (oldManagedState) {
+      const playerState =
+        oldManagedState.state?.context.reactPlayer.player.getState();
+
+      if (
+        oldManagedState.state?.value === "running" &&
+        playerState?.status === "in-progress"
+      ) {
+        previousManager.current.terminate?.(
+          playerState.controllers.data.serialize(),
+        );
+      }
     }
 
-    return unsub;
-  }, []);
+    const newKey = createKey();
+    const newManagedState = new ManagedState({
+      middleware: options.middleware,
+    });
+
+    managedPlayerStateMachines.set(newKey, newManagedState);
+    keyRef.current = newKey;
+    managedStateRef.current = newManagedState;
+    previousManager.current = options.manager;
+  }
+
+  const managedState =
+    managedPlayerStateMachines.get(keyRef.current) ?? managedStateRef.current;
+
+  /**
+   * There are times where the managedState the external store references no
+   * longer exists, so we have to wrap instead of calling addListener directly.
+   */
+  function subscription(callback: (val?: ManagedPlayerState) => void) {
+    if (managedState) {
+      const unsub = managedState.addListener((s) => {
+        callback(s);
+      });
+
+      return () => {
+        if (managedState) {
+          unsub();
+        }
+      };
+    }
+
+    return () => {};
+  }
+
+  function getSnapshot() {
+    return managedState.state;
+  }
+
+  const state = useSyncExternalStore(
+    subscription,
+    getSnapshot,
+    () => undefined,
+  );
+
+  /**
+   * This needs to come after useSyncExternalStore, otherwise it causes
+   * a weird state update and none of the refs in this hook persist
+   */
+  if (managedState.state === undefined) {
+    managedState.start(options);
+  }
 
   return { managedState, state };
 };
@@ -252,7 +319,9 @@ export const usePersistentStateMachine = (options: {
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
   const { state, managedState } = usePersistentStateMachine({
@@ -264,7 +333,9 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
     },
   });
 
-  React.useEffect(() => {
+  const previousState = React.useRef<ManagedPlayerState | undefined>();
+
+  if (state?.value !== previousState.current?.value) {
     if (state?.value === "ended") {
       props.onComplete?.(state?.context.result);
     } else if (state?.value === "error") {
@@ -272,7 +343,9 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
     } else if (state?.value === "running") {
       props.onStartedFlow?.();
     }
-  }, [state]);
+  }
+
+  previousState.current = state;
 
   React.useEffect(() => {
     return () => {

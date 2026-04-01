@@ -1,5 +1,13 @@
 import type { Asset } from "@player-ui/types";
 
+/**
+ * A markdown asset authored in flows.
+ * The value may be undefined or a string.
+ */
+export interface MarkdownAsset extends Asset<"markdown"> {
+  value?: string;
+}
+
 export interface BaseArgs {
   /**
    * Unparsed Asset
@@ -15,6 +23,10 @@ export type LiteralMapper<T extends object = object> = (
     value: string;
   } & BaseArgs &
     T,
+) => Asset;
+
+export type NullMapper<T extends object = object> = (
+  args: BaseArgs & T,
 ) => Asset;
 
 export type CompositeMapper<T extends object = object> = (
@@ -122,6 +134,10 @@ export interface Mappers {
    * list item markdown (e.g. - item)
    */
   listItem?: CompositeMapper;
+  /**
+   * Optional mapper for when nothing comes back from the mapping
+   */
+  null?: NullMapper;
 }
 
 export type Transformer<T = any> = (args: {

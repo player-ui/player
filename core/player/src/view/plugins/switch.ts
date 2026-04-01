@@ -11,7 +11,7 @@ import type { Resolver } from "../resolver";
 import { hasSwitchKey } from "../parser/utils";
 
 /** A view plugin to resolve switches */
-export default class SwitchPlugin implements ViewPlugin {
+export class SwitchPlugin implements ViewPlugin {
   private readonly options: Options;
 
   constructor(options: Options) {

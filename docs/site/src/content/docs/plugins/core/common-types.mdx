@@ -3,6 +3,7 @@ title: Common Types
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 import { PackageManagers } from 'starlight-package-managers'
 
 This plugin exposes some basic `DataTypes`, `validations`, and `formats` into Player content.
@@ -36,15 +37,7 @@ This will allow any `DataTypes`, `formats`, `validations` and custom data types 
 
 <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-
-pod 'PlayerUI/CommonTypesPlugin'
-
-```
+<PodAndPackage product="CommonTypesPlugin" />
 
 ### Swift Usage
 

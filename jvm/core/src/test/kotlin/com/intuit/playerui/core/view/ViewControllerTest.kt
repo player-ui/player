@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class ViewControllerTest : NodeBaseTest() {
-
     @MockK
     private lateinit var hookNode: Node
 

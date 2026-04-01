@@ -1,5 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
-load("//:cmake.bzl", "CMAKE_BUILD_TYPE_COPTS", "CMAKE_BUILD_TYPE_COPT_MAPPINGS")
+load("@rules_java//java:java_library.bzl", "java_library")
+load("//:cmake.bzl", "CMAKE_BUILD_TYPE_COPTS")
 load(":cc_binary_host_jni.bzl", "cc_library_host_jni")
 load(":copy_shared_lib.bzl", "copy_shared_lib")
 
@@ -26,6 +27,7 @@ cc_library(
         "RuntimeScope.cpp",
     ],
     hdrs = [
+        "Buffers.h",
         "JHermesRuntime.h",
         "JJSIValue.h",
         "RuntimeScope.h",
@@ -41,7 +43,10 @@ cc_library(
         # Host build
         ":should_include_jni": [],
         # Android build
-        "//conditions:default": ["-Wl,-z,max-page-size=16384"],
+        "//conditions:default": [
+            "-Wl,-z,max-page-size=16384",
+            "-lunwind"
+        ],
     }),
     visibility = ["//visibility:public"],
     deps = select({

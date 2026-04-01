@@ -8,6 +8,7 @@ typealias SwiftUIPlugin = (name: String, path: String, dependencies: [String], r
 
 // Simple iOS plugins that just rely on PlayerUI and optionally JS resources
 let ios_plugins: [SwiftPlugin] = [
+    (name: "AsyncNodePlugin", path: "async-node", resources: true),
     (name: "BaseBeaconPlugin", path: "beacon", resources: true),
     (name: "CheckPathPlugin", path: "check-path", resources: true),
     (name: "CommonExpressionsPlugin", path: "common-expressions", resources: true),

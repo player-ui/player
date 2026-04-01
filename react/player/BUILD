@@ -13,6 +13,7 @@ js_pipeline(
     package_name = "@player-ui/react",
     peer_deps = [
         "//:node_modules/@types/react",
+        "//:node_modules/@types/use-sync-external-store",
         "//:node_modules/react",
         "//:node_modules/react-dom",
     ],
@@ -28,5 +29,6 @@ js_pipeline(
         "//:node_modules/react-error-boundary",
         "//:node_modules/tapable-ts",
         "//:node_modules/leven",
+        "//:node_modules/use-sync-external-store",
     ],
 )

@@ -32,5 +32,8 @@ export default tseslint.config(
       "react/jsx-uses-vars": "error",
       "react/jsx-uses-react": "error",
     },
+    linterOptions: {
+      reportUnusedDisableDirectives: "error",
+    },
   },
 ) as Linter.Config;

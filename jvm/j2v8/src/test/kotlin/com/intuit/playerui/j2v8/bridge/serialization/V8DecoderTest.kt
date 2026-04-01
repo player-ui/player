@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test
 
 /** Legacy tests for encoding values into J2V8 */
 internal class V8DecoderTest : J2V8Test() {
-
     private val retVal = "this is my return"
 
     @Test
@@ -90,7 +89,10 @@ internal class V8DecoderTest : J2V8Test() {
     @Test
     fun testFunction() {
         v8.evaluateInJSThreadBlocking(runtime) {
-            val function = { arg: String -> println(arg); retVal }
+            val function = { arg: String ->
+                println(arg)
+                retVal
+            }
             assertEquals(retVal, function("this is my arg"))
 
             val result = format.encodeToV8Value(function).v8Function
@@ -112,7 +114,10 @@ internal class V8DecoderTest : J2V8Test() {
     @Test
     fun testTooManyParamsOnFunction() {
         v8.evaluateInJSThreadBlocking(runtime) {
-            val function = { arg: String -> println(arg); retVal }
+            val function = { arg: String ->
+                println(arg)
+                retVal
+            }
             assertEquals(retVal, function("this is my arg"))
 
             val result = format.encodeToV8Value(function).v8Function
@@ -123,7 +128,10 @@ internal class V8DecoderTest : J2V8Test() {
     @Test
     fun notEnoughParamsOnFunction() {
         v8.evaluateInJSThreadBlocking(runtime) {
-            val function = { arg: String? -> println(arg); retVal }
+            val function = { arg: String? ->
+                println(arg)
+                retVal
+            }
             assertEquals(retVal, function("this is my arg"))
 
             val result = format.encodeToV8Value(function).v8Function
@@ -134,7 +142,10 @@ internal class V8DecoderTest : J2V8Test() {
     @Test
     fun wrongParamsOnFunction() {
         v8.evaluateInJSThreadBlocking(runtime) {
-            val function = { arg: String -> println(arg); retVal }
+            val function = { arg: String ->
+                println(arg)
+                retVal
+            }
             assertEquals(retVal, function("this is my arg"))
 
             val result = format.encodeToV8Value(function).v8Function
@@ -331,7 +342,10 @@ internal class V8DecoderTest : J2V8Test() {
             assertEquals(mapTestClass, encodedMapTestClass.filter { (k) -> k != "method" })
 
             val encodedMapTestClassFromDecoded = format.decodeFromV8Value<Map<String, Any?>>(decodedObj)
-            assertEquals(testClass.method("testClass"), (encodedMapTestClassFromDecoded["method"] as Invokable<*>)("encodedMapTestClassFromDecoded"))
+            assertEquals(
+                testClass.method("testClass"),
+                (encodedMapTestClassFromDecoded["method"] as Invokable<*>)("encodedMapTestClassFromDecoded"),
+            )
 
             val encodedTestClass = format.decodeFromRuntimeValue(TestClass2.serializer(), obj)
             assertTrue(encodedTestClass.method("encodedTestClass"))
@@ -387,7 +401,10 @@ internal class V8DecoderTest : J2V8Test() {
             assertEquals(mapTestClass, encodedMapTestClass.filter { (k) -> k != "method" })
 
             val encodedMapTestClassFromDecoded = format.decodeFromV8Value<Map<String, Any?>>(decodedObj)
-            assertEquals(testClass.method!!("testClass"), (encodedMapTestClassFromDecoded["method"] as Invokable<*>)("encodedMapTestClassFromDecoded"))
+            assertEquals(
+                testClass.method!!("testClass"),
+                (encodedMapTestClassFromDecoded["method"] as Invokable<*>)("encodedMapTestClassFromDecoded"),
+            )
 
             val encodedTestClass = format.decodeFromRuntimeValue(TestClass3.serializer(), obj)
             assertTrue(encodedTestClass.method!!("encodedTestClass"))
@@ -492,26 +509,40 @@ internal class V8DecoderTest : J2V8Test() {
 
     @Serializable
     class LoggerAsValue(
-        var TAG: String = "Logger As Value",
+        var tag: String = "Logger As Value",
     ) {
         private val retVal = "this is my return"
-        val log: ((String?) -> String)? = { println(TAG); println(it); retVal }
-        val superLog: (String, Int, String) -> String = { arg1, arg2, arg3 -> println(TAG); println(arg1); println(arg2); println(arg3); retVal }
+        val log: ((String?) -> String)? = {
+            println(tag)
+            println(it)
+            retVal
+        }
+        val superLog: (
+            String,
+            Int,
+            String,
+        ) -> String = { arg1, arg2, arg3 ->
+            println(tag)
+            println(arg1)
+            println(arg2)
+            println(arg3)
+            retVal
+        }
     }
 
     @Serializable
     class LoggerAsMethod {
-        var TAG = "Logger As Method"
+        var tag = "Logger As Method"
         private val retVal = "this is my return"
 
         fun log(message: String?): String {
-            println(TAG)
+            println(tag)
             println(message)
             return retVal
         }
 
         fun logAndReturn(message: String): String {
-            println(TAG)
+            println(tag)
             println(message)
             return message
         }

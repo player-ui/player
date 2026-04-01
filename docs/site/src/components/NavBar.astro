@@ -2,7 +2,6 @@
 import Default from "@astrojs/starlight/components/SocialIcons.astro";
 import type { Props } from "@astrojs/starlight/props";
 import VersionSelector from "./tools/VersionSelector";
-
 ---
 
 <style>
@@ -29,6 +28,6 @@ import VersionSelector from "./tools/VersionSelector";
   }
 </style>
 
-<VersionSelector route={Astro.params.slug} client:only="react"/>
+<VersionSelector route={Astro.params.slug || ""} client:only="react" />
 
 <Default {...Astro.props} />

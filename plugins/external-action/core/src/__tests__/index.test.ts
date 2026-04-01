@@ -1,7 +1,9 @@
-import { expect, test } from "vitest";
-import type { Flow, InProgressState } from "@player-ui/player";
+import { expect, test, vitest } from "vitest";
+import type { Flow, InProgressState, NamedState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { ExternalActionPlugin } from "..";
+import { describe } from "node:test";
+import { waitFor } from "@testing-library/react";
 
 const externalFlow = {
   id: "test-flow",
@@ -195,4 +197,120 @@ test("only transitions if player still on this external state", async () => {
   expect(
     (state as InProgressState).controllers.flow.current?.currentState?.name,
   ).toBe("EXT_2");
+});
+
+describe("edge cases", () => {
+  test("async action nodes not transitioning from navigation states with *", async () => {
+    const player = new Player({
+      plugins: [
+        new ExternalActionPlugin(() => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve("next");
+            }, 100);
+          });
+        }),
+      ],
+    });
+
+    player.hooks.expressionEvaluator.tap("test", (expEval) => {
+      expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(name);
+          }, 10);
+        });
+      });
+    });
+
+    player.start({
+      id: "test-flow",
+      data: {
+        my: {
+          puppy: "Ginger",
+        },
+      },
+      views: [
+        {
+          id: "next",
+          type: "test",
+        },
+        {
+          id: "back",
+          type: "test",
+        },
+        {
+          id: "star",
+          type: "test",
+        },
+      ],
+      navigation: {
+        BEGIN: "FLOW_1",
+        FLOW_1: {
+          startState: "ACTION_1",
+          ACTION_1: {
+            state_type: "ASYNC_ACTION",
+            exp: "{{my.puppy}} = await(testAsync('Daisy'))",
+            transitions: {
+              Daisy: "EXTERNAL_1",
+            },
+            await: true,
+          },
+          EXTERNAL_1: {
+            state_type: "EXTERNAL",
+            ref: "view_1",
+            param: {
+              best: "{{my.puppy}}",
+            },
+            transitions: {
+              next: "VIEW_1",
+              back: "VIEW_2",
+              "*": "VIEW_3",
+            },
+          },
+          VIEW_1: {
+            state_type: "VIEW",
+            ref: "next",
+            transitions: {
+              "*": "END",
+            },
+          },
+          VIEW_2: {
+            state_type: "VIEW",
+            ref: "back",
+            transitions: {
+              "*": "END",
+            },
+          },
+          VIEW_3: {
+            state_type: "VIEW",
+            ref: "star",
+            transitions: {
+              "*": "END",
+            },
+          },
+        },
+      },
+    });
+
+    await vitest.waitFor(() =>
+      expect(player.getState().status).toBe("in-progress"),
+    );
+
+    let currentState: NamedState | undefined;
+
+    await waitFor(() => {
+      const state = player.getState();
+      currentState = (state as InProgressState).controllers.flow.current
+        ?.currentState;
+      expect(currentState?.name).toBe("EXTERNAL_1");
+    });
+
+    await waitFor(() => {
+      const state = player.getState();
+      currentState = (state as InProgressState).controllers.flow.current
+        ?.currentState;
+      expect(currentState?.name).toBe("VIEW_1");
+    });
+  });
 });

@@ -101,6 +101,7 @@ extension AnyType: Equatable {
         case (.booleanArray(let lhv), .booleanArray(let rhv)): return lhv == rhv
         case (.anyDictionary(let lhv), .anyDictionary(let rhv)): return (lhv as NSDictionary).isEqual(to: rhv)
         case (.anyArray(let lhv), .anyArray(let rhv)): return (lhv as NSArray).isEqual(to: rhv)
+        case (.unknownData, .unknownData): return true
         default: return false
         }
     }

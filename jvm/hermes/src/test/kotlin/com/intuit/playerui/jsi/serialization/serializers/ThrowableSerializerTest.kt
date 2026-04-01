@@ -14,10 +14,11 @@ import kotlin.test.currentStackTrace
 
 // TODO: This should be a core [RuntimeTest]
 internal class ThrowableSerializerTest : HermesTest() {
-
     @Test
     fun `JS Error is deserialized as PlayerException (using regex)`() = runtime.evaluateInJSThreadBlocking {
-        val error = runtime.global().getPropertyAsFunction(runtime, "Error")
+        val error = runtime
+            .global()
+            .getPropertyAsFunction(runtime, "Error")
             .callAsConstructor(runtime, Value.from(runtime, "hello"))
         val exception = format.decodeFromRuntimeValue(ThrowableSerializer(), error)
 

@@ -1,0 +1,204 @@
+---
+title: "Getting Started"
+---
+
+import PlatformTabs from "../../components/PlatformTabs.astro";
+import { PackageManagers } from "starlight-package-managers";
+import { Aside } from "@astrojs/starlight/components";
+
+Getting started with Player is simple.
+
+### Install Dependencies
+
+The first dependency you'll need to pull in is the Player itself. Additionally, you'll need an assets plugin to define any UI -- we'll use the reference assets as an example.
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+You can do this by installing the React Player and Reference Assets Packages
+
+<PackageManagers pkg="@player-ui/react @player-ui/reference-assets-plugin-react" />
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+### CocoaPods
+
+In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
+
+```ruby
+source 'https://github.com/player-ui/player'
+
+target 'MyApp' do
+  # Add the pod to your target
+  pod 'PlayerUI'
+  pod 'PlayerUI/ReferenceAssets' # For example only
+end
+```
+
+### Swift Package Manager
+
+In your `Package.swift` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
+
+<Aside title="Different SPM Repo">The SPM package is maintained in a separate auto-generated repo. You must use that git URL, not the git URL for the main Player repo.</Aside>
+
+```swift
+let package = Package(
+    name: "MyApp",
+    dependencies: [
+        .package(url: "https://github.com/player-ui/playerui-swift-package.git", from: "0.6.0"),
+    ],
+    targets: [
+        .target(
+            name: "MyApp",
+            dependencies: [
+                .product(name: "PlayerUI", package: "playerui-swift-package"),
+                .product(name: "PlayerUIReferenceAssets", package: "playerui-swift-package"),
+            ]
+        ),
+    ]
+)
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+Configure the Android Player dependencies in your `build.gradle(.kts)` files.
+
+```kotlin
+dependencies {
+    // Android Player
+    implementation("com.intuit.playerui:player:$playerVersion")
+    // Optional - reference assets
+    implementation("com.intuit.playerui.plugins:reference-assets:$playerVersion")
+}
+```
+
+  </Fragment>
+</PlatformTabs>
+
+:::caution
+The reference assets aren't intended for production use. They exist as an example of how to create assets and can be used to help get started.
+:::
+
+### Configuration
+
+Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this.
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+```javascript
+import { ReactPlayer } from "@player-ui/react";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+
+// create a new web-player instance
+
+const reactPlayer = new ReactPlayer({
+  plugins: [new ReferenceAssetsPlugin()],
+});
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+`SwiftUIPlayer` is just a normal SwiftUI View and can be inserted anywhere in your hierarchy.
+
+```swift
+import PlayerUI
+
+var body: some View {
+  SwiftUIPlayer(
+    plugins: [ReferenceAssetsPlugin()],
+  )
+}
+```
+
+  </Fragment>
+
+  <Fragment slot='android'>
+
+```kotlin
+// create Android Player with reference assets plugin
+val player = AndroidPlayer(
+    ReferenceAssetsPlugin(),
+    // Any other plugins
+)
+```
+
+Apart from providing a list of plugins while setting up `AndroidPlayer`, you can also provide a `config` object that has the following options:
+
+- `debuggable` - Indicates Player should instrument its `debuggable` constructs
+- `coroutineExceptionHandler` - [CoroutineExceptionHandler](https://kotlinlang.org/docs/exception-handling.html#coroutineexceptionhandler) should handle all uncaught exceptions while using the runtime coroutine scope.
+- `timeout` - Timeout for the JS thread. If none is provided then it is set as `if (debuggable) Int.MAX_VALUE.toLong() else 5000`.
+
+</Fragment>
+
+</PlatformTabs>
+
+### Render Content
+
+Now that you have a Player instance created. You'll need to start it with some [content](/content).
+
+<PlatformTabs>
+
+  <Fragment slot='react'>
+
+```javascript
+const content = {
+  /* your content here */
+};
+reactPlayer.start(content);
+```
+
+With Player running your content, you'll need to actually render out what is processed. To do this, you can use the React Player's component API to insert it into your React tree.
+
+```javascript
+const MyApp = () => {
+  return <reactPlayer.Component />;
+};
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+Expanding on the `SwiftUIPlayer` creation above, providing a `flow` will start the Player automatically, and the `result` will update the `Binding<Result<CompletedState, PlayerError>?>` that you pass to it:
+
+```swift
+import PlayerUI
+
+struct MyApp: View {
+  @State var result: Result<CompletedState, PlayerError>? = nil
+  @ObservedObject var viewModel: MyViewModel
+  var body: some View {
+    SwiftUIPlayer(
+      flow: $viewModel.flowString,
+      plugins: [ReferenceAssetsPlugin()],
+      result: $result
+    )
+  }
+}
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+To receive view updates, you must add a handler to render the views which are represented as `RenderableAsset`s.
+
+```kotlin
+// handle view updates - should be done before starting the Player
+player.onUpdate { asset: RenderableAsset? ->
+    // render asset as View `into` view tree
+    asset?.render() into binding.playerContainer
+}
+
+// start Player
+player.start(content)
+```
+
+Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a [Fragment/ViewModel integration](/platforms/android#viewmodel) to make it easier to properly integrate into your app and account for these concerns.
+
+  </Fragment>
+</PlatformTabs>
+
+Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](/plugins) section to take a look at the Plugins we've developed.

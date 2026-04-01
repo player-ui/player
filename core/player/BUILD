@@ -1,5 +1,6 @@
-load("@rules_player//javascript:defs.bzl", "js_pipeline")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("//jvm/hermes:hermesc.bzl", "hermes_compile")
 load("//tools:defs.bzl", "NATIVE_BUILD_DEPS", "tsup_config", "vitest_config")
 
 # TODO: Would be nice to macro all the native things to avoid missing this setup (consequence is bundling Player in a plugin bundle)
@@ -40,4 +41,31 @@ js_pipeline(
         "//:node_modules/timm",
         "//:node_modules/ts-nested-error",
     ],
+)
+
+# Source files consumed by docs generation (e.g., hooks reference).
+filegroup(
+    name = "hook_sources",
+    srcs = glob(
+        ["src/**/*.ts"],
+        exclude = [
+            "src/**/__tests__/**",
+            "src/**/*.test.ts",
+            "src/**/*.spec.ts",
+        ],
+    ),
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "native",
+    srcs = [":player_native_bundle"],
+    outs = ["Player.native.js"],
+    cmd = "echo $(SRCS) | tr ' ' '\\n' | grep %s$$ | xargs -I {} cp {} $(OUTS)" % "Player.native.js",
+)
+
+hermes_compile(
+    name = "hbc",
+    js = ":native",
+    visibility = ["//visibility:public"],
 )

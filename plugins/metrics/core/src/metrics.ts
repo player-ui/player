@@ -561,5 +561,3 @@ export class MetricsCorePlugin implements PlayerPlugin {
     }
   }
 }
-
-export default MetricsCorePlugin;

@@ -1,27 +1,31 @@
 package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
-import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
+import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
+import com.intuit.playerui.plugins.coroutines.UpdatesPlugin
+import com.intuit.playerui.plugins.coroutines.waitForUpdates
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.yield
+import org.amshove.kluent.internal.assertEquals
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @ExtendWith(MockKExtension::class)
 internal class AsyncNodePluginTest : PlayerTest() {
-
     private val asyncNodeFlowSimple =
         """{
           "id": "counter-flow",
@@ -107,7 +111,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
         """.trimMargin()
 
-    override val plugins = listOf(AsyncNodePlugin(), ReferenceAssetsPlugin())
+    override val plugins = listOf(AsyncNodePlugin(), ReferenceAssetsPlugin(), UpdatesPlugin())
 
     private val plugin get() = player.asyncNodePlugin!!
 
@@ -149,47 +153,103 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
 
     @TestTemplate
-    fun `async node hook is tappable for chat-message asset and replaces async nodes with provided node`() =
-        runBlockingTest {
-            var update: Asset? = null
-            plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
-                BailResult.Bail(
-                    mapOf(
-                        "asset" to mapOf(
-                            "id" to "6",
-                            "type" to "text",
-                            "value" to "New",
-                        ),
+    fun `async node hook is tappable for chat-message asset and replaces async nodes with provided node`() = runBlockingTest {
+        var update: Asset? = null
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            BailResult.Bail(
+                mapOf(
+                    "asset" to mapOf(
+                        "id" to "6",
+                        "type" to "text",
+                        "value" to "New",
                     ),
-                )
-            }
-            var count = 0
-            suspendCancellableCoroutine { cont ->
-                player.hooks.view.tap { v ->
-                    v?.hooks?.onUpdate?.tap { asset ->
-                        count++
-                        update = asset
-                        if (count == 2) cont.resume(true) {}
-                    }
-                }
-
-                player.start(chatMessageContent)
-            }
-            Assertions.assertTrue(count == 2)
-            val values = (update as? Map<*, *>)?.get("values") as? List<*>
-            Assertions.assertNotNull(values)
-            Assertions.assertEquals(2, values?.size)
-
-            val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-            val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
-
-            Assertions.assertEquals("text", asset0?.get("type"))
-            Assertions.assertEquals("Hello World!", asset0?.get("value"))
-
-            Assertions.assertEquals("6", asset1?.get("id"))
-            Assertions.assertEquals("text", asset1?.get("type"))
-            Assertions.assertEquals("New", asset1?.get("value"))
+                ),
+            )
         }
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+
+            player.start(chatMessageContent)
+        }
+        Assertions.assertTrue(count == 2)
+        val values = (update as? Map<*, *>)?.get("values") as? List<*>
+        Assertions.assertNotNull(values)
+        Assertions.assertEquals(2, values?.size)
+
+        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+
+        Assertions.assertEquals("text", asset0?.get("type"))
+        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+
+        Assertions.assertEquals("6", asset1?.get("id"))
+        Assertions.assertEquals("text", asset1?.get("type"))
+        Assertions.assertEquals("New", asset1?.get("value"))
+    }
+
+    @TestTemplate
+    fun `async node error bubbles up and fails the player state`() = runBlockingTest {
+        plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
+            throw Exception("This is an error message from onAsyncNode")
+        }
+
+        val errorMessage = assertThrows<Exception> {
+            runBlockingTest {
+                player.start(chatMessageContent).await()
+            }
+        }.message
+        assertEquals("This is an error message from onAsyncNode", errorMessage)
+    }
+
+    @TestTemplate
+    fun `async node error hook catches and gracefully handles the error`() = runBlockingTest {
+        plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
+            throw Exception("This is an error message from onAsyncNode")
+        }
+
+        plugin.hooks.onAsyncNodeError.tap("test") { _, error, node ->
+            BailResult.Bail(
+                mapOf(
+                    "asset" to mapOf(
+                        "type" to "text",
+                        "id" to "error-asset",
+                        "value" to "Value",
+                    ),
+                ),
+            )
+        }
+
+        var count = 0
+        var update: Asset? = null
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+
+            player.start(chatMessageContent)
+        }
+
+        val values = (update as? Map<*, *>)?.get("values") as? List<*>
+        Assertions.assertNotNull(values)
+        Assertions.assertEquals(2, values?.size)
+
+        val asset0 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+        Assertions.assertNotNull(asset0)
+        Assertions.assertEquals("text", asset0?.get("type"))
+        Assertions.assertEquals("Value", asset0?.get("value"))
+        Assertions.assertEquals("error-asset", asset0?.get("id"))
+    }
 
     @TestTemplate
     fun `replace async node with multiNode`() = runBlockingTest {
@@ -280,11 +340,10 @@ internal class AsyncNodePluginTest : PlayerTest() {
             ),
         )
 
-        deferredResolve!!.invoke(listOf(viewObject))
+        view = player.waitForUpdates {
+            deferredResolve!!.invoke(listOf(viewObject))
+        }
 
-        Assertions.assertEquals(1, count)
-
-        view = player.inProgressState?.lastViewUpdate
         Assertions.assertNotNull(view)
 
         Assertions.assertEquals(
@@ -293,16 +352,19 @@ internal class AsyncNodePluginTest : PlayerTest() {
         )
         Assertions.assertEquals(
             "action",
-            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")
+            view
+                .getList("actions")
+                ?.filterIsInstance<ArrayList<Node>>()
+                ?.get(0)
+                ?.get(0)
+                ?.getObject("asset")
                 ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
-        Assertions.assertEquals(2, count)
 
-        updateContent!!.invoke(null)
-
-        Assertions.assertEquals(3, count)
-        view = player.inProgressState?.lastViewUpdate
+        view = player.waitForUpdates {
+            updateContent!!.invoke(null)
+        }
 
         Assertions.assertNotNull(view)
         Assertions.assertEquals(
@@ -329,13 +391,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
             BailResult.Bail(result)
         }
 
-        var count = 0
-        player.hooks.view.tap { v ->
-            v?.hooks?.onUpdate?.tap { asset ->
-                count++
-            }
-        }
-
         player.start(asyncNodeFlowSimple)
 
         var view = player.inProgressState?.lastViewUpdate
@@ -355,10 +410,12 @@ internal class AsyncNodePluginTest : PlayerTest() {
             yield()
         }
 
-        deferredResolve!!.invoke(null)
-
-        Assertions.assertEquals(1, count)
-
+        // Check that update does not happen after making no changes
+        Assertions.assertThrows(TimeoutCancellationException::class.java) {
+            view = player.waitForUpdates {
+                deferredResolve!!.invoke(null)
+            }
+        }
         view = player.inProgressState?.lastViewUpdate
 
         Assertions.assertNotNull(view)
@@ -366,12 +423,13 @@ internal class AsyncNodePluginTest : PlayerTest() {
             "action",
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
-        Assertions.assertEquals(1, view.getList("actions")?.size)
+        Assertions.assertEquals(1, view!!.getList("actions")?.size)
 
-        updateContent!!.invoke(null)
-
-        Assertions.assertEquals(1, count)
-
+        Assertions.assertThrows(TimeoutCancellationException::class.java) {
+            player.waitForUpdates {
+                updateContent!!.invoke(null)
+            }
+        }
         view = player.inProgressState?.lastViewUpdate
 
         Assertions.assertNotNull(view)
@@ -379,7 +437,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             "action",
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
-        Assertions.assertEquals(1, view.getList("actions")?.size)
+        Assertions.assertEquals(1, view!!.getList("actions")?.size)
     }
 
     @TestTemplate
@@ -527,7 +585,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
                             ),
                         ),
                     ),
-
                 )
 
                 else -> BailResult.Bail(
@@ -598,15 +655,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             }
         }
 
-        setupPlayer(listOf(AsyncNodePlugin(handler), ReferenceAssetsPlugin()))
-
-        var count = 0
-
-        player.hooks.view.tap { v ->
-            v?.hooks?.onUpdate?.tap { asset ->
-                count++
-            }
-        }
+        setupPlayer(listOf(AsyncNodePlugin(handler), ReferenceAssetsPlugin(), UpdatesPlugin()))
         player.start(asyncNodeFlowSimple)
 
         var view = player.inProgressState?.lastViewUpdate
@@ -634,29 +683,26 @@ internal class AsyncNodePluginTest : PlayerTest() {
             ),
         )
 
-        deferredResolve!!.invoke(listOf(viewObject))
+        view = player.waitForUpdates { deferredResolve!!.invoke(listOf(viewObject)) }
 
-        Assertions.assertEquals(1, count)
-
-        view = player.inProgressState?.lastViewUpdate
         Assertions.assertNotNull(view)
-
         Assertions.assertEquals(
             "action",
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
         Assertions.assertEquals(
             "action",
-            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")
+            view
+                .getList("actions")
+                ?.filterIsInstance<ArrayList<Node>>()
+                ?.get(0)
+                ?.get(0)
+                ?.getObject("asset")
                 ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
-        Assertions.assertEquals(2, count)
 
-        updateContent!!.invoke(null)
-
-        Assertions.assertEquals(3, count)
-        view = player.inProgressState?.lastViewUpdate
+        view = player.waitForUpdates { updateContent!!.invoke(null) }
 
         Assertions.assertNotNull(view)
         Assertions.assertEquals(

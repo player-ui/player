@@ -14,9 +14,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** [RuntimePlugin] that adds a `setTimeout` implementation into a the [Runtime] if it doesn't exist */
-public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHandler? = null, private val override: Boolean = false) :
-    RuntimePlugin, PlayerPlugin {
-
+public class SetTimeoutPlugin(
+    private val exceptionHandler: CoroutineExceptionHandler? = null,
+    private val override: Boolean = false,
+) : RuntimePlugin,
+    PlayerPlugin {
     private var player: Player? = null
 
     @OptIn(ExperimentalPlayerApi::class)

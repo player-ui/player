@@ -18,7 +18,6 @@ import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.TestTemplate
 
 internal class PubSubPluginTest : PlayerTest() {
-
     override val plugins = listOf(PubSubPlugin())
 
     private val plugin get() = player.pubSubPlugin!!
@@ -39,7 +38,11 @@ internal class PubSubPluginTest : PlayerTest() {
         var name: String? = null
         var data: Any? = null
 
-        val token = plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        val token = plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         plugin.unsubscribe(token)
         plugin.publish(expectedName, expectedData)
 
@@ -52,7 +55,11 @@ internal class PubSubPluginTest : PlayerTest() {
         val (expectedName, expectedData) = "eventName" to "eventData"
         var name: String? = null
         var data: Any? = null
-        plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         plugin.publish(expectedName, expectedData)
 
         name `should be equal to` expectedName
@@ -66,7 +73,11 @@ internal class PubSubPluginTest : PlayerTest() {
         }
         var name: String? = null
         var data: Any? = null
-        plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         plugin.publish(expectedName, expectedData)
 
         name `should be equal to` expectedName
@@ -80,7 +91,11 @@ internal class PubSubPluginTest : PlayerTest() {
         )
         var name: String? = null
         var data: Any? = null
-        plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         plugin.publish(expectedName, expectedData)
 
         name `should be equal to` expectedName
@@ -94,7 +109,11 @@ internal class PubSubPluginTest : PlayerTest() {
         )
         var name: String? = null
         var data: Any? = null
-        plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         plugin.publish(
             expectedName,
             expectedData,
@@ -111,7 +130,11 @@ internal class PubSubPluginTest : PlayerTest() {
         )
         var name: String? = null
         var data: Any? = null
-        plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         player.start(simpleFlowString)
         player.inProgressState!!.evaluate("""@[publish("$expectedName", ${Json.encodeToString(expectedData)})]@""")
 
@@ -127,7 +150,11 @@ internal class PubSubPluginTest : PlayerTest() {
         )
         var name: String? = null
         var data: Any? = null
-        plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
+        plugin.subscribe(expectedName) { n, d ->
+            name = n
+            data = d
+            println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}")
+        }
         player.start(simpleFlowString)
         player.inProgressState!!.evaluate("""@[publishEvent("$expectedName", ${Json.encodeToString(expectedData)})]@""")
 

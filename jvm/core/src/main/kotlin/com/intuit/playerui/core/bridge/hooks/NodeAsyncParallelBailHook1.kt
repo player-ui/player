@@ -11,8 +11,11 @@ import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Serializable(with = NodeAsyncParallelBailHook1.Serializer::class)
-public class NodeAsyncParallelBailHook1<T1, R : Any>(override val node: Node, serializer1: KSerializer<T1>) : AsyncParallelBailHook<(HookContext, T1) -> BailResult<R>, R>(), AsyncNodeHook<R> {
-
+public class NodeAsyncParallelBailHook1<T1, R : Any>(
+    override val node: Node,
+    serializer1: KSerializer<T1>,
+) : AsyncParallelBailHook<(HookContext, T1) -> BailResult<R>, R>(),
+    AsyncNodeHook<R> {
     init {
         init(serializer1)
     }
@@ -27,7 +30,10 @@ public class NodeAsyncParallelBailHook1<T1, R : Any>(override val node: Node, se
     }
 
     /** The return type serializer is never used, but in order to generate the serializer with @Serializable for [NodeAsyncParallelBailHook1], it's needed */
-    internal class Serializer<T1, R : Any>(private val serializer1: KSerializer<T1>, `_`: KSerializer<R>) : NodeWrapperSerializer<NodeAsyncParallelBailHook1<T1, R>>({
-        NodeAsyncParallelBailHook1(it, serializer1)
-    })
+    internal class Serializer<T1, R : Any>(
+        private val serializer1: KSerializer<T1>,
+        `_`: KSerializer<R>,
+    ) : NodeWrapperSerializer<NodeAsyncParallelBailHook1<T1, R>>({
+            NodeAsyncParallelBailHook1(it, serializer1)
+        })
 }

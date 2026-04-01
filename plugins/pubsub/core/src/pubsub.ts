@@ -115,7 +115,6 @@ export class TinyPubSub {
           const tokens = this.events.get(key);
 
           if (tokens && tokens.size) {
-            // eslint-disable-next-line max-depth
             for (const token of tokens.keys()) {
               this.tokens.delete(token);
             }

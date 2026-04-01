@@ -137,7 +137,6 @@ export class BeaconPlugin implements PlayerPlugin {
 
             if (propertiesToSkip.includes("beacon")) return undefined;
 
-            // eslint-disable-next-line no-param-reassign
             obj.plugins = setIn(
               obj.plugins ?? {},
               ["stringResolver", "propertiesToSkip"],

@@ -47,7 +47,7 @@ describe("ReactPlayer React", () => {
   });
 
   test("fails flow when UI throws error", async () => {
-    const rp = new ReactPlayer({ suspend: false });
+    const rp = new ReactPlayer();
     const response = rp.start(makeFlow({ type: "err", id: "Error" }));
     act(() => {
       render(<rp.Component />);
@@ -58,7 +58,6 @@ describe("ReactPlayer React", () => {
   test("updates the react comp when view updates", async () => {
     const rp = new ReactPlayer({
       plugins: [new SimpleAssetPlugin()],
-      suspend: false,
     });
     rp.start(simpleFlow);
     const ele = render(<rp.Component />);
@@ -126,7 +125,6 @@ const Fallback = () => <div id="loader">Loading...</div>;
 describe("Suspense", () => {
   test("suspends while waiting for a flow to start", async () => {
     const rp = new ReactPlayer({
-      suspend: true,
       plugins: [new SimpleAssetPlugin()],
     });
 
@@ -153,7 +151,6 @@ describe("Suspense", () => {
 
   test("suspends while waiting for the view to render", async () => {
     const rp = new ReactPlayer({
-      suspend: true,
       plugins: [new SimpleAssetPlugin()],
     });
 
@@ -202,7 +199,6 @@ describe("Suspense", () => {
 
   test("suspends at the end of a flow until the next one starts", async () => {
     const rp = new ReactPlayer({
-      suspend: true,
       plugins: [new SimpleAssetPlugin()],
     });
 

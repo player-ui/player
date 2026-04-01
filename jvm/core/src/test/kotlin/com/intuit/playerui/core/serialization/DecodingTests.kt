@@ -21,15 +21,20 @@ sealed class Sealed {
 
     @Serializable
     @SerialName("intChild")
-    data class IntChild(val int: Int, override val str: String) : Sealed()
+    data class IntChild(
+        val int: Int,
+        override val str: String,
+    ) : Sealed()
 
     @Serializable
     @SerialName("boolChild")
-    data class BoolChild(val bool: Boolean, override val str: String) : Sealed()
+    data class BoolChild(
+        val bool: Boolean,
+        override val str: String,
+    ) : Sealed()
 }
 
 internal class StructureDecoding : RuntimeTest() {
-
     @TestTemplate
     fun `decode concretely typed flat map`() {
         val runtimeObject = format.runtimeObject {
@@ -85,7 +90,10 @@ internal class StructureDecoding : RuntimeTest() {
             ),
         )
 
-        val data = format.decodeFromRuntimeValue(MapSerializer(String.serializer(), MapSerializer(String.serializer(), Int.serializer())), runtimeObject)
+        val data = format.decodeFromRuntimeValue(
+            MapSerializer(String.serializer(), MapSerializer(String.serializer(), Int.serializer())),
+            runtimeObject,
+        )
         assertEquals(map, data)
     }
 
@@ -208,7 +216,6 @@ internal class StructureDecoding : RuntimeTest() {
 }
 
 class DecodingTests : RuntimeTest() {
-
     @TestTemplate
     fun `decode sealed class`() {
         val intDataObj = runtime.format.runtimeObject {
@@ -236,7 +243,6 @@ class DecodingTests : RuntimeTest() {
 }
 
 internal class ClassDecoding : RuntimeTest() {
-
     @Serializable
     data class PrimitiveData(
         val int: Int = 0,

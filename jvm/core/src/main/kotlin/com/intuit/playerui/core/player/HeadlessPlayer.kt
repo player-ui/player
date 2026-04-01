@@ -6,9 +6,11 @@ import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
+import com.intuit.playerui.core.bridge.runtime.RUNTIME_DETAILS_MSG
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.constants.ConstantsController
@@ -46,16 +48,14 @@ import java.net.URL
  *  - [JSPluginWrapper]
  *  - [PlayerPlugin]
  */
-public class HeadlessPlayer
-@ExperimentalPlayerApi
-@JvmOverloads
-public constructor(
+@Suppress("ktlint:standard:annotation") // To prevent class from being double indented
+public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public constructor(
     override val plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
-) : Player(), NodeWrapper {
-
+) : Player(),
+    NodeWrapper {
     /** Convenience constructor to allow [plugins] to be passed as varargs */
     @ExperimentalPlayerApi @JvmOverloads
     public constructor(
@@ -78,7 +78,10 @@ public constructor(
 
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    override val constantsController: ConstantsController by NodeSerializableField(ConstantsController.serializer(), NodeSerializableField.CacheStrategy.Full)
+    override val constantsController: ConstantsController by NodeSerializableField(
+        ConstantsController.serializer(),
+        NodeSerializableField.CacheStrategy.Full,
+    )
 
     override val state: PlayerFlowState get() = if (player.isReleased()) {
         ReleasedState
@@ -93,9 +96,10 @@ public constructor(
             if (state !is ReleasedState) {
                 inProgressState?.fail(throwable) ?: logger.error(
                     "Exception caught in Player scope: ${throwable.message}",
-                    throwable.stackTrace.joinToString("\n") {
-                        "\tat $it"
-                    }.replaceFirst("\tat ", "\n"),
+                    throwable.stackTrace
+                        .joinToString("\n") {
+                            "\tat $it"
+                        }.replaceFirst("\tat ", "\n"),
                 )
             }
         }
@@ -105,7 +109,15 @@ public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText()))
+        runtime.load(
+            ScriptContext(
+                if (runtime.config.debuggable) debugSource.readText() else source.readText(),
+                BUNDLED_SOURCE_PATH,
+                sourceMap.readText(),
+            ).apply {
+                preCompiledScript = precompiledSource?.readBytes()
+            },
+        )
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -130,14 +142,24 @@ public constructor(
 
         // we only have access to the logger after we have the player instance
         logger.info("Player created using $runtime")
+        if (explicitRuntime == null && runtimeContainers.size > 1) {
+            logger.warn(
+                """Player created its own runtime ($runtime), but multiple runtimes are on the classpath: $runtimeContainers
+                    |To avoid ambiguity, explicitly provide a runtime or remove extra runtime dependencies that could be bloating your app.
+                    |$RUNTIME_DETAILS_MSG
+                """.trimMargin(),
+            )
+        }
         runtime.checkBlockingThread = {
+            // TODO: Can we check for main dispatcher to mute logs?
             if (name == "main") {
                 scope.launch {
                     logger.warn(
                         "Main thread is blocking on JS runtime access: $this",
-                        stackTrace.joinToString("\n") {
-                            "\tat $it"
-                        }.replaceFirst("\tat ", "\n"),
+                        stackTrace
+                            .joinToString("\n") {
+                                "\tat $it"
+                            }.replaceFirst("\tat ", "\n"),
                     )
                 }
             }
@@ -160,10 +182,9 @@ public constructor(
     public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
 
     /** Start a [flow] and subscribe to the result */
-    public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> =
-        start(flow).apply {
-            onComplete(onComplete)
-        }
+    public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> = start(flow).apply {
+        onComplete(onComplete)
+    }
 
     override fun release() {
         if (!runtime.isReleased()) {
@@ -173,19 +194,27 @@ public constructor(
     }
 
     internal companion object {
+        private const val BUNDLED_SOURCE_PATH = "core/player/dist/Player.native.js"
 
-        private const val bundledSourcePath = "core/player/dist/Player.native.js"
+        private const val DEBUG_SOURCE_PATH = "core/player/dist/Player.native.js"
 
-        private const val debugSourcePath = "core/player/dist/Player.native.js"
+        private const val HBC_SOURCE_PATH = "core/player/Player.native.js.hbc"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
-            .classLoader.getResource(bundledSourcePath)!!
+            .classLoader
+            .getResource(BUNDLED_SOURCE_PATH)!!
 
         private val debugSource get() = this::class.java
-            .classLoader.getResource(debugSourcePath)!!
+            .classLoader
+            .getResource(DEBUG_SOURCE_PATH)!!
 
         private val sourceMap get() = this::class.java
-            .classLoader.getResource("$bundledSourcePath.map")
+            .classLoader
+            .getResource("$BUNDLED_SOURCE_PATH.map")
+
+        private val precompiledSource get() = this::class.java
+            .classLoader
+            .getResource(HBC_SOURCE_PATH)
     }
 }

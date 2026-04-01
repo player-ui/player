@@ -9,9 +9,9 @@ parameters:
     default: false
 
 orbs:
-  macos: circleci/macos@2
-  android: circleci/android@2.0
-  codecov: codecov/codecov@3.3.0
+  macos: circleci/macos@2.5.4
+  android: circleci/android@3.2.0
+  codecov: codecov/codecov@5.4.3
 
 executors:
   base:
@@ -30,58 +30,60 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: m2pro.medium
+    resource_class: m4pro.medium
     macos:
-      xcode: 15.3.0
+      xcode: 16.4.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
       image: android:2024.04.1
     working_directory: ~/player
+    resource_class: xlarge
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  benchmarks:
+    docker:
+      - image: docker.io/playerui/bazel-docker:13
+    working_directory: ~/player
     resource_class: large
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
 commands:
+  setup_auth:
+    description: Configure authentication for deployments
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: git config --global user.name "Intuit Service"
+      - run: git config --global user.email "opensource-svc@intuit.com"
+
   auto_shipit:
     description: Perform Auto shipit
     steps:
       - attach_workspace:
           at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
-
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
-
-      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - setup_auth
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: git config --global user.name "Intuit Service"
-      - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
           echo -e $GPG_KEY | gpg --import --batch
           echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
-      - run: |
-          source ~/.bashrc
-          bundle install
-          npx auto shipit --only-graduate-with-release-label -vv
+      - run:
+          command: |
+            source ~/.bashrc
+            bundle install
+            npx auto shipit -vv --only-graduate-with-release-label
+          no_output_timeout: 40m
 
 jobs:
   setup:
     executor: minimal
     steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - v1-dependencies-{ { checksum "package.json" }}
+      - checkout:
+          method: full
 
       - persist_to_workspace:
           root: .
@@ -102,6 +104,26 @@ jobs:
           root: .
           paths:
             - .
+  
+  bazelrc_fork:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - run: |
+          echo "build --bes_results_url=''" >> .bazelrc.local
+          echo "build --bes_backend=''" >> .bazelrc.local
+          echo "build --remote_cache=''" >> .bazelrc.local
+          echo "test --bes_results_url=''" >> .bazelrc.local
+          echo "test --bes_backend=''" >> .bazelrc.local
+          echo "test --remote_cache=''" >> .bazelrc.local
+          echo "coverage --bes_results_url=''" >> .bazelrc.local
+          echo "coverage --bes_backend=''" >> .bazelrc.local
+          echo "coverage --remote_cache=''" >> .bazelrc.local
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   build:
     executor: base
@@ -111,60 +133,26 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{ { checksum "package.json" }}
-
       - persist_to_workspace:
           root: .
           paths:
             - .
 
-  build_ios:
+  build_and_test_ios:
     executor: ios
     steps:
       - attach_workspace:
           at: ~/player
 
-      - macos/install-rosetta
-
       - run:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
-            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
-
-      - restore_cache:
-          keys:
-            - android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-
-      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV
-
-      - run:
-          name: Install Android tools
-          command: |
-            sh scripts/install-android-tools.sh
-            echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
-            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/23.2.8568313'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
-            source $BASH_ENV
-          environment:
-            JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
-
-      - save_cache:
-          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-          paths:
-            - ~/android-tools
 
       - macos/preboot-simulator:
-          version: "17.4"
+          version: "18.5"
           platform: "iOS"
-          device: "iPhone 15"
+          device: "iPhone 16 Pro"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
@@ -186,13 +174,17 @@ jobs:
               --config=ci-mac \
               --jobs=1 \
               --experimental_use_llvm_covmap \
-              --combined_report=lcov \
               --test_output=all \
               --test_timeout=1800 \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)")
+      - run:
+          name: Lint
+          command: |
+            bazel test \
+              --config=ci-mac \
               $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
 
@@ -205,16 +197,18 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
+
       - run:
+          name: Collect iOS coverage
           when: always
           command: |
-            mkdir -p _ios_coverage/lcov
-            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
+            mkdir -p coverage
+            cp ./bazel-out/_coverage/_coverage_report.dat coverage/ios_coverage.dat
 
       - persist_to_workspace:
           root: .
           paths:
-            - _ios_coverage
+            - coverage/ios_coverage.dat
 
       - store_test_results:
           path: _test_results
@@ -229,7 +223,7 @@ jobs:
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui|core|react", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel coverage --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -241,13 +235,35 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
+      - run:
+          name: Collect JS/JVM coverage
+          when: always
+          command: |
+            mkdir -p coverage
+            cp ./bazel-out/_coverage/_coverage_report.dat coverage/js_jvm_coverage.dat
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage/js_jvm_coverage.dat
+
       - store_test_results:
           path: _test_results
+
+  upload_coverage:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - codecov/upload:
+          files: coverage/ios_coverage.dat,coverage/js_jvm_coverage.dat
 
   android_test:
     executor: android
     steps:
-      - checkout
+      - checkout:
+          method: full
 
       - attach_workspace:
           at: ~/player
@@ -260,40 +276,8 @@ jobs:
             sudo mkdir /opt/bazelisk-v1.11.0 && \
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
-      
-      - run: |
-          echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "common --remote_upload_local_results" >> .bazelrc.local
 
-      - run:
-          name: Install Android tools
-          command: |
-            rm -rf $ANDROID_HOME/build-tools/*
-            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
-              "ndk;23.2.8568313" \
-              "system-images;android-33;default;x86_64"
-            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
-            source $BASH_ENV
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
-             source $BASH_ENV
-
-      - run:
-          name: Launch emulator
-          command: |
-            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          background: true
-
-      - run:
-          name: Wait for emulator to start
-          command: |
-            circle-android wait-for-boot
-
-      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
-
-      - run: bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
+      - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -311,41 +295,13 @@ jobs:
       - store_artifacts:
           path: screenshots
 
-  coverage:
+  bundle_analyze:
     executor: base
     steps:
       - attach_workspace:
           at: ~/player
 
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-
-      # union the bundle targets until //... doesnt explode analyzing jvm/android targets
-      - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
-
-      - run:
-          when: always
-          command: |
-            RESULTS_DIR=_test_results
-            find -L ./bazel-testlogs -name test.xml | while read line
-            do
-              mkdir -p $RESULTS_DIR/$(dirname $line)
-              cp $line $RESULTS_DIR/$(dirname $line)
-            done
-
-      - store_test_results:
-          path: _test_results
-
-      - codecov/upload:
-          file: ./bazel-out/_coverage/_coverage_report.dat
-
-      - codecov/upload:
-          file: _ios_coverage/lcov/_coverage_report.dat
+      - run: ./scripts/bundle-analyze.sh
 
   maybe_release:
     executor: base
@@ -358,12 +314,69 @@ jobs:
           steps:
             - auto_shipit
 
+  build_and_deploy_docs_preview:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - setup_auth
+      - run:
+          name: Check if docs should run
+          command: |
+            # Skip docs for release-main branches (placeholder PRs)
+            if [[ "$CIRCLE_BRANCH" =~ ^release-main ]]; then
+              echo "Skipping docs for release-main branch"
+              exit 0
+            fi
+
+            # Check if docs should build and deploy
+            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
+              echo "Docs build/deploy will proceed"
+            else
+              echo "Skipping docs - not requested"
+              circleci-agent step halt
+            fi
+
+      - run:
+          name: Build docs
+          command: |
+            echo "Building docs for << pipeline.parameters.GHA_Action >>"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
+
+      - run:
+          name: Deploy preview docs
+          command: |
+            echo "Deploying PR preview docs (next/release docs handled by release-docs.js script)"
+            ./scripts/docs/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
+
+  build_docs:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - run:
+          name: Build docs
+          command: |
+            echo "Building docs for release"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
+
   release:
     executor: base
     steps:
       - attach_workspace:
           at: ~/player
       - auto_shipit
+
+  bench_js:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: |
+          bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
 workflows:
   build_and_test_pr:
@@ -386,6 +399,14 @@ workflows:
           requires:
             - setup
 
+      - bazelrc_fork:
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+
       - build:
           name: build-trunk
           filters:
@@ -403,8 +424,9 @@ workflows:
                 - /pull\/.*/
           requires:
             - setup
+            - bazelrc_fork
 
-      - build_ios:
+      - build_and_test_ios:
           name: build-ios-trunk
           filters:
             branches:
@@ -414,7 +436,7 @@ workflows:
             - bazelrc
             - build-trunk
 
-      - build_ios:
+      - build_and_test_ios:
           name: build-ios-fork
           filters:
             branches:
@@ -422,6 +444,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-fork
+            - bazelrc_fork
 
       - maybe_release:
           filters:
@@ -431,8 +454,9 @@ workflows:
           context:
             - Publish
           requires:
-            - build-trunk
+            - test-trunk
             - build-ios-trunk
+            - android-test-trunk
 
       - test:
           name: test-trunk
@@ -474,25 +498,63 @@ workflows:
           requires:
             - build-fork
 
-      - coverage:
-          name: coverage-trunk
+      - upload_coverage:
+          name: upload-coverage-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - test-trunk
+            - build-ios-trunk
+
+      - upload_coverage:
+          name: upload-coverage-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - test-fork
+            - build-ios-fork
+
+      - bundle_analyze:
+          name: bundle-analyze-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - test-trunk
+
+      - bench_js:
+          name: js-benchmark-tests-trunk
           filters:
             branches:
               ignore:
                 - /pull\/.*/
           requires:
             - build-trunk
-            - build-ios-trunk
 
-      - coverage:
-          name: coverage-fork
+      - bench_js:
+          name: js-benchmark-tests-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
           requires:
             - build-fork
-            - build-ios-fork
+
+      - build_and_deploy_docs_preview:
+          name: preview-docs-trunk
+          context:
+            - Publish
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - test-trunk
 
   build_and_test_main:
     when:
@@ -504,7 +566,6 @@ workflows:
               only:
                 - main
                 - /version-.*/
-    
       - bazelrc:
           context:
             - Build
@@ -515,7 +576,7 @@ workflows:
           requires:
             - bazelrc
 
-      - build_ios:
+      - build_and_test_ios:
           requires:
             - build
 
@@ -525,18 +586,35 @@ workflows:
           requires:
             - build
 
-      - coverage:
+      - test:
           requires:
             - build
-            - build_ios
+            - build_and_test_ios
+
+      - upload_coverage:
+          requires:
+            - test
+
+      - bundle_analyze:
+          name: bundle-analyze
+          requires:
+            - test
+
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - test
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - coverage
-            - build_ios
+            - test
+            - bundle-analyze
+            - build_and_test_ios
+            - build_docs
 
   full_release:
     when:
@@ -554,7 +632,7 @@ workflows:
           requires:
             - setup
 
-      - build_ios:
+      - build_and_test_ios:
           requires:
             - bazelrc
 
@@ -564,14 +642,31 @@ workflows:
           requires:
             - build
 
-      - coverage:
+      - test:
           requires:
             - build
+
+      - upload_coverage:
+          requires:
+            - test
+
+      - bundle_analyze:
+          name: bundle-analyze
+          requires:
+            - test
+
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - test
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - coverage
-            - build_ios
+            - test
+            - bundle_analyze
+            - build_and_test_ios
+            - build_docs

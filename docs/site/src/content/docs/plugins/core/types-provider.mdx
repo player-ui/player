@@ -3,6 +3,7 @@ title: Types Provider
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 Similar to the [Expression Plugin](/plugins/core/expression), this plugin adds support for easily exposing new `DataTypes`, `formats`, and `validations` to Player's content.
 
@@ -75,13 +76,7 @@ Given a data-type reference to `CustomType` in the content, your new validation 
 
 The swift `TypesProviderPlugin` enables adding custom data types, formatters and validation purely through swift code. While in general, the recommendation would be to share a single JavaScript implementation to multiple platforms, some use cases may need a native integration.
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/TypesProviderPlugin'
-```
+<PodAndPackage product="TypesProviderPlugin" />
 
 ### Swift Usage
 

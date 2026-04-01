@@ -20,7 +20,7 @@ jobs:
           git commit --allow-empty -m "Release ${GITHUB_REF##*/}"
           echo "SOURCE_RELEASE_BRANCH=release-${GITHUB_REF##*/}" >> $GITHUB_ENV
           git push origin release-${GITHUB_REF##*/}
-          
+
       - name: create-pr
         id: open-pr
         uses: repo-sync/pull-request@v2.9
@@ -35,5 +35,5 @@ jobs:
       - name: Merge release PR
         uses: sudo-bot/action-pull-request-merge@v1.1.1
         with:
-            github-token: ${{ secrets.GH_TOKEN }}
-            number: ${{ steps.open-pr.outputs.pr_number }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          number: ${{ steps.open-pr.outputs.pr_number }}

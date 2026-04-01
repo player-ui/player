@@ -2,11 +2,12 @@ import { Builder } from "@player-ui/player";
 import type { AsyncTransformFunc } from "./types";
 
 /**
+ * @deprecated Use {@link createAsyncTransform} to create your before transform function.
  * Util function to generate transform function for async asset
  * @param asset - async asset to apply beforeResolve transform
- * @param transformedAssetType: transformed asset type for rendering
  * @param wrapperAssetType: container asset type
  * @param flatten: flatten the streamed in content
+ * @param path: property path to add the multinode containing the next async node to
  * @returns - wrapper asset with children of transformed asset and async node
  */
 
@@ -15,10 +16,12 @@ export const asyncTransform: AsyncTransformFunc = (
   wrapperAssetType,
   asset,
   flatten,
+  path = ["values"],
 ) => {
   const id = "async-" + assetId;
 
   const asyncNode = Builder.asyncNode(id, flatten);
+
   let multiNode;
   let assetNode;
 
@@ -34,7 +37,7 @@ export const asyncTransform: AsyncTransformFunc = (
     type: wrapperAssetType,
   });
 
-  Builder.addChild(wrapperAsset, ["values"], multiNode);
+  Builder.addChild(wrapperAsset, path, multiNode);
 
   return wrapperAsset;
 };

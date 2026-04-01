@@ -12,7 +12,9 @@ import kotlinx.serialization.builtins.nullable
 
 /** Limited definition of a stateful view instance from a flow */
 @Serializable(with = Serializer::class)
-public class View internal constructor(override val node: Node) : NodeWrapper {
+public class View internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     public val hooks: ViewHooks by NodeSerializableField(ViewHooks.serializer())
 
     public val initialView: Asset? by NodeSerializableField(Asset.serializer().nullable)

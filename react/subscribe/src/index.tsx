@@ -1,4 +1,5 @@
 import React from "react";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 
 export type SubscribeID = number;
 
@@ -102,7 +103,7 @@ export class Subscribe<T> {
   /**
    * Remove any updates from the given listener
    */
-  remove(id: SubscribeID) {
+  remove(id: SubscribeID): void {
     this.callbacks.delete(id);
   }
 
@@ -110,7 +111,7 @@ export class Subscribe<T> {
    * Reset the state of the listener
    * Passing in a promise will defer resetting the view until the promise is resolved
    */
-  async reset(promise?: Promise<void>) {
+  async reset(promise?: Promise<void>): Promise<void> {
     if (promise) {
       this.resetDeferred = deferred<void>();
       await promise;
@@ -156,22 +157,40 @@ export interface SubscribedStateHookOptions {
 
 /** Subscribe to a state change event in a react component */
 export function useSubscribedState<T>(subscriber: Subscribe<T>): T | undefined {
-  const [state, setState] = React.useState<T | undefined>(subscriber.get());
+  const subscription = React.useMemo(() => {
+    function subscribe(callback: (val?: T) => void) {
+      const id = subscriber.add(
+        (resp) => {
+          callback(resp);
+        },
+        {
+          initializeWithPreviousValue: true,
+        },
+      );
 
-  React.useEffect(() => {
-    const id = subscriber.add(
-      (resp) => {
-        setState(resp);
-      },
-      {
-        initializeWithPreviousValue: true,
-      },
-    );
+      return () => {
+        if (subscriber) {
+          subscriber.remove(id);
+        }
+      };
+    }
 
-    return () => {
-      subscriber.remove(id);
-    };
+    return subscribe;
   }, [subscriber]);
+
+  function getSnapshot() {
+    try {
+      return subscriber.get();
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  const state = useSyncExternalStore(
+    subscription,
+    getSnapshot,
+    () => undefined,
+  );
 
   return state;
 }

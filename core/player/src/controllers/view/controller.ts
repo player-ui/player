@@ -4,14 +4,24 @@ import { Registry } from "@player-ui/partial-match-registry";
 import type { View, NavigationFlowViewState } from "@player-ui/types";
 
 import { resolveDataRefsInString } from "../../string-resolver";
-import type { Resolve } from "../../view";
-import { ViewInstance } from "../../view";
+import type { Resolve, ViewPlugin } from "../../view";
+import {
+  ApplicabilityPlugin,
+  AssetPlugin,
+  AssetTransformCorePlugin,
+  MultiNodePlugin,
+  StringResolverPlugin,
+  SwitchPlugin,
+  TemplatePlugin,
+  toNodeResolveOptions,
+  ViewInstance,
+} from "../../view";
 import type { Logger } from "../../logger";
 import type { FlowInstance, FlowController } from "../flow";
 import type { DataController } from "../data/controller";
-import { AssetTransformCorePlugin } from "./asset-transform";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
+import type { Node } from "../../view";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -24,16 +34,26 @@ export interface ViewControllerOptions {
   flowController: FlowController;
 }
 
+export type ViewControllerHooks = {
+  /** Do any processing before the `View` instance is created */
+  resolveView: SyncWaterfallHook<
+    [View | undefined, string, NavigationFlowViewState]
+  >;
+
+  /** The hook right before the View starts resolving. Attach anything custom here */
+  view: SyncHook<[ViewInstance]>;
+};
+
+/** Merge two optional sets into a new set. Returns an empty set if both are undefined. */
+const mergeSets = <T>(setA?: Set<T>, setB?: Set<T>): Set<T> => {
+  return new Set<T>([...(setA?.values() ?? []), ...(setB?.values() ?? [])]);
+};
+
 /** A controller to manage updating/switching views */
 export class ViewController {
-  public readonly hooks = {
-    /** Do any processing before the `View` instance is created */
-    resolveView: new SyncWaterfallHook<
-      [View | undefined, string, NavigationFlowViewState]
-    >(),
-
-    // The hook right before the View starts resolving. Attach anything custom here
-    view: new SyncHook<[ViewInstance]>(),
+  public readonly hooks: ViewControllerHooks = {
+    resolveView: new SyncWaterfallHook(),
+    view: new SyncHook(),
   };
 
   private readonly viewMap: Record<string, View>;
@@ -41,9 +61,12 @@ export class ViewController {
   private pendingUpdate?: {
     /** pending data binding changes */
     changedBindings?: Set<BindingInstance>;
+    /** pending changes to view nodes */
+    changedNodes?: Set<Node.Node>;
     /** Whether we have a microtask queued to handle this pending update */
     scheduled?: boolean;
   };
+  private readonly viewPlugins: Array<ViewPlugin>;
 
   public currentView?: ViewInstance;
   public transformRegistry: TransformRegistry = new Registry();
@@ -56,14 +79,11 @@ export class ViewController {
     this.viewOptions = options;
     this.viewMap = initialViews.reduce<Record<string, View>>(
       (viewMap, view) => {
-        // eslint-disable-next-line no-param-reassign
         viewMap[view.id] = view;
         return viewMap;
       },
       {},
     );
-
-    new AssetTransformCorePlugin(this.transformRegistry).apply(this);
 
     options.flowController.hooks.flow.tap(
       "viewController",
@@ -82,7 +102,7 @@ export class ViewController {
     const update = (updates: Set<BindingInstance>, silent = false) => {
       if (this.currentView) {
         if (this.optimizeUpdates) {
-          this.queueUpdate(updates, silent);
+          this.queueUpdate(updates, undefined, silent);
         } else {
           this.currentView.update();
         }
@@ -110,27 +130,35 @@ export class ViewController {
         update(new Set([binding]));
       }
     });
+
+    this.viewPlugins = this.createViewPlugins();
   }
 
-  private queueUpdate(bindings: Set<BindingInstance>, silent = false) {
-    if (this.pendingUpdate?.changedBindings) {
-      // If there's already a pending update, just add to it don't worry about silent updates here yet
-      this.pendingUpdate.changedBindings = new Set([
-        ...this.pendingUpdate.changedBindings,
-        ...bindings,
-      ]);
-    } else {
-      this.pendingUpdate = { changedBindings: bindings, scheduled: false };
+  private queueUpdate(
+    bindings?: Set<BindingInstance>,
+    nodes?: Set<Node.Node>,
+    silent = false,
+  ) {
+    if (!this.pendingUpdate) {
+      this.pendingUpdate = {
+        scheduled: false,
+      };
     }
+
+    this.pendingUpdate = {
+      ...this.pendingUpdate,
+      changedBindings: mergeSets(this.pendingUpdate.changedBindings, bindings),
+      changedNodes: mergeSets(this.pendingUpdate.changedNodes, nodes),
+    };
 
     // If there's no pending update, schedule one only if this one isn't silent
     // otherwise if this is silent, we'll just wait for the next non-silent update and make sure our bindings are included
     if (!this.pendingUpdate.scheduled && !silent) {
       this.pendingUpdate.scheduled = true;
       queueMicrotask(() => {
-        const updates = this.pendingUpdate?.changedBindings;
+        const { changedBindings, changedNodes } = this.pendingUpdate ?? {};
         this.pendingUpdate = undefined;
-        this.currentView?.update(updates);
+        this.currentView?.update(changedBindings, changedNodes);
       });
     }
   }
@@ -156,7 +184,7 @@ export class ViewController {
     }
   }
 
-  public onView(state: NavigationFlowViewState) {
+  public onView(state: NavigationFlowViewState): void {
     const viewId = state.ref;
 
     const source = this.hooks.resolveView.call(
@@ -174,7 +202,35 @@ export class ViewController {
 
     // Give people a chance to attach their
     // own listeners to the view before we resolve it
+    this.applyViewPlugins(view);
     this.hooks.view.call(view);
     view.update();
+  }
+
+  private applyViewPlugins(view: ViewInstance): void {
+    for (const plugin of this.viewPlugins) {
+      plugin.apply(view);
+    }
+  }
+
+  private createViewPlugins(): Array<ViewPlugin> {
+    const pluginOptions = toNodeResolveOptions(this.viewOptions);
+    return [
+      new AssetPlugin(),
+      new SwitchPlugin(pluginOptions),
+      new ApplicabilityPlugin(),
+      new AssetTransformCorePlugin(this.transformRegistry),
+      new StringResolverPlugin(),
+      new TemplatePlugin(pluginOptions),
+      new MultiNodePlugin(),
+    ];
+  }
+
+  /** Marks all AST nodes in `nodes` as changed, triggering the view to update and re-resolve these nodes. View updates are triggered asynchronously and many calls to this in a short time will batch into a single update.
+   *
+   * NOTE: In most cases view updates are handled automatically by changes to data or any other built-in functionality that would require a view update. Only call this function if absolutely necessary.
+   */
+  public updateViewAST(nodes: Set<Node.Node>): void {
+    this.queueUpdate(undefined, nodes);
   }
 }

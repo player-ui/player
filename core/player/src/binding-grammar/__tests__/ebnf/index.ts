@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { Grammars } from "ebnf";
 import type {
   Parser,

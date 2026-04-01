@@ -335,7 +335,7 @@ static let imageBasic: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png"
       }
     }
   ],
@@ -367,7 +367,7 @@ static let imageWithAccessibility: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png",
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png",
         "accessibility": "This is accessibility text for an image"
       },
       "placeholder": "This is placeholder text for an image"
@@ -401,7 +401,7 @@ static let imageWithCaption: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png"
       },
       "caption": {
         "asset": {
@@ -440,7 +440,7 @@ static let imageWithPlaceholder: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png"
       },
       "placeholder": "This is placeholder text for an image"
     }
@@ -1436,6 +1436,133 @@ static let chatMessageBasic: String = """
 
     """
 
+    static let chatUi: String = """
+{
+  "id": "chat-ui",
+  "data": {
+    "content": ""
+  },
+  "views": [
+    {
+      "id": "root",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "chat-demo",
+            "type": "chat-message",
+            "value": {
+              "asset": {
+                "id": "values-0-value",
+                "type": "text",
+                "value": "Start chatting now!"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "input",
+            "type": "input",
+            "binding": "content"
+          }
+        },
+        {
+          "asset": {
+            "id": "values-2",
+            "type": "action",
+            "exp": "send({{content}})",
+            "label": {
+              "asset": {
+                "id": "values-2-label",
+                "type": "text",
+                "value": " Send "
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "root",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}
+"""
+
+    static let endStateReproFlow: String = """
+{
+  "id": "end-state-repro-flow-1",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "title",
+          "type": "text",
+          "value": "Flow 1 - Click End to complete this flow"
+        }
+      },
+      "values": [
+        {
+          "asset": {
+            "id": "action-end",
+            "type": "action",
+            "value": "End",
+            "label": {
+              "asset": {
+                "id": "action-end-label",
+                "type": "text",
+                "value": "End Flow 1 (loads Flow 2 next)"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "ACTION_1",
+      "ACTION_1": {
+        "state_type": "ACTION",
+        "exp": "{{foo}} = 1",
+        "transitions": {
+          "*": "VIEW_1"
+        }
+      },
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "End": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+
     public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),
@@ -1469,6 +1596,7 @@ static let chatMessageBasic: String = """
         ]),
         (title: "chat message", flows: [
             (name: "basic", flow: MockFlows.chatMessageBasic),
+            (name: "chat-ui", flow: MockFlows.chatUi),
         ])
     ]
 

@@ -12,6 +12,30 @@ import SwiftUI
 import PlayerUI
 #endif
 
+public enum AssetRenderError: Error {
+    // Thrown when the asset fails to decode its data from the JS runtime into its swift data type
+    case decodingFailure(innerError: Error, asset: AssetData? = nil, pathToAsset: [AssetData])
+}
+
+extension AssetRenderError: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        switch self {
+        case .decodingFailure(let innerError, let asset, let pathToAsset):
+            return """
+An error occured while decoding an asset.
+Caused by: \(innerError.playerDescription)
+Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?.type ?? "UNKNOWN")'\(pathToAsset.map({ "\n\tFound in (id: '\($0.id)', type: '\($0.type)')" }).joined())
+"""
+        }
+    }
+}
+
+struct MinimumAssetData: AssetData {
+    public var id: String
+    public var type: String
+}
+
+
 /**
  A ViewModel that contains decoded AssetData for an Asset
  */
@@ -60,35 +84,51 @@ open class ControlledAsset<DataType: AssetData, ModelType>: SwiftUIAsset where M
         - from: The decoder to decode from
      */
     public required init(from decoder: Decoder) throws {
-        let data = try decoder.singleValueContainer().decode(DataType.self)
-
-        // When we have a plain old AssetViewModel, not a subclass with custom
-        // properties, we want to bypass the model cache altogether.
-        //
-        // This is because the decode process can mutate reference types in the
-        // cache without properly publishing the changes to SwiftUI (meaning
-        // missed view updates).
-        //
-        // Eliminating the model cache altogether would be ideal but doing so
-        // leads to bugs where state stored by custom view models @Published
-        // properties is lost. On iOS 14+ this can be avoided by using
-        // @StateObject without a model cache - something to revisit...
-        //
-        let needsModelCache = (ModelType.self != AssetViewModel<DataType>.self)
-        let modelCache = needsModelCache ? try decoder.getModelCache() : nil
-        if let model: ModelType = modelCache?.entry(forKey: data.id, codingPath: decoder.codingPath) {
-            // we can't safely take advantage of AssetData.isEqual here because
-            // the process of decoding can alter the contents of previously
-            // cached model data (because AssetData can contain reference types)
-            self.model = model
-            decoder.logger?.t("Updating model for \(data.id)")
-            model.data = data
-            model.userInfo = decoder.userInfo
-        } else {
-            self.model = ModelType(data, userInfo: decoder.userInfo)
-            decoder.logger?.t("Creating model for \(data.id)")
-            modelCache?.set(model, forKey: data.id, codingPath: decoder.codingPath)
+        do {
+            let data = try decoder.singleValueContainer().decode(DataType.self)
+            
+            // When we have a plain old AssetViewModel, not a subclass with custom
+            // properties, we want to bypass the model cache altogether.
+            //
+            // This is because the decode process can mutate reference types in the
+            // cache without properly publishing the changes to SwiftUI (meaning
+            // missed view updates).
+            //
+            // Eliminating the model cache altogether would be ideal but doing so
+            // leads to bugs where state stored by custom view models @Published
+            // properties is lost. On iOS 14+ this can be avoided by using
+            // @StateObject without a model cache - something to revisit...
+            //
+            let needsModelCache = (ModelType.self != AssetViewModel<DataType>.self)
+            let modelCache = needsModelCache ? try decoder.getModelCache() : nil
+            if let model: ModelType = modelCache?.entry(forKey: data.id, codingPath: decoder.codingPath) {
+                // we can't safely take advantage of AssetData.isEqual here because
+                // the process of decoding can alter the contents of previously
+                // cached model data (because AssetData can contain reference types)
+                self.model = model
+                decoder.logger?.t("Updating model for \(data.id)")
+                model.data = data
+                model.userInfo = decoder.userInfo
+            } else {
+                self.model = ModelType(data, userInfo: decoder.userInfo)
+                decoder.logger?.t("Creating model for \(data.id)")
+                modelCache?.set(model, forKey: data.id, codingPath: decoder.codingPath)
+            }
+            
+            try super.init(from: decoder)
         }
-        try super.init(from: decoder)
+        catch AssetRenderError.decodingFailure(let innerError, let asset, let pathToAsset) {
+            let basicData = try? decoder.singleValueContainer().decode(MinimumAssetData.self)
+            var newPath = pathToAsset
+            if let basicData {
+                newPath = pathToAsset + [basicData]
+            }
+            throw AssetRenderError.decodingFailure(innerError: innerError, asset: asset, pathToAsset: newPath)
+            
+        }
+        catch {
+            let basicData = try? decoder.singleValueContainer().decode(MinimumAssetData.self)
+            throw AssetRenderError.decodingFailure(innerError: error, asset: basicData, pathToAsset: [])
+        }
     }
 }

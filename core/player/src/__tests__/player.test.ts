@@ -543,7 +543,7 @@ describe("failure cases", () => {
     );
   });
 
-  it("fails gracefully when states after an ACTION state have failures", async () => {
+  it("fails gracefully when states after an ACTION state have failures (sync)", async () => {
     const player = new Player();
 
     const payload = {
@@ -581,6 +581,56 @@ describe("failure cases", () => {
     );
   });
 
+  it("fails gracefully when states after an ACTION state have failures (async)", async () => {
+    const player = new Player();
+
+    player.hooks.expressionEvaluator.tap("test", (expEval) => {
+      expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(name);
+          }, 1);
+        });
+      });
+    });
+
+    const payload = {
+      id: "test",
+      views: [
+        {
+          id: "view",
+          type: "text",
+          value: "Some text",
+        },
+      ],
+      data: {},
+      navigation: {
+        BEGIN: "Flow",
+        Flow: {
+          startState: "ActionState",
+          ActionState: {
+            state_type: "ASYNC_ACTION",
+            exp: "await(testAsync('test'))",
+            transitions: {
+              test: "ViewState",
+            },
+            await: true,
+          },
+          ViewState: {
+            state_type: "VIEW",
+            ref: "non-existing-view-async",
+          },
+        },
+      },
+    };
+
+    const response = player.start(makeFlow(payload));
+
+    await expect(response).rejects.toThrowError(
+      "No view with id non-existing-view-async",
+    );
+  });
+
   it("can be failed from other places", async () => {
     const player = new Player();
 
@@ -593,5 +643,82 @@ describe("failure cases", () => {
     state.fail(new Error("Custom Error"));
 
     await expect(response).rejects.toThrowError("Custom Error");
+  });
+});
+
+test("it applies default-view-plugins first", () => {
+  let taps: Array<{ [key: string]: any; name: string }> = [];
+  class TestPlugin {
+    name = "test-plugin";
+
+    apply(player: Player) {
+      player.hooks.view.tap(this.name, (view) => {
+        view.hooks.resolver.tap(this.name, () => {
+          return;
+        });
+        // @ts-expect-error private property
+        taps = view.hooks.resolver!.taps;
+      });
+    }
+  }
+  const player = new Player({ plugins: [new TestPlugin()] });
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  const tapsByName = taps.map((tap) => tap!.name);
+  expect(tapsByName.pop()).toBe("test-plugin");
+});
+
+test("allows custom plugin to move before default", () => {
+  let taps: Array<{ [key: string]: any; name: string }> = [];
+  class TestPlugin {
+    name = "test-plugin";
+
+    apply(player: Player) {
+      player.hooks.view.tap(this.name, (view) => {
+        view.hooks.resolver.tap(
+          { name: this.name, before: "applicability" },
+          () => {
+            return;
+          },
+        );
+        // @ts-expect-error private property
+        taps = view.hooks.resolver!.taps;
+      });
+    }
+  }
+  const player = new Player({ plugins: [new TestPlugin()] });
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  const tapsByName = taps.map((tap) => tap!.name);
+  expect(tapsByName.indexOf("test-plugin")).toBeLessThan(
+    tapsByName.indexOf("applicability"),
+  );
+});
+
+test("view trigger once when moving between views", async () => {
+  const viewTap = vitest.fn();
+  class TestPlugin {
+    name = "test-plugin";
+
+    apply(player: Player) {
+      player.hooks.view.tap(this.name, viewTap);
+    }
+  }
+  const player = new Player({ plugins: [new TestPlugin()] });
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  await vitest.waitFor(() => {
+    expect(viewTap).toHaveBeenCalledOnce();
+  });
+
+  viewTap.mockClear();
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  await vitest.waitFor(() => {
+    expect(viewTap).toHaveBeenCalledOnce();
   });
 });

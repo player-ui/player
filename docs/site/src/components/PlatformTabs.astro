@@ -3,7 +3,7 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 const slotNames = ["core", "react", "android", "ios"];
 const populatedSlots = Object.fromEntries(
-  slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)])
+  slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)]),
 );
 ---
 
@@ -14,10 +14,10 @@ const populatedSlots = Object.fromEntries(
   }
 </style>
 
-<Tabs syncKey="platform-type">
+<Tabs syncKey="lang-type">
   {
     populatedSlots["core"] && (
-      <TabItem label="Core" icon="seti:javascript">
+      <TabItem label="Core" icon="seti:javascript" data-lang="core">
         <div class="card">
           <slot name="core" />
         </div>
@@ -26,7 +26,7 @@ const populatedSlots = Object.fromEntries(
   }
   {
     populatedSlots["react"] && (
-      <TabItem label="React" icon="seti:react">
+      <TabItem label="React" icon="seti:react" data-lang="react">
         <div class="card">
           <slot name="react" />
         </div>
@@ -35,7 +35,7 @@ const populatedSlots = Object.fromEntries(
   }
   {
     populatedSlots["android"] && (
-      <TabItem label="Android" icon="linux">
+      <TabItem label="Android" icon="linux" data-lang="android">
         <div class="card">
           <slot name="android" />
         </div>
@@ -44,7 +44,7 @@ const populatedSlots = Object.fromEntries(
   }
   {
     populatedSlots["ios"] && (
-      <TabItem label="iOS" icon="apple">
+      <TabItem label="iOS" icon="apple" data-lang="ios">
         <div class="card">
           <slot name="ios" />
         </div>
@@ -52,3 +52,45 @@ const populatedSlots = Object.fromEntries(
     )
   }
 </Tabs>
+
+<script>
+  function updateURLParam(lang: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", lang);
+    window.history.pushState({}, "", url);
+  }
+
+  function updateTabSelectionFromURL() {
+    const url = new URL(window.location.href);
+    const lang = url.searchParams.get("lang")?.toLowerCase();
+    if (lang) {
+      const tabs = document.querySelectorAll('a[role="tab"]');
+      tabs.forEach((tab) => {
+        if (tab.textContent?.trim().toLowerCase() === lang) {
+          (tab as HTMLButtonElement).click();
+        }
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateTabSelectionFromURL();
+
+    // Listen for URL changes and update which tab is selected
+    window.addEventListener("popstate", updateTabSelectionFromURL);
+
+    // Attach event listeners to all tab containers
+    const tabsContainers = document.querySelectorAll('[role="tablist"]');
+    tabsContainers.forEach((tabsContainer) => {
+      tabsContainer.addEventListener("click", (event) => {
+        const target = (event.target as HTMLElement)?.closest('a[role="tab"]');
+        if (target) {
+          const lang = target.textContent?.trim().toLowerCase();
+          if (lang) {
+            updateURLParam(lang);
+          }
+        }
+      });
+    });
+  });
+</script>

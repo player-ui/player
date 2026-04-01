@@ -1,12 +1,13 @@
 import { setIn } from "timm";
 import deferred from "p-defer";
-import type { Flow as FlowType, FlowResult } from "@player-ui/types";
+import type { Flow, FlowResult } from "@player-ui/types";
+import queueMicrotask from "queue-microtask";
 
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
 import { TapableLogger } from "./logger";
 import type { ExpressionType } from "./expressions";
-import { ExpressionEvaluator } from "./expressions";
+import { ExpressionEvaluator, isPromiseLike } from "./expressions";
 import { SchemaController } from "./schema";
 import { BindingParser } from "./binding";
 import type { ViewInstance } from "./view";
@@ -26,13 +27,25 @@ import type {
   InProgressState,
   CompletedState,
   ErrorState,
+  PlayerHooks,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
-import { DefaultViewPlugin } from "./plugins/default-view-plugin";
 
-// Variables injected at build time
-const PLAYER_VERSION = "__VERSION__";
-const COMMIT = "__GIT_COMMIT__";
+/**
+Variables injected at build time
+*/
+declare global {
+  const __VERSION__: string;
+  const __GIT_COMMIT__: string;
+}
+
+// Version of Player at buildtime
+const PLAYER_VERSION: string =
+  typeof __VERSION__ !== "undefined" ? __VERSION__ : "unknown";
+
+// HEAD commit used to build Player
+const COMMIT: string =
+  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "unknown";
 
 export interface PlayerPlugin {
   /**
@@ -60,6 +73,10 @@ export interface ExtendedPlayerPlugin<
   Expressions = void,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   DataTypes = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Formatters = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Validators = void,
 > {}
 
 export interface PlayerConfigOptions {
@@ -72,10 +89,10 @@ export interface PlayerConfigOptions {
 
 export interface PlayerInfo {
   /** Version of the running player */
-  version: string;
+  version: typeof PLAYER_VERSION;
 
   /** Hash of the HEAD commit used to build the current version */
-  commit: string;
+  commit: typeof COMMIT;
 }
 
 /**
@@ -87,46 +104,25 @@ export class Player {
     commit: COMMIT,
   };
 
-  public readonly logger = new TapableLogger();
-  public readonly constantsController = new ConstantsController();
+  public readonly logger: TapableLogger = new TapableLogger();
+  public readonly constantsController: ConstantsController =
+    new ConstantsController();
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
-  public readonly hooks = {
-    /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
+  public readonly hooks: PlayerHooks = {
     flowController: new SyncHook<[FlowController]>(),
-
-    /** The hook that updates/handles views */
     viewController: new SyncHook<[ViewController]>(),
-
-    /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
     view: new SyncHook<[ViewInstance]>(),
-
-    /** Called when an expression evaluator was created */
     expressionEvaluator: new SyncHook<[ExpressionEvaluator]>(),
-
-    /** The hook that creates and manages data */
     dataController: new SyncHook<[DataController]>(),
-
-    /** Called after the schema is created for a flow */
     schema: new SyncHook<[SchemaController]>(),
-
-    /** Manages validations (schema and x-field ) */
     validationController: new SyncHook<[ValidationController]>(),
-
-    /** Manages parsing binding */
     bindingParser: new SyncHook<[BindingParser]>(),
-
-    /** A that's called for state changes in the flow execution */
     state: new SyncHook<[PlayerFlowState]>(),
-
-    /** A hook to access the current flow */
-    onStart: new SyncHook<[FlowType]>(),
-
-    /** A hook for when the flow ends either in success or failure */
+    onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
-    /** Mutate the Content flow before starting */
-    resolveFlowContent: new SyncWaterfallHook<[FlowType]>(),
+    resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -137,7 +133,6 @@ export class Player {
     this.config = config || {};
     this.config.plugins = [
       new DefaultExpPlugin(),
-      new DefaultViewPlugin(),
       ...(this.config.plugins || []),
       new FlowExpPlugin(),
     ];
@@ -171,7 +166,7 @@ export class Player {
   }
 
   /** Register and apply [Plugin] if one with the same symbol is not already registered. */
-  public registerPlugin(plugin: PlayerPlugin) {
+  public registerPlugin(plugin: PlayerPlugin): void {
     plugin.apply(this);
     this.config.plugins?.push(plugin);
   }
@@ -205,7 +200,7 @@ export class Player {
   }
 
   /** Start Player with the given flow */
-  private setupFlow(userContent: FlowType): {
+  private setupFlow(userContent: Flow): {
     /** a callback to _actually_ start the flow */
     start: () => void;
 
@@ -368,13 +363,46 @@ export class Player {
         }
       });
 
-      flow.hooks.afterTransition.tap("player", (flowInstance) => {
+      // Tap for action states
+      flow.hooks.afterTransition.tap("player-action-states", (flowInstance) => {
         const value = flowInstance.currentState?.value;
-        if (value && value.state_type === "ACTION") {
+        if (value && value.state_type === "ASYNC_ACTION") {
           const { exp } = value;
-          flowController?.transition(
-            String(expressionEvaluator?.evaluate(exp)),
-          );
+          // defer async execution to next tick to allow transition to settle
+          try {
+            const result = expressionEvaluator.evaluateAsync(exp);
+            if (isPromiseLike(result)) {
+              if (value.await) {
+                queueMicrotask(() => {
+                  result
+                    .then((r) => flowController?.transition(String(r)))
+                    .catch(flowResultDeferred.reject);
+                });
+              } else {
+                this.logger.warn(
+                  "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
+                );
+                flowController?.transition(String(result));
+              }
+            } else {
+              this.logger.warn(
+                "Non async expression used in async action node",
+              );
+              flowController?.transition(String(result));
+            }
+          } catch (e) {
+            flowResultDeferred.reject(e);
+          }
+        } else if (value && value.state_type === "ACTION") {
+          // handle sync actions
+          const { exp } = value;
+          const result = expressionEvaluator.evaluate(exp);
+          if (isPromiseLike(result)) {
+            this.logger.warn(
+              "Async expression used as return value in in non-async context, transitioning with '*' value",
+            );
+          }
+          flowController?.transition(String(result));
         }
 
         expressionEvaluator.reset();
@@ -420,6 +448,7 @@ export class Player {
       },
       constants: this.constantsController,
     });
+
     viewController.hooks.view.tap("player", (view) => {
       validationController.onView(view);
       this.hooks.view.call(view);
@@ -465,7 +494,7 @@ export class Player {
     };
   }
 
-  public async start(payload: FlowType): Promise<CompletedState> {
+  public async start(payload: Flow): Promise<CompletedState> {
     const ref = Symbol(payload?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */

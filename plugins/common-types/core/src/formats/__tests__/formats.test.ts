@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-loss-of-precision */
 import { describe, it, expect } from "vitest";
 import { commaNumber, integer, date, currency, phone } from "..";
 

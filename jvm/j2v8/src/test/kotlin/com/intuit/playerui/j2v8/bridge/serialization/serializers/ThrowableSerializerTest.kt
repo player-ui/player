@@ -16,7 +16,6 @@ private inline fun currentStackTrace() = Exception().stackTrace
 
 // TODO: This should be a core [RuntimeTest]
 internal class ThrowableSerializerTest : J2V8Test() {
-
     @Test
     fun `JS Error is deserialized as PlayerException (using regex)`() {
         val error = format.v8.evaluateInJSThreadBlocking(runtime) {
@@ -62,10 +61,11 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
             assertEquals(true, error.get("serialized"))
             assertTrue(
-                format.encodeToRuntimeValue(
-                    SerializableStackTraceElement.serializer(),
-                    serializableStackTraceElement,
-                ).jsEquals(error.getArray("stackTrace").getObject(0)),
+                format
+                    .encodeToRuntimeValue(
+                        SerializableStackTraceElement.serializer(),
+                        serializableStackTraceElement,
+                    ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
         }
     }
@@ -123,10 +123,11 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
             assertEquals(true, error.get("serialized"))
             assertTrue(
-                format.encodeToRuntimeValue(
-                    SerializableStackTraceElement.serializer(),
-                    serializableStackTraceElement,
-                ).jsEquals(error.getArray("stackTrace").getObject(0)),
+                format
+                    .encodeToRuntimeValue(
+                        SerializableStackTraceElement.serializer(),
+                        serializableStackTraceElement,
+                    ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
 
             val cause = format.decodeFromV8Value<Throwable>(error.getObject("cause"))

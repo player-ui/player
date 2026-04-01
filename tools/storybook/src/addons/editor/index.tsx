@@ -1,8 +1,10 @@
-import React from "react";
-import { dequal } from "dequal";
 import Editor, { loader as monaco } from "@monaco-editor/react";
-import { Tabs, Placeholder } from "@storybook/components";
+import { dequal } from "dequal";
+import React from "react";
 import { useDispatch } from "react-redux";
+import { Placeholder, TabsView } from "storybook/internal/components";
+import type { TabProps } from "storybook/internal/components";
+import { API } from "storybook/manager-api";
 import type { CompilationErrorType } from "../../redux";
 import {
   setDSLEditorValue,
@@ -12,7 +14,6 @@ import {
   useJSONEditorValue,
 } from "../../redux";
 import { useDarkMode } from "../useDarkMode";
-import { API } from "@storybook/manager-api";
 
 if (typeof window !== "undefined") {
   monaco.init().then((m) => {
@@ -114,7 +115,9 @@ const CompileErrors = ({
       }}
     >
       <h3>Errors</h3>
-      {errors.compileErrors?.map((e) => <pre key={e.message}>{e.message}</pre>)}
+      {errors.compileErrors?.map((e) => (
+        <pre key={e.message}>{e.message}</pre>
+      ))}
       {errors.transpileErrors?.map((e) => (
         <pre key={e.message}>{e.message}</pre>
       ))}
@@ -142,7 +145,7 @@ const DSLEditorPanel = (props: EditorPanelProps) => {
   const [selected, setSelected] = React.useState("tsx");
 
   /** Handle editor updates */
-  const onChange = (val: string | undefined) => {
+  const onTsxEditorChange = (val: string | undefined) => {
     if (val) {
       dispatch(
         setDSLEditorValue({
@@ -152,60 +155,51 @@ const DSLEditorPanel = (props: EditorPanelProps) => {
     }
   };
 
-  return (
-    <div>
-      <Tabs
-        selected={selected}
-        actions={{
-          onSelect: (id) => {
-            setSelected(id);
-          },
-        }}
-      >
-        <div id="tsx" title="TSX" />
-        <div id="json" title="JSON (read-only)" />
-      </Tabs>
-      <div
-        style={{
-          height: "calc(100% - 60px)",
-        }}
-      >
-        {selected === "tsx" && (
-          <>
-            {compilationErrors && <CompileErrors errors={compilationErrors} />}
-            <Editor
-              theme={darkMode ? "vs-dark" : "light"}
-              value={editorValue}
-              language="typescript"
-              path="flow.tsx"
-              keepCurrentModel={true}
-              options={{
-                quickSuggestions: true,
-                suggestOnTriggerCharacters: true,
-                parameterHints: {
-                  enabled: true,
-                },
-              }}
-              onChange={(val) => {
-                onChange(val);
-              }}
-            />
-          </>
-        )}
-        {selected === "json" && (
+  const tabs: Array<TabProps> = [
+    {
+      id: "tsx",
+      title: "TSX",
+      children: (
+        <>
+          {compilationErrors && <CompileErrors errors={compilationErrors} />}
           <Editor
-            options={{
-              readOnly: true,
-            }}
             theme={darkMode ? "vs-dark" : "light"}
-            path="flow.json"
+            value={editorValue}
+            language="typescript"
+            path="flow.tsx"
             keepCurrentModel={true}
-            value={flow ? JSON.stringify(flow, null, 2) : "{}"}
-            language="json"
+            options={{
+              quickSuggestions: true,
+              suggestOnTriggerCharacters: true,
+              parameterHints: {
+                enabled: true,
+              },
+            }}
+            onChange={onTsxEditorChange}
           />
-        )}
-      </div>
-    </div>
+        </>
+      ),
+    },
+    {
+      id: "json",
+      title: "JSON (read-only)",
+      children: (
+        <Editor
+          options={{
+            readOnly: true,
+          }}
+          theme={darkMode ? "vs-dark" : "light"}
+          path="flow.json"
+          keepCurrentModel={true}
+          value={flow ? JSON.stringify(flow, null, 2) : "{}"}
+          language="json"
+        />
+      ),
+    },
+  ];
+
+  return (
+    <TabsView tabs={tabs} selected={selected} onSelectionChange={setSelected} />
   );
 };
 

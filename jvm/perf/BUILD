@@ -1,3 +1,4 @@
+load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//jvm:defs.bzl", "kt_player_module")
 
@@ -5,13 +6,14 @@ kt_player_module(
     name = "perf_tests",
     main_deps = ["//jvm/testutils"],
     main_srcs = ["src/main/kotlin/com/intuit/playerui/perf/junit/JSEngineTest.kt"],
+    test_deps = ["//jvm/testutils:with-runtimes"],
     test_package = "com.intuit.playerui.perf",
 )
 
 java_plugin(
     name = "jmh_annotation_processor",
     processor_class = "org.openjdk.jmh.generators.BenchmarkProcessor",
-    deps = ["@maven//:org_openjdk_jmh_jmh_generator_annprocess"],
+    deps = [artifact("org.openjdk.jmh:jmh-generator-annprocess")],
 )
 
 kt_jvm_library(
@@ -19,14 +21,14 @@ kt_jvm_library(
     srcs = ["src/main/kotlin/com/intuit/playerui/perf/jmh/PlayerPerf.kt"],
     kotlinc_opts = "//jvm:test_options",
     plugins = [":jmh_annotation_processor"],
-    resources = glob(["src/main/resources/*.json"]),
+    resources = glob(
+        ["src/main/resources/*.json"],
+        allow_empty = True,
+    ),
     deps = [
-        "//jvm/core",
-        "//jvm/graaljs",
-        "//jvm/hermes:hermes-host",
-        "//jvm/j2v8:j2v8-all",
+        "//jvm:supported_runtimes",
         "//tools/mocks:jar",
-        "@maven//:org_openjdk_jmh_jmh_core",
+        artifact("org.openjdk.jmh:jmh-core"),
     ],
 )
 

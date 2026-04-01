@@ -300,6 +300,7 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual(AnyType.anyDictionary(data: ["key": false, "key2": 1]), AnyType.anyDictionary(data: ["key": false, "key2": 1]))
         XCTAssertEqual(AnyType.anyArray(data: [1, "a", true]), AnyType.anyArray(data: [1, "a", true]))
         XCTAssertNotEqual(AnyType.unknownData, AnyType.string(data: "test"))
+        XCTAssertEqual(AnyType.unknownData, AnyType.unknownData)
     }
 
     func testDecodingContext() throws {

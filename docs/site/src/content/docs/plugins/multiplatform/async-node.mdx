@@ -3,6 +3,7 @@ title: AsyncNode Plugin
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 The AsyncNode Plugin is used to enable streaming additional content into a flow that has already been loaded and rendered.  
 A common use case for this plugin is conversational UI, as the users input more dialogue, new content must be streamed into Player in order to keep the UI up to date.
@@ -81,7 +82,7 @@ The `AsyncNodePluginPlugin` is provided as a default way of handling asset-async
 
 Add the plugin to Player:
 
-```js
+```typescript
 import { Player } from '@player-ui/player';
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
@@ -116,7 +117,7 @@ const player = new Player({
 
 or initialize plugin with async handler
 
-```js
+```typescript
 import { Player } from '@player-ui/player';
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
@@ -147,7 +148,7 @@ const player = new Player({
 
 The `react` version of the AsyncNodePlugin is identical to using the core plugin. Refer to core usage for handler configuration:
 
-```js
+```typescript
 import { ReactPlayer } from "@player-ui/react";
 import {
   AsyncNodePlugin,
@@ -166,13 +167,23 @@ const player = new ReactPlayer({
   </Fragment>
   <Fragment slot='ios'>
 
-### CocoaPods
+### Error Handling
 
-Add the subspec to your `Podfile`
+By default, errors happening during the `onAsyncNode` hook bubble up as player flow failures. These errors can come from the taps themselves, or from parsing the result of those taps within the core plugin. Use the `onAsyncNodeError` to catch these errors and handle them gracefully. Even if the error is handled, it will be logged by the player logger. The return on the hook will determine what gets rendered in the view. To render nothing, return `null`
 
-```ruby
-pod 'PlayerUI/AsyncNodePlugin'
+```typescript
+const asyncNodePlugin = new AsyncNodePlugin({
+  plugins: [new AsyncNodePluginPlugin()],
+});
+
+asyncNodePlugin.hooks.onAsyncNodeError.tap("handleAsyncError", (error, node) => {
+  // Do something to handle the error in the background
+
+  return null;
+});
 ```
+
+<PodAndPackage product="AsyncNodePlugin" />
 
 ### Swift Usage
 
@@ -324,24 +335,60 @@ AndroidPlayer(asyncNodePlugin)
 </PlatformTabs>
 
 
-### AsyncTransform function
-`AsyncTransform` is a helper function to create the transform for async asset. With the example below, 
-- id - `chat-message` asset id
-- wrapperType - container asset type eg. `Collection` with `values` as children that will be resolved asynchronously 
-- asset - value asset to pass in (`Text` in example)
-- flatten - default value is true. Determine if the content streamed in should be flattened. 
+### AsyncTransform
+`createAsyncTransform` is a helper function to create the transform for async asset. The function takes a set of options that help adjust the transform generated to your needs:
+- flatten (Optional. Default: true) - Whether or not to flatten chained results of the same asset type into a single container.
+- path (Optional. Default: ["values"]) - The path to the array within the `wrapperAssetType` that will contain the async content.
+- transformAssetType (Required) - The asset type that the transform is matching against.
+- wrapperAssetType (Required) - The asset type that will contain the async content.
+- getNestedAsset (Optional) - Function to get any nested asset that will need to be extracted and kept when creating the wrapper asset. This is useful when combined with `flatten: true` to help chain async content with a single asset type.
+- getAsyncNodeId (Optional) - Function to get the id for the generated async node. By default it uses a format of `async-{asset.id}`
+- asyncNodePosition (Optional) - Where to place the async node relative to the asset from `getNestedAsset`. Defaults to `"append"`
+
+#### Usage
+
+Setting up a transform like below:
+
+```ts
+const beforeResolve = createAsyncTransform({
+  transformAssetType: "chat-message",
+  wrapperAssetType: "collection",
+  getNestedAsset: (node) => node.children?.[0]?.value
+})
+```
+
+transforms the following content:
 
 ```json
-      {
-        "id": "chat",
-        "type": "chat-message",
-        "value": {
-          "id": "text",
-          "type": "text",
-          "value": "chat message",
-        },
-      },
+{
+  "id": "chat",
+  "type": "chat-message",
+  "value": {
+    "id": "text",
+    "type": "text",
+    "value": "chat message",
+  },
+},
 ```
+
+into: 
+
+```json
+{
+  "id": "collection-async-chat",
+  "type": "collection",
+  "values": [
+    {
+      "id": "text",
+      "type": "text",
+      "value": "chat message",
+    },
+    { /** async content managed by your handler */ }
+  ],
+},
+```
+
+And using additional `chat-message` assets in the async content will flatten itself into this top level collection.
 
 ### Flatten
 Flatten is introduced to avoid nested structure caused by continuous streaming. eg. When a new `chat-message` asset is streamed in, in AST tree, instead of `[chat1, [chat2, asyncNode]]`, it's flattened into `[chat1, chat2, asyncNode]`

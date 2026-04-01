@@ -6,70 +6,204 @@ If you find something interesting you want contribute to the repo, feel free to 
 
 ## Proposing a Change
 
-For small bug-fixes, documentation updates, or other trivial changes, feel free to jump straight to submitting a pull request. 
+For small bug-fixes, documentation updates, or other trivial changes, feel free to jump straight to submitting a pull request.
 
 If the changes are larger (API design, architecture, etc), [opening an issue](https://github.com/player-ui/player/issues/new/choose) can be helpful to reduce implementation churn as we hash out the design.
 
 ## Requirements
-* [bazelisk](https://github.com/bazelbuild/bazelisk)
-* [pnpm >= 8.0.0](https://pnpm.io/installation)
 
-* [Swift >= 5.5](https://www.swift.org/download/)
-* [Xcode 15.3](https://developer.apple.com/download/all/) 
+> [!IMPORTANT]
+> The owners of this repo develop on MacOS with Apple Silicon chips.
+> All recommendations are based on that build environment.
 
-* [Android NDK 27.1.12297006](https://github.com/android/ndk/releases/tag/r27b). You'll need to add `ANDROID_NDK_HOME` to your environment manually.
-* Python < 3 (recommended 2.7.18) - you can use [pyenv](https://realpython.com/intro-to-pyenv/) to manage different python versions with ease. 
+Since this repo uses Bazel to build cross-platform, it requires tools that you may not use directly. Please set-up all required tools.
 
-* [Signed Commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification). For convenience it is recommended to set git to sign all commits by default as mentioned [here](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
+<table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Version</th>
+      <th>Recommendations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MacOS</td>
+      <td>Sequoia 15.5</td>
+      <td>Update via System Settings. Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/bazelbuild/bazelisk">bazelisk</a></td>
+      <td>Latest</td>
+      <td>Install through homebrew</td>
+    </tr>
+    <tr>
+      <td><a href="https://pnpm.io/installation">pnpm</a></td>
+      <td>&gt;= 9.0.0</td>
+      <td>Install via <a href="https://volta.sh/">volta</a>. Our repo specifies an appropriate pnpm version in our package.json for Volta.</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.swift.org/download/">Swift</a></td>
+      <td>&gt;= 5.5</td>
+      <td>This comes installed with Xcode. Do not install separately.</td>
+    </tr>
+    <tr>
+      <td><a href="https://developer.apple.com/download/all/">Xcode</a></td>
+      <td>16.3 or 16.4</td>
+      <td>Download from Apple. Having this <b>exact</b> Xcode version is extremely important.
+      Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.
+      </td>
+    </tr>
+    <tr>
+      <td>Python</td>
+      <td>>= 2.7.18</td>
+      <td>Use <a href="https://realpython.com/intro-to-pyenv/">pyenv</a> to manage versions</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification">Signed Commits</a></td>
+      <td>-</td>
+      <td>For your convenience, set git to sign all commits by default as described <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key">here</a></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Building and Testing Locally (All platforms)
 
 > This project also contains [just](https://github.com/casey/just) recipes for many common commands. They can be listed using `just -l`
 
 ### Player
-For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
+
+For speed and consistency, this repo leverages `bazel` as its main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
 After forking the repo, run builds using bazel to test, build and run:
 
 ## Docs Sites
-These require the [Android NDK](https://developer.android.com/ndk).
-The docs site can be ran using:
+
+The docs site can be run locally using:
 
 ```bash
-bazel build //docs/site:start
-bazel run //docs/site:start
+bazel run //docs/site:dev
 ```
-which will run an instance on `http://localhost:3000`.
 
+which will run an instance on `http://localhost:4321`.
 
-## For Android Only builds
-If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
+### Documentation Previews
 
-## For iOS Only builds
-### Xcode Project generation
-Generate the `.xcodeproj` to open and work in Xcode. Builds and tests will be executed through bazel, to ensure behavioral parity.
+To trigger a docs preview, collaborators can add a `/docs` comment to any PR. This will build and deploy a docs preview to the [Player Docs Repo](https://github.com/player-ui/player-ui.github.io) in the `pr/{PR_NUMBER}` folder structure. A comment will be added to the PR with the preview link.
 
-```bash
-bazel run //ios:xcodeproj
-open -a Xcode ios/PlayerUI.xcodeproj/
-```
-### Demo Application
-#### Xcode
-The first time the Xcode project is generated, the default selected target is `PlayerUI`, for a runnable target select `PlayerUIDemo` to run the demo application in the simulator.
+The docs preview will be available at: `https://player-ui.github.io/pr/{PR_NUMBER}/`
+
+### Canary Releases
+
+When a collaborator comments `/canary` on a PR, it will trigger a canary release that publishes NPM packages with a canary version. A comment will be added to the PR with the version information.
+
+### Production Documentation
+
+When a PR is merged, any `docs/site` changes will be deployed to the `next` folder in [https://github.com/player-ui/player-ui.github.io](https://github.com/player-ui/player-ui.github.io), which stores the built files for the site.
+
+The OSS site is deployed with the following route logic:
+
+- The `next` route correlates to the doc site generated by the latest build of Player.
+  Every PR merged into the main branch (unless opted out) will generate a next build so that functionality can be immediately consumed.
+- The `latest` route correlates to the doc site generated from the last non-next release of Player.
+  These are releases that are we intentionally choose to cut and have a non-tagged semvar version.
+- The `0` route contains the docs for the last `0.x.x` release.
+  For every major release, we preserve the doc site for the last version released for it to allow folks who can't upgrade immediately to still have access to docs that are relevant for them.
+
+## For Android
+
+If you are interested in contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
+
+## For iOS
+
+Once you have done the set-up below, please refer to [our iOS Dev Wiki page](https://github.com/player-ui/player/wiki/iOS-Development-Guide) for more advanced iOS development info.
+
+### Additional Set-up
+
+iOS Development requires a bit more set-up.
+
+1. In the terminal, run `which brew`. You should have `/opt/homebrew/bin/brew`.
+   - If you instead have `/usr/local` or something similar, you have the Intel chip homebrew.
+     You need Apple Silicon homebrew. This will let you run the project without Rosetta. Follow the next step.
+1. If you need to replace Intel homebrew, do the following. Keep in mind that this will remove everything you have installed through homebrew. E.g. existing installations of VSCode, xcodes, rsync, etc.
+
+   1. Delete all your formulas and casks. This is to ensure no conflicts with the new homebrew. If you don’t feel comfortable deleting everything, delete at least bazelisk.
+
+      ````bash
+      brew remove --force $(brew list --formula)```
+      brew remove --cask --force $(brew list)
+      ````
+
+   1. Delete homebrew
+
+      ```bash
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+      ```
+
+   1. [Install homebrew](https://github.com/homebrew/install?tab=readme-ov-file#install-homebrew-on-macos-or-linux) again. Make sure to follow the steps to add homebrew to your `PATH`.
+   1. Run `which brew` and make sure you now have `/opt/homebrew/bin/brew`
+
+1. (Optional) We recommend using [xcodes](https://github.com/XcodesOrg/xcodes?tab=readme-ov-file#installation) via homebrew to manage multiple Xcode versions. If you have multiple Xcode versions, select the needed version of Xcode:
+
+   ```bash
+   xcodes select {version}
+   ```
+
+   E.g.
+
+   ```bash
+   xcodes select 16.3
+   ```
+
+1. `brew install rsync`. This fixes a bunch of permission denied issues.
+   1. Close and re-open the terminal.
+   1. Run `which rsync` to make sure you’re using the homebrew one. If it’s not the homebrew rsync, something is wrong and needs to be fixed.
+
+### To Run
+
+1. Generate the `.xcodeproj` to open and work in Xcode.
+
+   ```bash
+   bazel run //ios:xcodeproj
+   ```
+
+1. Open the `.xcodeproj`. If Xcode is your default app for xcodeprojs, you can use this:
+
+   ```bash
+   open ios/PlayerUI.xcodeproj/
+   ```
+
+   > [!IMPORTANT]
+   > You may need to regenerate the project when adding new files or modifying targets.
+   > Close Xcode first, then regenerate and re-open.
+
+1. In Xcode, switch to the `PlayerUIDemo` target. Run the app.
+1. To run the tests, switch to the Test Navigator. You can run any suite directly from Xcode.
+   The Test Navigator may show 0 tests in each suite until you actually run the suite.
 
 #### Bazel
+
 The demo app can also be built and launched in a simulator from the command line with bazel:
+
 ```bash
 bazel run //ios/demo:PlayerUIDemo
 ```
 
 ## Submitting a Pull Request
 
-Prior to submitting a pull request, ensure that your fork and branch are up to date with the lastest changes on `main`. 
+Prior to submitting a pull request, ensure that your fork and branch are up to date with the lastest changes on `main`.
 
 Any new features should have corresponding tests that exercise all code paths, and public symbols should have docstrings at a minimum. For more complex features, adding new documentation pages to the site to help guide users to consume the feature would be preferred.
 
-When you're ready, submit a new pull request to the `main` branch and the team will be notified of the new requested changes. We'll do our best to respond as soon as we can. 
+When you're ready, submit a new pull request to the `main` branch and the team will be notified of the new requested changes. We'll do our best to respond as soon as we can.
+
+## Releases
+
+When a PR is merged, it will generate a `next` release, so something like `0.12.0-next.0` which can then be used in your project. This is done so that you can consume the latest changes without having to wait for a release to be cut.
+
+### Canary Releases
+
+To trigger a canary release, collaborators can add a `/canary` comment to any PR. Note: Canary builds can only be requested by collaborators.
 
 ---
 

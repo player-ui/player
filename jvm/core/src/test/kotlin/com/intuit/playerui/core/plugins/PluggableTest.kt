@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class PluggableTest {
-
     object IncludedPlugin : Plugin
 
     object NotIncludedPlugin : Plugin
@@ -30,12 +29,16 @@ internal class PluggableTest {
                 IncludedPlugin,
                 object : LoggerPlugin {
                     override fun trace(vararg args: Any?) = throw UnsupportedOperationException()
+
                     override fun debug(vararg args: Any?) = throw UnsupportedOperationException()
+
                     override fun info(vararg args: Any?) = throw UnsupportedOperationException()
+
                     override fun warn(vararg args: Any?) {
                         assertEquals("NotIncludedPlugin not found", args.first())
                         didWarn = true
                     }
+
                     override fun error(vararg args: Any?) = throw UnsupportedOperationException()
                 },
             )

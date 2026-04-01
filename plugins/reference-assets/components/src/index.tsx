@@ -18,6 +18,7 @@ import {
   toJsonProperties,
   ObjectWithIndexTracking,
   GeneratedIDProperty,
+  toJsonElement,
 } from "@player-tools/dsl";
 import type { Asset as AssetType } from "@player-ui/player";
 import type {
@@ -102,14 +103,18 @@ Collection.Label = LabelSlot;
 export const Action = (
   props: Omit<AssetPropsWithChildren<ActionAsset>, "exp"> & {
     /** An optional expression to execute before transitioning */
-    exp?: ExpressionTemplateInstance;
+    exp?: ExpressionTemplateInstance | Array<ExpressionTemplateInstance>;
   },
 ) => {
   const { exp, children, ...rest } = props;
 
   return (
     <Asset type="action" {...rest}>
-      <property name="exp">{exp?.toValue()}</property>
+      <property name="exp">
+        {Array.isArray(exp)
+          ? toJsonElement(exp.map((e) => e.toValue()))
+          : exp?.toValue()}
+      </property>
       {children}
     </Asset>
   );

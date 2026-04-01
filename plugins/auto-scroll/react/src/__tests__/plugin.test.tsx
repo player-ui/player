@@ -16,7 +16,7 @@ import { Info, Action, Input } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 
-import scrollIntoViewWithOffset from "../scrollIntoViewWithOffset";
+import { scrollIntoViewWithOffset } from "../scrollIntoViewWithOffset";
 
 import {
   AutoScrollManagerPlugin,
@@ -177,24 +177,24 @@ describe("auto-scroll plugin", () => {
 
     const action = await findByRole(container, "button");
     act(() => action.click());
-    await act(() => waitFor(() => {}));
-
-    expect(scrollIntoViewWithOffset).toBeCalledWith(
-      expect.anything(),
-      expect.objectContaining({ id: "view" }),
-      40,
+    await waitFor(() =>
+      expect(scrollIntoViewWithOffset).toBeCalledWith(
+        expect.anything(),
+        expect.objectContaining({ id: "view" }),
+        40,
+      ),
     );
 
     // Mock the case where the base element can't be found, so document.body is used as a fallback
     getBaseElementMock.mockReturnValue(null);
 
     act(() => action.click());
-    await act(() => waitFor(() => {}));
-
-    expect(scrollIntoViewWithOffset).toHaveBeenLastCalledWith(
-      expect.anything(),
-      document.body,
-      40,
+    await waitFor(() =>
+      expect(scrollIntoViewWithOffset).toHaveBeenLastCalledWith(
+        expect.anything(),
+        document.body,
+        40,
+      ),
     );
   });
 
@@ -233,12 +233,12 @@ describe("auto-scroll plugin", () => {
 
     const action = await findByRole(container, "button");
     act(() => action.click());
-    await act(() => waitFor(() => {}));
-
-    expect(scrollIntoViewWithOffset).toBeCalledWith(
-      expect.anything(),
-      document.body,
-      0,
+    await waitFor(() =>
+      expect(scrollIntoViewWithOffset).toBeCalledWith(
+        expect.anything(),
+        document.body,
+        0,
+      ),
     );
   });
 
@@ -277,6 +277,170 @@ describe("auto-scroll plugin", () => {
     });
 
     expect(scrollIntoViewWithOffset).not.toBeCalled();
+  });
+});
+
+const twoViewFlow = {
+  id: "two-view-flow",
+  views: [
+    {
+      id: "view-1",
+      type: "info",
+      primaryInfo: {
+        asset: { id: "info-1", type: "input", binding: "person.name" },
+      },
+      actions: [
+        { asset: { id: "next-action", type: "action", value: "Next" } },
+      ],
+    },
+    {
+      id: "view-2",
+      type: "info",
+      primaryInfo: {
+        asset: { id: "info-2", type: "input", binding: "person.age" },
+      },
+      actions: [],
+    },
+  ],
+  schema: {},
+  data: { person: { name: "sam", age: "30" } },
+  navigation: {
+    BEGIN: "FLOW_Start",
+    FLOW_Start: {
+      startState: "VIEW_1",
+      VIEW_1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: { "*": "VIEW_2" },
+      },
+      VIEW_2: {
+        state_type: "VIEW",
+        ref: "view-2",
+        transitions: { "*": "END_Done" },
+      },
+      END_Done: { state_type: "END", outcome: "done" },
+    },
+  },
+};
+
+describe("scroll reset on view transition", () => {
+  test("does not scroll to page 1 elements after view transition (stale scrollableMap)", async () => {
+    vitest.clearAllMocks();
+
+    const withFirstAppearance = (Component: ComponentType<any>) => {
+      const Scrollable = (props: any) => {
+        const register = useRegisterAsScrollable();
+        useLayoutEffect(() => {
+          register({ type: ScrollType.FirstAppearance, ref: props.id });
+        }, []);
+        return <Component {...props} />;
+      };
+      return Scrollable;
+    };
+
+    // only "info-1" (page 1) is findable. if the map isn't cleared on transition,
+    // "info-1" remains a scroll target and scrollIntoViewWithOffset gets called.
+    vitest.spyOn(document, "getElementById").mockImplementation((id) => {
+      if (id === "info-1") {
+        return { getBoundingClientRect: () => ({ top: 50 }) } as any;
+      }
+      return null;
+    });
+
+    const wp = new ReactPlayer({
+      plugins: [
+        new AssetTransformPlugin([
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
+        ]),
+        new CommonTypesPlugin(),
+        new AutoScrollManagerPlugin({}),
+      ],
+    });
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, withFirstAppearance(Input));
+
+    wp.start(twoViewFlow as any);
+
+    const { container } = render(
+      <div>
+        <React.Suspense fallback="loading...">
+          <wp.Component />
+        </React.Suspense>
+      </div>,
+    );
+
+    // wait for page 1 to settle, then reset scroll call history so we only assert on page 2
+    await act(() => waitFor(() => {}));
+    (scrollIntoViewWithOffset as ReturnType<typeof vitest.fn>).mockClear();
+
+    // navigate to page 2
+    const action = await findByRole(container, "button");
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    // map was cleared on transition — "info-1" is no longer a scroll target
+    expect(scrollIntoViewWithOffset).not.toHaveBeenCalled();
+    vitest.restoreAllMocks();
+  });
+});
+
+describe("scroll reset on view transition cancels in-flight polyfill animation", () => {
+  test("dispatches a wheel event and calls scroll(0,0) on transition", async () => {
+    vitest.clearAllMocks();
+
+    const dispatchSpy = vitest
+      .spyOn(window, "dispatchEvent")
+      .mockImplementation(() => true);
+    const scrollSpy = vitest
+      .spyOn(window, "scroll")
+      .mockImplementation(() => {});
+
+    vitest.spyOn(document, "getElementById").mockReturnValue(null);
+
+    const wp = new ReactPlayer({
+      plugins: [
+        new AssetTransformPlugin([
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
+        ]),
+        new CommonTypesPlugin(),
+        new AutoScrollManagerPlugin({}),
+      ],
+    });
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, Input);
+
+    wp.start(twoViewFlow as any);
+
+    const { container } = render(
+      <div>
+        <React.Suspense fallback="loading...">
+          <wp.Component />
+        </React.Suspense>
+      </div>,
+    );
+
+    await act(() => waitFor(() => {}));
+
+    // navigate to page 2 — triggers the transition hook
+    const action = await findByRole(container, "button");
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    // wheel event must have been dispatched to cancel the polyfill's RAF
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "wheel" }),
+    );
+
+    // scroll must be reset to top
+    expect(scrollSpy).toHaveBeenCalledWith(0, 0);
+
+    vitest.restoreAllMocks();
   });
 });
 

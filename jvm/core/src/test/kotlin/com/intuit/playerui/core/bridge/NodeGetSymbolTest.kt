@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestTemplate
 
 class NodeGetSymbolTest : RuntimeTest() {
-
     @Test
     fun `getSymbol injects helper`() {
         val runtime: Runtime<*> = mockk()

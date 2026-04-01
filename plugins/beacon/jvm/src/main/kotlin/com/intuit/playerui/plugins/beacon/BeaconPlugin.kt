@@ -30,8 +30,10 @@ import kotlinx.serialization.json.Json
 /**
  * Core beaconing plugin wrapper for the JVM. Beaconing format can be augmented with a wrapped core beaconing plugin passed in as [JSPluginWrapper]s.
  */
-public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), Pluggable {
-
+public open class BeaconPlugin(
+    override val plugins: List<JSPluginWrapper>,
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH),
+    Pluggable {
     public constructor(vararg plugins: JSPluginWrapper) : this(plugins.toList())
 
     public lateinit var hooks: Hooks
@@ -56,7 +58,7 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
                 }
             }
 
-        runtime.load(ScriptContext(script, bundledSourcePath))
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
         runtime.add("beaconOptions", config)
         instance = runtime.buildInstance("(new $name.$name(beaconOptions))")
         hooks = instance.getSerializable("hooks", Hooks.serializer())
@@ -75,8 +77,14 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
     }
 
     // TODO: Convert to suspend method to ensure view scope is captured in a non-blocking way
+
     /** Fire a beacon event */
-    public fun beacon(action: String, element: String, asset: Asset, data: Any? = null) {
+    public fun beacon(
+        action: String,
+        element: String,
+        asset: Asset,
+        data: Any? = null,
+    ) {
         beacon.invoke(
             mapOf(
                 "action" to action,
@@ -88,7 +96,9 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
     }
 
     @Serializable(Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         /** A hook to build beacon */
         public val buildBeacon: NodeAsyncWaterfallHook2<Any?, HookArgs>
             by NodeSerializableField(NodeAsyncWaterfallHook2.serializer(GenericSerializer(), HookArgs.serializer()))
@@ -110,7 +120,9 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
     )
 
     @Serializable(HookArgs.Serializer::class)
-    public class HookArgs internal constructor(override val node: Node) : NodeWrapper {
+    public class HookArgs internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         /** The current player state */
         public val state: PlayerFlowState? by NodeSerializableField(PlayerFlowState.serializer().nullable)
 
@@ -136,8 +148,8 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
     }
 
     private companion object {
-        private const val pluginName = "BeaconPlugin"
-        private const val bundledSourcePath = "plugins/beacon/core/dist/BeaconPlugin.native.js"
+        private const val PLUGIN_NAME = "BeaconPlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/beacon/core/dist/BeaconPlugin.native.js"
     }
 
     @Serializable
@@ -156,6 +168,11 @@ public fun Player.onBeacon(block: (String) -> Unit) {
 }
 
 /** Convenience method for firing a beacon without a reference to the [BeaconPlugin] */
-public fun Player.beacon(action: String, element: String, asset: Asset, data: Any? = null) {
+public fun Player.beacon(
+    action: String,
+    element: String,
+    asset: Asset,
+    data: Any? = null,
+) {
     beaconPlugin?.beacon(action, element, asset, data)
 }

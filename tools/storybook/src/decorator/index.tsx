@@ -1,10 +1,5 @@
 import React from "react";
-import type {
-  Renderer,
-  PartialStoryFn,
-  StoryContext,
-  DecoratorFunction,
-} from "@storybook/types";
+import type { DecoratorFunction } from "storybook/internal/types";
 import { useSelector } from "react-redux";
 import { StateProvider, type StateType } from "../redux";
 import {

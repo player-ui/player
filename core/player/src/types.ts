@@ -1,4 +1,4 @@
-import type { Flow, FlowResult } from "@player-ui/types";
+import type { Asset, Flow, FlowResult } from "@player-ui/types";
 import type { BindingParser, BindingLike } from "./binding";
 import type { SchemaController } from "./schema";
 import type { ExpressionEvaluator } from "./expressions";
@@ -10,6 +10,41 @@ import type {
   FlowController,
 } from "./controllers";
 import type { ReadOnlyDataController } from "./controllers/data/utils";
+import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import { ViewInstance } from "./view";
+
+/**
+ * Public Player Hooks
+ */
+export interface PlayerHooks {
+  /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
+  flowController: SyncHook<[FlowController], Record<string, any>>;
+  /** The hook that updates/handles views */
+  viewController: SyncHook<[ViewController], Record<string, any>>;
+  /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
+  view: SyncHook<[ViewInstance], Record<string, any>>;
+  /** Called when an expression evaluator was created */
+  expressionEvaluator: SyncHook<[ExpressionEvaluator], Record<string, any>>;
+  /** The hook that creates and manages data */
+  dataController: SyncHook<[DataController], Record<string, any>>;
+  /** Called after the schema is created for a flow */
+  schema: SyncHook<[SchemaController], Record<string, any>>;
+  /** Manages validations (schema and x-field ) */
+  validationController: SyncHook<[ValidationController], Record<string, any>>;
+  /** Manages parsing binding */
+  bindingParser: SyncHook<[BindingParser], Record<string, any>>;
+  /** A that's called for state changes in the flow execution */
+  state: SyncHook<[PlayerFlowState], Record<string, any>>;
+  /** A hook to access the current flow */
+  onStart: SyncHook<[Flow<Asset<string>>], Record<string, any>>;
+  /** A hook for when the flow ends either in success or failure */
+  onEnd: SyncHook<[], Record<string, any>>;
+  /** Mutate the Content flow before starting */
+  resolveFlowContent: SyncWaterfallHook<
+    [Flow<Asset<string>>],
+    Record<string, any>
+  >;
+}
 
 /** The status for a flow's execution state */
 export type PlayerFlowStatus =

@@ -9,7 +9,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 
 @Serializable(NamedState.Serializer::class)
-public class NamedState internal constructor(override val node: Node) : NodeWrapper {
+public class NamedState internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     /** The name of the navigation node */
     public val name: String by NodeSerializableField(String.serializer())
 

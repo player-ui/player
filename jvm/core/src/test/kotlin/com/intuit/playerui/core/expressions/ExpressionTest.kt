@@ -11,15 +11,22 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class ExpressionTest {
-
     private val singleJson = JsonPrimitive("some expression")
     private val single = Expression.Single(singleJson.content)
     private val genericSingleJson = JsonPrimitive("generic expression")
     private val genericSingle: Expression = Expression.Single(genericSingleJson.content)
-    private val collectionJson = buildJsonArray { add("one expression"); add("another expression") }
+    private val collectionJson = buildJsonArray {
+        add("one expression")
+        add("another expression")
+    }
     private val collection = Expression.Collection(collectionJson.map { it.jsonPrimitive.content })
-    private val genericCollectionJson = buildJsonArray { add("vararg expression"); add("another vararg expression") }
-    private val genericCollection: Expression = Expression.Collection(*genericCollectionJson.map { it.jsonPrimitive.content }.toTypedArray())
+    private val genericCollectionJson = buildJsonArray {
+        add("vararg expression")
+        add("another vararg expression")
+    }
+    private val genericCollection: Expression = Expression.Collection(
+        *genericCollectionJson.map { it.jsonPrimitive.content }.toTypedArray(),
+    )
 
     @Test
     fun `test ExpressionType to JSON using implicit serializer`() {

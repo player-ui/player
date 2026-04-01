@@ -46,7 +46,11 @@ internal fun V8Object.toNode(format: RuntimeFormat<V8Value>): Node? = evaluateIn
     }
 }
 
-internal fun <R> V8Function.toInvokable(format: RuntimeFormat<V8Value>, receiver: V8Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
+internal fun <R> V8Function.toInvokable(
+    format: RuntimeFormat<V8Value>,
+    receiver: V8Object,
+    deserializationStrategy: DeserializationStrategy<R>?,
+): Invokable<R>? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     Invokable { args ->
         evaluateInJSThreadBlocking(format.runtime) {
             try {
@@ -54,10 +58,11 @@ internal fun <R> V8Function.toInvokable(format: RuntimeFormat<V8Value>, receiver
                     val result =
                         call(
                             receiver,
-                            format.encodeToRuntimeValue(
-                                ArraySerializer(GenericSerializer()),
-                                args as Array<Any?>,
-                            ).v8Array,
+                            format
+                                .encodeToRuntimeValue(
+                                    ArraySerializer(GenericSerializer()),
+                                    args as Array<Any?>,
+                                ).v8Array,
                         ).handleValue(format)
                 ) {
                     is Node -> deserializationStrategy?.let {

@@ -15,8 +15,10 @@ import org.junit.jupiter.api.TestTemplate
  * [RuntimeTest] docs, [TestTemplate]s will be executed for each [Runtime] on the classpath, while normal
  * [Test]s will just be executed once.
  */
-public abstract class PlayerTest : RuntimeTest(), Pluggable, LoggerPlugin by TestLogger {
-
+public abstract class PlayerTest :
+    RuntimeTest(),
+    Pluggable,
+    LoggerPlugin by TestLogger {
     public lateinit var player: Player
 
     override val plugins: List<Plugin> get() = emptyList()

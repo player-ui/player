@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 
 internal class JsonPromiseTest : RuntimeTest() {
-
     @TestTemplate
     fun testChain() {
         val result = runBlockingTest {
-            runtime.Promise.resolve(42)
+            runtime.Promise
+                .resolve(42)
                 .then<JsonElement> {
                     assertTrue(it is JsonPrimitive)
                     assertEquals(JsonPrimitive(42), it)
@@ -29,7 +29,8 @@ internal class JsonPromiseTest : RuntimeTest() {
                     assertTrue(it is JsonPrimitive)
                     assertEquals(JsonPrimitive(52), it)
                     62
-                }.toCompletable<Int>().await()
+                }.toCompletable<Int>()
+                .await()
         }
 
         assertEquals(62, result)

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class PrimitiveDecoding : J2V8Test() {
-
     @Test
     fun `decode string primitive`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals("hello", format.decodeFromV8Value<String>(V8Primitive("hello")))
@@ -48,7 +47,6 @@ internal class PrimitiveDecoding : J2V8Test() {
 }
 
 internal class FunctionDecoding : J2V8Test() {
-
     @Test fun `decode typed lambda`() = v8.evaluateInJSThreadBlocking(runtime) {
         val args = V8Array {
             push("PLAYER")
@@ -107,11 +105,12 @@ internal class FunctionDecoding : J2V8Test() {
         assertEquals("PLAYER: 1", function.call(this, args))
         assertEquals(
             "PLAYER: 2",
-            format.decodeFromV8Value<Container>(
-                V8Object {
-                    add("method", function)
-                },
-            ).method("PLAYER", 2),
+            format
+                .decodeFromV8Value<Container>(
+                    V8Object {
+                        add("method", function)
+                    },
+                ).method("PLAYER", 2),
         )
     }
 }

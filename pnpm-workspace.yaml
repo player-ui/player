@@ -5,3 +5,8 @@ packages:
   - "tools/*/*"
   - "tools/*"
   - "docs/*"
+
+strictDepBuilds: true
+minimumReleaseAge: 4320 # 3 days
+minimumReleaseAgeExclude:
+  - "@player-tools/*"

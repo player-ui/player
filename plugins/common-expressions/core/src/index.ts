@@ -13,6 +13,8 @@ import type {
   replace,
   titleCase,
   sentenceCase,
+  split,
+  substr,
   number,
   round,
   floor,
@@ -22,6 +24,9 @@ import type {
   findProperty,
   containsAny,
 } from "./expressions";
+
+export { Expressions };
+
 /**
  * Exposes a lot of expressions to Player.
  */
@@ -42,6 +47,8 @@ export class CommonExpressionsPlugin
         typeof replace,
         typeof titleCase,
         typeof sentenceCase,
+        typeof split,
+        typeof substr,
         typeof number,
         typeof round,
         typeof floor,
@@ -55,7 +62,7 @@ export class CommonExpressionsPlugin
 {
   name = "CommonExpressions";
 
-  apply(player: Player) {
+  apply(player: Player): void {
     player.registerPlugin(
       new ExpressionPlugin(new Map(Object.entries(Expressions))),
     );

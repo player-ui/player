@@ -13,6 +13,8 @@ import {
   replace,
   titleCase,
   sentenceCase,
+  split,
+  substr,
   isEmpty,
   isNotEmpty,
   findProperty,
@@ -100,6 +102,80 @@ describe("expr functions", () => {
 
     test("sentenceCase", () => {
       expect(sentenceCase(context, "foo Bar baz")).toBe("Foo Bar baz");
+    });
+
+    test("split", () => {
+      // Basic split functionality
+      expect(split(context, "hello,world,test", ",")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello world test", " ")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello-world", "-")).toEqual(["hello", "world"]);
+
+      // Split with limit
+      expect(split(context, "hello,world,test", ",", 2)).toEqual([
+        "hello",
+        "world",
+      ]);
+      expect(split(context, "hello world test", " ", 1)).toEqual(["hello"]);
+      expect(split(context, "hello,world,test", ",", 5)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+
+      // Edge cases
+      expect(split(context, "hello", ",")).toEqual(["hello"]);
+      expect(split(context, "", ",")).toEqual([""]);
+
+      // Invalid limit parameter
+      expect(split(context, "hello,world,test", ",", -1)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello,world,test", ",", 0)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+
+      // Empty separator
+      expect(split(context, "hello", "")).toEqual(["h", "e", "l", "l", "o"]);
+      expect(split(context, "hello world", "")).toEqual([
+        "h",
+        "e",
+        "l",
+        "l",
+        "o",
+        " ",
+        "w",
+        "o",
+        "r",
+        "l",
+        "d",
+      ]);
+      expect(split(context, "", "")).toEqual([]);
+      expect(split(context, "hello", "", 3)).toEqual(["h", "e", "l"]);
+    });
+
+    test("substr", () => {
+      // Basic substring functionality
+      expect(substr(context, "hello world", 0, 5)).toBe("hello");
+      expect(substr(context, "hello world", 6)).toBe("world");
+      expect(substr(context, "hello world", 6, 3)).toBe("wor");
+
+      // Edge cases
+      expect(substr(context, "hello world", 0)).toBe("hello world");
+      expect(substr(context, "hello world", 100)).toBe("");
+      expect(substr(context, "hello world", 6, 100)).toBe("world");
+      expect(substr(context, "hello world", -3)).toBe("rld");
     });
   });
 
@@ -334,20 +410,8 @@ describe("expr functions", () => {
       expect(containsAny(context, "foo", ["foo", "bar"])).toBe(true);
     });
 
-    test("should return false since keyword does not exist (second arg is array)", () => {
-      expect(containsAny(context, "fuba", ["foo", "bar"])).toBe(false);
-    });
-
     test("should return false since keyword does not exist (second arg is string)", () => {
       expect(containsAny(context, "foo", "bar")).toBe(false);
-    });
-
-    test("should return false since first argument is bad", () => {
-      expect(containsAny(context, null, "bar")).toBe(false);
-    });
-
-    test("should return false since second argument is bad", () => {
-      expect(containsAny(context, "foo", null)).toBe(false);
     });
 
     test("should return true since second argument as blank is acceptable", () => {

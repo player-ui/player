@@ -5,6 +5,7 @@ import rehypeMermaid from "rehype-mermaid";
 import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
+import pagefind from "astro-pagefind";
 
 export const rehypeLinks = (options) => {
   let base = options?.base;
@@ -31,10 +32,23 @@ export const rehypeLinks = (options) => {
 };
 
 export const BASE_PREFIX =
+  // eslint-disable-next-line no-undef
   process.env.NODE_ENV === "production" ? "DOCS_BASE_PATH" : undefined;
+
+// Helper function to build paths with BASE_PREFIX when available
+const resolvedPath = (path) => {
+  return `${BASE_PREFIX ? `/${BASE_PREFIX}` : ""}${path}`;
+};
 
 // https://astro.build/config
 export default defineConfig({
+  redirects: {
+    "/guides/getting-started": resolvedPath("/getting-started/"),
+    "/plugins/common-types": resolvedPath("/plugins/core/common-types/"),
+    "/tools/cli": resolvedPath("/capabilities/cli/"),
+    "/tools/storybook": resolvedPath("/capabilities/storybook/"),
+    "/assets/cross-platform/": resolvedPath("/platforms/cross-platform"),
+  },
   integrations: [
     react(),
     tailwind({
@@ -48,9 +62,14 @@ export default defineConfig({
         light: "./src/assets/logo/logo-light-large.png",
         replacesTitle: true,
       },
-      social: {
-        github: "https://github.com/player-ui/player",
-      },
+      lastUpdated: true, // Using custom component that reads from remark plugin for Bazel compatibility
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/player-ui/player",
+        },
+      ],
       editLink: {
         baseUrl: "https://github.com/player-ui/player/edit/main/docs/site",
       },
@@ -58,6 +77,7 @@ export default defineConfig({
       components: {
         Sidebar: "./src/components/Sidebar.astro",
         SocialIcons: "./src/components/NavBar.astro",
+        LastUpdated: "./src/components/LastUpdated.astro",
       },
       plugins: [
         starlightDocSearch({
@@ -75,8 +95,16 @@ export default defineConfig({
               autogenerate: { directory: "player" },
             },
             {
+              label: "Getting Started",
+              slug: "getting-started",
+            },
+            {
               label: "Guides",
               autogenerate: { directory: "guides" },
+            },
+            {
+              label: "Platforms",
+              autogenerate: { directory: "platforms" },
             },
             {
               label: "Authoring",
@@ -91,12 +119,25 @@ export default defineConfig({
               autogenerate: { directory: "assets" },
             },
             {
-              label: "Tools",
-              autogenerate: { directory: "tools" },
+              label: "Capabilities",
+              autogenerate: { directory: "capabilities" },
             },
             {
               label: "XLR",
-              autogenerate: { directory: "xlr" },
+              items: [
+                {
+                  label: "Intro",
+                  slug: "xlr/intro",
+                },
+                {
+                  label: "Concepts",
+                  slug: "xlr/concepts",
+                },
+                {
+                  label: "Usage",
+                  autogenerate: { directory: "xlr/usage" },
+                },
+              ],
             },
           ],
         },
@@ -104,33 +145,36 @@ export default defineConfig({
           label: "Plugins",
           items: [
             {
-              label: "Plugins",
-              items: [
-                {
-                  label: "Plugins Overview",
-                  slug: "plugins",
-                },
-                {
-                  label: "Android/JVM Plugins",
-                  autogenerate: { directory: "plugins/android" },
-                },
-                {
-                  label: "Core Plugins",
-                  autogenerate: { directory: "plugins/core" },
-                },
-                {
-                  label: "iOS Plugins",
-                  autogenerate: { directory: "plugins/iOS" },
-                },
-                {
-                  label: "React Plugins",
-                  autogenerate: { directory: "plugins/react" },
-                },
-                {
-                  label: "Multiplatform Plugins",
-                  autogenerate: { directory: "plugins/multiplatform" },
-                },
-              ],
+              label: "Plugins Overview",
+              slug: "plugins",
+            },
+            {
+              label: "Hooks",
+              slug: "plugins/hooks",
+            },
+            {
+              label: "Android/JVM Plugins",
+              autogenerate: { directory: "plugins/android" },
+            },
+            {
+              label: "Core Plugins",
+              autogenerate: { directory: "plugins/core" },
+            },
+            {
+              label: "iOS Plugins",
+              autogenerate: { directory: "plugins/ios" },
+            },
+            {
+              label: "Language Plugins",
+              autogenerate: { directory: "plugins/language" },
+            },
+            {
+              label: "React Plugins",
+              autogenerate: { directory: "plugins/react" },
+            },
+            {
+              label: "Multiplatform Plugins",
+              autogenerate: { directory: "plugins/multiplatform" },
             },
           ],
         },
@@ -149,6 +193,7 @@ export default defineConfig({
         },
       ],
     }),
+    pagefind(),
   ],
   base: BASE_PREFIX,
   vite: {

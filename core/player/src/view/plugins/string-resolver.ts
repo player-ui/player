@@ -111,7 +111,7 @@ const findBasePath = (
 };
 
 /** A plugin that resolves all string references for each node */
-export default class StringResolverPlugin implements ViewPlugin {
+export class StringResolverPlugin implements ViewPlugin {
   private propertiesToSkipCache: Map<string, Set<string>>;
 
   constructor() {

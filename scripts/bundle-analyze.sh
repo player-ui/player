@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+readonly JS_PACKAGES=`bazel query --output=package 'kind("npm_package rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
+readonly JS_BUILD_TARGETS=`bazel query --output=label 'kind("js_library rule", //...) intersect attr(name, "_library$", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
+
+bazel build -- $JS_BUILD_TARGETS
+
+# Pre download bundle analyzer before uploading in parallel otherwise npx has issues with multiple downloads
+npx @codecov/bundle-analyzer 
+
+pids=()
+for pkg in $JS_PACKAGES ; do
+    npx @codecov/bundle-analyzer ./bazel-bin/${pkg}/dist --bundle-name=${pkg} --ignore-patterns="*.map" --upload-token=$CODECOV_TOKEN &
+    pids+=($!)
+done
+
+for pid in "${pids[@]}"; do
+    wait "$pid" || exit 1
+done

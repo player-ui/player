@@ -347,21 +347,21 @@ const stringRegexValidator = (
 };
 
 /** Checks that the given value represents an email */
-export const email = stringRegexValidator(
+export const email: ValidatorFunction = stringRegexValidator(
   EMAIL_REGEX,
   "validation.email",
   "Improper email format",
 );
 
 /** Checks that the given value represents a phone number */
-export const phone = stringRegexValidator(
+export const phone: ValidatorFunction = stringRegexValidator(
   PHONE_REGEX,
   "validation.phone",
   "Invalid phone number",
 );
 
 /** Checks that the given value represents a phone number */
-export const zip = stringRegexValidator(
+export const zip: ValidatorFunction = stringRegexValidator(
   ZIP_REGEX,
   "validation.regex",
   "Invalid zip code",

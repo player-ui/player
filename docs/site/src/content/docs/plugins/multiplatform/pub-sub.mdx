@@ -3,6 +3,7 @@ title: PubSub
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 The PubSub plugin adds a publish/subscribe interface between the host app and Player's content.
 
@@ -39,13 +40,7 @@ pubsub.unsubscribe(token);
 
 If your content uses the `@[ publish() ]@` expression for actions, you can subscribe to these events by using the `PubSubPlugin`.
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/PubSubPlugin'
-```
+<PodAndPackage product="PubSubPlugin" />
 
 ### Swift Usage
 

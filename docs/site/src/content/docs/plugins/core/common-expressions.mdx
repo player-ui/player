@@ -4,6 +4,7 @@ title: Common Expressions
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
 import { PackageManagers } from 'starlight-package-managers'
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 This plugin exposes some basic expressions into Player content.
 
@@ -36,15 +37,7 @@ This will allow any included expressions or custom expressions to be used in the
 
 <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-
-pod 'PlayerUI/CommonExpressionsPlugin'
-
-```
+<PodAndPackage product="CommonExpressionsPlugin" />
 
 ### Swift Usage
 
@@ -144,6 +137,30 @@ function replace(
   value: string,
   pattern: string | RegExp,
   replacement: string,
+): string;
+```
+
+### split
+
+> Splits a string into an array of substrings based on a separator. Optionally limits the number of splits.
+
+```ts
+function split(
+  value: string,
+  separator: string,
+  limit?: number,
+): Array<string>;
+```
+
+### substr
+
+> Extracts a substring from a string. Supports negative indices to count from the end of the string.
+
+```ts
+function substr(
+  value: string,
+  start: number,
+  length?: number,
 ): string;
 ```
 

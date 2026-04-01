@@ -1,0 +1,57 @@
+---
+title: Android
+---
+
+:::note
+As a JVM use case, Android extends the concepts from the [JVM platform documentation](/platforms/jvm). Being familiar with those concepts may not be required, but certainly helpful for understanding the following content.
+:::
+
+## ViewModel
+
+The `AndroidPlayer` can be consumed directly, in which case, you'd be responsible for managing the lifecycle, responding to updates, and starting flows. To limit overhead, we provide the `PlayerViewModel` and `PlayerFragment` to couple the Player lifecycle with the Android lifecycle and remove this responsibility for general use cases. All that is needed is to provide concrete implementations of each and add the fragment to your app.
+
+:::note
+The [`ManagedPlayer`](/guides/multi-flow-experiences#managed-player) paradigm was introduced after the `PlayerViewModel` and `PlayerFragment` -- they exist as functional equivalents, and may even use some of the same terminology. There will eventually be a more aligned implementation for Jetpack Compose integrations.
+:::
+
+### PlayerViewModel
+
+The `PlayerViewModel` requires an `AsyncFlowIterator` to be supplied in the constructor. The `AsyncFlowIterator` (aka [`FlowManager`](/guides/multi-flow-experiences#flow-manager)) is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
+
+```kotlin
+class SimplePlayerViewModel(flows: AsyncFlowIterator) : PlayerViewModel(flows) {
+    override val plugins = listOf(ReferenceAssetsPlugin())
+}
+```
+
+### `PlayerFragment`
+
+The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `AsyncFlowIterator` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
+
+Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `AsyncFlowIterator` instance using the pseudo-constructor helper.
+
+```kotlin
+class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
+    override val playerViewModel by viewModels<SimplePlayerViewModel> {
+        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::SimplePlayerViewModel)
+    }
+}
+```
+
+## Release Optimization
+
+The Android Player dependency automatically pulls source maps for the mobile JS bundles.
+
+To optimize the release bundles, it is highly recommended to exclude `.map` files, as well as enabling R8 to strip out unused code from the final bundle.
+
+```kotlin
+buildTypes {
+    getByName("release") {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        packagingOptions {
+            exclude("**/*.js.map")
+        }
+    }
+}
+```

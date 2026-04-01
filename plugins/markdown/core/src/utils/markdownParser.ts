@@ -1,8 +1,7 @@
 import type { Node, ParseObjectOptions } from "@player-ui/player";
 import { NodeType } from "@player-ui/player";
-import type { Asset } from "@player-ui/types";
 import { fromMarkdown } from "mdast-util-from-markdown";
-import type { Mappers } from "../types";
+import type { Mappers, MarkdownAsset } from "../types";
 import { transformers } from "./transformers";
 
 /**
@@ -16,7 +15,7 @@ export function parseAssetMarkdownContent({
   /**
    * Asset to be parsed
    */
-  asset: Asset;
+  asset: MarkdownAsset;
   /**
    * Mappers record of AST Node to Player Content
    *
@@ -32,36 +31,45 @@ export function parseAssetMarkdownContent({
     options?: ParseObjectOptions,
   ) => Node.Node | null;
 }): Node.Node | null {
-  const { children } = fromMarkdown(asset.value as string);
-  const isMultiParagraph = children.length > 1;
+  const input = asset.value ?? "";
+  const { children } = fromMarkdown(input);
 
-  if (isMultiParagraph) {
-    const value = children.map((node) => {
-      const transformer = transformers[node.type as keyof typeof transformers];
+  // No markdown content: return an empty text asset
+  if (children.length === 0) {
+    const empty = mappers.text({ originalAsset: asset, value: "" });
+    return parser?.(empty, NodeType.Asset) || null;
+  }
+
+  // Map all children to their transformed content
+  const value = children
+    .map((node) => {
+      const transformer = transformers[node.type];
+      if (!transformer) {
+        if (mappers.null) {
+          return mappers?.null({ originalAsset: asset });
+        } else {
+          return null;
+        }
+      }
       return transformer({
-        astNode: node as any,
+        astNode: node,
         asset,
         mappers,
         transformers,
       });
-    });
+    })
+    .filter((x) => x !== null);
 
-    const collection = mappers.collection({
-      originalAsset: asset,
-      value,
-    });
-
-    return parser?.(collection, NodeType.Asset) || null;
+  // If only one item, return it directly; otherwise wrap in collection
+  if (value.length === 1) {
+    const [first] = value;
+    return parser?.(first!, NodeType.Asset) || null;
   }
 
-  const transformer =
-    transformers[children[0].type as keyof typeof transformers];
-  const content = transformer({
-    astNode: children[0] as any,
-    asset,
-    mappers,
-    transformers,
+  const collection = mappers.collection({
+    originalAsset: asset,
+    value,
   });
 
-  return parser?.(content, NodeType.Asset) || null;
+  return parser?.(collection, NodeType.Asset) || null;
 }

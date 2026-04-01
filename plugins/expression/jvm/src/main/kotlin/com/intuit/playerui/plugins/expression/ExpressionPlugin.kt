@@ -19,12 +19,11 @@ public typealias ExpressionHandler = (List<Any?>) -> Any?
  */
 public class ExpressionPlugin(
     public val map: Map<String, ExpressionHandler>,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(script, bundledSourcePath))
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
         runtime.add(
             "expressionHandlers",
             map.entries.fold(runtime.execute("new Map()") as Node) { acc, entry ->
@@ -43,7 +42,7 @@ public class ExpressionPlugin(
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/expression/core/dist/ExpressionPlugin.native.js"
-        private const val pluginName = "ExpressionPlugin.ExpressionPlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/expression/core/dist/ExpressionPlugin.native.js"
+        private const val PLUGIN_NAME = "ExpressionPlugin.ExpressionPlugin"
     }
 }

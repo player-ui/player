@@ -19,7 +19,9 @@ import kotlinx.serialization.json.longOrNull
 @InternalPlayerApi
 public val JsonPrimitive.value: Any get() = if (isString) {
     content
-} else { null }
+} else {
+    null
+}
     ?: longOrNull
     ?: doubleOrNull
     ?: booleanOrNull

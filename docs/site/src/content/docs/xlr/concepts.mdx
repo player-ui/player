@@ -27,3 +27,33 @@ The XLR SDK is used to abstract away the more tedious interactions XLRs like loa
 ## Transform Functions
 
 Transform functions can be used to modify XLRs when they're loaded and when they're exported. There is no real limit to what you can do in a transform function but typical use cases are things like adding new properties to object and substituting type references with different ones.
+
+This is the signature for a transform function:
+
+```typescript
+export type TransformFunction = (
+  input: NamedType<NodeType> | NodeType,
+  capabilityType: string,
+) => NamedType | NodeType;
+```
+
+### Example
+
+Here is an example of a transform function that adds a new `transformed` property to all objects that are part of the `Assets` capability:
+
+```typescript
+import type { TransformFunction } from "@player-tools/xlr";
+
+const transformFunction: TransformFunction = (input, capability) => {
+  if (capability === "Assets" && input.type === "object") {
+    const copyOfNode = structuredClone(input);
+    copyOfNode.properties.transformed = {
+      required: false,
+      node: { type: "boolean", const: true },
+    };
+    return copyOfNode;
+  }
+
+  return input;
+};
+```

@@ -13,9 +13,12 @@ js_pipeline(
     package_name = "@player-ui/react-subscribe",
     peer_deps = [
         "//:node_modules/@types/react",
+        "//:node_modules/@types/use-sync-external-store",
         "//:node_modules/react",
     ],
     deps = [
         "//:node_modules/p-defer",
+        "//:node_modules/use-sync-external-store",
     ],
+
 )

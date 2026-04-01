@@ -1,8 +1,8 @@
 // Based on https://github.com/storybookjs/addon-kit/blob/main/tsup.config.ts
 
 import { defineConfig, type Options } from "tsup";
-import { globalPackages as globalManagerPackages } from "@storybook/manager/globals";
-import { globalPackages as globalPreviewPackages } from "@storybook/preview/globals";
+import { globalPackages as globalManagerPackages } from "storybook/internal/manager/globals";
+import { globalPackages as globalPreviewPackages } from "storybook/internal/preview/globals";
 
 // The current browsers supported by Storybook v7
 const BROWSER_TARGET: Options["target"] = [

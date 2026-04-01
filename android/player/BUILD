@@ -1,84 +1,78 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
-load("@build_constants//:constants.bzl", "VERSION")
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
-load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
-load("//jvm:defs.bzl", "distribution")
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load("@rules_java//java:java_import.bzl", "java_import")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+load("//android:defs.bzl", "kt_android")
 
-string_flag(
-    name = "runtime",
-    build_setting_default = "j2v8",
-    values = [
-        "j2v8",
-        "j2v8-debug",
-        "hermes",
+# TODO: Hack for compile-only deps
+java_import(
+    name = "compose_compile_only",
+    jars = ["//jvm:empty.jar"],
+    neverlink = True,
+    tags = ["maven:compile-only"],
+    deps = [
+        artifact("androidx.compose.material:material"),
     ],
 )
 
-config_setting(
-    name = "j2v8_runtime",
-    flag_values = {":runtime": "j2v8"},
-)
+main_exports = [
+    "//jvm/core",
 
-config_setting(
-    name = "j2v8_debug_runtime",
-    flag_values = {":runtime": "j2v8-debug"},
-)
+    artifact("androidx.databinding:viewbinding"),
+    artifact("androidx.transition:transition"),
+]
 
-config_setting(
-    name = "hermes_runtime",
-    flag_values = {":runtime": "hermes"},
-)
+main_deps = main_exports + [
+    # JVM plugin deps
+    "//plugins/beacon/jvm",
+    "//plugins/pubsub/jvm",
+    "//plugins/coroutines/jvm",
 
-kt_android_library(
-    name = "player_android",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.playerui.android",
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    resources = main_resources,
-    plugins = [":jetpack_compose_compiler_plugin"],
-    deps = main_deps,
-)
+    artifact("androidx.constraintlayout:constraintlayout"),
+    artifact("androidx.lifecycle:lifecycle-viewmodel-ktx"),
+    artifact("androidx.lifecycle:lifecycle-runtime-ktx"),
 
-kt_compiler_plugin(
-    name = "jetpack_compose_compiler_plugin",
-    id = "androidx.compose.compiler",
-    target_embedded_compiler = True,
-    visibility = ["//visibility:public"],
-    deps = ["@maven//:androidx_compose_compiler_compiler"],
-)
+    # Compose deps (compile-only)
+    # TODO: Split out into actual compose module to link properly
+    ":compose_compile_only",
+]
 
-android_library(
-    name = "player",
-    custom_package = "com.intuit.playerui.android",
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
-    visibility = ["//visibility:public"],
-    exports = [":player_android"] + main_exports,
-    deps = main_deps,
-)
+main_resources = [
+    # TS core deps
+    # TODO: Wrap as it's own plugin
+    "//plugins/partial-match-fingerprint/core:core_native_bundle",
+    # TODO: Wrap as it's own plugin
+    "//core/partial-match-registry:partial-match-registry_native_bundle",
+]
 
-distribution(
-    name = "player",
-    maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
-)
+unit_test_deps = [
+    "//jvm/testutils:with-runtimes",
+    artifact("io.mockk:mockk"),
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("androidx.test:core"),
+]
 
-kt_jvm_junit5_test(
-    name = "player-tests",
-    srcs = glob(["src/test/java/**"]),
-    associates = [":player_android_kt"],
-    kotlinc_opts = "//jvm:test_options",
-    test_package = "com.intuit.playerui.android",
-    deps = [":player"] + test_deps,
-)
+instrumented_test_deps = [
+    "//jvm/testutils",
+    "//android/testutils:with-runtime",
+    artifact("io.mockk:mockk"),
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("androidx.test:core"),
+    "//jvm:kotlin_serialization"
+]
 
-lint(
-    name = "player",
-    srcs = glob(["src/**/*.kt"]),
-    lint_config = "//jvm:lint_config",
+# TODO: Update this to be updated automatically instead of maintaining a list manually
+instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.ThrowingAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest']
+
+kt_android(
+    # TODO: Maybe rename to player-android
+    name = "android",
+
+    main_deps = main_deps,
+    main_exports = main_exports,
+    main_resources = main_resources,
+    unit_test_deps = unit_test_deps,
+    main_opts = "//jvm:test_options",
+    instrumented_test_deps = instrumented_test_deps,
+    instrumented_test_classes = instrumented_test_classes,
+    plugins = ["//android:jetpack_compose_compiler_plugin"],
+    unit_test_package = "com.intuit.playerui.android"
 )

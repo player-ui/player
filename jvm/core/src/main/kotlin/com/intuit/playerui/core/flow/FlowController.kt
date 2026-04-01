@@ -13,7 +13,10 @@ import kotlinx.serialization.builtins.serializer
 
 /** Limited definition of the player flow controller that enables flow transitions */
 @Serializable(with = FlowController.Serializer::class)
-public class FlowController internal constructor(override val node: Node) : NodeWrapper, Transition {
+public class FlowController internal constructor(
+    override val node: Node,
+) : NodeWrapper,
+    Transition {
     private val transition: Invokable<Unit>? by NodeSerializableFunction()
 
     override fun transition(state: String, options: TransitionOptions?) {
@@ -25,8 +28,9 @@ public class FlowController internal constructor(override val node: Node) : Node
     public val current: FlowInstance? by NodeSerializableField(FlowInstance.serializer().nullable)
 
     @Serializable(Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
-
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         public val flow: NodeSyncHook1<FlowInstance>
             by NodeSerializableField(NodeSyncHook1.serializer(FlowInstance.serializer()))
 

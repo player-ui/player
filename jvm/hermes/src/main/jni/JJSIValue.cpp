@@ -2,8 +2,19 @@
 #include "JJSIValue.h"
 
 #include <iostream>
+#include <hermes/hermes.h>
+#include <hermes/CompileJS.h>
 
 namespace intuit::playerui {
+
+using facebook::jsi::Runtime;
+using facebook::jsi::Value;
+using facebook::jsi::Object;
+using facebook::jsi::Array;
+using facebook::jsi::Function;
+using facebook::jsi::String;
+using facebook::jsi::Symbol;
+using facebook::jsi::BigInt;
 
 [[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle) {
     // TODO: create a new exception type for this to hook into PlayerRuntimeException
@@ -30,6 +41,12 @@ void JJSIPreparedJavaScript::registerNatives() {
 
 local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL) {
     return JJSIValue::newObjectCxxArgs(this->get_scope(), get_runtime().evaluateJavaScript(std::make_shared<StringBuffer>(script), sourceURL));;
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateHermesBytecode(alias_ref<JRuntimeThreadContext>, alias_ref<jbyteArray> byteArray, std::string sourceURL) {
+    auto size = byteArray->size();
+    auto region = byteArray->getRegion(0, size);
+    return JJSIValue::newObjectCxxArgs(this->get_scope(), get_runtime().evaluateJavaScript(std::make_shared<ByteArrayBuffer>(region.get(), size), sourceURL));
 }
 
 local_ref<JJSIPreparedJavaScript::jhybridobject> JJSIRuntime::prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL) {
@@ -61,6 +78,7 @@ std::string JJSIRuntime::description(alias_ref<JRuntimeThreadContext>) {
 void JJSIRuntime::registerNatives() {
     registerHybrid({
         makeNativeMethod("evaluateJavaScript", JJSIRuntime::evaluateJavaScript),
+        makeNativeMethod("evaluateHermesBytecode", JJSIRuntime::evaluateHermesBytecode),
         makeNativeMethod("prepareJavaScript", JJSIRuntime::prepareJavaScript),
         makeNativeMethod("evaluatePreparedJavaScript", JJSIRuntime::evaluatePreparedJavaScript),
 #ifdef JSI_MICROTASK

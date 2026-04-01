@@ -11,8 +11,9 @@ import kotlinx.serialization.Serializable
 
 /** Limited definition of the player data controller to enable data modification */
 @Serializable(with = Serializer::class)
-public class DataController internal constructor(override val node: Node) : NodeWrapper {
-
+public class DataController internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     private val set: Invokable<Unit>? by NodeSerializableFunction()
     private val get: Invokable<Any?>? by NodeSerializableFunction()
 

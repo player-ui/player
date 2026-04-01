@@ -1,5 +1,23 @@
+load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//plugins:defs.bzl", "kt_player_plugin")
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+
+main_exports = [
+    "//jvm/core",
+]
+
+main_deps = main_exports
+
+test_deps = [
+    "//jvm/testutils:with-runtimes",
+    "//plugins/reference-assets/jvm",
+    "//plugins/coroutines/jvm",
+    artifact("io.mockk:mockk"),
+    artifact("org.amshove.kluent:kluent"),
+]
+
+main_resources = [
+    "//plugins/async-node/core:core_native_bundle",
+]
 
 kt_player_plugin(
     name = "async-node",

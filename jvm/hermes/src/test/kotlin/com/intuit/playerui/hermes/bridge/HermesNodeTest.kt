@@ -5,7 +5,9 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.getJson
+import com.intuit.playerui.core.bridge.snapshot
 import com.intuit.playerui.core.bridge.toJson
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
@@ -25,19 +27,19 @@ import kotlin.concurrent.thread
 
 /** Each method should test correct get, incorrect type, and key not found */
 internal class HermesNodeTest : HermesTest() {
-
     @Test
     fun get() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("string", "thisisastring")
-                set("int", 1)
-                set("object", mapOf("string" to "anotherstring"))
-                set("list", listOf(1, "two", mapOf("string" to "onemorestring"), null))
-                set("function", Invokable { "classicstring" })
-                set("null", null)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("string", "thisisastring")
+                    set("int", 1)
+                    set("object", mapOf("string" to "anotherstring"))
+                    set("list", listOf(1, "two", mapOf("string" to "onemorestring"), null))
+                    set("function", Invokable { "classicstring" })
+                    set("null", null)
+                }
+            }.toNode(format)
 
         assertEquals("thisisastring", node["string"])
         assertEquals(1, node["int"])
@@ -52,12 +54,13 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getString() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("string", "string")
-                set("notastring", 1)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("string", "string")
+                    set("notastring", 1)
+                }
+            }.toNode(format)
 
         assertEquals("string", node.getString("string"))
         assertNull(node.getString("notastring"))
@@ -66,13 +69,14 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getFunction() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("function", Invokable { "classicstring" })
-                set("tuple", Invokable { (p0, p1) -> listOf(p0, p1) })
-                set("notafunction", 1)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("function", Invokable { "classicstring" })
+                    set("tuple", Invokable { (p0, p1) -> listOf(p0, p1) })
+                    set("notafunction", 1)
+                }
+            }.toNode(format)
 
         assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
         assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
@@ -82,12 +86,13 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getList() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("list", listOf(1, 2.2, 3))
-                set("notalist", 1)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("list", listOf(1, 2.2, 3))
+                    set("notalist", 1)
+                }
+            }.toNode(format)
 
         assertEquals(listOf(1, 2.2, 3), node.getList("list"))
         assertNull(node.getList("notalist"))
@@ -96,17 +101,18 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getObject() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set(
-                    "object",
-                    mapOf(
-                        "string" to "thisisastring",
-                    ),
-                )
-                set("notaobject", 1234)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set(
+                        "object",
+                        mapOf(
+                            "string" to "thisisastring",
+                        ),
+                    )
+                    set("notaobject", 1234)
+                }
+            }.toNode(format)
 
         assertEquals("thisisastring", node.getObject("object")?.getString("string"))
 
@@ -116,11 +122,12 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getAsset() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("asset", mapOf("id" to "testId", "type" to "testType"))
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("asset", mapOf("id" to "testId", "type" to "testType"))
+                }
+            }.toNode(format)
 
         val (id, type) = node.getObject("asset") as Asset
         assertEquals(id, "testId")
@@ -129,24 +136,25 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getListHandlesObjects() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set(
-                    "assets",
-                    listOf(
-                        mapOf(
-                            "id" to "testId1",
-                            "type" to "testType",
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set(
+                        "assets",
+                        listOf(
+                            mapOf(
+                                "id" to "testId1",
+                                "type" to "testType",
+                            ),
+                            mapOf(
+                                "id" to "notAnAsset",
+                            ),
+                            1,
                         ),
-                        mapOf(
-                            "id" to "notAnAsset",
-                        ),
-                        1,
-                    ),
-                )
-                set("notassets", "justastring")
-            }
-        }.toNode(format)
+                    )
+                    set("notassets", "justastring")
+                }
+            }.toNode(format)
 
         val assets = node.getList("assets") as List<*>
         assertEquals(3, assets.size)
@@ -165,12 +173,13 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getInt() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("int", 1)
-                set("notanint", "asdf")
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("int", 1)
+                    set("notanint", "asdf")
+                }
+            }.toNode(format)
 
         assertEquals(1, node.getInt("int"))
         assertNull(node.getInt("notanint"))
@@ -179,22 +188,24 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getJson() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("beacon", mapOf("key" to "value"))
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("beacon", mapOf("key" to "value"))
+                }
+            }.toNode(format)
         assertEquals(JsonNull, node.getJson("notthere"))
         assertEquals(buildJsonObject { put("key", "value") }, node.getJson("beacon"))
     }
 
     @Test
     fun toJson() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("beacon", mapOf("key" to "value"))
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("beacon", mapOf("key" to "value"))
+                }
+            }.toNode(format)
 
         assertEquals(
             buildJsonObject {
@@ -211,27 +222,29 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getBoolean() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("isSelected", true)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("isSelected", true)
+                }
+            }.toNode(format)
         assertEquals(true, node.getBoolean("isSelected"))
         assertNull(node.getBoolean("notthere"))
     }
 
     @Test
     fun testConcurrency() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("string", "thisisastring")
-                set("int", 1)
-                set("object", mapOf("string" to "anotherstring"))
-                set("list", listOf(1, "two", mapOf("string" to "onemorestring"), null))
-                set("function", Invokable { "classicstring" })
-                set("null", null)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("string", "thisisastring")
+                    set("int", 1)
+                    set("object", mapOf("string" to "anotherstring"))
+                    set("list", listOf(1, "two", mapOf("string" to "onemorestring"), null))
+                    set("function", Invokable { "classicstring" })
+                    set("null", null)
+                }
+            }.toNode(format)
 
         addThreads(
             thread {
@@ -271,26 +284,102 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun getSerializablePrimitive() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set("number", 9)
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("number", 9)
+                }
+            }.toNode(format)
         assertEquals(9, node.getSerializable("number", Int.serializer()))
     }
 
     @Test
     fun getSerializable() {
-        val node = runtime.evaluateInJSThreadBlocking {
-            format.`object` {
-                set(
-                    "flow",
-                    mapOf(
-                        "id" to "testId",
-                    ),
-                )
-            }
-        }.toNode(format)
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set(
+                        "flow",
+                        mapOf(
+                            "id" to "testId",
+                        ),
+                    )
+                }
+            }.toNode(format)
         assertEquals("testId", node.getSerializable("flow", Flow.serializer())?.id)
+    }
+
+    @OptIn(ExperimentalPlayerApi::class)
+    @Test
+    fun snapshot() {
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("title", "Player Flow")
+                    set("count", 42)
+                    set("rate", 3.5)
+                    set("isActive", true)
+                    set("nothing", null)
+                    set("callback", Invokable { "should be nulled" })
+                    set(
+                        "settings",
+                        mapOf(
+                            "theme" to "dark",
+                            "nested" to mapOf(
+                                "level" to 2,
+                                "tags" to listOf("a", "b"),
+                            ),
+                        ),
+                    )
+                    set(
+                        "items",
+                        listOf(
+                            mapOf("id" to "item1", "label" to "First"),
+                            mapOf("id" to "item2", "label" to "Second"),
+                            "plainString",
+                            100,
+                            null,
+                            mapOf(
+                                "id" to "item3",
+                                "children" to listOf(
+                                    mapOf("id" to "child1", "value" to "deep"),
+                                ),
+                            ),
+                        ),
+                    )
+                    set("emptyList", listOf<Any>())
+                }
+            }.toNode(format)
+        val snapshot = node.snapshot()
+        // primitives
+        assertEquals("Player Flow", snapshot["title"])
+        assertEquals(42, snapshot["count"])
+        assertEquals(3.5, snapshot["rate"])
+        assertEquals(true, snapshot["isActive"])
+        assertNull(snapshot["nothing"])
+        // functions become null
+        assertNull(snapshot["callback"])
+        // nested nodes are recursively snapshotted into plain maps
+        val settings = snapshot["settings"] as Map<*, *>
+        assertEquals("dark", settings["theme"])
+        val nested = settings["nested"] as Map<*, *>
+        assertEquals(2, nested["level"])
+        assertEquals(listOf("a", "b"), nested["tags"])
+        // lists with mixed content: nodes, primitives, and nulls
+        val items = snapshot["items"] as List<*>
+        assertEquals(6, items.size)
+        assertEquals(mapOf("id" to "item1", "label" to "First"), items[0])
+        assertEquals(mapOf("id" to "item2", "label" to "Second"), items[1])
+        assertEquals("plainString", items[2])
+        assertEquals(100, items[3])
+        assertNull(items[4])
+        // deeply nested: node inside list with its own list of nodes
+        val item3 = items[5] as Map<*, *>
+        assertEquals("item3", item3["id"])
+        val children = item3["children"] as List<*>
+        assertEquals(1, children.size)
+        assertEquals(mapOf("id" to "child1", "value" to "deep"), children[0])
+        // empty list preserved
+        assertEquals(emptyList<Any>(), snapshot["emptyList"])
     }
 }

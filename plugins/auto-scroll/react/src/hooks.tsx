@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import React, { useEffect, useState } from "react";
-import scrollIntoViewWithOffset from "./scrollIntoViewWithOffset";
+import { scrollIntoViewWithOffset } from "./scrollIntoViewWithOffset";
 import type { ScrollType } from "./index";
 
 export interface AutoScrollProviderProps {
@@ -12,6 +12,8 @@ export interface AutoScrollProviderProps {
   getBaseElement: () => HTMLElement | undefined | null;
   /** Additional offset to be used (default: 0) */
   offset: number;
+  /** Called on mount with a function that clears all registered scroll targets */
+  onMount?: (clearScrollableMap: () => void) => void;
 }
 
 export interface RegisterData {
@@ -41,6 +43,7 @@ export const AutoScrollProvider = ({
   getElementToScrollTo,
   getBaseElement,
   offset,
+  onMount,
   children,
 }: PropsWithChildren<AutoScrollProviderProps>) => {
   // Tracker for what elements are registered to be scroll targets
@@ -49,6 +52,10 @@ export const AutoScrollProvider = ({
   const [scrollableMap, setScrollableMap] = useState<
     Map<ScrollType, Set<string>>
   >(new Map());
+
+  useEffect(() => {
+    onMount?.(() => setScrollableMap(new Map()));
+  }, []);
 
   /** Add a new entry as a scroll target */
   const updateScrollableMap = (key: ScrollType, value: string) => {
@@ -76,7 +83,7 @@ export const AutoScrollProvider = ({
     if (node) {
       scrollIntoViewWithOffset(node, getBaseElement() || document.body, offset);
     }
-  });
+  }, [scrollableMap]);
 
   return (
     <AutoScrollManagerContext.Provider value={{ register }}>

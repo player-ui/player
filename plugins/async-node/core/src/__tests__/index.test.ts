@@ -1,9 +1,89 @@
-import { expect, test, describe } from "vitest";
-import { Node, InProgressState } from "@player-ui/player";
+import { expect, test, describe, vi, beforeEach } from "vitest";
+import {
+  Node,
+  InProgressState,
+  ErrorState,
+  PlayerPlugin,
+  AssetTransformCorePlugin,
+  BeforeTransformFunction,
+  Flow,
+  NodeType,
+} from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
-import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
-import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+  createAsyncTransform,
+} from "../index";
+import { CheckPathPlugin } from "@player-ui/check-path-plugin";
+import { Registry } from "@player-ui/partial-match-registry";
+
+const transform: BeforeTransformFunction = createAsyncTransform({
+  transformAssetType: "chat-message",
+  wrapperAssetType: "collection",
+  getNestedAsset: (node) => node.children?.[0]?.value,
+});
+
+const transformPlugin = new AssetTransformCorePlugin(
+  new Registry([
+    [{ type: "chat-message" }, { beforeResolve: transform }],
+    [
+      { type: "async-asset" },
+      {
+        beforeResolve: (asset: Node.ViewOrAsset): Node.Async => ({
+          type: NodeType.Async,
+          flatten: true,
+          id: asset.value.id,
+          value: {
+            type: NodeType.Value,
+            value: {
+              id: asset.value.id,
+            },
+          },
+        }),
+      },
+    ],
+  ]),
+);
+
+class TestAsyncPlugin implements PlayerPlugin {
+  name = "test-async";
+  apply(player: Player) {
+    player.hooks.view.tap("test-async", (view) => {
+      transformPlugin.apply(view);
+    });
+  }
+}
+
+const asyncAssetFrf: Flow = {
+  id: "test-flow",
+  views: [
+    {
+      id: "my-view",
+      type: "view",
+      actions: [
+        {
+          asset: {
+            id: "async-0",
+            type: "async-asset",
+          },
+        },
+      ],
+    },
+  ],
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "VIEW_1",
+      VIEW_1: {
+        state_type: "VIEW",
+        ref: "my-view",
+        transitions: {},
+      },
+    },
+  },
+};
 
 describe("view", () => {
   const basicFRFWithActions = {
@@ -54,6 +134,9 @@ describe("view", () => {
         },
       },
     ],
+    data: {
+      foo: true,
+    },
     navigation: {
       BEGIN: "FLOW_1",
       FLOW_1: {
@@ -68,6 +151,59 @@ describe("view", () => {
         END_Done: {
           state_type: "END",
           outcome: "DONE",
+        },
+      },
+    },
+  };
+
+  const simpleAsyncContent: Flow = {
+    id: "test-flow",
+    views: [
+      {
+        type: "view",
+        id: "my-view",
+        values: {
+          async: true,
+          id: "async-values",
+        },
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "my-view",
+          transitions: {},
+        },
+      },
+    },
+  };
+
+  const simpleAsyncMultiNode: Flow = {
+    id: "test-flow",
+    views: [
+      {
+        type: "view",
+        id: "my-view",
+        values: [
+          {
+            async: true,
+            id: "async-values",
+            flatten: true,
+          },
+        ],
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "my-view",
+          transitions: {},
         },
       },
     },
@@ -151,6 +287,179 @@ describe("view", () => {
     expect(view?.actions[0].asset.type).toBe("action");
     expect(view?.actions.length).toBe(1);
   };
+
+  test("should resolve async content children", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    const asyncNodeHandler = vi.fn();
+    asyncNodeHandler.mockResolvedValue([
+      {
+        asset: {
+          id: "test-1",
+          type: "text",
+          value: "Test 1",
+        },
+      },
+      {
+        asset: {
+          id: "test-2",
+          type: "text",
+          value: "Test 2",
+        },
+      },
+    ]);
+
+    plugin.hooks.onAsyncNode.tap("test", asyncNodeHandler);
+    const player = new Player({ plugins: [plugin] });
+
+    player.start(simpleAsyncContent);
+
+    await waitFor(() => {
+      expect(asyncNodeHandler).toHaveBeenCalled();
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      expect(
+        (playerState as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual(
+        expect.objectContaining({
+          values: [
+            {
+              asset: {
+                id: "test-1",
+                type: "text",
+                value: "Test 1",
+              },
+            },
+            {
+              asset: {
+                id: "test-2",
+                type: "text",
+                value: "Test 2",
+              },
+            },
+          ],
+        }),
+      );
+    });
+  });
+
+  test("should update flattened multi-nodes", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let updateFn: ((content: unknown) => void) | undefined;
+    const asyncNodeHandler = vi.fn((_, update) => {
+      updateFn = update;
+
+      return new Promise(() => {});
+    });
+
+    plugin.hooks.onAsyncNode.tap("test", asyncNodeHandler);
+    const player = new Player({ plugins: [plugin] });
+
+    player.start(simpleAsyncMultiNode);
+
+    await waitFor(() => {
+      expect(asyncNodeHandler).toHaveBeenCalled();
+      expect(updateFn).toBeDefined();
+    });
+
+    // Initial update. Check after that content is flattened
+    updateFn?.([
+      {
+        asset: {
+          id: "test-1",
+          type: "text",
+          value: "Test 1",
+        },
+      },
+      {
+        asset: {
+          id: "test-2",
+          type: "text",
+          value: "Test 2",
+        },
+      },
+    ]);
+
+    await waitFor(() => {
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      expect(
+        (playerState as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual(
+        expect.objectContaining({
+          values: [
+            {
+              asset: {
+                id: "test-1",
+                type: "text",
+                value: "Test 1",
+              },
+            },
+            {
+              asset: {
+                id: "test-2",
+                type: "text",
+                value: "Test 2",
+              },
+            },
+          ],
+        }),
+      );
+    });
+
+    // Second update. Check that it is properly updated and flattened.
+    updateFn?.([
+      {
+        asset: {
+          id: "test-1",
+          type: "text",
+          value: "Test 1 (updated)",
+        },
+      },
+      {
+        asset: {
+          id: "test-2",
+          type: "text",
+          value: "Test 2 (updated)",
+        },
+      },
+    ]);
+
+    await waitFor(() => {
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      expect(
+        (playerState as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual(
+        expect.objectContaining({
+          values: [
+            {
+              asset: {
+                id: "test-1",
+                type: "text",
+                value: "Test 1 (updated)",
+              },
+            },
+            {
+              asset: {
+                id: "test-2",
+                type: "text",
+                value: "Test 2 (updated)",
+              },
+            },
+          ],
+        }),
+      );
+    });
+  });
 
   test("should return current node view when the resolved node is null", async () => {
     await asyncNodeTest(null);
@@ -730,6 +1039,84 @@ describe("view", () => {
     });
   });
 
+  describe("Async Node Error Handling", () => {
+    let failingAsyncNodePlugin: AsyncNodePlugin = new AsyncNodePlugin({});
+    const onAsyncNodeErrorCallback = vi.fn();
+
+    beforeEach(() => {
+      onAsyncNodeErrorCallback.mockReset();
+      const failingHandler = vi.fn();
+      failingHandler.mockRejectedValue("Promise Rejected");
+
+      failingAsyncNodePlugin = new AsyncNodePlugin(
+        {
+          plugins: [new AsyncNodePluginPlugin()],
+        },
+        failingHandler,
+      );
+
+      failingAsyncNodePlugin.hooks.onAsyncNodeError.tap(
+        "test",
+        onAsyncNodeErrorCallback,
+      );
+    });
+
+    test("should replace the async node with the result from the onAsyncNodeError hook when there is an error handling the async node", async () => {
+      onAsyncNodeErrorCallback.mockReturnValue({
+        asset: {
+          id: "async-text",
+          type: "text",
+          value: "Fallback Text",
+        },
+      });
+
+      const player = new Player({ plugins: [failingAsyncNodePlugin] });
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
+          new Error("Promise Rejected"),
+          expect.anything(),
+        );
+
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "Fallback Text",
+          },
+        });
+      });
+    });
+
+    test("should bubble up the error and cause player to fail when there is an error handling the async node and the onAsyncNodeError hook does not produce a fallback", async () => {
+      onAsyncNodeErrorCallback.mockReturnValue(undefined);
+
+      const player = new Player({ plugins: [failingAsyncNodePlugin] });
+      player.start(basicFRFWithActions as any).catch(() => {
+        /** Purposefully failing player in this test so catching the unresolved exception suppresses warnings from vitest */
+      });
+
+      await waitFor(() => {
+        expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
+          new Error("Promise Rejected"),
+          expect.anything(),
+        );
+
+        const playerState = player.getState();
+        expect(playerState.status).toBe("error");
+        const errorState = playerState as ErrorState;
+        expect(errorState.error.message).toBe("Promise Rejected");
+      });
+    });
+  });
+
   test("chat-message asset - replaces async nodes with multi node flattened", async () => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
@@ -737,7 +1124,7 @@ describe("view", () => {
 
     let deferredResolve: ((value: any) => void) | undefined;
 
-    plugin.hooks.onAsyncNode.tap("test", async (node) => {
+    plugin.hooks.onAsyncNode.tap("test", async () => {
       return new Promise((resolve) => {
         deferredResolve = resolve;
       });
@@ -745,7 +1132,7 @@ describe("view", () => {
 
     let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+    const plugins = [plugin, new TestAsyncPlugin()];
 
     const player = new Player({
       plugins: plugins,
@@ -753,7 +1140,7 @@ describe("view", () => {
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
       vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
+        view.hooks.onUpdate.tap("async-node-test", () => {
           updateNumber++;
         });
       });
@@ -798,8 +1185,8 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[1][0].asset.type).toBe("text");
-    expect(view?.values[1][1].asset.type).toBe("text");
+    expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[2].asset.type).toBe("text");
   });
 
   test("chat-message asset - replaces async nodes with provided node", async () => {
@@ -817,7 +1204,7 @@ describe("view", () => {
 
     let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+    const plugins = [plugin, new TestAsyncPlugin()];
 
     const player = new Player({
       plugins: plugins,
@@ -882,7 +1269,7 @@ describe("view", () => {
     let updateNumber = 0;
 
     const player = new Player({
-      plugins: [plugin, new ReferenceAssetsPlugin()],
+      plugins: [plugin, new TestAsyncPlugin()],
     });
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
@@ -949,7 +1336,7 @@ describe("view", () => {
 
     let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+    const plugins = [plugin, new TestAsyncPlugin()];
 
     const player = new Player({
       plugins: plugins,
@@ -1028,6 +1415,511 @@ describe("view", () => {
 
     expect(view?.values[2].asset.type).toBe("text");
     expect(view?.values[2].asset.value).toBe("chained async content");
+  });
+
+  test("chat-message asset - resolve chained chat-message with CheckPathPlugin", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let deferredResolve: ((value: any) => void) | undefined;
+
+    plugin.hooks.onAsyncNode.tap("test", async (node) => {
+      return new Promise((resolve) => {
+        deferredResolve = resolve;
+      });
+    });
+
+    let updateNumber = 0;
+
+    const checkPathPlugin = new CheckPathPlugin();
+
+    const plugins = [plugin, new TestAsyncPlugin(), checkPathPlugin];
+
+    const player = new Player({
+      plugins: plugins,
+    });
+
+    player.hooks.viewController.tap("async-node-test", (vc) => {
+      vc.hooks.view.tap("async-node-test", (view) => {
+        view.hooks.onUpdate.tap("async-node-test", (update) => {
+          updateNumber++;
+        });
+      });
+    });
+
+    player.start(chatMessageContent as any);
+
+    let view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.values[0].asset.type).toBe("text");
+    expect(view?.values[0].asset.value).toBe("chat message");
+    expect(updateNumber).toBe(1);
+
+    await waitFor(() => {
+      expect(deferredResolve).toBeDefined();
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-1",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-1",
+              type: "text",
+              value: "async content",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(2);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[1].asset.value).toBe("async content");
+
+    expect(checkPathPlugin.getParent("text-1")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+      ],
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-2",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-2",
+              type: "text",
+              value: "async content2",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(3);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[2].asset.type).toBe("text");
+    expect(view?.values[2].asset.value).toBe("async content2");
+    expect(checkPathPlugin.getParent("text-2")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+        {
+          asset: {
+            id: "text-2",
+            type: "text",
+            value: "async content2",
+          },
+        },
+      ],
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-3",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-3",
+              type: "text",
+              value: "async content3",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(4);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[3].asset.type).toBe("text");
+    expect(view?.values[3].asset.value).toBe("async content3");
+
+    expect(checkPathPlugin.getParent("text-3")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+        {
+          asset: {
+            id: "text-2",
+            type: "text",
+            value: "async content2",
+          },
+        },
+        {
+          asset: {
+            id: "text-3",
+            type: "text",
+            value: "async content3",
+          },
+        },
+      ],
+    });
+  });
+
+  test("should add resolved async node to its own list of resolved async nodes", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let asyncUpdate: ((value: any) => void) | undefined;
+
+    plugin.hooks.onAsyncNode.tap("test", async (node, update) => {
+      asyncUpdate = update;
+      return new Promise(() => {});
+    });
+
+    const plugins = [plugin, new TestAsyncPlugin()];
+
+    const player = new Player({
+      plugins: plugins,
+    });
+
+    player.start(asyncAssetFrf);
+
+    await vi.waitFor(() => {
+      expect(asyncUpdate).toBeDefined();
+    });
+
+    asyncUpdate!({
+      type: "text",
+      value: "value",
+      id: "id-0",
+    });
+
+    await vi.waitFor(() => {
+      const state = player.getState();
+      expect(state.status).toBe("in-progress");
+
+      expect(
+        (state as InProgressState).controllers.view.currentView?.lastUpdate,
+      ).toStrictEqual({
+        id: "my-view",
+        type: "view",
+        actions: [
+          {
+            asset: {
+              type: "text",
+              value: "value",
+              id: "id-0",
+            },
+          },
+        ],
+      });
+    });
+
+    asyncUpdate!({
+      type: "another-text",
+      value: "value 2",
+      id: "id-1",
+    });
+
+    await vi.waitFor(() => {
+      const state = player.getState();
+      expect(state.status).toBe("in-progress");
+
+      expect(
+        (state as InProgressState).controllers.view.currentView?.lastUpdate,
+      ).toStrictEqual({
+        id: "my-view",
+        type: "view",
+        actions: [
+          {
+            asset: {
+              type: "another-text",
+              value: "value 2",
+              id: "id-1",
+            },
+          },
+        ],
+      });
+    });
+  });
+
+  describe("multi-view cache", () => {
+    let asyncNodePlugin: AsyncNodePlugin = new AsyncNodePlugin({});
+    const deferHandler = vi.fn();
+    let deferredResolve = (value: any) => {};
+
+    beforeEach(() => {
+      deferHandler.mockReset();
+      deferHandler.mockImplementation(
+        () =>
+          new Promise((res) => {
+            deferredResolve = res;
+          }),
+      );
+
+      asyncNodePlugin = new AsyncNodePlugin(
+        {
+          plugins: [new AsyncNodePluginPlugin()],
+        },
+        deferHandler,
+      );
+    });
+
+    test("clear cache between views", async () => {
+      const player = new Player({ plugins: [asyncNodePlugin] });
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(deferHandler).toHaveBeenCalledOnce();
+      });
+
+      deferredResolve({
+        asset: {
+          id: "async-text",
+          type: "text",
+          value: "Fallback Text",
+        },
+      });
+
+      await waitFor(() => {
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "Fallback Text",
+          },
+        });
+      });
+
+      deferHandler.mockClear();
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(deferHandler).toHaveBeenCalledOnce();
+      });
+
+      deferredResolve({
+        asset: {
+          id: "async-text",
+          type: "text",
+          value: "New Fallback Text",
+        },
+      });
+
+      await waitFor(() => {
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "New Fallback Text",
+          },
+        });
+      });
+    });
+  });
+
+  test("should not start async node handling if process has already started", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    const doNothingTap = vi.fn();
+    doNothingTap.mockReturnValue(undefined);
+    const asyncTapFn = vi.fn();
+    let deferredResolve = (_?: any) => {};
+    asyncTapFn.mockReturnValue(
+      new Promise((res) => {
+        deferredResolve = () => {
+          res({
+            asset: {
+              type: "text",
+              id: "async-text",
+              value: "text",
+            },
+          });
+        };
+      }),
+    );
+
+    plugin.hooks.onAsyncNode.tap("test", doNothingTap);
+    plugin.hooks.onAsyncNode.tap("test", asyncTapFn);
+
+    const player = new Player({ plugins: [plugin] });
+    player.start(simpleAsyncContent);
+
+    await vi.waitFor(() => {
+      expect(asyncTapFn).toHaveBeenCalledOnce();
+      expect(doNothingTap).toHaveBeenCalledOnce();
+    });
+
+    const playerState = player.getState();
+    expect(playerState.status).toBe("in-progress");
+    // force an update while ignoring the cache.
+    const firstRender = (playerState as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    // Should not be called again.
+    expect(firstRender).toStrictEqual({
+      type: "view",
+      id: "my-view",
+    });
+
+    deferredResolve();
+
+    vi.waitFor(() => {
+      const currentView = (playerState as InProgressState).controllers.view
+        .currentView?.lastUpdate;
+      expect(currentView).toStrictEqual({
+        type: "view",
+        id: "my-view",
+        values: {
+          asset: {
+            type: "text",
+            id: "async-text",
+            value: "text",
+          },
+        },
+      });
+    });
+  });
+
+  // For tests dealing with the startup and cleanup of promises for async nodes.
+  describe("Promise Management", () => {
+    test("should not start async node handling if process has already started", async () => {
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+
+      // Create a promise that won't be resolved.
+      const asyncTapFn = vi.fn();
+      asyncTapFn.mockReturnValue(new Promise(() => {}));
+
+      plugin.hooks.onAsyncNode.tap("test", asyncTapFn);
+
+      const player = new Player({ plugins: [plugin] });
+      player.start(basicFRFWithActions as any);
+
+      await vi.waitFor(() => {
+        expect(asyncTapFn).toHaveBeenCalledOnce();
+      });
+
+      // Clear the one call since it has already been checked.
+      asyncTapFn.mockClear();
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      // force an update while ignoring the cache.
+      (playerState as InProgressState).controllers.view.currentView?.update();
+
+      // Should not be called again.
+      expect(
+        vi.waitFor(() => {
+          expect(asyncTapFn).toHaveBeenCalledOnce();
+        }),
+      ).rejects.toThrowError();
+    });
+
+    test("should allow for handling to start again if the promise completes", async () => {
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+
+      // Create a promise that won't be resolved.
+      const asyncTapFn = vi.fn();
+      asyncTapFn.mockResolvedValue(null);
+
+      plugin.hooks.onAsyncNode.tap("test", asyncTapFn);
+
+      const player = new Player({ plugins: [plugin] });
+      player.start(basicFRFWithActions as any);
+
+      await vi.waitFor(() => {
+        expect(asyncTapFn).toHaveBeenCalledOnce();
+      });
+
+      // Clear the one call since it has already been checked.
+      asyncTapFn.mockClear();
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      // force an update while ignoring the cache.
+      (playerState as InProgressState).controllers.view.currentView?.update();
+
+      // Should be called again.
+      vi.waitFor(() => {
+        expect(asyncTapFn).toHaveBeenCalledOnce();
+      });
+    });
   });
 });
 

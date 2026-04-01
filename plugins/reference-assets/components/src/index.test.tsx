@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, test, expect } from "vitest";
-import { render, binding as b } from "@player-tools/dsl";
+import { render, binding as b, expression as e } from "@player-tools/dsl";
 import { Text, Action, Info, Collection, Input, Choice, ChatMessage } from ".";
 
 describe("JSON serialization", () => {
@@ -321,6 +321,88 @@ describe("JSON serialization", () => {
       ).toStrictEqual({
         id: "1",
         type: "chat-message",
+      });
+    });
+  });
+
+  describe("action", () => {
+    test("action allows for an array of expressions", async () => {
+      expect(
+        (
+          await render(
+            <Action
+              id="action"
+              exp={[
+                e`${b`local.testValue`} = 1`,
+                e`${b`local.otherValue`} = 2`,
+              ]}
+            >
+              <Action.Label>
+                <Text id="text">Test</Text>
+              </Action.Label>
+            </Action>,
+          )
+        ).jsonValue,
+      ).toStrictEqual({
+        id: "action",
+        type: "action",
+        exp: ["{{local.testValue}} = 1", "{{local.otherValue}} = 2"],
+        label: {
+          asset: {
+            id: "text",
+            type: "text",
+            value: "Test",
+          },
+        },
+      });
+    });
+
+    test("action allows for a single expression", async () => {
+      expect(
+        (
+          await render(
+            <Action id="action" exp={e`${b`local.testValue`} = 1`}>
+              <Action.Label>
+                <Text id="text">Test</Text>
+              </Action.Label>
+            </Action>,
+          )
+        ).jsonValue,
+      ).toStrictEqual({
+        id: "action",
+        type: "action",
+        exp: "{{local.testValue}} = 1",
+        label: {
+          asset: {
+            id: "text",
+            type: "text",
+            value: "Test",
+          },
+        },
+      });
+    });
+
+    test("action allows for an undefined expression", async () => {
+      expect(
+        (
+          await render(
+            <Action id="action">
+              <Action.Label>
+                <Text id="text">Test</Text>
+              </Action.Label>
+            </Action>,
+          )
+        ).jsonValue,
+      ).toStrictEqual({
+        id: "action",
+        type: "action",
+        label: {
+          asset: {
+            id: "text",
+            type: "text",
+            value: "Test",
+          },
+        },
       });
     });
   });
