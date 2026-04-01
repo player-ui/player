@@ -199,13 +199,14 @@ public extension HeadlessPlayer {
         let warn = logger.getJSLogFor(level: .warning, context)
         let error = logger.getJSLogFor(level: .error, context)
 
+        context.loadCore()
         for plugin in plugins {
             if let plugin = plugin as? JSBasePlugin, plugin.context != context {
                 plugin.context = context
             }
         }
         return context
-            .getClassReference("Player.Player", load: loadCore(into:))?
+            .getClassReference("Player.Player", load: { _ in })?
             .construct(withArguments: [[
                 "plugins": plugins.compactMap({$0 as? JSBasePlugin}).map(\.pluginRef),
                 "logger": [

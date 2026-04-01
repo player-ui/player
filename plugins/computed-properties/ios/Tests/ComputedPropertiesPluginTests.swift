@@ -6,9 +6,15 @@ import JavaScriptCore
 @testable import PlayerUIComputedPropertiesPlugin
 
 class ComputedPropertiesPluginTests: XCTestCase {
-    func testPluginConstructs() {
-        let context = JSContext()
+    var context: JSContext!
 
+    override func setUp() {
+        super.setUp()
+        context = JSContext()
+        context.loadCore()
+    }
+
+    func testPluginConstructs() {
         let plugin = ComputedPropertiesPlugin()
         plugin.context = context
 
