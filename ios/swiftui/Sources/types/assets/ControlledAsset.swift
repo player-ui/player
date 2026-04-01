@@ -18,6 +18,10 @@ public enum AssetRenderError: Error {
 }
 
 extension AssetRenderError: ErrorWithMetadata {
+    public var hasMetadata: Bool {
+        true
+    }
+    
     public var type: String {
         ErrorTypes.render
     }

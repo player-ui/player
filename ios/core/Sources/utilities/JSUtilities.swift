@@ -63,8 +63,13 @@ public class JSUtilities {
 
 internal extension JSContext {
     func error<E>(for error: E) -> JSValue? where E: Error, E: JSConvertibleError {
+        if let jsError = error as? JSValueError {
+            // If the error originated in JS, just return the original object
+            return jsError.getJSErrorObject()
+        }
+        
         let errObj = objectForKeyedSubscript("Error").construct(withArguments: [error.jsDescription])
-        if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj {
+        if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj, errorWithMetadata.hasMetadata {
             err.setValue(errorWithMetadata.type, forProperty: "type")
             err.setValue(errorWithMetadata.severity?.rawValue, forProperty: "severity")
             if let metadata = errorWithMetadata.metadata {
@@ -83,6 +88,7 @@ public protocol JSConvertibleError {
 }
 
 public protocol ErrorWithMetadata : Error {
+    var hasMetadata: Bool { get }
     var type: String { get }
     var severity: ErrorSeverity? { get }
     var metadata: [String: Any]? { get }
