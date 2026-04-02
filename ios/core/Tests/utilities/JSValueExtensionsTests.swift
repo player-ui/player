@@ -31,12 +31,8 @@ class JSValueExtensionsTests: XCTestCase {
                 return
             }
             
-            switch jsValueError {
-            case .simpleJsError(_, let message):
-                XCTAssertEqual(message, "Fail")
-            default:
-                XCTFail("Unhandled case")
-            }
+            XCTAssertFalse(jsValueError.hasMetadata)
+            XCTAssertEqual(jsValueError.message, "Fail")
         })
     }
     
@@ -46,13 +42,13 @@ class JSValueExtensionsTests: XCTestCase {
         let functionReturningError = self.context
             .evaluateScript("""
                              (() => {
-                                const err = new Error("Fail")
-                                err.type = "Error Type"
-                                err.severity = "error"
-                                err.metadata = {
+                                const error = new Error("Fail")
+                                error.type = "Error Type"
+                                error.severity = "error"
+                                error.metadata = {
                                   property: "value"
                                 }
-                                throw err
+                                throw error
                              })
                            """)
 
@@ -62,16 +58,12 @@ class JSValueExtensionsTests: XCTestCase {
                 return
             }
             
-            switch jsValueError {
-            case .errorWithMetadata(_, let message, let type, let severity, let metadata):
-                XCTAssertEqual(message, "Fail")
-                XCTAssertEqual(type, "Error Type")
-                XCTAssertEqual(severity, ErrorSeverity.error)
-                XCTAssertNotNil(metadata)
-                XCTAssertEqual(metadata!["property"] as? String, "value")
-            default:
-                XCTFail("Unhandled case")
-            }
+            XCTAssertEqual(jsValueError.message, "Fail")
+            XCTAssertEqual(jsValueError.type, "Error Type")
+            XCTAssertEqual(jsValueError.severity, ErrorSeverity.error)
+            XCTAssertNotNil(jsValueError.metadata)
+            XCTAssertEqual(jsValueError.metadata?["property"] as? String, "value")
+            XCTAssertTrue(jsValueError.hasMetadata)
         })
     }
     
@@ -91,13 +83,10 @@ class JSValueExtensionsTests: XCTestCase {
                 return
             }
             
-            switch jsValueError {
-            case .unknownError(let jsError):
-                XCTAssertTrue(jsError.isBoolean)
-                XCTAssertFalse(jsError.toBool())
-            default:
-                XCTFail("Unhandled case")
-            }
+            XCTAssertTrue(jsValueError.originalJSError.isBoolean)
+            XCTAssertFalse(jsValueError.originalJSError.toBool())
+            XCTAssertEqual(jsValueError.message, "Unknown JS Error")
+            XCTAssertFalse(jsValueError.hasMetadata)
         })
     }
 
@@ -134,13 +123,8 @@ class JSValueExtensionsTests: XCTestCase {
                                 return
                             }
                             
-                            switch jsValueError {
-                            case .simpleJsError(_, let message):
-                                XCTAssertEqual(message, "Transitioning while ongoing transition from VIEW_1 is in progress is not supported")
-                            default:
-                                XCTFail("Should throw a JSValueError.simpleJsError")
-                            }
-                            
+                            XCTAssertEqual(jsValueError.message, "Transitioning while ongoing transition from VIEW_1 is in progress is not supported")
+                            XCTAssertFalse(jsValueError.hasMetadata)
                             expectation.fulfill()
                         }
 

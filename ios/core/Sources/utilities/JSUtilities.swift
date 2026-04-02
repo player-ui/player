@@ -55,25 +55,37 @@ public class JSUtilities {
         }
         guard
             let closure = JSValue(object: constructor, in: context),
-            let promise = context.evaluateScript("Promise")?.construct(withArguments: [closure])
+            let promise = context.constructClass(.Promise, withArguments: [closure])
         else { return nil }
         return promise
     }
 }
 
+internal enum JSClass: String {
+    case Error
+    case Promise
+}
+
 internal extension JSContext {
+    func getJSClass(_ jsClass: JSClass) -> JSValue {
+        objectForKeyedSubscript(jsClass.rawValue)
+    }
+    func constructClass(_ jsClass: JSClass, withArguments: [Any]?) -> JSValue? {
+        getJSClass(jsClass).construct(withArguments: withArguments)
+    }
+    
     func error<E>(for error: E) -> JSValue? where E: Error, E: JSConvertibleError {
-        if let jsError = error as? JSValueError {
+        if let jsValueError = error as? JSValueError {
             // If the error originated in JS, just return the original object
-            return jsError.getJSErrorObject()
+            return jsValueError.originalJSError
         }
         
-        let errObj = objectForKeyedSubscript("Error").construct(withArguments: [error.jsDescription])
+        let errObj = constructClass(.Error, withArguments: [error.jsDescription])
         if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj, errorWithMetadata.hasMetadata {
-            err.setValue(errorWithMetadata.type, forProperty: "type")
-            err.setValue(errorWithMetadata.severity?.rawValue, forProperty: "severity")
+            err.setValue(errorWithMetadata.type, forProperty: JSValueError.JSKeys.type)
+            err.setValue(errorWithMetadata.severity?.rawValue, forProperty: JSValueError.JSKeys.severity)
             if let metadata = errorWithMetadata.metadata {
-                err.setValue(metadata, forProperty: "metadata")
+                err.setValue(metadata, forProperty: JSValueError.JSKeys.metadata)
             }
         }
         

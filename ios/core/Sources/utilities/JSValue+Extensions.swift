@@ -9,6 +9,11 @@ import Foundation
 import JavaScriptCore
 
 extension JSValue {
+    
+    public enum TryCatchResultKeys {
+        static let success = "success"
+        static let result = "result"
+    }
 
 
     /**
@@ -17,128 +22,102 @@ extension JSValue {
         - args: List of arguments taken by the function
      */
     @discardableResult
-    public func tryCatch(args: Any...) throws(JSValueError) -> JSValue? {
+    public func tryCatch(args: Any...) throws -> JSValue? {
         var tryCatchWrapper: JSValue? {
             self.context.evaluateScript(
             """
                (fn, args) => {
                    try {
                        return {
-                           result: fn(...args),
-                           success: true
+                           \(TryCatchResultKeys.result): fn(...args),
+                           \(TryCatchResultKeys.success): true
                        }
-                   } catch(e) {
+                   } catch(error) {
                        return {
-                           result: e,
-                           success: false
+                           \(TryCatchResultKeys.result): error,
+                           \(TryCatchResultKeys.success): false
                        }
                    }
                }
             """)
         }
-
         
         let result = tryCatchWrapper?.call(withArguments: [self, args])
-        let success = result?.objectForKeyedSubscript("success")?.toBool()
-        let resultValue = result?.objectForKeyedSubscript("result")
-
-        if success! {
-            return resultValue
-        } else {
-            throw JSValueError.createInstance(value: resultValue!)
+        guard
+            let success = result?.objectForKeyedSubscript(TryCatchResultKeys.success)?.toBool(),
+            let resultValue = result?.objectForKeyedSubscript(TryCatchResultKeys.result)
+        else {
+            throw PlayerError.jsConversionFailure
         }
+
+        if !success {
+            throw JSValueError.createInstance(value: resultValue)
+        }
+        
+        return resultValue
     }
 }
 
 /**
  Represents the different errors that occur when evaluating JSValue
  */
-public enum JSValueError: Error {
-    case simpleJsError(jsError: JSValue, message: String)
-    case errorWithMetadata(jsError: JSValue, message: String, type: String, severity: ErrorSeverity?, metadata: [String: Any]?)
-    case unknownError(jsError: JSValue)
+public struct JSValueError: Error, CreatedFromJSValue {
+    private static let DEFAULT_MESSAGE: String  = "Unknown JS Error"
+    private static let DEFAULT_TYPE: String  = ""
     
-    func getJSErrorObject() -> JSValue {
-        switch self {
-        case .simpleJsError(let jsError, _):
-            return jsError
-        case .errorWithMetadata(let jsError, _, _, _, _):
-            return jsError
-        case .unknownError(let jsError):
-            return jsError
-        }
+    public let message: String
+    public let type: String
+    public let severity: ErrorSeverity?
+    public let metadata: [String: Any]?
+    
+    public let originalJSError: JSValue
+    
+    public enum JSKeys {
+        static let message = "message"
+        static let type = "type"
+        static let severity = "severity"
+        static let metadata = "metadata"
     }
-}
-
-extension JSValueError: CreatedFromJSValue {
+    
     public static func createInstance(value: JSValue) -> JSValueError {
-        if (!value.isInstance(of: value.context.objectForKeyedSubscript("Error"))) {
-            return JSValueError.unknownError(jsError: value)
+        return JSValueError(value)
+    }
+    
+    public init(_ jsErrorObject: JSValue) {
+        originalJSError = jsErrorObject
+        if !jsErrorObject.isInstance(of: jsErrorObject.context.getJSClass(.Error)) {
+            type = JSValueError.DEFAULT_MESSAGE
+            message = JSValueError.DEFAULT_TYPE
+            severity = nil
+            metadata = nil
+            return
         }
         
-        let message = value.objectForKeyedSubscript("message")
-        if (message?.isString != true) {
-            return JSValueError.unknownError(jsError: value)
+        if let messageProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.message), messageProperty.isString == true {
+            message = messageProperty.toString()
+        } else {
+            message = JSValueError.DEFAULT_MESSAGE
         }
         
-        let type = value.objectForKeyedSubscript("type")
-        if (type?.isString != true) {
-            return JSValueError.simpleJsError(jsError: value, message: message!.toString()!)
+        if let typeProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.type), typeProperty.isString == true {
+            type = typeProperty.toString()
+        } else {
+            type = JSValueError.DEFAULT_TYPE
         }
         
-        let severity = ErrorSeverity(rawValue: value.objectForKeyedSubscript("severity")?.toString() ?? "")
-        let metadata = value.objectForKeyedSubscript("metadata")?.toDictionary() as? [String: Any]
-        return JSValueError.errorWithMetadata(jsError: value, message: message!.toString()!, type: type!.toString()!, severity: severity, metadata: metadata)
+        severity = ErrorSeverity(rawValue: jsErrorObject.objectForKeyedSubscript(JSKeys.severity)?.toString() ?? "")
+        metadata = jsErrorObject.objectForKeyedSubscript(JSKeys.metadata)?.toDictionary() as? [String: Any]
     }
 }
 
 extension JSValueError: ErrorWithMetadata {
     public var hasMetadata: Bool {
-        switch self {
-        case .errorWithMetadata(_, _, _, _, _):
-            return true
-        default:
-            return false
-        }
-    }
-    
-    public var type: String {
-        switch self {
-        case .errorWithMetadata(_, _, let type, _, _):
-            return type
-        default:
-            return "UNKNOWN"
-        }
-    }
-    
-    public var severity: ErrorSeverity? {
-        switch self {
-        case .errorWithMetadata(_, _, _, let severity, _):
-            return severity
-        default:
-            return nil
-        }
-    }
-    
-    public var metadata: [String: Any]? {
-        switch self {
-        case .errorWithMetadata(_, _, _, _, let metadata):
-            return metadata
-        default:
-            return nil
-        }
+        !type.isEmpty
     }
 }
 
 extension JSValueError: JSConvertibleError {
     public var jsDescription: String {
-        switch self {
-        case .simpleJsError(_, let message):
-            return message
-        case .errorWithMetadata(_, let message, _, _, _):
-            return message
-        case .unknownError:
-            return "Unknown JS Error"
-        }
+        message
     }
 }
