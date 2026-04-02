@@ -1,9 +1,26 @@
 import { describe, it, beforeEach, expect, vitest } from "vitest";
 import { ErrorController } from "../controller";
-import { ErrorSeverity, ErrorTypes } from "../types";
+import {
+  ErrorMetadata,
+  ErrorSeverity,
+  ErrorTypes,
+  PlayerErrorMetadata,
+} from "../types";
 import type { DataController } from "../../data/controller";
 import type { FlowController } from "../../flow/controller";
 import type { Logger } from "../../../logger";
+
+/** Test class to create an error with any additional properties */
+class ErrorWithProps extends Error implements PlayerErrorMetadata {
+  constructor(
+    message: string,
+    public type: string,
+    public severity?: ErrorSeverity,
+    public metadata?: ErrorMetadata,
+  ) {
+    super(message);
+  }
+}
 
 describe("ErrorController", () => {
   let errorController: ErrorController;
@@ -98,6 +115,36 @@ describe("ErrorController", () => {
           writeSymbol: expect.any(Symbol),
         }),
       );
+    });
+
+    it("should merge options from args and error object when avaiable", () => {
+      const error = new ErrorWithProps(
+        "Message",
+        ErrorTypes.EXPRESSION,
+        ErrorSeverity.FATAL,
+        { fromError: "value", overlap: "error" },
+      );
+      const err = errorController.captureError(
+        error,
+        ErrorTypes.VIEW,
+        ErrorSeverity.WARNING,
+        {
+          fromFunctionCall: "value",
+          overlap: "function",
+        },
+      );
+
+      expect(err).toStrictEqual({
+        skipped: false,
+        metadata: {
+          fromError: "value",
+          overlap: "error",
+          fromFunctionCall: "value",
+        },
+        severity: ErrorSeverity.FATAL,
+        errorType: ErrorTypes.EXPRESSION,
+        error,
+      });
     });
   });
 
@@ -247,6 +294,11 @@ describe("ErrorController", () => {
       expect(observer2).not.toHaveBeenCalled(); // Execution stops after bail
       // Data model should not be updated when skipped
       expect(mockDataController.set).not.toHaveBeenCalled();
+      expect(playerError).toStrictEqual(
+        expect.objectContaining({
+          skipped: true,
+        }),
+      );
     });
 
     it("should continue to next plugin when undefined is returned", () => {

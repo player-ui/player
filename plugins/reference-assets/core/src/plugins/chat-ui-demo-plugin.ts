@@ -4,9 +4,24 @@ import {
   ExtendedPlayerPlugin,
   NodeType,
   Player,
+  Node,
 } from "@player-ui/player";
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import { send } from "./send";
+
+const isInChatDemo = (node: Node.Node) => {
+  if (
+    node.parent?.parent?.type === NodeType.View &&
+    node.parent.parent.value.id === "chat-view"
+  ) {
+    return true;
+  }
+
+  return (
+    node.parent?.parent?.type === NodeType.Asset &&
+    node.parent.parent.value.id.startsWith("collection-async-chat-demo")
+  );
+};
 
 const createContentFromMessage = (message: string, id: string): any => ({
   asset: {
@@ -18,6 +33,27 @@ const createContentFromMessage = (message: string, id: string): any => ({
         id: `${id}-value`,
         value: message,
       },
+    },
+  },
+});
+
+/** This content will fail to display its label since it isn't a valid asset */
+const createBrokenRenderContent = (id: string): any => ({
+  asset: {
+    id,
+    type: "input",
+    binding: "binding",
+    label: 100,
+  },
+});
+
+/** this content will fail to fetch from the data model since the binding is an object */
+const createBrokenTransformContent = (id: string): any => ({
+  asset: {
+    id,
+    type: "input",
+    binding: {
+      prop: "value",
     },
   },
 });
@@ -41,10 +77,10 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
     let allPromiseKeys: string[] = [];
     let counter = 0;
 
-    const sendMessage: send = (
+    const sendMessage = (
       context: ExpressionContext,
-      message: string,
       nodeId?: string,
+      getContent?: () => any,
     ): void => {
       if (nodeId && !(nodeId in deferredPromises)) {
         context.logger?.warn(
@@ -62,12 +98,8 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       const keys = nodeId ? [nodeId] : allPromiseKeys;
 
       for (const id of keys) {
-        const content = createContentFromMessage(
-          message,
-          `chat-demo-${counter++}`,
-        );
         const resolveFunction = deferredPromises[id];
-        resolveFunction?.(content);
+        resolveFunction?.(getContent?.());
         delete deferredPromises[id];
       }
 
@@ -81,11 +113,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
 
     asyncNodePlugin.hooks.onAsyncNode.tap(this.name, (node) => {
       // Ensure this is only used on the chat-ui.tsx mock to prevent the promise from setting up during tests.
-      if (
-        (node.parent?.parent?.type !== NodeType.Asset &&
-          node.parent?.parent?.type !== NodeType.View) ||
-        !node.parent.parent.value.id.startsWith("collection-async-chat-demo")
-      ) {
+      if (!isInChatDemo(node)) {
         return Promise.resolve(undefined);
       }
 
@@ -94,6 +122,37 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
         allPromiseKeys.push(node.id);
       });
     });
+
+    const sendRealMessage: send = (
+      context: ExpressionContext,
+      message: string,
+      nodeId?: string,
+    ) => {
+      return sendMessage(context, nodeId, () =>
+        createContentFromMessage(message, `chat-demo-${counter++}`),
+      );
+    };
+
+    /** These expressions are used as examples in the storybook to allow broken content through and show the error recovery fallback pattern. */
+    const sendBrokenMessage: send = (
+      context: ExpressionContext,
+      _: string,
+      nodeId?: string,
+    ) => {
+      return sendMessage(context, nodeId, () =>
+        createBrokenRenderContent(`chat-demo-${counter++}`),
+      );
+    };
+
+    const sendBrokenTransformMessage: send = (
+      context: ExpressionContext,
+      _: string,
+      nodeId?: string,
+    ) => {
+      return sendMessage(context, nodeId, () =>
+        createBrokenTransformContent(`chat-demo-${counter++}`),
+      );
+    };
 
     // Reset at the start of a new view.
     player.hooks.view.tap(this.name, (_) => {
@@ -104,7 +163,11 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
 
     // Register 'send' expression
     const expressionPlugin = new ExpressionPlugin(
-      new Map([["send", sendMessage]]),
+      new Map([
+        ["send", sendRealMessage],
+        ["sendBroken", sendBrokenMessage],
+        ["sendBrokenTransform", sendBrokenTransformMessage],
+      ]),
     );
     player.registerPlugin(expressionPlugin);
   }

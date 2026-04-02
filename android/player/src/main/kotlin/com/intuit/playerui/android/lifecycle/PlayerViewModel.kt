@@ -8,6 +8,7 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.managed.AsyncIterationManager
@@ -207,7 +208,10 @@ public open class PlayerViewModel(
     }
 
     public fun fail(cause: Throwable) {
-        player.inProgressState?.fail(cause)
+        player.inProgressState?.controllers?.error?.captureError(
+            cause,
+            ErrorTypes.RENDER,
+        )
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */
@@ -225,5 +229,6 @@ public open class PlayerViewModel(
 }
 
 public inline fun PlayerViewModel.fail(message: String, cause: Throwable? = null) {
-    fail(PlayerException(message, cause))
+    val playerException = cause as? PlayerException ?: PlayerException(message, cause)
+    fail(playerException)
 }

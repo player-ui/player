@@ -20,7 +20,7 @@ compile_mocks(
         "info",
         "input",
         "text",
-        "chat-message",
+        "chat-message"
     ],
     dsl_config = ":dsl_config",
     data = [

@@ -44,6 +44,7 @@ describe("ErrorController Navigation", () => {
         },
       },
       errorTransition: vitest.fn(),
+      getErrorTransitionState: vitest.fn(() => true),
     } as any;
 
     // Mock FlowController
@@ -100,6 +101,15 @@ describe("ErrorController Navigation", () => {
       expect(mockFlowInstance.errorTransition).toHaveBeenCalledWith(
         "custom_type",
       );
+    });
+
+    it("should fail the player state when there is no available transition", () => {
+      vitest
+        .mocked(mockFlowController.current?.getErrorTransitionState)
+        ?.mockReturnValue(undefined);
+      const error = new Error("Test error");
+      errorController.captureError(error, ErrorTypes.VIEW);
+      expect(mockFail).toHaveBeenCalled();
     });
   });
 

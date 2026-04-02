@@ -104,7 +104,9 @@ export const ReactAsset = (
   return (
     <ErrorBoundary
       fallbackRender={(props) => {
-        const { error } = props;
+        const { error, resetErrorBoundary } = props;
+
+        resetErrorBoundary();
         if (error instanceof AssetRenderError) {
           error.addAssetParent(unwrapped);
           throw error;
@@ -115,6 +117,7 @@ export const ReactAsset = (
             error,
           );
         }
+        return null;
       }}
     >
       <Impl key={unwrapped.id} {...unwrapped} />

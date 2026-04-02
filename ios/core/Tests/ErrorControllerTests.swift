@@ -98,7 +98,7 @@ class ErrorControllerTests: XCTestCase {
         // Convert JSValue to PlayerErrorInfo
         if let jsValue = capturedErrorValue {
             let capturedError = PlayerErrorInfo(jsValue)
-            XCTAssertEqual(capturedError.message, "Not found")
+            XCTAssertEqual(capturedError.message, "Error Domain=com.test Code=404 \"Not found\" UserInfo={NSLocalizedDescription=Not found}")
             XCTAssertEqual(capturedError.errorType, ErrorTypes.network)
             XCTAssertEqual(capturedError.severity, .error)
             XCTAssertNotNil(capturedError.metadata)
@@ -131,7 +131,7 @@ class ErrorControllerTests: XCTestCase {
         // Convert JSValue to PlayerErrorInfo
         if let jsValue = capturedErrorValue {
             let capturedError = PlayerErrorInfo(jsValue)
-            XCTAssertEqual(capturedError.message, "Internal error")
+            XCTAssertEqual(capturedError.message, "Error Domain=com.test Code=500 \"Internal error\" UserInfo={NSLocalizedDescription=Internal error}")
             XCTAssertEqual(capturedError.errorType, ErrorTypes.plugin)
             XCTAssertNil(capturedError.severity)
             XCTAssertNil(capturedError.metadata)
@@ -157,7 +157,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Verify current error is the first one
         if let firstErrorValue = errorController?.getCurrentError(), !firstErrorValue.isUndefined {
-            XCTAssertEqual(PlayerErrorInfo(firstErrorValue).message, "First error")
+            XCTAssertEqual(PlayerErrorInfo(firstErrorValue).message, "Error Domain=test Code=1 \"First error\" UserInfo={NSLocalizedDescription=First error}")
         }
         
         // Capture second error
@@ -169,7 +169,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Current error should be updated to the second one
         if let secondErrorValue = errorController?.getCurrentError(), !secondErrorValue.isUndefined {
-            XCTAssertEqual(PlayerErrorInfo(secondErrorValue).message, "Second error")
+            XCTAssertEqual(PlayerErrorInfo(secondErrorValue).message, "Error Domain=test Code=2 \"Second error\" UserInfo={NSLocalizedDescription=Second error}")
         }
         
         // Capture third error
@@ -181,7 +181,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Current error should be updated to the third one
         if let thirdErrorValue = errorController?.getCurrentError(), !thirdErrorValue.isUndefined {
-            XCTAssertEqual(PlayerErrorInfo(thirdErrorValue).message, "Third error")
+            XCTAssertEqual(PlayerErrorInfo(thirdErrorValue).message, "Error Domain=test Code=3 \"Third error\" UserInfo={NSLocalizedDescription=Third error}")
         }
         
         // Get all errors and verify history
@@ -198,9 +198,9 @@ class ErrorControllerTests: XCTestCase {
         let secondError = PlayerErrorInfo(errorsValue.atIndex(1))
         let thirdError = PlayerErrorInfo(errorsValue.atIndex(2))
         
-        XCTAssertEqual(firstError.message, "First error")
-        XCTAssertEqual(secondError.message, "Second error")
-        XCTAssertEqual(thirdError.message, "Third error")
+        XCTAssertEqual(firstError.message, "Error Domain=test Code=1 \"First error\" UserInfo={NSLocalizedDescription=First error}")
+        XCTAssertEqual(secondError.message, "Error Domain=test Code=2 \"Second error\" UserInfo={NSLocalizedDescription=Second error}")
+        XCTAssertEqual(thirdError.message, "Error Domain=test Code=3 \"Third error\" UserInfo={NSLocalizedDescription=Third error}")
     }
     
     // MARK: - Get Current Error Tests
@@ -239,7 +239,7 @@ class ErrorControllerTests: XCTestCase {
         }
         
         let currentError = PlayerErrorInfo(currentErrorValue)
-        XCTAssertEqual(currentError.message, "Current error")
+        XCTAssertEqual(currentError.message, "Error Domain=test Code=100 \"Current error\" UserInfo={NSLocalizedDescription=Current error}")
         XCTAssertEqual(currentError.errorType, ErrorTypes.data)
     }
     
