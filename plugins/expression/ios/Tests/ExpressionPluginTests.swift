@@ -13,16 +13,23 @@ import JavaScriptCore
 @testable import PlayerUIExpressionPlugin
 
 class ExpressionPluginTests: XCTestCase {
+    var context: JSContext!
+
+    override func setUp() {
+        super.setUp()
+        context = JSContext()
+        context.loadCore()
+    }
     func testExpressionPluginConstructsWithoutExpressions() {
         let plugin = ExpressionPlugin()
-        plugin.context = JSContext()
+        plugin.context = context
         XCTAssertNotNil(plugin.pluginRef)
     }
 
     func testExpressionPluginConstructsWithExpressions() {
         let expectation = XCTestExpectation(description: "custom expression called")
         let plugin = ExpressionPlugin(expressions: ["test": {_ in expectation.fulfill() }])
-        plugin.context = JSContext()
+        plugin.context = context
         XCTAssertNotNil(plugin.pluginRef)
         plugin.pluginRef?.objectForKeyedSubscript("expressions")?.invokeMethod("get", withArguments: ["test"])?.call(withArguments: [])
         wait(for: [expectation], timeout: 1)
@@ -36,7 +43,7 @@ class ExpressionPluginTests: XCTestCase {
             }
             return nil
         }])
-        plugin.context = JSContext()
+        plugin.context = context
         XCTAssertNotNil(plugin.pluginRef)
         plugin.pluginRef?.objectForKeyedSubscript("expressions")?.invokeMethod("get", withArguments: ["test"])?.call(withArguments: ["context", "example"])
         wait(for: [expectation], timeout: 1)
@@ -50,7 +57,7 @@ class ExpressionPluginTests: XCTestCase {
             }
             return nil
         }])
-        plugin.context = JSContext()
+        plugin.context = context
         XCTAssertNotNil(plugin.pluginRef)
         plugin.pluginRef?
             .objectForKeyedSubscript("expressions")?

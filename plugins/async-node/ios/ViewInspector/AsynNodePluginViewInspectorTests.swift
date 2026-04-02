@@ -34,6 +34,7 @@ class AsyncNodePluginViewInspectorTests: XCTestCase {
                 """) ?? JSValue()))
         }
 
+        jsContext?.loadCore()
         plugin.context = jsContext
 
         let context = SwiftUIPlayer.Context { jsContext ?? JSContext() }

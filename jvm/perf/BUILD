@@ -27,6 +27,8 @@ kt_jvm_library(
     ),
     deps = [
         "//jvm:supported_runtimes",
+        "//plugins/beacon/jvm:beacon",
+        "//plugins/check-path/jvm:check-path",
         "//tools/mocks:jar",
         artifact("org.openjdk.jmh:jmh-core"),
     ],
