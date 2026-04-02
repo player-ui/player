@@ -10,7 +10,7 @@ import type {
 import { Registry } from "@player-ui/partial-match-registry";
 import { ExternalActionPluginSymbol } from "./symbols.js";
 
-export type ExternalStateHandler = (
+export type ExternalActionHandler = (
   state: NavigationFlowExternalState,
   options: InProgressState["controllers"],
 ) => string | undefined | Promise<string | undefined>;
@@ -25,8 +25,9 @@ function isInProgress(state: PlayerFlowState): state is InProgressState {
   return state.status === "in-progress";
 }
 
-type ExternalActionMatch = Partial<NavigationFlowExternalState> &
-  Pick<NavigationFlowExternalState, "ref">;
+type ExternalActionMatch = {
+  ref: string;
+} & Partial<NavigationFlowExternalState>;
 
 /**
  * A plugin to handle external action states
@@ -46,12 +47,12 @@ export class ExternalActionPlugin implements PlayerPlugin {
    * The shared registry that maps external states to handlers.
    * All plugin instances use the same registry.
    */
-  private registry?: Registry<ExternalStateHandler>;
+  private registry?: Registry<ExternalActionHandler>;
 
   /**
    * The handlers for this plugin instance.
    */
-  private readonly handlers: Map<ExternalActionMatch, ExternalStateHandler>;
+  private readonly handlers: Map<ExternalActionMatch, ExternalActionHandler>;
 
   /**
    * Creates a new ExternalActionPlugin
@@ -73,14 +74,14 @@ export class ExternalActionPlugin implements PlayerPlugin {
    */
   constructor(
     // This array of tuples is an established player pattern. Internally we use a Map.
-    handlers: [ExternalActionMatch, ExternalStateHandler][],
+    handlers: [ExternalActionMatch, ExternalActionHandler][],
   ) {
     this.handlers = new Map(handlers);
   }
 
   apply(player: Player): void {
     const isFirstInstance = this.createRegistry(player);
-    this.registerHandlers();
+    this.registerHandlers(player);
 
     // Only the first instance should tap the hooks to avoid redundant taps
     if (!isFirstInstance) {
@@ -156,7 +157,7 @@ export class ExternalActionPlugin implements PlayerPlugin {
     }
 
     // We are the first plugin instance, create the registry
-    this.registry = new Registry<ExternalStateHandler>(
+    this.registry = new Registry<ExternalActionHandler>(
       undefined,
       player.logger,
     );
@@ -169,8 +170,17 @@ export class ExternalActionPlugin implements PlayerPlugin {
    * If a handler with the same specificity already exists, it will be replaced
    * and a debug log will be emitted (accessible via player.logger.debug).
    */
-  private registerHandlers(): void {
+  private registerHandlers(player: Player): void {
     for (const [state, handler] of this.handlers) {
+      // Runtime check for 'ref' property is necessary despite TypeScript constraint because
+      // the Swift bridge allows improperly formatted objects to bypass TypeScript validation.
+      // We log this here and not in the constructor because the Logger is not yet available in the constructor.
+      if (!state.ref) {
+        player.logger.warn(
+          `An external action match is missing the 'ref' property. This handler will be ignored. Match: ${JSON.stringify(state)}`,
+        );
+        continue;
+      }
       // Registry will handle keeping only the last handler for each state
       this.registry?.set(state, handler);
     }

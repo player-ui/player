@@ -30,21 +30,7 @@ public struct FlowManagerView: View {
             } else {
                 VStack {
                     ManagedPlayer(
-                        plugins: [
-                            ReferenceAssetsPlugin(),
-                            MetricsPlugin { (render, _, flow) in
-                                print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
-                            },
-                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
-
-                                return AnyView(
-                                    Text("External State")
-                                        .onDisappear {
-                                            transition("Next")
-                                        }
-                                )
-                            }
-                        ],
+                        plugins: plugins,
                         flowManager: ConstantFlowManager(flowSequence),
                         onComplete: { _ in
                             complete = true
@@ -79,5 +65,40 @@ public struct FlowManagerView: View {
                 }
             }
         }.navigationBarTitle(Text(navTitle))
+    }
+
+    private var plugins: [NativePlugin] {
+        [
+            ReferenceAssetsPlugin(),
+            MetricsPlugin { (render, _, flow) in
+                print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
+            }
+        ] + throwingPlugins
+    }
+
+    private var throwingPlugins: [NativePlugin] {
+        var plugins: [NativePlugin] = []
+        do {
+            let externalActionPlugin = try ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+                .init(
+                    match: ["ref": "test-1"],
+                    handler: { _, _, transition in
+                        return AnyView(
+                            Text("External State")
+                                .onAppear {
+                                    print("Managed Player External State triggered")
+                                }
+                                .onDisappear {
+                                    transition("Next")
+                                }
+                        )
+                    }
+                )
+            ])
+            plugins.append(externalActionPlugin)
+        } catch {
+            fatalError("Failed to create ExternalActionPlugin: \(error)")
+        }
+        return plugins
     }
 }

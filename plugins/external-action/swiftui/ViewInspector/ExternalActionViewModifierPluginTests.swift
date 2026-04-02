@@ -15,14 +15,16 @@ import ViewInspector
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUISwiftUI
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUIExternalActionPlugin
 @testable import PlayerUIExternalActionViewModifierPlugin
 
+// swiftlint:disable type_body_length force_try
 class ExternalActionViewModifierPluginTests: XCTestCase {
     override func setUp() {
         XCUIApplication().terminate()
     }
-    // swiftlint:disable function_body_length
-    func testExternalStateHandling() throws {
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandling() throws {
         let json = """
         {
           "id": "test-flow",
@@ -58,41 +60,51 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
-        let plugin = ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
-            XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
-            XCTAssertEqual(state.ref, "test-1")
-            // Test out subscript fetching additional properties
-            let extra: String? = state.extraProperty
-            XCTAssertEqual(extra, "extraValue")
-            handlerExpectation.fulfill()
-            return AnyView(
-                Text("External State")
-                    .onDisappear {
-                        transition("Next")
-                    }
-                    .onAppear {
-                        renderExpectation.fulfill()
-                    }
+        let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+            .init(
+                match: ["ref": "test-1"],
+                handler: { (state, _, transition) in
+                    XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
+                    XCTAssertEqual(state.ref, "test-1")
+                    // Test out subscript fetching additional properties
+                    let extra: String? = state.extraProperty
+                    XCTAssertEqual(extra, "extraValue")
+                    handlerExpectation.fulfill()
+                    return AnyView(
+                        Text("External State")
+                            .onDisappear {
+                                transition("Next")
+                            }
+                            .onAppear {
+                                renderExpectation.fulfill()
+                            }
+                    )
+                }
             )
-        }
+        ])
 
         let context = SwiftUIPlayer.Context()
 
-        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
-            switch result {
-            case .success:
-                completionExpectation.fulfill()
-            default:
-                break
-            }
-        }), context: context, unloadOnDisappear: false)
+        let player = SwiftUIPlayer(
+            flow: json,
+            plugins: [ReferenceAssetsPlugin(), plugin],
+            result: Binding(get: {nil}, set: { (result) in
+                switch result {
+                case .success:
+                    completionExpectation.fulfill()
+                default:
+                    break
+                }
+            }), context: context, unloadOnDisappear: false
+        )
 
         ViewHosting.host(view: player)
 
         wait(for: [renderExpectation, handlerExpectation], timeout: 10)
 
         XCTAssertNotNil(plugin.state)
-        let content = try player.inspect().vStack().first?.anyView().anyView().modifier(ExternalStateSheetModifier.self).viewModifierContent()
+        let content = try player.inspect().vStack().first?.anyView().anyView()
+            .modifier(ExternalActionSheetModifier.self).viewModifierContent()
         try content?.sheet().anyView().text().callOnDisappear()
 
         wait(for: [completionExpectation], timeout: 10)
@@ -101,8 +113,8 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         ViewHosting.expel()
     }
 
-    // swiftlint:disable function_body_length
-    func testExternalStateHandlingForcedTransition() throws {
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandlingForcedTransition() throws {
         let json = """
         {
           "id": "test-flow",
@@ -152,15 +164,20 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
-        let plugin = ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
-            XCTAssertEqual(state.transitions, ["Next": "VIEW_1", "Prev": "END_BCK"])
-            XCTAssertEqual(state.ref, "test-1")
-            // Test out subscript fetching additional properties
-            let extra: String? = state.extraProperty
-            XCTAssertEqual(extra, "extraValue")
-            handlerExpectation.fulfill()
-            return AnyView(Text("External State").onAppear { renderExpectation.fulfill() })
-        }
+        let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+            .init(
+                match: ["ref": "test-1"],
+                handler: { (state, _, transition) in
+                    XCTAssertEqual(state.transitions, ["Next": "VIEW_1", "Prev": "END_BCK"])
+                    XCTAssertEqual(state.ref, "test-1")
+                    // Test out subscript fetching additional properties
+                    let extra: String? = state.extraProperty
+                    XCTAssertEqual(extra, "extraValue")
+                    handlerExpectation.fulfill()
+                    return AnyView(Text("External State").onAppear { renderExpectation.fulfill() })
+                }
+            )
+        ])
         class HasTransitionedPlugin: NativePlugin {
             var pluginName: String = "HasTransitioned"
 
@@ -173,7 +190,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
                 self.expectation = expectation
             }
 
-            func apply<P>(player: P) where P : HeadlessPlayer {
+            func apply<P>(player: P) where P: HeadlessPlayer {
                 player.hooks?.flowController.tap({ flowController in
                     flowController.hooks.flow.tap { flow in
                         flow.hooks.afterTransition.tap { [weak self] newFlow in
@@ -190,7 +207,14 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
 
         let context = SwiftUIPlayer.Context()
 
-        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin, HasTransitionedPlugin(expected: "VIEW", expectation: viewTransition)], result: Binding(get: {nil}, set: { (result) in
+        let player = SwiftUIPlayer(
+            flow: json,
+            plugins: [
+                ReferenceAssetsPlugin(),
+                plugin,
+                HasTransitionedPlugin(expected: "VIEW", expectation: viewTransition)
+            ],
+            result: Binding(get: {nil}, set: { (result) in
             switch result {
             case .success:
                 completionExpectation.fulfill()
@@ -204,7 +228,8 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         wait(for: [renderExpectation, handlerExpectation], timeout: 10)
 
         XCTAssertNotNil(plugin.state)
-        let content = try player.inspect().vStack().first?.anyView().anyView().modifier(ExternalStateSheetModifier.self).viewModifierContent()
+        let content = try player.inspect().vStack().first?.anyView().anyView()
+            .modifier(ExternalActionSheetModifier.self).viewModifierContent()
         let value = try content?.sheet().anyView().text().string()
         XCTAssertEqual(value, "External State")
         try (player.state as? InProgressState)?.controllers?.flow.transition(with: "Next")
@@ -214,7 +239,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         XCTAssertNotNil(state)
         XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, "VIEW")
         XCTAssertNil(plugin.state)
-        XCTAssertFalse(plugin.isExternalState)
+        XCTAssertFalse(plugin.isExternalAction)
         do {
             try state?.controllers?.flow.transition(with: "Next")
         } catch {
@@ -225,7 +250,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         ViewHosting.expel()
     }
 
-    func skiptestExternalStateHandlingThrowsError() throws {
+    func testExternalActionHandlingThrowsError() throws {
         let json = """
         {
           "id": "test-flow",
@@ -260,28 +285,165 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (_, _, _) in
-            handlerExpectation.fulfill()
-            throw PlayerError.jsConversionFailure
-        }
+        let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+            .init(
+                match: ["ref": "test-1"],
+                handler: { (_, _, _) in
+                    handlerExpectation.fulfill()
+                    throw PlayerError.jsConversionFailure
+                }
+            )
+        ])
 
         let context = SwiftUIPlayer.Context()
 
-        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
-            guard result != nil else { return }
-            switch result {
-            case .success:
-                XCTFail("Should have failed")
-            default:
-                completionExpectation.fulfill()
-            }
-        }), context: context, unloadOnDisappear: false)
+        let player = SwiftUIPlayer(
+            flow: json,
+            plugins: [ReferenceAssetsPlugin(), plugin],
+            result: Binding(get: {nil}, set: { (result) in
+                guard result != nil else { return }
+                switch result {
+                case .success:
+                    XCTFail("Should have failed")
+                default:
+                    completionExpectation.fulfill()
+                }
+            }), context: context, unloadOnDisappear: false
+        )
 
         ViewHosting.host(view: player)
 
         wait(for: [handlerExpectation, completionExpectation], timeout: 10)
 
         ViewHosting.expel()
+    }
+
+    // swiftlint:disable:next function_body_length
+    func testExternalActionHandlingWithSpecificity() throws {
+        let json = """
+        {
+          "id": "test-flow",
+          "data": {
+            "transitionValue": "Next"
+          },
+          "navigation": {
+            "BEGIN": "FLOW_1",
+            "FLOW_1": {
+              "startState": "EXT_1",
+              "EXT_1": {
+                "state_type": "EXTERNAL",
+                "ref": "test-1",
+                "transitions": {
+                  "Next": "END_FWD",
+                  "Prev": "END_BCK"
+                },
+                "extraProperty": "extraValue"
+              },
+              "END_FWD": {
+                "state_type": "END",
+                "outcome": "FWD"
+              },
+              "END_BCK": {
+                "state_type": "END",
+                "outcome": "BCK"
+              }
+            }
+          }
+        }
+        """
+
+        let lessSpecificExpectation = XCTestExpectation(description: "less specific handler should not be called")
+        lessSpecificExpectation.isInverted = true
+        let moreSpecificExpectation = XCTestExpectation(description: "more specific handler called")
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        let renderExpectation = XCTestExpectation(description: "external view rendered")
+
+        let plugin = try! ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+            // Less specific - only matches ref
+            .init(
+                match: ["ref": "test-1"],
+                handler: { (_, _, transition) in
+                    lessSpecificExpectation.fulfill()
+                    return AnyView(
+                        Text("Less Specific")
+                            .onDisappear {
+                                transition("Prev")
+                            }
+                    )
+                }
+            ),
+            // More specific - matches ref and extraProperty
+            .init(
+                match: ["ref": "test-1", "extraProperty": "extraValue"],
+                handler: { (_, _, transition) in
+                    moreSpecificExpectation.fulfill()
+                    return AnyView(
+                        Text("More Specific")
+                            .onDisappear {
+                                transition("Next")
+                            }
+                            .onAppear {
+                                renderExpectation.fulfill()
+                            }
+                    )
+                }
+            )
+        ])
+
+        let context = SwiftUIPlayer.Context()
+
+        let player = SwiftUIPlayer(
+            flow: json,
+            plugins: [ReferenceAssetsPlugin(), plugin],
+            result: Binding(get: {nil}, set: { (result) in
+                switch result {
+                case .success(let completed):
+                    // More specific handler should have been called, returning "Next" -> outcome "FWD"
+                    XCTAssertEqual(completed.endState?.outcome, "FWD")
+                    completionExpectation.fulfill()
+                default:
+                    break
+                }
+            }), context: context, unloadOnDisappear: false
+        )
+
+        ViewHosting.host(view: player)
+
+        wait(for: [renderExpectation, moreSpecificExpectation], timeout: 10)
+
+        XCTAssertNotNil(plugin.state)
+        let content = try player.inspect().vStack().first?.anyView().anyView()
+            .modifier(ExternalActionSheetModifier.self).viewModifierContent()
+        try content?.sheet().anyView().text().callOnDisappear()
+
+        wait(for: [lessSpecificExpectation, completionExpectation], timeout: 10)
+        XCTAssertNil(plugin.state)
+
+        ViewHosting.expel()
+    }
+
+    func testInitThrowsErrorWhenHandlerMissingRef() {
+        // Test that initializer throws when a handler match is missing the 'ref' key
+        XCTAssertThrowsError(try ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+            .init(
+                match: ["extraProperty": "value"],
+                handler: { _, _, _ in
+                    return AnyView(Text("Should not be called"))
+                }
+            )
+        ])) { error in
+            guard let pluginError = error as? ExternalActionPluginError else {
+                XCTFail("Expected ExternalActionPluginError but got \(type(of: error))")
+                return
+            }
+
+            if case .matchMissingRef(let match) = pluginError {
+                XCTAssertNil(match["ref"])
+                XCTAssertEqual(match["extraProperty"] as? String, "value")
+            } else {
+                XCTFail("Expected matchMissingRef error")
+            }
+        }
     }
 }
 

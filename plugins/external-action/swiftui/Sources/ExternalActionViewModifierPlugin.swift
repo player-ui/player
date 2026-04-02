@@ -5,17 +5,10 @@ import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIExternalActionPlugin
 
-/**
- A variation on `ExternalActionPlugin` for `SwiftUIPlayer` that applies a ViewModifier to SwiftUIPlayer content when in an external state
- */
-open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModifier>: JSBasePlugin, NativePlugin, ObservableObject {
-
-    /// Whether or not Player is currently in an EXTERNAL state
-    @Published public var isExternalState = false
-    /// The content the plugin has determined to show during the current EXTERNAL state
-    @Published public var content: AnyView?
-    /// The current state if player is in an EXTERNAL state
-    @Published public var state: NavigationFlowExternalState?
+public struct ExternalActionViewModifierHandler {
+    /// Map of properties to match against external states.
+    /// Must include "ref" key.
+    public typealias Match = [String: Any]
 
     /**
      The handler function to run when an external state is transitioned to
@@ -25,18 +18,54 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
         - transition: A completion handler that takes a string to transition with
      - returns: A view to show as content by the ViewModifier
      */
-    public typealias ExternalStateViewModifierHandler = (NavigationFlowExternalState, PlayerControllers, @escaping (String) -> Void) throws -> AnyView
+    public typealias Handler = (
+        NavigationFlowExternalState,
+        PlayerControllers,
+        @escaping (String) -> Void
+    ) throws -> AnyView
 
-    private var handler: ExternalStateViewModifierHandler?
+    public let match: Match
+    public let handler: Handler
+
+    public init(match: Match, handler: @escaping Handler) {
+        self.match = match
+        self.handler = handler
+    }
+}
+
+/**
+ A variation on `ExternalActionPlugin` for `SwiftUIPlayer` that applies a ViewModifier to
+ SwiftUIPlayer content when in an external state
+ */
+open class ExternalActionViewModifierPlugin<ModifierType: ExternalActionViewModifier>:
+    JSBasePlugin, NativePlugin, ObservableObject {
+
+    /// Whether or not Player is currently in an EXTERNAL state
+    @Published public var isExternalAction = false
+    /// The content the plugin has determined to show during the current EXTERNAL state
+    @Published public var content: AnyView?
+    /// The current state if player is in an EXTERNAL state
+    @Published public var state: NavigationFlowExternalState?
+
+    private var handlers: [ExternalActionViewModifierHandler]
 
     /**
      Construct a plugin to handle external states
      - parameters:
-        - handler: the function to call when an external state is transitioned to
+        - handlers: array of handlers with matchers and handler functions
      */
-    public convenience init(handler: @escaping ExternalStateViewModifierHandler) {
-        self.init(fileName: "ExternalActionPlugin.native", pluginName: "ExternalActionPlugin.ExternalActionPlugin")
-        self.handler = handler
+    public init(handlers: [ExternalActionViewModifierHandler]) throws {
+        try handlers.forEach { handler in
+            let match = handler.match
+            if match["ref"] == nil {
+                throw ExternalActionPluginError.matchMissingRef(match: match)
+            }
+        }
+        self.handlers = handlers
+        super.init(
+            fileName: "ExternalActionPlugin.native",
+            pluginName: "ExternalActionPlugin.ExternalActionPlugin"
+        )
     }
 
     open func apply<P>(player: P) where P: HeadlessPlayer {
@@ -54,7 +83,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
                         old?.value?.stateType == "EXTERNAL",
                         newState.value?.stateType != "EXTERNAL"
                     else { return }
-                    self?.isExternalState = false
+                    self?.isExternalAction = false
                     self?.state = nil
                 }
             }
@@ -62,37 +91,68 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
     }
 
     /**
-     Retrieves the arguments for constructing this plugin, this is necessary because the arguments need to be supplied after
-     construction of the swift object, once the context has been provided
+     Retrieves the arguments for constructing this plugin.
+     This is necessary because the arguments need to be supplied after construction of the swift object,
+     once the context has been provided.
      - returns: An array of arguments to construct the plugin
      */
     override open func getArguments() -> [Any] {
-        let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
-            guard
-                let context = self?.context,
-                let controllers = PlayerControllers(from: options),
-                let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
-                    self?.isExternalState = true
-                    let state = NavigationFlowExternalState(state)
-                    self?.state = state
-                    do {
-                        self?.content = try self?.handler?(state, controllers) { transition in
-                            resolve(transition)
-                            withAnimation {
-                                self?.isExternalState = false
-                                self?.state = nil
+        guard let context = context else { return [] }
+
+        // Convert handlers to array of tuples [match, callback]
+        let jsHandlers = handlers.map { handler in
+            let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
+                guard
+                    let context = self?.context,
+                    let controllers = PlayerControllers(from: options),
+                    let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
+                        let updateUI: () -> Void = {
+                            self?.isExternalAction = true
+                            let state = NavigationFlowExternalState(state)
+                            self?.state = state
+                            do {
+                                self?.content = try handler.handler(state, controllers) { transition in
+                                    resolve(transition)
+                                    let resetWithAnimation: () -> Void = {
+                                        withAnimation {
+                                            self?.resetState()
+                                        }
+                                    }
+                                    if Thread.isMainThread {
+                                        resetWithAnimation()
+                                    } else {
+                                        DispatchQueue.main.sync { resetWithAnimation() }
+                                    }
+                                }
+                            } catch {
+                                // Reset state when handler throws
+                                self?.resetState()
+                                reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
                             }
-                            self?.content = nil
                         }
-                    } catch {
-                        reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)
-                    }
-                })
-            else { return nil }
-            return promise
+
+                        if Thread.isMainThread {
+                            updateUI()
+                        } else {
+                            DispatchQueue.main.sync(execute: updateUI)
+                        }
+                    })
+                else { return nil }
+                return promise
+            }
+
+            let jsMatch = JSValue(object: handler.match, in: context)
+            let jsCallback = JSValue(object: callback, in: context)
+            return [jsMatch, jsCallback]
         }
-        let jsCallback = JSValue(object: callback, in: context) as Any
-        return [jsCallback]
+
+        return [jsHandlers]
+    }
+
+    private func resetState() {
+        isExternalAction = false
+        state = nil
+        content = nil
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
@@ -107,12 +167,12 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
  ViewModifier type specifically for the `ExternalActionViewModifierPlugin` to provide observable properties
  to present content in an external action
  */
-public protocol ExternalStateViewModifier: ViewModifier {
+public protocol ExternalActionViewModifier: ViewModifier {
     /// An observable reference to the presenting plugin, to know when we are in an external state
     var plugin: ExternalActionViewModifierPlugin<Self> { get }
 
     /**
-     Creates a new `ExternalStateViewModifier` with the plugin that is presenting it
+     Creates a new `ExternalActionViewModifier` with the plugin that is presenting it
      - parameters:
         - plugin: The plugin presenting this view modifier
      */
@@ -122,7 +182,7 @@ public protocol ExternalStateViewModifier: ViewModifier {
 /**
  A ViewModifier for the `ExternalActionViewModifierPlugin` that presents the external state with the `.sheet` modifier
  */
-public struct ExternalStateSheetModifier: ExternalStateViewModifier {
+public struct ExternalActionSheetModifier: ExternalActionViewModifier {
     @ObservedObject public var plugin: ExternalActionViewModifierPlugin<Self>
     /**
      Constructs this ViewModifier
@@ -134,7 +194,7 @@ public struct ExternalStateSheetModifier: ExternalStateViewModifier {
     }
     @ViewBuilder
     public func body(content: Content) -> some View {
-        content.inspectableSheet(isPresented: $plugin.isExternalState, content: {
+        content.inspectableSheet(isPresented: $plugin.isExternalAction, content: {
             plugin.content
         })
     }
@@ -142,9 +202,14 @@ public struct ExternalStateSheetModifier: ExternalStateViewModifier {
 
 // MARK: ViewInspector
 extension View {
-    func inspectableSheet<Sheet>(isPresented: Binding<Bool>, onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Sheet
+    func inspectableSheet<Sheet>(
+        isPresented: Binding<Bool>,
+        onDismiss: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping () -> Sheet
     ) -> some View where Sheet: View {
-        return self.modifier(InspectableSheet(isPresented: isPresented, onDismiss: onDismiss, popupBuilder: content))
+        return self.modifier(
+            InspectableSheet(isPresented: isPresented, onDismiss: onDismiss, popupBuilder: content)
+        )
     }
 }
 

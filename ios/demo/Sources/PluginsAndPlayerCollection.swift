@@ -59,7 +59,7 @@ public struct PluginsAndPlayerCollection: View {
                     )
                     .padding(padding)
                 }.accessibility(identifier: "Reuse already loaded flow")
-                
+
                 NavigationLink("Simple Flows") {
                     FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
                         .padding(padding)
@@ -91,48 +91,27 @@ public struct PluginsAndPlayerCollection: View {
     }
 
     var pluginFlows: some View {
-        let pubsubPlugin = PubSubPlugin([("some-event", { (eventName, eventData) in
-            $alertPresented.wrappedValue = true
-
-            switch eventData {
-            case .string(data: let string):
-                $beaconAndPubsubInfo.wrappedValue += "Published: `\(eventName)` with message: `\(string)` \n"
-            default: break
-            }
-        })])
-
-        let beaconPlugin =  BeaconPlugin<DefaultBeacon> { beaconStruct in
-            $alertPresented.wrappedValue = true
-            let encoder = JSONEncoder()
-            if let data = try? encoder.encode(beaconStruct), let jsonString = String(data: data, encoding: .utf8) {
-                $beaconAndPubsubInfo.wrappedValue += "Beacon: \(jsonString) \n"
-            }
-        }
-
-        let externalActionPlugin =  ExternalActionPlugin(handler: { state, options, transition in
-            guard state.ref == "test-1" else { return transition("Prev") }
-            let transitionValue = options.data.get(binding: "transitionValue") as? String
-            options.expression.evaluate("{{foo}} = 'bar'")
-            transition(transitionValue ?? "Next")
-        })
-
-        return ForEach(sections, id: \.title) { section in
+        ForEach(sections, id: \.title) { section in
             Section {
                 ForEach(section.flows, id: \.name) { flow in
                     NavigationLink(flow.name) {
-                        AssetFlowView(flow: flow.flow, plugins: plugins + [externalActionPlugin, beaconPlugin, pubsubPlugin], completion: completion(result:))
-                            .padding(padding)
-                            .navigationBarTitle(Text(flow.name))
-                            .modifier(
-                                AlertViewModifier(
-                                    alertPresented: $alertPresented,
-                                    pubsubEventName: $beaconAndPubsubInfo,
-                                    completionMessage: $completionMessage)
-                            )
-                            .onDisappear {
-                                // clear tracked beacons and pub sub info
-                                $beaconAndPubsubInfo.wrappedValue = ""
-                            }
+                        AssetFlowView(
+                            flow: flow.flow,
+                            plugins: plugins + throwingPlugins + [beaconPlugin, pubsubPlugin],
+                            completion: completion(result:)
+                        )
+                        .padding(padding)
+                        .navigationBarTitle(Text(flow.name))
+                        .modifier(
+                            AlertViewModifier(
+                                alertPresented: $alertPresented,
+                                pubsubEventName: $beaconAndPubsubInfo,
+                                completionMessage: $completionMessage)
+                        )
+                        .onDisappear {
+                            // clear tracked beacons and pub sub info
+                            $beaconAndPubsubInfo.wrappedValue = ""
+                        }
                     }
                     .accessibility(identifier: "\(section.title) \(flow.name)")
                 }
@@ -175,5 +154,48 @@ public struct PluginsAndPlayerCollection: View {
 
             completionMessage = "\(errorState.error)"
         }
+    }
+
+    var pubsubPlugin: PubSubPlugin {
+        .init([("some-event", { (eventName, eventData) in
+            $alertPresented.wrappedValue = true
+
+            switch eventData {
+            case .string(data: let string):
+                $beaconAndPubsubInfo.wrappedValue += "Published: `\(eventName)` with message: `\(string)` \n"
+            default: break
+            }
+        })])
+    }
+
+    var beaconPlugin : BeaconPlugin<DefaultBeacon> {
+        .init { beaconStruct in
+            $alertPresented.wrappedValue = true
+            let encoder = JSONEncoder()
+            if let data = try? encoder.encode(beaconStruct), let jsonString = String(data: data, encoding: .utf8) {
+                $beaconAndPubsubInfo.wrappedValue += "Beacon: \(jsonString) \n"
+            }
+        }
+    }
+
+    var throwingPlugins: [NativePlugin] {
+        var plugins: [NativePlugin] = []
+        do {
+            let externalActionPlugin = try ExternalActionPlugin(handlers: [
+                ExternalActionHandler(
+                    match: ["ref": "test-1"],
+                    handler: { _, options, transition in
+                        print("PluginsAndPlayerCollection External State triggered")
+                        let transitionValue = options.data.get(binding: "transitionValue") as? String
+                        options.expression.evaluate("{{foo}} = 'bar'")
+                        transition(transitionValue ?? "Next")
+                    }
+                )
+            ])
+            plugins.append(externalActionPlugin)
+        } catch {
+            fatalError("Failed to create ExternalActionPlugin: \(error)")
+        }
+        return plugins
     }
 }
