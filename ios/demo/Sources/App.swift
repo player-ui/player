@@ -38,27 +38,45 @@ struct MainView: View {
         }
     }
 
-    let plugins: [NativePlugin] = [
-        PrintLoggerPlugin(level: .trace),
-        ReferenceAssetsPlugin(),
-        CommonTypesPlugin(),
-        ExpressionPlugin(),
-        CommonExpressionsPlugin(),
-        ExternalActionPlugin(handler: { _, _, _ in
-            print("external state")
-        }),
-        MetricsPlugin { timing, render, flow in
-            print(timing as Any)
-            print(render as Any)
-            print(flow as Any)
-        },
-        RequestTimePlugin { 5 },
-        PubSubPlugin([]),
-        TypesProviderPlugin(types: [], validators: [], formats: []),
-        TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
-    ]
+    private var plugins: [NativePlugin] {
+        [
+            PrintLoggerPlugin(level: .trace),
+            ReferenceAssetsPlugin(),
+            CommonTypesPlugin(),
+            ExpressionPlugin(),
+            CommonExpressionsPlugin(),
+            MetricsPlugin { timing, render, flow in
+                print(timing as Any)
+                print(render as Any)
+                print(flow as Any)
+            },
+            RequestTimePlugin { 5 },
+            PubSubPlugin([]),
+            TypesProviderPlugin(types: [], validators: [], formats: []),
+            TransitionPlugin(popTransition: .pop),
+            BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+            SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
+        ] + throwingPlugins
+    }
+
+    private var throwingPlugins: [NativePlugin] {
+        var plugins: [NativePlugin] = []
+        do {
+            let plugin = try ExternalActionPlugin(handlers: [
+                ExternalActionHandler(
+                    match: ["ref": "test-1"],
+                    handler: { _, _, _ in
+                        print("MainView External State triggered")
+                    }
+                )
+            ])
+            plugins.append(plugin)
+        } catch {
+            fatalError("Failed to create ExternalActionPlugin: \(error)")
+        }
+        return plugins
+    }
+
     var body: some View {
         SegmentControlView(
             plugins: plugins,

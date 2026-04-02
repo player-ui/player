@@ -16,7 +16,13 @@ function traverseObj(
     const val: any = object[key];
     const nestedPath = [...path, key];
 
-    if (typeof val === "object") {
+    /* Explicitly avoid traversing null values.
+    JavaScript's typeof null === "object" would otherwise cause the function to traverse null as an object
+    and throw an error. 
+    
+    Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof#typeof_null
+    */
+    if (typeof val === "object" && val !== null) {
       traverseObj(val, nestedPath, pairs);
     } else {
       pairs.set(nestedPath, val);
