@@ -10,17 +10,6 @@ import JavaScriptCore
 
 import PlayerUI
 
-public enum ExternalStatePluginError: LocalizedError {
-    case matchMissingRef(match: [String: Any])
-
-    public var errorDescription: String? {
-        switch self {
-        case .matchMissingRef(let match):
-            return "The key/match (\(match)) must contain a 'ref' key."
-        }
-    }
-}
-
 public struct ExternalStateHandler {
     /// Map of properties to match against external states.
     /// Must include "ref" key.
@@ -34,18 +23,20 @@ public struct ExternalStateHandler {
         - transition: A completion handler that takes a string to transition with.
             This completion handler lets the user transition at an appropriate time.
      */
-    public typealias Handler = (
+    public typealias Function = (
         NavigationFlowExternalState,
         PlayerControllers,
         @escaping (String) -> Void
     ) throws -> Void
 
-    public let match: Match
-    public let handler: Handler
+    public let ref: String
+    public let match: Match?
+    public let handlerFunction: Function
 
-    public init(match: Match, handler: @escaping Handler) {
+    public init(ref: String, match: Match? = nil, handlerFunction: @escaping Function) {
+        self.ref = ref
         self.match = match
-        self.handler = handler
+        self.handlerFunction = handlerFunction
     }
 }
 
@@ -60,13 +51,7 @@ public class ExternalStatePlugin: JSBasePlugin, NativePlugin {
      - parameters:
         - handlers: array of handlers with matchers and handler functions.
      */
-    public init(handlers: [ExternalStateHandler]) throws {
-        try handlers.forEach { handler in
-            let match = handler.match
-            if match["ref"] == nil {
-                throw ExternalStatePluginError.matchMissingRef(match: match)
-            }
-        }
+    public init(handlers: [ExternalStateHandler]) {
         self.handlers = handlers
         super.init(
             fileName: "ExternalStatePlugin.native",
@@ -83,14 +68,14 @@ public class ExternalStatePlugin: JSBasePlugin, NativePlugin {
     override public func getArguments() -> [Any] {
         guard let context = context else { return [] }
 
-        let jsHandlers = handlers.map { matchedHandler in
+        let jsHandlers = handlers.map { matchedHandler -> JSValue? in
             let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
                 guard
                     let context = self?.context,
                     let controllers = PlayerControllers(from: options),
                     let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
                         do {
-                            try matchedHandler.handler(NavigationFlowExternalState(state), controllers) { transition in
+                            try matchedHandler.handlerFunction(NavigationFlowExternalState(state), controllers) { transition in
                                 resolve(transition)
                             }
                         } catch {
@@ -101,9 +86,11 @@ public class ExternalStatePlugin: JSBasePlugin, NativePlugin {
                 return promise
             }
 
-            let jsMatch = JSValue(object: matchedHandler.match, in: context)
-            let jsCallback = JSValue(object: callback, in: context)
-            return [jsMatch, jsCallback]
+            return JSValue(object: [
+                "ref": matchedHandler.ref,
+                "match": matchedHandler.match,
+                "handlerFunction": JSValue(object: callback, in: context) as Any
+            ], in: context)
         }
 
         return [jsHandlers]

@@ -60,10 +60,10 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
-        let plugin = try! ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
             .init(
-                match: ["ref": "test-1"],
-                handler: { (state, _, transition) in
+                ref: "test-1",
+                handlerFunction: { (state, _, transition) in
                     XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
                     XCTAssertEqual(state.ref, "test-1")
                     // Test out subscript fetching additional properties
@@ -164,10 +164,10 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
-        let plugin = try! ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
             .init(
-                match: ["ref": "test-1"],
-                handler: { (state, _, transition) in
+                ref: "test-1",
+                handlerFunction: { (state, _, transition) in
                     XCTAssertEqual(state.transitions, ["Next": "VIEW_1", "Prev": "END_BCK"])
                     XCTAssertEqual(state.ref, "test-1")
                     // Test out subscript fetching additional properties
@@ -285,10 +285,10 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = try! ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
             .init(
-                match: ["ref": "test-1"],
-                handler: { (_, _, _) in
+                ref: "test-1",
+                handlerFunction: { (_, _, _) in
                     handlerExpectation.fulfill()
                     throw PlayerError.jsConversionFailure
                 }
@@ -358,11 +358,11 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
         let completionExpectation = XCTestExpectation(description: "flow completed")
         let renderExpectation = XCTestExpectation(description: "external view rendered")
 
-        let plugin = try! ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
             // Less specific - only matches ref
             .init(
-                match: ["ref": "test-1"],
-                handler: { (_, _, transition) in
+                ref: "test-1",
+                handlerFunction: { (_, _, transition) in
                     lessSpecificExpectation.fulfill()
                     return AnyView(
                         Text("Less Specific")
@@ -374,8 +374,9 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
             ),
             // More specific - matches ref and extraProperty
             .init(
-                match: ["ref": "test-1", "extraProperty": "extraValue"],
-                handler: { (_, _, transition) in
+                ref: "test-1",
+                match: ["extraProperty": "extraValue"],
+                handlerFunction: { (_, _, transition) in
                     moreSpecificExpectation.fulfill()
                     return AnyView(
                         Text("More Specific")
@@ -420,30 +421,6 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
         XCTAssertNil(plugin.state)
 
         ViewHosting.expel()
-    }
-
-    func testInitThrowsErrorWhenHandlerMissingRef() {
-        // Test that initializer throws when a handler match is missing the 'ref' key
-        XCTAssertThrowsError(try ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
-            .init(
-                match: ["extraProperty": "value"],
-                handler: { _, _, _ in
-                    return AnyView(Text("Should not be called"))
-                }
-            )
-        ])) { error in
-            guard let pluginError = error as? ExternalStatePluginError else {
-                XCTFail("Expected ExternalStatePluginError but got \(type(of: error))")
-                return
-            }
-
-            if case .matchMissingRef(let match) = pluginError {
-                XCTAssertNil(match["ref"])
-                XCTAssertEqual(match["extraProperty"] as? String, "value")
-            } else {
-                XCTFail("Expected matchMissingRef error")
-            }
-        }
     }
 }
 

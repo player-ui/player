@@ -97,7 +97,7 @@ public struct PluginsAndPlayerCollection: View {
                     NavigationLink(flow.name) {
                         AssetFlowView(
                             flow: flow.flow,
-                            plugins: plugins + throwingPlugins + [beaconPlugin, pubsubPlugin],
+                            plugins: plugins + [externalStatePlugin, beaconPlugin, pubsubPlugin],
                             completion: completion(result:)
                         )
                         .padding(padding)
@@ -178,24 +178,17 @@ public struct PluginsAndPlayerCollection: View {
         }
     }
 
-    var throwingPlugins: [NativePlugin] {
-        var plugins: [NativePlugin] = []
-        do {
-            let externalStatePlugin = try ExternalStatePlugin(handlers: [
-                ExternalStateHandler(
-                    match: ["ref": "test-1"],
-                    handler: { _, options, transition in
-                        print("PluginsAndPlayerCollection External State triggered")
-                        let transitionValue = options.data.get(binding: "transitionValue") as? String
-                        options.expression.evaluate("{{foo}} = 'bar'")
-                        transition(transitionValue ?? "Next")
-                    }
-                )
-            ])
-            plugins.append(externalStatePlugin)
-        } catch {
-            fatalError("Failed to create ExternalStatePlugin: \(error)")
-        }
-        return plugins
+    var externalStatePlugin: ExternalStatePlugin {
+        ExternalStatePlugin(handlers: [
+            ExternalStateHandler(
+                ref: "test-1",
+                handlerFunction: { _, options, transition in
+                    print("PluginsAndPlayerCollection External State triggered")
+                    let transitionValue = options.data.get(binding: "transitionValue") as? String
+                    options.expression.evaluate("{{foo}} = 'bar'")
+                    transition(transitionValue ?? "Next")
+                }
+            )
+        ])
     }
 }

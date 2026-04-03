@@ -9,17 +9,21 @@ import type {
 import { Registry } from "@player-ui/partial-match-registry";
 import { ExternalStatePluginSymbol } from "./symbols.js";
 
-export type ExternalStateHandler = (
+export type ExternalStateHandlerMatch = Record<string, unknown>;
+
+export type ExternalStateHandlerFunction = (
   state: NavigationFlowExternalState,
   options: InProgressState["controllers"],
 ) => string | undefined | Promise<string | undefined>;
 
-type ExternalStateMatch = {
+export type ExternalStateHandler = {
   ref: string;
-} & Partial<NavigationFlowExternalState>;
+  match?: ExternalStateHandlerMatch;
+  handlerFunction: ExternalStateHandlerFunction;
+};
 
 /**
- * A plugin to handle external state states
+ * A plugin to handle external states
  *
  * This plugin uses a registry-based approach to match external states to handler functions.
  * Multiple plugins can be registered, and handlers are matched using partial object matching
@@ -36,36 +40,23 @@ export class ExternalStatePlugin implements PlayerPlugin {
    * The shared registry that maps external states to handlers.
    * All plugin instances use the same registry.
    */
-  private registry?: Registry<ExternalStateHandler>;
+  private registry?: Registry<ExternalStateHandlerFunction>;
 
   /**
    * The handlers for this plugin instance.
    */
-  private readonly handlers: Map<ExternalStateMatch, ExternalStateHandler>;
+  private readonly handlers: ExternalStateHandler[];
 
   /**
    * Creates a new ExternalStatePlugin
    *
-   * @param handlers - Array of [matcher, handler] tuples.
-   *                   Matchers are partial state objects used for matching.
-   *                   More specific matchers (with more properties) take precedence.
-   *
-   * @example
-   * ```typescript
-   * new ExternalStatePlugin([
-   *   // Less specific - matches any state with ref: "action"
-   *   [{ ref: "action" }, (state, options) => "default"],
-   *
-   *   // More specific - matches state with both ref and type
-   *   [{ ref: "action", type: "special" }, (state, options) => "special"],
-   * ])
-   * ```
+   * @param handlers - Array of ExternalStateHandler objects.
+   *                   Each object has a required `ref` (the external state reference),
+   *                   an optional `match` object for additional match criteria,
+   *                   and a `handlerFunction` to run when the external state is transitioned to.
    */
-  constructor(
-    // This array of tuples is an established player pattern. Internally we use a Map.
-    handlers: [ExternalStateMatch, ExternalStateHandler][],
-  ) {
-    this.handlers = new Map(handlers);
+  constructor(handlers: ExternalStateHandler[]) {
+    this.handlers = handlers;
   }
 
   apply(player: Player): void {
@@ -144,7 +135,7 @@ export class ExternalStatePlugin implements PlayerPlugin {
     }
 
     // We are the first plugin instance, create the registry
-    this.registry = new Registry<ExternalStateHandler>(
+    this.registry = new Registry<ExternalStateHandlerFunction>(
       undefined,
       player.logger,
     );
@@ -158,18 +149,22 @@ export class ExternalStatePlugin implements PlayerPlugin {
    * and a debug log will be emitted (accessible via player.logger.debug).
    */
   private registerHandlers(player: Player): void {
-    for (const [state, handler] of this.handlers) {
+    for (const handler of this.handlers) {
       // Runtime check for 'ref' property is necessary despite TypeScript constraint because
       // the Swift bridge allows improperly formatted objects to bypass TypeScript validation.
       // We log this here and not in the constructor because the Logger is not yet available in the constructor.
-      if (!state.ref) {
+      if (handler.match?.ref) {
         player.logger.warn(
-          `An external state match is missing the 'ref' property. This handler will be ignored. Match: ${JSON.stringify(state)}`,
+          `An ExternalStateHandler contains a superfluous 'match.ref' property. 'match.ref' will be ignored. 'ref' will be used instead. Handler: ${JSON.stringify({ ref: handler.ref, match: handler.match })}`,
         );
+        delete handler.match?.["ref"];
         continue;
       }
-      // Registry will handle keeping only the last handler for each state
-      this.registry?.set(state, handler);
+      // Registry will handle keeping only the last handlerFunction for each match
+      this.registry?.set(
+        { ref: handler.ref, ...handler.match },
+        handler.handlerFunction,
+      );
     }
   }
 

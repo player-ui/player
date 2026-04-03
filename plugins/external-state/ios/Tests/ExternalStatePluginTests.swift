@@ -51,10 +51,10 @@ class ExternalStatePluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = try! ExternalStatePlugin(handlers: [
+        let plugin = ExternalStatePlugin(handlers: [
             ExternalStateHandler(
-                match: ["ref": "test-1"],
-                handler: { (state, _, handler) in
+                ref: "test-1",
+                handlerFunction: { (state, _, handler) in
                     XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
                     XCTAssertEqual(state.ref, "test-1")
                     // Test out subscript fetching additional properties
@@ -116,10 +116,10 @@ class ExternalStatePluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = try! ExternalStatePlugin(handlers: [
+        let plugin = ExternalStatePlugin(handlers: [
             ExternalStateHandler(
-                match: ["ref": "test-1"],
-                handler: { (_, _, _) in
+                ref: "test-1",
+                handlerFunction: { (_, _, _) in
                     handlerExpectation.fulfill()
                     throw PlayerError.jsConversionFailure
                 }
@@ -184,10 +184,10 @@ class ExternalStatePluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = try! ExternalStatePlugin(handlers: [
+        let plugin = ExternalStatePlugin(handlers: [
             ExternalStateHandler(
-                match: ["ref": "test-1"],
-                handler: { (state, _, handler) in
+                ref: "test-1",
+                handlerFunction: { (state, _, handler) in
                     XCTAssertEqual(state.transitions, ["Next": "END_FWD", "Prev": "END_BCK"])
                     XCTAssertEqual(state.ref, "test-1")
                     if let param: [String: Any] = state.param {
@@ -250,10 +250,10 @@ class ExternalStatePluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = try! ExternalStatePlugin(handlers: [
+        let plugin = ExternalStatePlugin(handlers: [
             ExternalStateHandler(
-                match: ["ref": "test-1"],
-                handler: { (_, _, handler) in
+                ref: "test-1",
+                handlerFunction: { (_, _, handler) in
                     DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                         handlerExpectation.fulfill()
                         handler("Next")
@@ -311,10 +311,10 @@ class ExternalStatePluginTests: XCTestCase {
 
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
-        let plugin = try! ExternalStatePlugin(handlers: [
+        let plugin = ExternalStatePlugin(handlers: [
             ExternalStateHandler(
-                match: ["ref": "test-1"],
-                handler: { (_, options, handler) in
+                ref: "test-1",
+                handlerFunction: { (_, options, handler) in
                     XCTAssertEqual(options.data.get(binding: "transitionValue") as? String, "Next")
 
                     // Test expression evaluation
@@ -383,19 +383,20 @@ class ExternalStatePluginTests: XCTestCase {
         let moreSpecificExpectation = XCTestExpectation(description: "more specific handler called")
         let completionExpectation = XCTestExpectation(description: "flow completed")
 
-        let plugin = try! ExternalStatePlugin(handlers: [
+        let plugin = ExternalStatePlugin(handlers: [
             // Less specific - only matches ref
             ExternalStateHandler(
-                match: ["ref": "test-1"],
-                handler: { (_, _, handler) in
+                ref: "test-1",
+                handlerFunction: { (_, _, handler) in
                     lessSpecificExpectation.fulfill()
                     handler("Prev")
                 }
             ),
             // More specific - matches ref and extraProperty
             ExternalStateHandler(
-                match: ["ref": "test-1", "extraProperty": "extraValue"],
-                handler: { (_, _, handler) in
+                ref: "test-1",
+                match: ["extraProperty": "extraValue"],
+                handlerFunction: { (_, _, handler) in
                     moreSpecificExpectation.fulfill()
                     handler("Next")
                 }
@@ -415,29 +416,5 @@ class ExternalStatePluginTests: XCTestCase {
         }
 
         wait(for: [moreSpecificExpectation, lessSpecificExpectation, completionExpectation], timeout: 1)
-    }
-
-    func testInitThrowsErrorWhenHandlerMissingRef() {
-        // Test that initializer throws when a handler match is missing the 'ref' key
-        XCTAssertThrowsError(try ExternalStatePlugin(handlers: [
-            ExternalStateHandler(
-                match: ["extraProperty": "value"],
-                handler: { (_, _, handler) in
-                    handler("Next")
-                }
-            )
-        ])) { error in
-            guard let pluginError = error as? ExternalStatePluginError else {
-                XCTFail("Expected ExternalStatePluginError but got \(type(of: error))")
-                return
-            }
-
-            if case .matchMissingRef(let match) = pluginError {
-                XCTAssertNil(match["ref"])
-                XCTAssertEqual(match["extraProperty"] as? String, "value")
-            } else {
-                XCTFail("Expected matchMissingRef error")
-            }
-        }
     }
 }

@@ -34,19 +34,16 @@ const externalFlow = {
   },
 };
 
-const refMatch = { ref: "test-1" };
-const refAndDataMatch = { ref: "test-1", testProperty: "testValue" };
-
 test("handles the external state", async () => {
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refMatch,
-          (state, options) => {
+        {
+          ref: "test-1",
+          handlerFunction: (state, options) => {
             return options.data.get("transitionValue");
           },
-        ],
+        },
       ]),
     ],
   });
@@ -60,12 +57,12 @@ test("thrown errors will fail player", async () => {
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refMatch,
-          (state, options) => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             throw new Error("Bad Code");
           },
-        ],
+        },
       ]),
     ],
   });
@@ -79,12 +76,12 @@ test("works async", async () => {
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refMatch,
-          () => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             return Promise.resolve("Prev");
           },
-        ],
+        },
       ]),
     ],
   });
@@ -98,20 +95,20 @@ test("allows multiple plugins - last one wins", async () => {
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refMatch,
-          () => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             return "Next";
           },
-        ],
+        },
       ]),
       new ExternalStatePlugin([
-        [
-          refMatch,
-          () => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             return "Prev";
           },
-        ],
+        },
       ]),
     ],
   });
@@ -128,20 +125,20 @@ test("logs debug message when replacing handler", async () => {
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refMatch,
-          () => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             return "Next";
           },
-        ],
+        },
       ]),
       new ExternalStatePlugin([
-        [
-          refMatch,
-          () => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             return "Prev";
           },
-        ],
+        },
       ]),
     ],
     logger: {
@@ -156,11 +153,10 @@ test("logs debug message when replacing handler", async () => {
   await player.start(externalFlow as Flow);
 
   // Should have logged that the handler was replaced
-  // Check if any of the calls match our expected message
   const replacementCalls = mockDebug.mock.calls.filter(
     (call) =>
       call[0] === "Registry: Replacing existing entry for key " &&
-      call[1] === refMatch,
+      JSON.stringify(call[1]) === JSON.stringify({ ref: "test-1" }),
   );
   expect(replacementCalls.length).toBeGreaterThan(0);
 });
@@ -169,27 +165,28 @@ test("different plugins, more specific match overrides less specific match", asy
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refAndDataMatch,
-          () => {
+        {
+          ref: "test-1",
+          match: { testProperty: "testValue" },
+          handlerFunction: () => {
             return "Next";
           },
-        ],
+        },
       ]),
       new ExternalStatePlugin([
-        [
-          refMatch,
-          () => {
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             return "Prev";
           },
-        ],
+        },
       ]),
     ],
   });
 
   const completed = await player.start(externalFlow as Flow);
 
-  // More specific match (refAndDataMatch) should win, returning "Next" which leads to outcome "FWD"
+  // More specific match (with testProperty) should win, returning "Next" which leads to outcome "FWD"
   expect(completed.endState.outcome).toBe("FWD");
 });
 
@@ -200,20 +197,21 @@ test("within same plugin, more specific match overrides less specific match", as
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refAndDataMatch,
-          () => {
+        {
+          ref: "test-1",
+          match: { testProperty: "testValue" },
+          handlerFunction: () => {
             moreSpecificHandlerCalled();
             return "Next";
           },
-        ],
-        [
-          refMatch,
-          () => {
+        },
+        {
+          ref: "test-1",
+          handlerFunction: () => {
             lessSpecificHandlerCalled();
             return "Prev";
           },
-        ],
+        },
       ]),
     ],
   });
@@ -231,11 +229,11 @@ test("only transitions if player still on this external state", async () => {
   const player = new Player({
     plugins: [
       new ExternalStatePlugin([
-        [
-          refMatch,
-          (state, options) => {
+        {
+          ref: "test-1",
+          handlerFunction: (state, options) => {
             return new Promise((res) => {
-              // Only save resolver for first external action
+              // Only save resolver for first external state
               if (!resolver) {
                 resolver = () => {
                   res(options.data.get("transitionValue"));
@@ -243,7 +241,7 @@ test("only transitions if player still on this external state", async () => {
               }
             });
           },
-        ],
+        },
       ]),
     ],
   });
@@ -326,16 +324,16 @@ describe("edge cases", () => {
     const player = new Player({
       plugins: [
         new ExternalStatePlugin([
-          [
-            { ref: "view_1" },
-            () => {
+          {
+            ref: "view_1",
+            handlerFunction: () => {
               return new Promise((resolve) => {
                 setTimeout(() => {
                   resolve("next");
                 }, 100);
               });
             },
-          ],
+          },
         ]),
       ],
     });
@@ -447,7 +445,7 @@ describe("edge cases", () => {
       plugins: [
         new ExternalStatePlugin([
           // Register handler for a different ref - not matching our external state
-          [{ ref: "different-ref" }, () => "Next"],
+          { ref: "different-ref", handlerFunction: () => "Next" },
         ]),
       ],
     });
@@ -483,41 +481,32 @@ describe("edge cases", () => {
 });
 
 describe("Type Safety", () => {
-  test("handlers with invalid matches (no ref) should not be triggered at runtime", async () => {
-    const invalidHandler1Called = vitest.fn();
-    const invalidHandler2Called = vitest.fn();
+  test("handlers with superfluous match.ref should warn and be skipped", async () => {
+    const superflousHandlerCalled = vitest.fn();
     const validHandlerCalled = vitest.fn();
     const warnSpy = vitest.fn();
 
     const player = new Player({
       plugins: [
         new ExternalStatePlugin([
-          // Invalid match - empty object (TypeScript error suppressed for testing)
-          [
-            // @ts-expect-error - testing runtime behavior with invalid match
-            {},
-            () => {
-              invalidHandler1Called();
+          // Handler with superfluous match.ref (TypeScript error suppressed for testing)
+          {
+            ref: "test-1",
+            // @ts-expect-error - testing runtime behavior with superfluous match.ref
+            match: { ref: "test-1", testProperty: "testValue" },
+            handlerFunction: () => {
+              superflousHandlerCalled();
               return "Next";
             },
-          ],
-          // Invalid match - missing ref (TypeScript error suppressed for testing)
-          [
-            // @ts-expect-error - testing runtime behavior with invalid match
-            { testProperty: "testValue" },
-            () => {
-              invalidHandler2Called();
-              return "Next";
-            },
-          ],
-          // Valid match - has ref
-          [
-            { ref: "test-1" },
-            () => {
+          },
+          // Valid handler - no match.ref
+          {
+            ref: "test-1",
+            handlerFunction: () => {
               validHandlerCalled();
               return "Next";
             },
-          ],
+          },
         ]),
       ],
       logger: {
@@ -531,22 +520,14 @@ describe("Type Safety", () => {
 
     const completed = await player.start(externalFlow as Flow);
 
-    // Warnings should have been logged for handlers with invalid matches (2 warnings)
-    expect(warnSpy).toHaveBeenCalledTimes(2);
-    // First warning for empty object match
-    expect(warnSpy).toHaveBeenNthCalledWith(
-      1,
-      "An external state match is missing the 'ref' property. This handler will be ignored. Match: {}",
-    );
-    // Second warning for match without ref
-    expect(warnSpy).toHaveBeenNthCalledWith(
-      2,
-      'An external state match is missing the \'ref\' property. This handler will be ignored. Match: {"testProperty":"testValue"}',
+    // Warning should have been logged for the handler with superfluous match.ref
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      'An ExternalStateHandler contains a superfluous \'match.ref\' property. \'match.ref\' will be ignored. \'ref\' will be used instead. Handler: {"ref":"test-1","match":{"ref":"test-1","testProperty":"testValue"}}',
     );
 
-    // The handlers with invalid matches should NOT have been called
-    expect(invalidHandler1Called).not.toHaveBeenCalled();
-    expect(invalidHandler2Called).not.toHaveBeenCalled();
+    // The handler with superfluous match.ref should NOT have been called (it was skipped)
+    expect(superflousHandlerCalled).not.toHaveBeenCalled();
 
     // The valid handler should have been called
     expect(validHandlerCalled).toHaveBeenCalledTimes(1);

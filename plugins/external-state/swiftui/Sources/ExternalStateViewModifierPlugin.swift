@@ -18,18 +18,20 @@ public struct ExternalStateViewModifierHandler {
         - transition: A completion handler that takes a string to transition with
      - returns: A view to show as content by the ViewModifier
      */
-    public typealias Handler = (
+    public typealias Function = (
         NavigationFlowExternalState,
         PlayerControllers,
         @escaping (String) -> Void
     ) throws -> AnyView
 
-    public let match: Match
-    public let handler: Handler
+    public let ref: String
+    public let match: Match?
+    public let handlerFunction: Function
 
-    public init(match: Match, handler: @escaping Handler) {
+    public init(ref: String, match: Match? = nil, handlerFunction: @escaping Function) {
+        self.ref = ref
         self.match = match
-        self.handler = handler
+        self.handlerFunction = handlerFunction
     }
 }
 
@@ -54,13 +56,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
      - parameters:
         - handlers: array of handlers with matchers and handler functions
      */
-    public init(handlers: [ExternalStateViewModifierHandler]) throws {
-        try handlers.forEach { handler in
-            let match = handler.match
-            if match["ref"] == nil {
-                throw ExternalStatePluginError.matchMissingRef(match: match)
-            }
-        }
+    public init(handlers: [ExternalStateViewModifierHandler]) {
         self.handlers = handlers
         super.init(
             fileName: "ExternalStatePlugin.native",
@@ -99,8 +95,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
     override open func getArguments() -> [Any] {
         guard let context = context else { return [] }
 
-        // Convert handlers to array of tuples [match, callback]
-        let jsHandlers = handlers.map { handler in
+        let jsHandlers = handlers.map { handler -> JSValue? in
             let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
                 guard
                     let context = self?.context,
@@ -111,7 +106,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
                             let state = NavigationFlowExternalState(state)
                             self?.state = state
                             do {
-                                self?.content = try handler.handler(state, controllers) { transition in
+                                self?.content = try handler.handlerFunction(state, controllers) { transition in
                                     resolve(transition)
                                     let resetWithAnimation: () -> Void = {
                                         withAnimation {
@@ -141,9 +136,11 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
                 return promise
             }
 
-            let jsMatch = JSValue(object: handler.match, in: context)
-            let jsCallback = JSValue(object: callback, in: context)
-            return [jsMatch, jsCallback]
+            return JSValue(object: [
+                "ref": handler.ref,
+                "match": handler.match,
+                "handlerFunction": JSValue(object: callback, in: context) as Any
+            ], in: context)
         }
 
         return [jsHandlers]
