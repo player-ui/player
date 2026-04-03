@@ -1233,7 +1233,7 @@ static let beaconAction: String = """
   }
 }
 """
-static let externalAction: String = """
+static let externalState: String = """
 {
   "id": "test-flow",
   "data": {
@@ -1604,8 +1604,8 @@ static let chatMessageBasic: String = """
               (title: "beacon", flows: [
             (name: "action", flow: MockFlows.beaconAction)
         ]),
-        (title: "external-action", flows: [
-            (name: "external-action", flow: MockFlows.externalAction)
+        (title: "external-state", flows: [
+            (name: "external-state", flow: MockFlows.externalState)
         ]),
         (title: "pubsub", flows: [
             (name: "pub sub basic", flow: MockFlows.pubSubBasic)

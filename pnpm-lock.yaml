@@ -790,7 +790,7 @@ importers:
         specifier: workspace:*
         version: link:../../../core/player
 
-  plugins/external-action/core:
+  plugins/external-state/core:
     dependencies:
       '@player-ui/partial-match-registry':
         specifier: workspace:*

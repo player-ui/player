@@ -1,0 +1,18 @@
+public abstract interface class com/intuit/player/plugins/externalState/ExternalStateHandler {
+	public abstract fun onExternalState (Lcom/intuit/player/jvm/core/flow/state/NavigationFlowExternalState;Lcom/intuit/player/jvm/core/player/state/ControllerState;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class com/intuit/player/plugins/externalState/ExternalStatePlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper, com/intuit/player/jvm/core/plugins/PlayerPlugin {
+	public fun <init> ()V
+	public fun <init> (Lcom/intuit/player/plugins/externalState/ExternalStateHandler;)V
+	public synthetic fun <init> (Lcom/intuit/player/plugins/externalState/ExternalStateHandler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
+	public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
+	public final fun onExternalState (Lcom/intuit/player/plugins/externalState/ExternalStateHandler;)V
+}
+
+public final class com/intuit/player/plugins/externalState/ExternalStatePluginKt {
+	public static final fun getExternalStatePlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/plugins/externalState/ExternalStatePlugin;
+	public static final fun onExternalState (Lcom/intuit/player/jvm/core/player/Player;Lcom/intuit/player/plugins/externalState/ExternalStateHandler;)V
+}
+

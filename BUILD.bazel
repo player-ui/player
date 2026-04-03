@@ -146,10 +146,10 @@ assemble_ios_release(
         "//plugins/expression/ios:PlayerUIExpressionPlugin_Sources": "plugins/expression/ios/",
         "//plugins/expression/core:core_native_bundle": "plugins/expression/ios/Resources/",
 
-        # External Action
-        "//plugins/external-action/ios:PlayerUIExternalActionPlugin_Sources": "plugins/external-action/ios/",
-        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPlugin_Sources": "plugins/external-action/swiftui/",
-        "//plugins/external-action/core:core_native_bundle": "plugins/external-action/ios/Resources/",
+        # External State
+        "//plugins/external-state/ios:PlayerUIExternalStatePlugin_Sources": "plugins/external-state/ios/",
+        "//plugins/external-state/swiftui:PlayerUIExternalStateViewModifierPlugin_Sources": "plugins/external-state/swiftui/",
+        "//plugins/external-state/core:core_native_bundle": "plugins/external-state/ios/Resources/",
 
         # Metrics
         "//plugins/metrics/swiftui:PlayerUIMetricsPlugin_Sources": "plugins/metrics/swiftui/",

@@ -9,7 +9,7 @@ import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIReferenceAssets
 import PlayerUIMetricsPlugin
-import PlayerUIExternalActionViewModifierPlugin
+import PlayerUIExternalStateViewModifierPlugin
 
 /**
  SwiftUI View to wrap the `ManagedPlayer` and handle the result
@@ -79,7 +79,7 @@ public struct FlowManagerView: View {
     private var throwingPlugins: [NativePlugin] {
         var plugins: [NativePlugin] = []
         do {
-            let externalActionPlugin = try ExternalActionViewModifierPlugin<ExternalActionSheetModifier>(handlers: [
+            let externalStatePlugin = try ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
                 .init(
                     match: ["ref": "test-1"],
                     handler: { _, _, transition in
@@ -95,9 +95,9 @@ public struct FlowManagerView: View {
                     }
                 )
             ])
-            plugins.append(externalActionPlugin)
+            plugins.append(externalStatePlugin)
         } catch {
-            fatalError("Failed to create ExternalActionPlugin: \(error)")
+            fatalError("Failed to create ExternalStatePlugin: \(error)")
         }
         return plugins
     }
