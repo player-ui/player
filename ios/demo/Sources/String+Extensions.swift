@@ -9,7 +9,7 @@ import Foundation
 
 // mocks for managed player flows
 extension String {
-    static let externalActionFlow = """
+    static let externalStateFlow = """
         {
           "id": "test-flow",
           "data": {

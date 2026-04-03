@@ -9,7 +9,7 @@ import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIReferenceAssets
 import PlayerUIMetricsPlugin
-import PlayerUIExternalActionViewModifierPlugin
+import PlayerUIExternalStateViewModifierPlugin
 
 /**
  SwiftUI View to wrap the `ManagedPlayer` and handle the result
@@ -30,21 +30,7 @@ public struct FlowManagerView: View {
             } else {
                 VStack {
                     ManagedPlayer(
-                        plugins: [
-                            ReferenceAssetsPlugin(),
-                            MetricsPlugin { (render, _, flow) in
-                                print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
-                            },
-                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
-
-                                return AnyView(
-                                    Text("External State")
-                                        .onDisappear {
-                                            transition("Next")
-                                        }
-                                )
-                            }
-                        ],
+                        plugins: plugins,
                         flowManager: ConstantFlowManager(flowSequence),
                         onComplete: { _ in
                             complete = true
@@ -79,5 +65,30 @@ public struct FlowManagerView: View {
                 }
             }
         }.navigationBarTitle(Text(navTitle))
+    }
+
+    private var plugins: [NativePlugin] {
+        [
+            ReferenceAssetsPlugin(),
+            MetricsPlugin { (render, _, flow) in
+                print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
+            },
+            ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+                .init(
+                    ref: "test-1",
+                    handlerFunction: { _, _, transition in
+                        return AnyView(
+                            Text("External State")
+                                .onAppear {
+                                    print("Managed Player External State triggered")
+                                }
+                                .onDisappear {
+                                    transition("Next")
+                                }
+                        )
+                    }
+                )
+            ])
+        ]
     }
 }

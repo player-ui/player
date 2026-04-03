@@ -38,8 +38,8 @@ xcodeproj(
 
         "//plugins/expression/ios:PlayerUIExpressionPluginTests",
 
-        "//plugins/external-action/ios:PlayerUIExternalActionPluginTests",
-        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPluginViewInspectorTests",
+        "//plugins/external-state/ios:PlayerUIExternalStatePluginTests",
+        "//plugins/external-state/swiftui:PlayerUIExternalStateViewModifierPluginViewInspectorTests",
 
         "//plugins/metrics/swiftui:PlayerUIMetricsPluginViewInspectorTests",
 

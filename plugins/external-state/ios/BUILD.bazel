@@ -1,0 +1,6 @@
+load("//tools/ios:util.bzl", "ios_plugin")
+
+ios_plugin(
+    name = "ExternalStatePlugin",
+    resources = ["//plugins/external-state/core:core_native_bundle"]
+)
