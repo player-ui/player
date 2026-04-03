@@ -52,7 +52,7 @@ plugins/console-logger/core/node_modules
 plugins/data-change-listener/core/node_modules
 plugins/data-filter/core/node_modules
 plugins/expression/core/node_modules
-plugins/external-action/core/node_modules
+plugins/external-state/core/node_modules
 plugins/markdown/core/node_modules
 plugins/meta-plugin/core/node_modules
 plugins/partial-match-fingerprint/core/node_modules

@@ -1,0 +1,209 @@
+---
+title: External State
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import SPM from "../../../../components/SPM.astro";
+import { PackageManagers } from 'starlight-package-managers'
+
+The External State Plugin is an easy way to handle External states from the navigation of a Player flow.
+
+:::note[Handler Matching]
+The plugin uses the [Partial Match Registry](/plugins/multiplatform/partial-match-fingerprint/#partial-match-registry) to match external states to handlers. See the registry documentation for details on how fuzzy matching and specificity work.
+:::
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Install the plugin:
+
+<PackageManagers pkg="@player-ui/external-state-plugin" />
+
+Create handlers for external states:
+
+```js
+import { ExternalStatePlugin } from '@player-ui/external-state-plugin';
+
+const plugin = new ExternalStatePlugin([
+  [{ ref: 'custom' }, async (state, options) => {
+    // Handle external state with ref: 'custom'
+    return 'next';
+  }],
+  [{ ref: 'other-action' }, async (state, options) => {
+    // Handle external state with ref: 'other-action'
+    return 'prev';
+  }],
+]);
+```
+
+Add it to Player:
+
+```js
+import { Player } from "@player-ui/player";
+
+const player = new Player({
+  plugins: [plugin],
+});
+```
+
+This will transition any `EXTERNAL` state in Player's navigation based on the registered handlers. Handlers are matched using partial object matching, with more specific matches taking precedence:
+
+```js
+new ExternalStatePlugin([
+  // Less specific - matches any state with ref: 'action'
+  [{ ref: 'action' }, () => 'default'],
+  
+  // More specific - matches state with both ref and type
+  [{ ref: 'action', type: 'special' }, () => 'special'],
+])
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+<SPM product="ExternalStatePlugin" />
+
+### Swift Usage
+
+For an example flow with an external state such as:
+
+```json
+{
+  "id": "test-flow",
+  "data": {
+    "transitionValue": "Next"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        },
+        "extraProperty": "extraValue"
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_BCK": {
+        "state_type": "END",
+        "outcome": "BCK"
+      }
+    }
+  }
+}
+```
+
+The plugin can be declared to handle this external state, whether that means integrating an existing platform native experience, or doing headless processing:
+
+```swift
+let plugin = ExternalStatePlugin { state, options, transition in
+		guard state.ref == "test-1" else { return transition("Prev") }
+		// Options contains the dataModel as well as an evaluate function for expressions
+		let transitionValue = options.data.get(binding: "transitionValue") as? String
+		options.expression.evaluate("{{foo}} = 'bar'")
+
+		let extraProperty: String? = state.extraProperty // uses @dynamicMemberLookup
+		// Do some processing
+		transition(transitionValue ?? "Next")
+}
+
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      plugin
+    ],
+    result: $resultBinding
+  )
+}
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+The `ExternalStatePlugin` adds support for handling `EXTERNAL` navigation states in the application. The handler, which can be provided during plugin initialization, receives three parameters:
+
+1. state: `NavigationFlowExternalState` provides access to the information defined in the `EXTERNAL` state node
+2. options: `ControllerState` provides access to the current player controllers
+3. transition: `(String) -> Unit` is provided to enable the handler to "complete" the `EXTERNAL` state and transition using the provided `String` value
+
+## Usage
+
+In build.gradle
+
+```kotlin
+implementation "com.intuit.playerui.plugins:external-state:$PLAYER_VERSION"
+```
+
+In Player constructor
+
+```kotlin
+import com.intuit.playerui.plugins.externalState.ExternalStatePlugin
+
+val externalStatePlugin = ExternalStatePlugin { state, options, transition ->
+    // access external state node
+    val extraProperty = state["extraProperty"]
+    // access data model
+    options.data.get("{{foo.bar}}")
+    // evaluate expression
+    options.expression.evaluate("{{foo.bar}} = 1")
+    // do other processing or show non-player experience
+
+    // transition to the next node using "Next"
+    transition("Next")
+}
+AndroidPlayer(externalStatePlugin)
+
+// handler can be configured after instantiation
+externalStatePlugin.onExternalState { /** handle external state */ }
+
+// extension method for configuring plugin with player instance
+androidPlayer.onExternalState { /** handle external state */ }
+```
+
+In Player content
+
+```json
+{
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        },
+        "extraProperty": "extraValue"
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_BCK": {
+        "state_type": "END",
+        "outcome": "BCK"
+      }
+    }
+  }
+}
+```
+
+## API
+
+Public API available from sources here:
+
+[ExternalStatePlugin](https://github.com/player-ui/player/blob/main/plugins/external-state/jvm/src/main/kotlin/com/intuit/playerui/plugins/externalState/ExternalStatePlugin.kt)
+
+  </Fragment>
+</PlatformTabs>

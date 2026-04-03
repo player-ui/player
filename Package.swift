@@ -15,7 +15,7 @@ let ios_plugins: [SwiftPlugin] = [
     (name: "CommonTypesPlugin", path: "common-types", resources: true),
     (name: "ComputedPropertiesPlugin", path: "computed-properties", resources: true),
     (name: "ExpressionPlugin", path: "expression", resources: true),
-    (name: "ExternalActionPlugin", path: "external-action", resources: true),
+    (name: "ExternalStatePlugin", path: "external-state", resources: true),
     (name: "PubSubPlugin", path: "pubsub", resources: true),
     (name: "StageRevertDataPlugin", path: "stage-revert-data", resources: true),
     (name: "TypesProviderPlugin", path: "types-provider", resources: true),
@@ -27,7 +27,7 @@ let swiftui_plugins: [SwiftUIPlugin] = [
     (name: "BeaconPlugin", path: "beacon", dependencies: ["BaseBeaconPlugin"], resources: false),
     (name: "MetricsPlugin", path: "metrics", dependencies: [], resources: true),
     (name: "SwiftUICheckPathPlugin", path: "check-path", dependencies: ["CheckPathPlugin"], resources: false),
-    (name: "ExternalActionViewModifierPlugin", path: "external-action", dependencies: ["ExternalActionPlugin"], resources: false),
+    (name: "ExternalStateViewModifierPlugin", path: "external-state", dependencies: ["ExternalStatePlugin"], resources: false),
     (name: "SwiftUIPendingTransactionPlugin", path: "pending-transaction", dependencies: [], resources: false),
     (name: "TransitionPlugin", path: "transition", dependencies: [], resources: false),
 ]

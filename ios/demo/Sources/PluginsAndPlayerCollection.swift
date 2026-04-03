@@ -12,7 +12,7 @@ import PlayerUI
 import PlayerUITestUtilitiesCore
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
-import PlayerUIExternalActionPlugin
+import PlayerUIExternalStatePlugin
 import PlayerUIPubSubPlugin
 
 /**
@@ -78,10 +78,10 @@ public struct PluginsAndPlayerCollection: View {
                         .padding(padding)
                 }.accessibility(identifier: "Multi Action state before multi view flow")
 
-                NavigationLink("External Action transition flow") {
-                    FlowManagerView(flowSequence: [.externalActionFlow, .secondFlow], navTitle: "External Action transition flow")
+                NavigationLink("External State transition flow") {
+                    FlowManagerView(flowSequence: [.externalStateFlow, .secondFlow], navTitle: "External State transition flow")
                         .padding(padding)
-                }.accessibility(identifier: "External Action transition flow")
+                }.accessibility(identifier: "External State transition flow")
             }  header: {
                 Text("Managed Player")
             }
@@ -181,8 +181,8 @@ public struct PluginsAndPlayerCollection: View {
     var throwingPlugins: [NativePlugin] {
         var plugins: [NativePlugin] = []
         do {
-            let externalActionPlugin = try ExternalActionPlugin(handlers: [
-                ExternalActionHandler(
+            let externalStatePlugin = try ExternalStatePlugin(handlers: [
+                ExternalStateHandler(
                     match: ["ref": "test-1"],
                     handler: { _, options, transition in
                         print("PluginsAndPlayerCollection External State triggered")
@@ -192,9 +192,9 @@ public struct PluginsAndPlayerCollection: View {
                     }
                 )
             ])
-            plugins.append(externalActionPlugin)
+            plugins.append(externalStatePlugin)
         } catch {
-            fatalError("Failed to create ExternalActionPlugin: \(error)")
+            fatalError("Failed to create ExternalStatePlugin: \(error)")
         }
         return plugins
     }

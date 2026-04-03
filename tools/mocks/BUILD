@@ -4,7 +4,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 PLUGIN_MOCKS = [
     "beacon",
-    "external-action",
+    "external-state",
     "pubsub",
     "reference-assets",
 ]

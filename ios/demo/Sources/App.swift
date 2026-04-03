@@ -9,7 +9,7 @@ import PlayerUIBeaconPlugin
 import PlayerUICommonExpressionsPlugin
 import PlayerUICommonTypesPlugin
 import PlayerUIExpressionPlugin
-import PlayerUIExternalActionPlugin
+import PlayerUIExternalStatePlugin
 import PlayerUIMetricsPlugin
 import PlayerUIPrintLoggerPlugin
 import PlayerUIPubSubPlugin
@@ -62,8 +62,8 @@ struct MainView: View {
     private var throwingPlugins: [NativePlugin] {
         var plugins: [NativePlugin] = []
         do {
-            let plugin = try ExternalActionPlugin(handlers: [
-                ExternalActionHandler(
+            let plugin = try ExternalStatePlugin(handlers: [
+                ExternalStateHandler(
                     match: ["ref": "test-1"],
                     handler: { _, _, _ in
                         print("MainView External State triggered")
@@ -72,7 +72,7 @@ struct MainView: View {
             ])
             plugins.append(plugin)
         } catch {
-            fatalError("Failed to create ExternalActionPlugin: \(error)")
+            fatalError("Failed to create ExternalStatePlugin: \(error)")
         }
         return plugins
     }
