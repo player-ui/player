@@ -153,13 +153,13 @@ export class ReactPlayer {
   }
 
   /** Register and apply [Plugin] if one with the same symbol is not already registered. */
-  public registerPlugin(plugin: ReactPlayerPlugin): void {
+  public registerPlugin(plugin: ReactPlayerPlugin | PlayerPlugin): void {
     if (plugin.apply) {
       this.player.registerPlugin(plugin as PlayerPlugin);
     }
 
-    if (plugin.applyReact) {
-      plugin.applyReact(this);
+    if ((plugin as ReactPlayerPlugin).applyReact) {
+      (plugin as ReactPlayerPlugin).applyReact?.(this);
     }
 
     if (!this.options.plugins) {

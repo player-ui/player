@@ -1,6 +1,7 @@
 package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.Completable
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.Promise
@@ -13,6 +14,7 @@ import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
@@ -72,8 +74,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
     private val player: Node
 
-    private val _plugins: MutableList<Plugin> = plugins.toMutableList()
-    override val plugins: List<Plugin> get() = _plugins
+    override var plugins: List<Plugin> = plugins; private set
 
     override val node: Node by ::player
 
@@ -174,6 +175,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
             .onEach { it.apply(this) }
     }
 
+    private val registerPlugin: Invokable<Unit> by NodeSerializableFunction()
+
     override fun start(flow: String): Completable<CompletedState> = try {
         start(runtime.execute("($flow)") as Node)
     } catch (exception: Exception) {
@@ -198,12 +201,12 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
     /** Register and apply a [Plugin] to this player after instantiation. */
     public fun registerPlugin(plugin: Plugin) {
-        _plugins.add(plugin)
+        plugins = plugins + plugin
         when (plugin) {
             is RuntimePlugin -> {
                 plugin.apply(runtime)
                 if (plugin is JSPluginWrapper) {
-                    player.getInvokable<Unit>("registerPlugin")!!.invoke(plugin.instance)
+                    registerPlugin.invoke(plugin.instance)
                 }
             }
             is PlayerPlugin -> plugin.apply(this)
