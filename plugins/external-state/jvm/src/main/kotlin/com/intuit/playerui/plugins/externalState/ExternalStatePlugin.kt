@@ -15,28 +15,25 @@ import com.intuit.playerui.core.plugins.PlayerPlugin
 import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 
+public typealias ExternalStateHandlerMatch = Map<String, Any>
+
 public data class ExternalStateHandler(
-    val match: Map<String, Any>,
-    val handler: Handler,
+    val ref: String,
+    val match: ExternalStateHandlerMatch? = null,
+    val handlerFunction: Function,
 ) {
     /**
-     * Function definition of an external action handler
+     * Function definition of an external state handler
      * @param state The NavigationFlowExternalState that was transitioned to
      * @param options The ControllerState providing access to data and expression evaluation
      * @param transition Callback to transition to the next state
      */
-    public fun interface Handler {
-        public fun onExternalState(
+    public fun interface Function {
+        public operator fun invoke(
             state: NavigationFlowExternalState,
             options: ControllerState,
             transition: (String) -> Unit,
         )
-    }
-
-    init {
-        require(match.containsKey("ref")) {
-            "The match map must contain a 'ref' key. Got: $match"
-        }
     }
 }
 
@@ -64,21 +61,23 @@ public class ExternalStatePlugin(
         SetTimeoutPlugin().apply(runtime)
         runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
 
-        // Build array of [match, handler] tuples for JavaScript
+        // Build array of { ref, match, handlerFunction } objects for JavaScript
         val jsHandlers = handlers.map { handlerConfig ->
-            // Register handler callback
             val callback: (Node, Node) -> Any? = callback@{ state, options ->
                 val externalState = state.deserialize(NavigationFlowState.serializer())
                     as? NavigationFlowExternalState ?: throw PlayerException("ExternalStatePlugin Could not deserialize $state")
                 val controllerState = options.deserialize(ControllerState.serializer())
 
                 runtime.Promise<Any> { resolve, _ ->
-                    handlerConfig.handler.onExternalState(externalState, controllerState, resolve)
+                    handlerConfig.handlerFunction(externalState, controllerState, resolve)
                 }
             }
 
-            // Return [match, callback] tuple
-            listOf(handlerConfig.match, callback)
+            mapOf(
+                "ref" to handlerConfig.ref,
+                "match" to handlerConfig.match,
+                "handlerFunction" to callback,
+            )
         }
 
         runtime.add("externalStateHandlers", jsHandlers)

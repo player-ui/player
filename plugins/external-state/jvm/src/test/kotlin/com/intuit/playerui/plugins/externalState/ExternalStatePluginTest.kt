@@ -51,8 +51,8 @@ internal class ExternalStatePluginTest : PlayerTest() {
     fun testExternalStateHandling() = runBlockingTest {
         val plugin = ExternalStatePlugin(
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { state, _, transition ->
+                ref = "test-1",
+                handlerFunction = { state, _, transition ->
                     assertEquals(state.transitions, mapOf("Next" to "END_FWD", "Prev" to "END_BCK"))
                     assertEquals(state.ref, "test-1")
 
@@ -72,8 +72,8 @@ internal class ExternalStatePluginTest : PlayerTest() {
     fun testExternalStateHandlingThrows() = runBlockingTest {
         val plugin = ExternalStatePlugin(
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { _, _, _ ->
+                ref = "test-1",
+                handlerFunction = { _, _, _ ->
                     throw Exception("Bad Code")
                 },
             ),
@@ -94,8 +94,8 @@ internal class ExternalStatePluginTest : PlayerTest() {
     fun testExternalStateHandlingWithDelay() = runBlockingTest {
         val plugin = ExternalStatePlugin(
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { _, _, transition ->
+                ref = "test-1",
+                handlerFunction = { _, _, transition ->
                     launch {
                         delay(2000)
                         transition("Next")
@@ -115,8 +115,8 @@ internal class ExternalStatePluginTest : PlayerTest() {
 
         val plugin = ExternalStatePlugin(
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { _, options, transition ->
+                ref = "test-1",
+                handlerFunction = { _, options, transition ->
                     callbackOptions = options
                     transition("Prev")
                 },
@@ -142,16 +142,17 @@ internal class ExternalStatePluginTest : PlayerTest() {
         val plugin = ExternalStatePlugin(
             // Less specific - only matches ref
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { _, _, transition ->
+                ref = "test-1",
+                handlerFunction = { _, _, transition ->
                     lessSpecificCalled = true
                     transition("Prev")
                 },
             ),
             // More specific - matches ref and extraProperty
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1", "extraProperty" to "extraValue"),
-                handler = { _, _, transition ->
+                ref = "test-1",
+                match = mapOf("extraProperty" to "extraValue"),
+                handlerFunction = { _, _, transition ->
                     moreSpecificCalled = true
                     transition("Next")
                 },
@@ -171,8 +172,8 @@ internal class ExternalStatePluginTest : PlayerTest() {
     fun testMultiplePluginsLastOneWins() = runBlockingTest {
         val plugin1 = ExternalStatePlugin(
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { _, _, transition ->
+                ref = "test-1",
+                handlerFunction = { _, _, transition ->
                     transition("Next")
                 },
             ),
@@ -180,8 +181,8 @@ internal class ExternalStatePluginTest : PlayerTest() {
 
         val plugin2 = ExternalStatePlugin(
             ExternalStateHandler(
-                match = mapOf("ref" to "test-1"),
-                handler = { _, _, transition ->
+                ref = "test-1",
+                handlerFunction = { _, _, transition ->
                     transition("Prev")
                 },
             ),
@@ -192,16 +193,5 @@ internal class ExternalStatePluginTest : PlayerTest() {
 
         // Last handler registered wins (Prev)
         assertEquals(result.endState.outcome, "BCK")
-    }
-
-    @TestTemplate
-    fun testHandlerConfigRequiresRef() {
-        val exception = assertThrows<IllegalArgumentException> {
-            ExternalStateHandler(
-                match = mapOf("extraProperty" to "value"),
-                handler = ExternalStateHandler.Handler { _, _, transition -> transition("Next") },
-            )
-        }
-        assertTrue(exception.message?.contains("must contain a 'ref' key") == true)
     }
 }

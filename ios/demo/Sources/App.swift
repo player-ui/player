@@ -55,26 +55,16 @@ struct MainView: View {
             TypesProviderPlugin(types: [], validators: [], formats: []),
             TransitionPlugin(popTransition: .pop),
             BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-            SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
-        ] + throwingPlugins
-    }
-
-    private var throwingPlugins: [NativePlugin] {
-        var plugins: [NativePlugin] = []
-        do {
-            let plugin = try ExternalStatePlugin(handlers: [
+            SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
+            ExternalStatePlugin(handlers: [
                 ExternalStateHandler(
-                    match: ["ref": "test-1"],
-                    handler: { _, _, _ in
+                    ref: "test-1",
+                    handlerFunction: { _, _, _ in
                         print("MainView External State triggered")
                     }
                 )
             ])
-            plugins.append(plugin)
-        } catch {
-            fatalError("Failed to create ExternalStatePlugin: \(error)")
-        }
-        return plugins
+        ]
     }
 
     var body: some View {

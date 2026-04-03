@@ -72,17 +72,11 @@ public struct FlowManagerView: View {
             ReferenceAssetsPlugin(),
             MetricsPlugin { (render, _, flow) in
                 print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
-            }
-        ] + throwingPlugins
-    }
-
-    private var throwingPlugins: [NativePlugin] {
-        var plugins: [NativePlugin] = []
-        do {
-            let externalStatePlugin = try ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+            },
+            ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
                 .init(
-                    match: ["ref": "test-1"],
-                    handler: { _, _, transition in
+                    ref: "test-1",
+                    handlerFunction: { _, _, transition in
                         return AnyView(
                             Text("External State")
                                 .onAppear {
@@ -95,10 +89,6 @@ public struct FlowManagerView: View {
                     }
                 )
             ])
-            plugins.append(externalStatePlugin)
-        } catch {
-            fatalError("Failed to create ExternalStatePlugin: \(error)")
-        }
-        return plugins
+        ]
     }
 }
