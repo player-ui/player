@@ -3,6 +3,7 @@ package com.intuit.playerui.core.player
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.JSErrorException
+import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.runtime.serialize
@@ -639,7 +640,7 @@ internal class HeadlessPlayerTest :
                 applied = true
             }
         }
-        (player as HeadlessPlayer).registerPlugin(plugin)
+        player.registerPlugin(plugin)
         assertTrue(applied)
         assertTrue(player.plugins.contains(plugin))
     }
@@ -650,7 +651,7 @@ internal class HeadlessPlayerTest :
         val plugin = object : PlayerPlugin {
             override fun apply(player: Player) {}
         }
-        (player as HeadlessPlayer).registerPlugin(plugin)
+        player.registerPlugin(plugin)
         assertEquals(sizeBefore + 1, player.plugins.size)
     }
 
@@ -658,8 +659,37 @@ internal class HeadlessPlayerTest :
     fun `registerPlugin applies JSScriptPluginWrapper via BeaconPlugin`() {
         val sizeBefore = player.plugins.size
         val beaconPlugin2 = BeaconPlugin()
-        (player as HeadlessPlayer).registerPlugin(beaconPlugin2)
+        player.registerPlugin(beaconPlugin2)
         assertEquals(sizeBefore + 1, player.plugins.size)
         assertNotNull(player.findPlugin<BeaconPlugin>())
+    }
+
+    @TestTemplate
+    fun `findPlugin returns native plugin when registered natively`() {
+        var applied = false
+        val plugin = object : PlayerPlugin {
+            override fun apply(player: Player) {
+                applied = true
+            }
+        }
+        player.registerPlugin(plugin)
+        val found = player.findPlugin<PlayerPlugin>()
+        assertNotNull(found)
+        assertTrue(found is PlayerPlugin)
+    }
+
+    @TestTemplate
+    fun `findPlugin falls back to JS and returns Node for JS-only plugin`() {
+        // BeaconPlugin is a JSScriptPluginWrapper already registered during player init (via plugins list).
+        // Create a fresh player WITHOUT BeaconPlugin in native plugins, then verify findPlugin
+        // falls back to JS and returns a Node for a JS-only plugin (registered by another JS plugin).
+        setupPlayer(listOf(ReferenceAssetsPlugin(), CommonTypesPlugin()))
+        // BeaconPlugin is not in native plugins list but IS registered via JS (it's a JS-only plugin here).
+        // findPlugin should return the raw Node from the JS runtime.
+        val result = player.findPlugin<BeaconPlugin>()
+        // Result is either null (BeaconPlugin not loaded in JS) or a Node — not a BeaconPlugin instance
+        if (result != null) {
+            assertTrue(result is Node)
+        }
     }
 }

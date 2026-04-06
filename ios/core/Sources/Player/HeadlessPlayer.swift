@@ -141,6 +141,9 @@ public protocol HeadlessPlayer {
     /// A reference to the Key/Value store for constants and context for player
     var constantsController: ConstantsController? { get }
 
+    /// Collection of native plugins registered to this player instance
+    var plugins: [NativePlugin] { get }
+
     /**
      Sets up the core javascript player in the given context
      - parameters:
@@ -149,6 +152,12 @@ public protocol HeadlessPlayer {
      - returns: Reference to the created JS player
      */
     func setupPlayer(context: JSContext, plugins: [NativePlugin]) -> JSValue?
+
+    /**
+     Registers a plugin with player after instantiation
+     - Parameter plugin: The plugin to register
+     */
+    func registerPlugin(_ plugin: NativePlugin)
 
     /**
      Starts the given flow
@@ -165,6 +174,9 @@ public protocol HeadlessPlayer {
  Default Implementation for player methods
  */
 public extension HeadlessPlayer {
+    /// Default empty plugins list for conformers that do not track native plugins
+    var plugins: [NativePlugin] { [] }
+
     /// The current state of Player
     var state: BaseFlowState? {
         return jsPlayerReference?.getState()
@@ -217,20 +229,14 @@ public extension HeadlessPlayer {
     }
 
     /// Registers a plugin with player after instantiation
-    /// Primarily for plugins to be able to add other plugins to player
-    /// - Parameter plugin: The plugin to register
-    func registerPlugin<P: JSBasePlugin>(_ plugin: P) {
-        assert(jsPlayerReference != nil, "Cannot register plugins before setuPlayer(context:plugins:) is called")
-        plugin.context = jsPlayerReference?.context
-        jsPlayerReference?.invokeMethod("registerPlugin", withArguments: [plugin.pluginRef as Any])
-    }
-
-    /// Registers a NativePlugin with player after instantiation
-    /// For JSBasePlugin instances, delegates to the typed overload; for other NativePlugins, calls apply directly
+    /// For JSBasePlugin instances, sets the JS context and registers with the JS player;
+    /// for other NativePlugins, calls apply directly.
     /// - Parameter plugin: The plugin to register
     func registerPlugin(_ plugin: NativePlugin) {
         if let jsPlugin = plugin as? JSBasePlugin {
-            registerPlugin(jsPlugin)
+            assert(jsPlayerReference != nil, "Cannot register plugins before setupPlayer(context:plugins:) is called")
+            jsPlugin.context = jsPlayerReference?.context
+            jsPlayerReference?.invokeMethod("registerPlugin", withArguments: [jsPlugin.pluginRef as Any])
         } else {
             plugin.apply(player: self)
         }
@@ -307,6 +313,13 @@ public extension HeadlessPlayer {
     }
 
     func findPlugin<Plugin: WithSymbol>(_ plugin: Plugin.Type) -> JSValue? {
+        // Check native plugins list first: if a JSBasePlugin is registered natively, return its
+        // pluginRef directly rather than going through the JS player lookup.
+        if let jsPlugin = plugins.first(where: { $0 is Plugin }) as? JSBasePlugin {
+            return jsPlugin.pluginRef
+        }
+        // Fall back to the JS player's findPlugin using the symbol for plugins that were
+        // registered only at the JS layer (e.g. by another core plugin).
         return jsPlayerReference?
             .invokeMethod("findPlugin", withArguments: [
                 jsPlayerReference?.context.getSymbol(plugin.symbol) as Any

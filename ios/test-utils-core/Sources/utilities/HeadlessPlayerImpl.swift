@@ -10,6 +10,8 @@ open class HeadlessPlayerImpl: HeadlessPlayer {
 
     public var jsPlayerReference: JSValue?
 
+    public var plugins: [NativePlugin] = []
+
     let match = PartialMatchFingerprintPlugin()
 
     public init(plugins: [NativePlugin], context: JSContext = JSContext()) {
@@ -18,7 +20,20 @@ open class HeadlessPlayerImpl: HeadlessPlayer {
         assetRegistry.partialMatchRegistry = match
         guard let player = jsPlayerReference else { return }
         hooks = HeadlessHooks(from: player)
+        self.plugins = plugins
         for plugin in plugins { plugin.apply(player: self) }
+    }
+
+    public func registerPlugin(_ plugin: NativePlugin) {
+        plugins.append(plugin)
+        if let jsPlugin = plugin as? JSBasePlugin {
+            assert(jsPlayerReference != nil, "Cannot register plugins before setupPlayer(context:plugins:) is called")
+            jsPlugin.context = jsPlayerReference?.context
+            jsPlayerReference?.invokeMethod("registerPlugin", withArguments: [jsPlugin.pluginRef as Any])
+        } else {
+            assert(jsPlayerReference != nil, "Cannot register plugins before setupPlayer(context:plugins:) is called")
+            plugin.apply(player: self)
+        }
     }
 }
 

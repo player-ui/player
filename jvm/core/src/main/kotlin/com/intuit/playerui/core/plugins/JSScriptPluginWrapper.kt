@@ -15,13 +15,16 @@ public abstract class JSScriptPluginWrapper(
     public val name: String,
     protected val script: String,
     private val sourcePath: String? = null,
-) : JSPluginWrapper {
+) : JSPluginWrapper,
+    WithSymbol {
     public constructor(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader) :
         this(name, classLoader.getResource(sourcePath)!!.readText(), sourcePath)
 
     final override lateinit var instance: Node protected set
 
     public val isInstantiated: Boolean get() = ::instance.isInitialized
+
+    override val symbol: String get() = "$name.symbol"
 
     override fun apply(runtime: Runtime<*>) {
         runtime.load(ScriptContext(script, sourcePath ?: "$name.js"))

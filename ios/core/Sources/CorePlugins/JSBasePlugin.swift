@@ -11,7 +11,7 @@ import JavaScriptCore
 /**
  Base class for wrapping and loading javascript plugins
  */
-open class JSBasePlugin {
+open class JSBasePlugin: NativePlugin {
     /// Reference to the plugin inside the context
     public var pluginRef: JSValue?
 

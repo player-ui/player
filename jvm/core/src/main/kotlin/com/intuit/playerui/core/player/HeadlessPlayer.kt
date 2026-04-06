@@ -29,11 +29,14 @@ import com.intuit.playerui.core.plugins.LoggerPlugin
 import com.intuit.playerui.core.plugins.PlayerPlugin
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.core.plugins.RuntimePlugin
+import com.intuit.playerui.core.plugins.WithSymbol
 import com.intuit.playerui.core.plugins.logging.loggers
+import com.intuit.playerui.core.plugins.warnPluginNotFound
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.net.URL
+import kotlin.reflect.full.companionObjectInstance
 
 /**
  * Headless [Player] wrapping a core JS player with a [Runtime]. The [player]
@@ -74,7 +77,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
     private val player: Node
 
-    override var plugins: List<Plugin> = plugins; private set
+    override var plugins: List<Plugin> = plugins
+        private set
 
     override val node: Node by ::player
 
@@ -200,17 +204,15 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     }
 
     /** Register and apply a [Plugin] to this player after instantiation. */
-    public fun registerPlugin(plugin: Plugin) {
+    override fun registerPlugin(plugin: Plugin) {
         plugins = plugins + plugin
-        when (plugin) {
-            is RuntimePlugin -> {
-                plugin.apply(runtime)
-                if (plugin is JSPluginWrapper) {
-                    registerPlugin.invoke(plugin.instance)
-                }
+        if (plugin is RuntimePlugin) {
+            plugin.apply(runtime)
+            if (plugin is JSPluginWrapper) {
+                registerPlugin.invoke(plugin.instance)
             }
-            is PlayerPlugin -> plugin.apply(this)
         }
+        if (plugin is PlayerPlugin) plugin.apply(this)
     }
 
     internal companion object {
@@ -237,4 +239,22 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
             .classLoader
             .getResource(HBC_SOURCE_PATH)
     }
+}
+
+/**
+ * Find a [Plugin] by type. First checks the native [plugins] list and returns [T] if found.
+ * If not found natively, falls back to the JS player's findPlugin by evaluating the plugin's
+ * symbol expression in the runtime — using [WithSymbol.symbol] from [T]'s companion object if
+ * available, otherwise deriving it from the class name (e.g. "MyPlugin.symbol"). Returns the
+ * raw [Node] from the JS runtime if found only there, or null if not found in either location.
+ */
+public inline fun <reified T : Plugin> HeadlessPlayer.findPlugin(): Any? {
+    plugins.filterIsInstance<T>().firstOrNull()?.let { return it }
+    val symbolExpr = (T::class.companionObjectInstance as? WithSymbol)?.symbol
+        ?: "${T::class.java.simpleName}.symbol"
+    return runCatching {
+        runtime.execute("(function(){try{return player.findPlugin($symbolExpr);}catch(e){return null;}})()")
+    }.getOrNull()
+        ?.let { it as? Node }
+        ?: warnPluginNotFound<T>(T::class.java.simpleName)
 }

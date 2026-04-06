@@ -11,7 +11,7 @@ import JavaScriptCore
 /**
  Plugin used to register match dictionaries and an associated index for use in the AssetRegistry
  */
-public class PartialMatchFingerprintPlugin: JSBasePlugin, NativePlugin {
+public class PartialMatchFingerprintPlugin: JSBasePlugin {
     /**
      Initializes a PartialMatchFingerprintPlugin
      */
