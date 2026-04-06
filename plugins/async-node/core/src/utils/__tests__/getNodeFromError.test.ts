@@ -29,23 +29,8 @@ class ErrorWithProps extends Error implements PlayerErrorMetadata {
 const createPlayerError = (
   errorType: string,
   metadata?: ErrorMetadata,
-): PlayerError => ({
-  error: new ErrorWithProps("Error", errorType, ErrorSeverity.ERROR, metadata),
-  errorType,
-  skipped: false,
-  metadata,
-  severity: ErrorSeverity.ERROR,
-});
-
-const createPlayerErrorForError = (
-  error: Error & PlayerErrorMetadata,
-): PlayerError => ({
-  error,
-  errorType: error.type,
-  metadata: error.metadata,
-  severity: error.severity,
-  skipped: false,
-});
+): PlayerError =>
+  new ErrorWithProps("Error", errorType, ErrorSeverity.ERROR, metadata);
 
 const createContext = (
   baseContext?: Partial<AsyncPluginContext>,
@@ -193,18 +178,16 @@ describe("getNodeFromError", () => {
         updateNodes: new Set(),
       };
       const result = getNodeFromError(
-        createPlayerErrorForError(
-          new AsyncNodeError({
-            type: NodeType.Async,
-            id: "test-id",
+        new AsyncNodeError({
+          type: NodeType.Async,
+          id: "test-id",
+          value: {
+            type: NodeType.Value,
             value: {
-              type: NodeType.Value,
-              value: {
-                prop: "value",
-              },
+              prop: "value",
             },
-          }),
-        ),
+          },
+        }),
         createContext({
           asyncNodeCache: new Map([["test-id", cacheEntry]]),
         }),

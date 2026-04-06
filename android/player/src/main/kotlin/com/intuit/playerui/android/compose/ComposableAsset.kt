@@ -25,7 +25,6 @@ import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
-import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.state.inProgressState
 import kotlinx.coroutines.launch
@@ -66,7 +65,6 @@ public abstract class ComposableAsset<Data>(
 
                 player.inProgressState?.controllers?.error?.captureError(
                     AssetRenderException(assetContext, "Error fetching data while rendering asset. See cause for details", error),
-                    ErrorTypes.RENDER,
                 )
                 null
             }

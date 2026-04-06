@@ -22,7 +22,7 @@ import type { DataController } from "../data/controller";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
 import type { Node } from "../../view";
-import { ErrorController, ErrorTypes } from "../error";
+import { ErrorController } from "../error";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -178,7 +178,7 @@ export class ViewController {
         exception instanceof Error ? exception : new Error(String(exception));
       // Can't assume any node or binding changes were consumed correctly during the update, so trigger a silent update to ensure that any additional update triggered to recover still updates everything.
       this.queueUpdate(changedBindings, changedNodes, true);
-      this.viewOptions.errorController.captureError(err, ErrorTypes.VIEW);
+      this.viewOptions.errorController.captureError(err);
     }
   }
 

@@ -11,6 +11,8 @@ import {
   Logger,
   ErrorTypes,
   ErrorSeverity,
+  PlayerErrorMetadata,
+  ErrorMetadata,
 } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
@@ -23,6 +25,17 @@ import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import { AsyncNodeError } from "../AsyncNodeError";
+
+class ErrorWithProps extends Error implements PlayerErrorMetadata {
+  constructor(
+    message: string,
+    public type: string,
+    public severity?: ErrorSeverity,
+    public metadata?: ErrorMetadata,
+  ) {
+    super(message);
+  }
+}
 
 const transform: BeforeTransformFunction = createAsyncTransform({
   transformAssetType: "chat-message",
@@ -1223,10 +1236,12 @@ describe("view", () => {
               (
                 player.getState() as InProgressState
               ).controllers.error.captureError(
-                new Error("Test Error"),
-                ErrorTypes.RENDER,
-                ErrorSeverity.ERROR,
-                { assetId: "asset" },
+                new ErrorWithProps(
+                  "Test Error",
+                  ErrorTypes.RENDER,
+                  ErrorSeverity.ERROR,
+                  { assetId: "asset" },
+                ),
               );
             },
           ],
@@ -1281,15 +1296,12 @@ describe("view", () => {
       });
 
       (player.getState() as InProgressState).controllers.error.captureError(
-        new Error("Test Error"),
-        ErrorTypes.VIEW,
-        ErrorSeverity.ERROR,
-        {
+        new ErrorWithProps("Test Error", ErrorTypes.VIEW, ErrorSeverity.ERROR, {
           node: {
             type: NodeType.Async,
             value: {},
           },
-        },
+        }),
       );
 
       await vi.waitFor(() => {

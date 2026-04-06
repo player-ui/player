@@ -2,7 +2,7 @@ import { SyncBailHook } from "tapable-ts";
 import type { Logger } from "../../logger";
 import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
-import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
+import type { PlayerError } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
 import { isErrorWithMetadata, makeJsonStringifyReplacer } from "./utils";
 
@@ -39,7 +39,7 @@ export interface ErrorControllerOptions {
 /** The orchestrator for player error handling */
 export class ErrorController {
   public hooks: ErrorControllerHooks = {
-    onError: new SyncBailHook<[PlayerError], boolean | undefined>(),
+    onError: new SyncBailHook(),
   };
 
   private options: ErrorControllerOptions;
@@ -76,44 +76,29 @@ export class ErrorController {
   }
 
   /**
-   * Capture error with metadata, add to history, fire hooks, update data model, and navigate
+   * Capture an error and try to recover. Errors implementing the `PlayerErrorMetadata` interface will be added to history, fire hooks and update data model. As a fallback, all errors will try to trigger an errorTransition. If the error does not have a `type` property, it will default to only using the wildcard navigation.
    */
-  public captureError(
-    error: Error,
-    errorType: string,
-    severity?: ErrorSeverity,
-    metadata?: ErrorMetadata,
-  ): PlayerError {
-    const playerError: PlayerError = {
-      error,
-      errorType,
-      severity,
-      metadata,
-      skipped: false,
-    };
-
-    if (isErrorWithMetadata(error)) {
-      playerError.errorType = error.type;
-      playerError.severity = error.severity ?? playerError.severity;
-      playerError.metadata = {
-        ...playerError.metadata,
-        ...error.metadata,
-      };
+  public captureError(error: Error): boolean {
+    this.options.logger.debug("[ErrorController]: Found error");
+    if (!isErrorWithMetadata(error)) {
+      this.options.logger.debug("[ErrorController]: Does not match structure");
+      return this.tryNavigateToErrorState(error, "*");
     }
 
+    this.options.logger.debug("[ErrorController]: Implements interface");
     // Add to history
-    this.errorHistory.push(playerError);
+    this.errorHistory.push(error);
 
     // Set as current error
-    this.currentError = playerError;
+    this.currentError = error;
 
     this.options.logger.debug(
       `[ErrorController] Captured error: ${error.message}`,
       JSON.stringify(
         {
-          errorType: playerError.errorType,
-          severity: playerError.severity,
-          metadata: playerError.metadata,
+          errorType: error.type,
+          severity: error.severity,
+          metadata: error.metadata,
         },
         makeJsonStringifyReplacer(),
       ),
@@ -121,48 +106,44 @@ export class ErrorController {
 
     // Notify listeners and check if navigation should be skipped
     // Plugins can observe the error and optionally return true to bail
-    const shouldSkip = this.hooks.onError.call(playerError) ?? false;
+    const shouldSkip = this.hooks.onError.call(error) ?? false;
 
     if (shouldSkip) {
-      playerError.skipped = true;
       this.options.logger.debug(
         "[ErrorController] Error state navigation skipped by plugin",
       );
-      return playerError;
+      return true;
     }
 
     // Set error in data model
-    this.setErrorInDataModel(playerError);
+    this.setErrorInDataModel(error);
 
     // Navigate to error state
-    this.navigateToErrorState(playerError);
-
-    return playerError;
+    return this.tryNavigateToErrorState(error, error.type);
   }
 
   /**
    * Navigate to error state using errorTransitions.
    * Uses errorTransition() which handles node-level and flow-level fallback internally.
    */
-  private navigateToErrorState(playerError: PlayerError): void {
+  private tryNavigateToErrorState(error: Error, transition: string): boolean {
     const flowInstance = this.options.flow.current;
 
     if (!flowInstance) {
       this.options.logger.warn(
         "[ErrorController] No active flow instance for error navigation",
       );
-      return;
+      return false;
     }
 
-    if (
-      flowInstance.getErrorTransitionState(playerError.errorType) === undefined
-    ) {
-      this.options.fail(playerError.error);
-      return;
+    if (flowInstance.getErrorTransitionState(transition) === undefined) {
+      this.options.fail(error);
+      return false;
     }
 
     try {
-      flowInstance.errorTransition(playerError.errorType);
+      flowInstance.errorTransition(transition);
+      return true;
     } catch (e) {
       this.options.logger.error(
         `[ErrorController] Error transition failed with unexpected error: ${e}`,
@@ -170,7 +151,8 @@ export class ErrorController {
 
       // Fallback: Reject flow
       this.options.logger.debug("[ErrorController] Rejecting flow with error");
-      this.options.fail(playerError.error);
+      this.options.fail(error);
+      return false;
     }
   }
 
@@ -217,7 +199,7 @@ export class ErrorController {
     }
 
     try {
-      const { error, errorType, severity, metadata } = playerError;
+      const { type, severity, metadata, name, message } = playerError;
 
       // Pass write symbol to authorize write through middleware
       this.options.model.set(
@@ -225,9 +207,9 @@ export class ErrorController {
           [
             "errorState",
             {
-              message: error.message,
-              name: error.name,
-              errorType,
+              message,
+              name,
+              errorType: type,
               severity,
               ...metadata,
             },

@@ -86,8 +86,8 @@ public struct JSValueError: Error, CreatedFromJSValue {
     public init(_ jsErrorObject: JSValue) {
         originalJSError = jsErrorObject
         if !jsErrorObject.isInstance(of: jsErrorObject.context.getJSClass(.Error)) {
-            type = JSValueError.DEFAULT_MESSAGE
-            message = JSValueError.DEFAULT_TYPE
+            message = JSValueError.DEFAULT_MESSAGE
+            type = JSValueError.DEFAULT_TYPE
             severity = nil
             metadata = nil
             return

@@ -13,7 +13,7 @@ import type {
   View,
   PlayerInfo,
 } from "@player-ui/player";
-import { ErrorTypes, Player } from "@player-ui/player";
+import { Player } from "@player-ui/player";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import type { AssetRegistryType } from "./asset";
 import { AssetContext } from "./asset";
@@ -261,11 +261,7 @@ export class ReactPlayer {
                 : prev;
 
             // Get skipped state after trying to capture.
-            const playerError = playerState.controllers.error.captureError(
-              err,
-              ErrorTypes.RENDER,
-            );
-            isRecovering = playerError.skipped;
+            isRecovering = playerState.controllers.error.captureError(err);
             trackedErrors.current.set(err, isRecovering);
 
             // If we can't recover from the error, avoid updating state to stay in error boundary

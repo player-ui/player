@@ -3,7 +3,7 @@ import type { Flow, NavigationFlowViewState } from "@player-ui/types";
 import type { FlowController } from "../controllers";
 import TrackBindingPlugin from "./helpers/binding.plugin";
 import type { InProgressState } from "../types";
-import { ErrorSeverity, ErrorTypes, Player, PlayerPlugin } from "..";
+import { Player, PlayerPlugin } from "..";
 import { ActionExpPlugin } from "./helpers/action-exp.plugin";
 
 const minimal: Flow = {
@@ -738,17 +738,11 @@ describe("view error capturing", () => {
     const player = new Player({ plugins: [viewFailurePlugin] });
     player.start(minimal).catch(() => {});
     await vitest.waitFor(() => {
-      expect(errorControllerSpy).toHaveBeenCalledWith({
-        error: expect.objectContaining({
+      expect(errorControllerSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
           cause: new Error("ERROR!"),
         }),
-        errorType: ErrorTypes.VIEW,
-        skipped: false,
-        metadata: {
-          node: expect.anything(),
-        },
-        severity: ErrorSeverity.ERROR,
-      });
+      );
     });
   });
 });

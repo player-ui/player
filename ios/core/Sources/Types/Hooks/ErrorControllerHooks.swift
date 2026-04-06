@@ -19,6 +19,6 @@ public struct ErrorControllerHooks {
      - Return true from the callback to bail and prevent error state navigation
      - Return nil/false to allow automatic navigation to continue
      */
-    public var onError: BailHook<PlayerErrorInfo>
+    public var onError: BailHook<JSValueError>
 }
 

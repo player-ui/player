@@ -7,7 +7,7 @@ export const getNodeFromError = (
   playerError: PlayerError,
   context: AsyncPluginContext,
 ): Node.Node | undefined => {
-  if (playerError.errorType === ErrorTypes.RENDER) {
+  if (playerError.type === ErrorTypes.RENDER) {
     const { assetId } = playerError.metadata ?? {};
 
     if (typeof assetId !== "string") {
@@ -17,7 +17,7 @@ export const getNodeFromError = (
     return context.assetIdCache.get(assetId);
   }
 
-  if (playerError.errorType === ErrorTypes.VIEW) {
+  if (playerError.type === ErrorTypes.VIEW) {
     const { node } = playerError.metadata ?? {};
     // TODO: Remove some of this from here. Maybe export type assertion functions from where the errors are generated?
     if (typeof node === "object" && node !== null && !Array.isArray(node)) {

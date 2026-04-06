@@ -12,6 +12,16 @@ import JavaScriptCore
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
 
+private struct ErrorWithAnyMetadata: Error, ErrorWithMetadata, JSConvertibleError {
+    public var message: String
+    public var type: String
+    public var severity: ErrorSeverity?
+    public var metadata: [String : Any]?
+    
+    public let hasMetadata: Bool = true
+    public var jsDescription: String { get { message } }
+}
+
 class HooksTests: XCTestCase {
     var player: HeadlessPlayerImpl!
     
@@ -97,10 +107,14 @@ class HooksTests: XCTestCase {
         let secondHandlerCalled = expectation(description: "Second handler called")
         secondHandlerCalled.isInverted = true // Should NOT be called
         
-        player.hooks?.errorController.tap { errorController in
+        guard let playerHooks = player.hooks else {
+            return XCTFail("Player hooks is undefined. Test cannot run")
+        }
+        
+        playerHooks.errorController.tap { errorController in
             // First handler - returns true to bail
             errorController.hooks.onError.tap { errorInfo -> Bool? in
-                XCTAssertEqual(errorInfo.errorType, ErrorTypes.network)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.network)
                 firstHandlerCalled.fulfill()
                 return true  // BAIL - should prevent second handler from being called
             }
@@ -110,12 +124,20 @@ class HooksTests: XCTestCase {
                 secondHandlerCalled.fulfill()
                 return nil
             }
+        }
+        
+        playerHooks.state.tap { state in
+            guard let inProgressState = self.player.state as? InProgressState else {
+                return
+            }
+            
+            guard let errorController = inProgressState.controllers?.error else {
+                return XCTFail("Error controller not found on in-progress state")
+            }
             
             // Capture error to trigger the hooks
             errorController.captureError(
-                error: NSError(domain: "test", code: 500, userInfo: [NSLocalizedDescriptionKey: "Server error"]),
-                errorType: ErrorTypes.network,
-                severity: .fatal
+                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.network, severity: .fatal)
             )
             
             // Verify error was captured
@@ -123,12 +145,13 @@ class HooksTests: XCTestCase {
             XCTAssertNotNil(currentError)
             
             // Check that errorState was NOT set in data model (bail prevented it)
-            if let inProgressState = self.player.state as? InProgressState,
-               let dataController = inProgressState.controllers?.data {
-                let errorState = dataController.get(binding: "errorState")
-                // errorState should be nil because bail prevented it from being set
-                XCTAssertTrue(errorState == nil || (errorState as? NSNull) != nil)
+            guard let dataController = inProgressState.controllers?.data else {
+                return XCTFail("Data controller needs to be defined")
             }
+            
+            let errorState = dataController.get(binding: "errorState")
+            // errorState should be nil because bail prevented it from being set
+            XCTAssertTrue(errorState == nil || (errorState as? NSNull) != nil)
         }
         
         player.start(flow: FlowData.COUNTER) { _ in }
@@ -143,23 +166,21 @@ class HooksTests: XCTestCase {
         player.hooks?.errorController.tap { errorController in
             // First handler - returns nil to continue
             errorController.hooks.onError.tap { errorInfo -> Bool? in
-                XCTAssertEqual(errorInfo.errorType, ErrorTypes.data)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.data)
                 firstHandlerCalled.fulfill()
                 return nil  // Continue to next handler
             }
             
             // Second handler - should be called
             errorController.hooks.onError.tap { errorInfo -> Bool? in
-                XCTAssertEqual(errorInfo.errorType, ErrorTypes.data)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.data)
                 secondHandlerCalled.fulfill()
                 return nil
             }
             
             // Capture error to trigger the hooks
             errorController.captureError(
-                error: NSError(domain: "test", code: 400, userInfo: [NSLocalizedDescriptionKey: "Data error"]),
-                errorType: ErrorTypes.data,
-                severity: .error
+                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.data, severity: .error)
             )
         }
         

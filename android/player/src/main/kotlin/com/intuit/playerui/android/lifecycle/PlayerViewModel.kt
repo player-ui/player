@@ -8,7 +8,6 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.bridge.runtime.Runtime
-import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.managed.AsyncIterationManager
@@ -210,7 +209,6 @@ public open class PlayerViewModel(
     public fun fail(cause: Throwable) {
         player.inProgressState?.controllers?.error?.captureError(
             cause,
-            ErrorTypes.RENDER,
         )
     }
 

@@ -4,5 +4,5 @@ import { ASYNC_ERROR_TYPE, AsyncErrorMetadata } from "../AsyncNodeError";
 export const isAsyncPlayerError = (
   error: PlayerError,
 ): error is PlayerError<AsyncErrorMetadata> => {
-  return error.errorType === ASYNC_ERROR_TYPE;
+  return error.type === ASYNC_ERROR_TYPE;
 };

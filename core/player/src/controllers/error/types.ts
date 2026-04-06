@@ -28,21 +28,6 @@ export interface ErrorMetadata {
   [key: string]: unknown;
 }
 
-export interface PlayerError<
-  MetadataType extends ErrorMetadata = ErrorMetadata,
-> {
-  /** Native Error object */
-  error: Error;
-  /** Error category (use ErrorTypes constants or custom plugin types) */
-  errorType: string;
-  /** Impact level */
-  severity?: ErrorSeverity;
-  /** Additional metadata */
-  metadata?: MetadataType;
-  /** Whether or not the error was skipped. */
-  skipped: boolean;
-}
-
 export interface PlayerErrorMetadata<
   ErrorMetadataType extends ErrorMetadata = ErrorMetadata,
 > {
@@ -50,3 +35,7 @@ export interface PlayerErrorMetadata<
   severity?: ErrorSeverity;
   metadata?: ErrorMetadataType;
 }
+
+export type PlayerError<
+  ErrorMetadataType extends ErrorMetadata = ErrorMetadata,
+> = Error & PlayerErrorMetadata<ErrorMetadataType>;

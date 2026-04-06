@@ -342,7 +342,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         "An error occured during async node resolution. See cause for details.",
         cause,
       );
-      playerState.controllers.error.captureError(error, error.type);
+      playerState.controllers.error.captureError(error);
     }
   }
 
@@ -429,7 +429,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
           let result: any = undefined;
           result = this.basePlugin?.hooks.onAsyncNodeError.call(
-            playerError.error,
+            playerError,
             asyncNode,
           );
 
@@ -439,7 +439,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
           player.logger?.warn(
             "[AsyncNodePlugin]: Async node handling failed and resolved with a fallback. Cause:",
-            playerError.error.message,
+            playerError.message,
           );
 
           // Stop tracking before the next update is triggered

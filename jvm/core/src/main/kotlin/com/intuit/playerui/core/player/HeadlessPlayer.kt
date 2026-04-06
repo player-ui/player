@@ -14,7 +14,6 @@ import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.constants.ConstantsController
-import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer.Companion.bundledSource
@@ -96,7 +95,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         coroutineExceptionHandler =
             config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
                 if (state !is ReleasedState) {
-                    inProgressState?.controllers?.error?.captureError(throwable, ErrorTypes.RENDER) ?: logger.error(
+                    inProgressState?.controllers?.error?.captureError(throwable) ?: logger.error(
                         "Exception caught in Player scope: ${throwable.message}",
                         throwable.stackTrace
                             .joinToString("\n") {
