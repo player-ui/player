@@ -105,13 +105,12 @@ public class HermesNode(
         .evaluateInJSThreadBlocking {
             getJSIValue(key)
                 .mapUndefinedToNull()
-                ?.let { format.decodeFromRuntimeValue(deserializer, it) }
-        }
+        }?.let { format.decodeFromRuntimeValue(deserializer, it) }
 
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = runtime
         .evaluateInJSThreadBlocking {
-            format.decodeFromRuntimeValue(deserializer, jsiObject.asValue(runtime))
-        }
+            jsiObject.asValue(runtime)
+        }.let { format.decodeFromRuntimeValue(deserializer, it) }
 
     override fun isReleased(): Boolean = runtime.isReleased()
 

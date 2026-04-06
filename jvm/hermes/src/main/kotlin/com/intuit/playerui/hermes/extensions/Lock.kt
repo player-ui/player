@@ -44,7 +44,7 @@ internal suspend fun <T> Runtime<*>.evaluateInJSThread(block: suspend RuntimeThr
     val currentRuntimeThreadContext = coroutineContext[RuntimeThreadContext]
     // TODO: Put Dedicated Runtime Thread Context in the dispatcher context if we can?
     return if (currentRuntimeThreadContext != null) {
-        ensureNotReleased { block(currentRuntimeThreadContext) }
+        block(currentRuntimeThreadContext)
     } else {
         withContext(runtime.dispatcher + DedicatedRuntimeThreadContext) {
             val runtimeThreadContext = coroutineContext[RuntimeThreadContext]
