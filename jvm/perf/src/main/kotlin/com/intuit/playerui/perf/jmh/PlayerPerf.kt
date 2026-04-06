@@ -97,7 +97,7 @@ public abstract class RuntimePerformance {
         runtime = it
     }
 
-    protected fun releaseRuntime() {
+    protected fun releaseWhenIdle() {
         runBlocking { runtime.scope.coroutineContext[Job]?.children?.forEach { it.join() } }
         runtime.release()
     }
@@ -111,7 +111,7 @@ public open class BenchRuntimeCreation : RuntimePerformance() {
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark public fun createRuntime(consumer: Blackhole) {
         consumer.consume(setupRuntime())
-        releaseRuntime()
+        releaseWhenIdle()
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
@@ -124,7 +124,7 @@ public open class BenchRuntimeCreation : RuntimePerformance() {
         consumer.consume(HeadlessPlayer(explicitRuntime = setupRuntime()))
         // we always release the runtime to make sure jmh isn't waiting
         // for the runtime thread to be released
-        releaseRuntime()
+        releaseWhenIdle()
     }
 }
 
@@ -142,14 +142,14 @@ public open class BenchPlayerCreation : RuntimePerformance() {
     @Benchmark public fun createJSPlayer(consumer: Blackhole) {
         consumer.consume(runtime.execute(playerSource))
         consumer.consume(runtime.execute("""(new Player.Player())"""))
-        releaseRuntime()
+        releaseWhenIdle()
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark public fun createHeadlessPlayer(consumer: Blackhole) {
         // uses runtime created outside benchmark
         consumer.consume(HeadlessPlayer(explicitRuntime = runtime))
-        releaseRuntime()
+        releaseWhenIdle()
     }
 }
 
@@ -187,7 +187,7 @@ public open class BenchPlayerFlow : RuntimePerformance() {
         runBlocking {
             pending.await()
         }
-        releaseRuntime()
+        releaseWhenIdle()
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
@@ -209,7 +209,7 @@ public open class BenchPlayerFlow : RuntimePerformance() {
         runBlocking {
             pending.await()
         }
-        releaseRuntime()
+        releaseWhenIdle()
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
@@ -231,7 +231,7 @@ public open class BenchPlayerFlow : RuntimePerformance() {
         runBlocking {
             pending.await()
         }
-        releaseRuntime()
+        releaseWhenIdle()
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
@@ -253,6 +253,6 @@ public open class BenchPlayerFlow : RuntimePerformance() {
         runBlocking {
             pending.await()
         }
-        releaseRuntime()
+        releaseWhenIdle()
     }
 }
