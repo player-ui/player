@@ -2,13 +2,15 @@
 title: Player 1.0
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 ## 1.0!
 
 TBA
 
 ## Breaking Changes
 
-Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release.  If a change pertains to only one platform, that section will be prefaced with "(Core)", "(iOS)", or "(Android)". E.g. (iOS) `.anyArray` and `.anyDictionary` use `AnyType`.
+Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release. If a change pertains to only one platform, that section will be prefaced with "(Core)", "(iOS)", or "(Android)". E.g. (iOS) `.anyArray` and `.anyDictionary` use `AnyType`.
 
 ### (iOS) `.anyArray` and `.anyDictionary` use `AnyType`
 
@@ -19,12 +21,13 @@ The `AnyType` enum now conforms to `Sendable` protocol and is concurrency-safe. 
 case anyDictionary(data: [String: Any])
 case anyArray(data: [Any])
 
-// After  
+// After
 case anyDictionary(data: [String: AnyType])
 case anyArray(data: [AnyType])
 ```
 
 #### Migration
+
 Use `AnyType` cases directly instead of converting from/to `Any`:
 
 ```swift
@@ -32,7 +35,7 @@ Use `AnyType` cases directly instead of converting from/to `Any`:
 let anyType = AnyType.anyDictionary(data: ["key": "value"])
 let anyArray = AnyType.anyArray(data: ["key", 2])
 
-// New (Sendable-safe)  
+// New (Sendable-safe)
 let anyType = AnyType.anyDictionary(data: ["key": .string(data: "value")])
 let anyArray = AnyType.anyArray(data: [.string(data: "key"), .number(data: 2)])
 ```
@@ -62,7 +65,7 @@ All decoding of `AnyType` is now handled internally. So `AnyTypeDecodingContext.
 ### `FlowManager` alignment
 
 #### 1. All platforms have same `FlowManager`
-    
+
 All platforms now have a user-facing `FlowManager` with an aligned API.
 
 Android previously aliased `AsyncIterationManager` to `FlowManager`. However, Android's actual `FlowManager` equivalent was `AsyncIterator`. `AsyncIterator` with appropriate types is now aliased as `FlowManager` to match the other platforms.
@@ -92,18 +95,62 @@ PlayerViewModel(manager: someFlowManager)
   </thead>
   <tbody>
     <tr>
-      <td><strong>React</strong></td>
-      <td><pre><code class="language-tsx">next: (previousValue?: CompletedState) =&gt; Promise&lt;FinalState | NextState&lt;Flow&gt;&gt;</code></pre></td>
-      <td><pre><code class="language-tsx">next: (result?: CompletedState) =&gt; Promise&lt;FinalState | NextState&gt;</code></pre><br/><strong>Migration:</strong> Change the function signature to match.</td>
+      <td>
+        <strong>React</strong>
+      </td>
+      <td>
+        <pre>
+          <code class="language-tsx">
+            next: (previousValue?: CompletedState) =&gt; Promise&lt;FinalState |
+            NextState&lt;Flow&gt;&gt;
+          </code>
+        </pre>
+      </td>
+      <td>
+        <pre>
+          <code class="language-tsx">
+            next: (result?: CompletedState) =&gt; Promise&lt;FinalState |
+            NextState&gt;
+          </code>
+        </pre>
+        <br />
+        <strong>Migration:</strong> Change the function signature to match.
+      </td>
     </tr>
     <tr>
-      <td><strong>Swift</strong></td>
-      <td><pre><code class="language-swift">func next(_ state: CompletedState?) async throws -&gt; NextState</code></pre></td>
-      <td><pre><code class="language-swift">func next(result: CompletedState?) async throws -&gt; String?</code></pre><br/><strong>Migration:</strong> Instead of <code>.flow(someString)</code>, return the <code>String</code> directly. Instead of <code>.finished</code>, return <code>nil</code>.</td>
+      <td>
+        <strong>Swift</strong>
+      </td>
+      <td>
+        <pre>
+          <code class="language-swift">
+            func next(_ state: CompletedState?) async throws -&gt; NextState
+          </code>
+        </pre>
+      </td>
+      <td>
+        <pre>
+          <code class="language-swift">
+            func next(result: CompletedState?) async throws -&gt; String?
+          </code>
+        </pre>
+        <br />
+        <strong>Migration:</strong> Instead of <code>.flow(someString)</code>,
+        return the <code>String</code> directly. Instead of{" "}
+        <code>.finished</code>, return <code>nil</code>.
+      </td>
     </tr>
     <tr>
-      <td><strong>Kotlin</strong></td>
-      <td><pre><code class="language-kotlin">suspend fun next(result: CompletedState?): String?</code></pre></td>
+      <td>
+        <strong>Kotlin</strong>
+      </td>
+      <td>
+        <pre>
+          <code class="language-kotlin">
+            suspend fun next(result: CompletedState?): String?
+          </code>
+        </pre>
+      </td>
       <td>Unchanged</td>
     </tr>
   </tbody>
@@ -123,24 +170,70 @@ This API is now the same across all platforms. It accepts an optional `InProgres
   </thead>
   <tbody>
     <tr>
-      <td><strong>React</strong></td>
-      <td><pre><code>terminate?: (data?: FlowResult["data"]) =&gt; void</code></pre></td>
-      <td><pre><code>terminate?: (state?: InProgressState) =&gt; void</code></pre><br/><strong>Migration:</strong> Call terminate with the <code>InProgressState</code> instead of the flow data. This may look like: <pre><code>{`const state = reactPlayer.player.getState();
+      <td>
+        <strong>React</strong>
+      </td>
+      <td>
+        <pre>
+          <code>terminate?: (data?: FlowResult["data"]) =&gt; void</code>
+        </pre>
+      </td>
+      <td>
+        <pre>
+          <code>terminate?: (state?: InProgressState) =&gt; void</code>
+        </pre>
+        <br />
+        <strong>Migration:</strong> Call terminate with the{" "}
+        <code>InProgressState</code> instead of the flow data. This may look
+        like:{" "}
+        <pre>
+          <code>{`const state = reactPlayer.player.getState();
 if (playerState?.status === "in-progress") {
     flowManager.terminate(playerState)
-}`}</code></pre></td>
+}`}</code>
+        </pre>
+      </td>
     </tr>
     <tr>
-      <td><strong>Swift</strong></td>
-      <td><pre><code>func terminate(state: InProgressState?)</code></pre></td>
+      <td>
+        <strong>Swift</strong>
+      </td>
+      <td>
+        <pre>
+          <code>func terminate(state: InProgressState?)</code>
+        </pre>
+      </td>
       <td>Unchanged</td>
     </tr>
     <tr>
-      <td><strong>Kotlin</strong></td>
-      <td><pre><code>suspend fun terminate()</code></pre> <em>(on <code>AsyncFlowIterator</code>)</em></td>
-      <td><pre><code>suspend fun terminate(data: InProgressState? = null)</code></pre> <em>(on <code>FlowManager</code>)</em><br/><br/><strong>Migration:</strong> Call terminate with the <code>InProgressState</code>. This may look like: <pre><code>{`// In PlayerViewModel.kt:
+      <td>
+        <strong>Kotlin</strong>
+      </td>
+      <td>
+        <pre>
+          <code>suspend fun terminate()</code>
+        </pre>{" "}
+        <em>
+          (on <code>AsyncFlowIterator</code>)
+        </em>
+      </td>
+      <td>
+        <pre>
+          <code>suspend fun terminate(data: InProgressState? = null)</code>
+        </pre>{" "}
+        <em>
+          (on <code>FlowManager</code>)
+        </em>
+        <br />
+        <br />
+        <strong>Migration:</strong> Call terminate with the{" "}
+        <code>InProgressState</code>. This may look like:{" "}
+        <pre>
+          <code>{`// In PlayerViewModel.kt:
 val playerState = player.inProgressState
-flowManager.terminate(playerState)`}</code></pre></td>
+flowManager.terminate(playerState)`}</code>
+        </pre>
+      </td>
     </tr>
   </tbody>
 </table>
@@ -178,48 +271,148 @@ targets: [
         ],
     ),
 ]
+```
 
-### `ExternalActionPlugin` uses registry-based handler matching
+### `ExternalActionPlugin` renamed to `ExternalStatePlugin` with new handler API
 
-The `ExternalActionPlugin` now accepts a `Map` of state matchers to handlers instead of a single handler function. This enables:
-- Multiple plugins to register handlers for different external states. The last registered handler will be used.
-- Fuzzy matching with specificity ordering (more specific matches take precedence)
-- Automatic logging when handlers are replaced
+**The plugin has been renamed** from `ExternalActionPlugin` to `ExternalStatePlugin`.
+The name `ExternalState` better reflects what the plugin does — it handles `EXTERNAL`
+navigation states — and is now used consistently across all platforms.
 
-**Migration:**
+**The handler API has changed.**
+Instead of a single function that receives all external states, you now provide an array
+of handlers. Each handler requires a `ref` (matching the external state's `ref` field)
+and a `handlerFunction`. An optional `match` object can be provided to match on
+additional state properties beyond `ref`:
+
+<PlatformTabs>
+  <Fragment slot="core">
 
 ```typescript
-// Before - single handler for all external states
+// Before
 new ExternalActionPlugin((state, options) => {
   if (state.ref === "my-action") {
     return "Next";
   }
-})
+});
 
-// After - array of [matcher, handler] tuples
-new ExternalActionPlugin([
-  [{ ref: "my-action" }, (state, options) => "Next"],
-  [{ ref: "other-action" }, (state, options) => "Prev"],
+// After
+new ExternalStatePlugin([
+  { ref: "my-action", handlerFunction: (state, options) => "Next" },
+  { ref: "other-action", handlerFunction: (state, options) => "Prev" },
+]);
+```
+
+  </Fragment>
+  <Fragment slot="ios">
+
+```swift
+// Before — ExternalActionPlugin
+// Single handler receives all external states; ref checked manually inside
+let plugin = ExternalActionPlugin { state, options, transition in
+  guard state.ref == "my-action" else { return }
+  transition("Next")
+}
+
+// After — ExternalStatePlugin
+// Separate handler per ref; matched automatically
+let plugin = ExternalStatePlugin(handlers: [
+  ExternalStateHandler(ref: "my-action") { state, options, transition in
+    transition("Next")
+  }
+])
+
+// Before — ExternalActionViewModifierPlugin
+let plugin = ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { state, options, transition in
+  return AnyView(Text("External State"))
+}
+
+// After — ExternalStateViewModifierPlugin
+let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+  ExternalStateViewModifierHandler(ref: "my-action") { state, options, transition in
+    return AnyView(Text("External State"))
+  }
 ])
 ```
 
-Handlers are matched by the registry using partial object matching. More specific matchers (with more properties) take precedence over less specific ones:
+  </Fragment>
+  <Fragment slot="android">
+
+```kotlin
+// Before — ExternalActionPlugin
+// Single handler receives all external states; ref checked manually inside
+val plugin = ExternalActionPlugin { state, options, transition ->
+  if (state.ref == "my-action") {
+    transition("Next")
+  }
+}
+
+// After — ExternalStatePlugin
+// Separate handler per ref; matched automatically
+val plugin = ExternalStatePlugin(
+  ExternalStateHandler(
+    ref = "my-action",
+    handlerFunction = ExternalStateHandler.Function { state, options, transition ->
+      transition("Next")
+    }
+  )
+)
+```
+
+  </Fragment>
+</PlatformTabs>
+
+#### Handler matching and specificity
+
+Handlers are matched against the external state using partial object matching on `ref`
+and any additional properties in `match`. When multiple handlers could match a state,
+the most specific one wins (the one with the most matching properties).
+
+This allows you to register a general handler for a `ref` and a more specific one for
+a particular variant:
 
 ```typescript
-new ExternalActionPlugin([
-  // Less specific - matches any state with ref: "action"
-  [{ ref: "action" }, () => "default"],
-  // More specific - matches state with both ref and type
-  [{ ref: "action", type: "special" }, () => "special"],
-])
+new ExternalStatePlugin([
+  // Matches any state with ref: "my-action"
+  { ref: "my-action", handlerFunction: () => "default" },
+  // Takes precedence when type: "special" is also present
+  {
+    ref: "my-action",
+    match: { type: "special" },
+    handlerFunction: () => "special",
+  },
+]);
 ```
+
+#### Overriding handlers across plugins
+
+Overriding handlers is now supported. When multiple `ExternalStatePlugin` instances
+register a handler for the same state,
+the **last registered handler wins**. A `debug` log is emitted when a handler is
+replaced, so you can tell when an override is happening.
+
+To add more handlers after initial setup, register a new `ExternalStatePlugin` instance.
+Plugins are typically grouped together and easy to find by name. This makes it straightforward to
+determine the override order.
+
+We considered allowing more handlers to be added to an `ExternalStatePlugin` after creation,
+however, this would make it more difficult to figure out the override order. So we do not
+support that.
+
+#### Missing handlers
+
+For now, If no handler matches an external state, the Player remains on that state and no
+transition occurs. Ensure every `EXTERNAL` state in your flow has a registered handler.
+
+:::note
+In a future release, unhandled external states will automatically report an error via the Error Controller.
+:::
 
 ## Behavioural Changes & Bug Fixes
 
-### Partial Match Registry replaces exact matches, with log
+### (Core) Partial Match Registry replaces exact matches, with log
 
-The `Registry.set()` method now replaces existing entries with exactly matching keys/`match`es. Previously, calling `set()` would always insert a new entry without removing any existing entries. This would potentially create duplicate matches.
-
+The `Registry.set()` method now replaces existing entries with exactly matching keys/`match`es.
 Whenever a replacement happens, a `debug` log will occur.
 
 **Example:**
@@ -248,7 +441,8 @@ registry.get({ foo: "bar", baz: "qux" }); // Returns "more-specific-match"
 
 ### (Core) Partial Match Registry uses MOST SPECIFIC match
 
-The `Registry.get()` method now consistently returns the **most specific** matching entry, regardless of the order entries were added. Previously, it would return the most recent matching entry.
+The `Registry.get()` method now consistently returns the **most specific** matching entry, regardless of
+the order entries were added. Previously, it would return the most recent matching entry.
 
 **Example:**
 
