@@ -1,3 +1,28 @@
+# 0.15.3-next.0 (Tue Apr 07 2026)
+
+### Release Notes
+
+#### Fix HermesNode property access on released JSI objects ([#825](https://github.com/player-ui/player/pull/825))
+
+Added a defensive guard in HermesNode so property reads on a released runtime/object fail safely by throwing a PlayerRuntimeException with context instead of a fatal native NPE.
+
+Added regression tests:
+- A deterministic unit test for “released JSI object property read”
+- A small concurrency test that reads player.state while player.release() is happening
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix HermesNode property access on released JSI objects [#825](https://github.com/player-ui/player/pull/825) ([@kharrop](https://github.com/kharrop) [@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
 # 0.15.2 (Mon Mar 30 2026)
 
 ### Release Notes
