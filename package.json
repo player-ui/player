@@ -193,6 +193,8 @@
   },
   "resolutions": {
     "esbuild": "0.19.8",
-    "jackspeak": "2.1.1"
+    "jackspeak": "2.1.1",
+    "@player-ui/player": "workspace:*",
+    "@player-ui/types": "workspace:*"
   }
 }
