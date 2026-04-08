@@ -10,7 +10,6 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSeri
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 /** Severity levels for errors */
@@ -54,7 +53,7 @@ public class ErrorController internal constructor(
     override val node: Node,
 ) : NodeWrapper {
     private val captureError: Invokable<Boolean>? by NodeSerializableFunction()
-    private val getCurrentError: Invokable<Throwable?>? by NodeSerializableFunction(ThrowableSerializer().nullable)
+    private val getCurrentError: Invokable<Throwable?>? by NodeSerializableFunction()
     private val getErrors: Invokable<List<Throwable>?>? by NodeSerializableFunction()
     private val clearErrors: Invokable<Unit>? by NodeSerializableFunction()
     private val clearCurrentError: Invokable<Unit>? by NodeSerializableFunction()

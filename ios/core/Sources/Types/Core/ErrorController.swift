@@ -65,7 +65,7 @@ public class ErrorController: CreatedFromJSValue {
     public init(_ value: JSValue) {
         self.value = value
         hooks = ErrorControllerHooks(
-            onError: BailHook<JSValueError>(baseValue: value, name: "onError")
+            onError: HookWithResult<JSValueError, Bool>(baseValue: value, name: "onError")
         )
     }
     

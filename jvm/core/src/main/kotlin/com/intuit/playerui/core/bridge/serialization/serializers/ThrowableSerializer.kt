@@ -8,6 +8,7 @@ import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeEncoder
 import com.intuit.playerui.core.error.ErrorSeverity
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.PlayerExceptionMetadata
+import com.intuit.playerui.core.player.PlayerExceptionWithMetadata
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -120,7 +121,11 @@ public class ThrowableSerializer : KSerializer<Throwable> {
 
             if (serialized) {
                 // TODO: Solve for serialized exceptions with specific types defining their error type, severity and metadata
-                PlayerException(message, cause)
+                if (type == null) {
+                    PlayerException(message, cause)
+                } else {
+                    PlayerExceptionWithMetadata(message, type, severity, metadata, cause)
+                }
             } else {
                 val error = decoder.requireNodeDecoder().decodeNode()
                 stackTrace = decodeStackTraceFromStack(error.getString("stack"))
@@ -155,14 +160,20 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                 )
                 encodeNullableSerializableElement(descriptor, 4, nullable, value.cause)
                 if (value is PlayerExceptionMetadata) {
+                    val severity = value.severity
+                    val metadata = value.metadata
                     encodeStringElement(descriptor, 5, value.type)
-                    encodeNullableSerializableElement(descriptor, 6, String.serializer(), value.severity?.value)
-                    encodeNullableSerializableElement(
-                        descriptor,
-                        7,
-                        MapSerializer(String.serializer(), GenericSerializer()),
-                        value.metadata,
-                    )
+                    if (severity != null) {
+                        encodeNullableSerializableElement(descriptor, 6, String.serializer(), severity.value)
+                    }
+                    if (metadata != null) {
+                        encodeNullableSerializableElement(
+                            descriptor,
+                            7,
+                            MapSerializer(String.serializer(), GenericSerializer()),
+                            metadata,
+                        )
+                    }
                 }
             }
         }

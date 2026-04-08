@@ -13,6 +13,7 @@ import com.intuit.playerui.utils.normalizeStackTraceElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 
 private inline fun currentStackTrace() = Exception().stackTrace
 
@@ -120,7 +121,9 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
             assertEquals(ErrorSeverity.ERROR.value, error.get("severity"))
             assertEquals("TestError", error.get("type"))
-            assertEquals("testValue", error.get("metadata.testProperty"))
+            val metadata = error.get("metadata")
+            assertInstanceOf<V8Object>(metadata)
+            assertEquals("testValue", metadata.get("testProperty"))
         }
     }
 
