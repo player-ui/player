@@ -20,9 +20,7 @@ import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
-import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
-import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withStyles
 import com.intuit.playerui.android.withTag
@@ -30,7 +28,6 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
-import kotlin.collections.emptyList
 
 /**
  * Base class for assets that render using Jetpack Compose.
