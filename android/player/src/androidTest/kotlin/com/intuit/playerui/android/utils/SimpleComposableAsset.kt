@@ -185,7 +185,7 @@ internal class StyledNestedComposableAsset(
             ),
         )
 
-        /** Compose (styled) → Compose → XML view chain (3-level). */
+        /** Compose (styled) → XML view chain — tests withStyles propagation. */
         @OptIn(InternalPlayerApi::class)
         val styledComposeToViewFlow = makeFlow(
             Json.encodeToJsonElement(
@@ -197,17 +197,9 @@ internal class StyledNestedComposableAsset(
                     "metaData" to mapOf<String, Any>("a" to "b"),
                     "nested" to mapOf(
                         "asset" to mapOf(
-                            "id" to "middle-compose-id",
-                            "type" to "nested-compose",
-                            "label" to "MiddleCompose",
+                            "id" to "leaf-view-id",
+                            "type" to "context-capturing",
                             "metaData" to mapOf<String, Any>("a" to "b"),
-                            "nested" to mapOf(
-                                "asset" to mapOf(
-                                    "id" to "leaf-view-id",
-                                    "type" to "context-capturing",
-                                    "metaData" to mapOf<String, Any>("a" to "b"),
-                                ),
-                            ),
                         ),
                     ),
                 ),

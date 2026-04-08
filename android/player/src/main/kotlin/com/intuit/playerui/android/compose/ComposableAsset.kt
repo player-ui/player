@@ -24,6 +24,7 @@ import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
+import com.intuit.playerui.android.withStyles
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.Dispatchers
@@ -87,28 +88,26 @@ public abstract class ComposableAsset<Data>(
     ) {
         val assetTag = tag ?: asset.id
         val containerModifier = Modifier.testTag(assetTag) then modifier
-        assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
+        assetContext.withContext(LocalContext.current).withStyles(styles?.xmlStyles).withTag(assetTag).build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
-                    // Propagate XML styles to nested Compose → XML children via LocalContext.
-                    LocalContext provides LocalContext.current.overlayStyles(emptyList(), styles?.xmlStyles ?: emptyList()),
                 ) {
                     Box(containerModifier) {
                         compose()
                     }
                 }
-                else -> composeAndroidView(containerModifier, styles?.xmlStyles)
+                else -> composeAndroidView(containerModifier)
             }
         }
     }
 
     @Composable
-    private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
+    private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier) {
         AndroidView(factory = ::FrameLayout, modifier) {
             hydrationScope.launch(Dispatchers.Main) {
-                render(styles) into it
+                render() into it
             }
         }
     }

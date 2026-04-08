@@ -118,7 +118,7 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `Compose to Compose to XML view propagates xmlStyles through LocalContext`() = runBlocking {
+    fun `Compose to XML view propagates xmlStyles via withStyles`() = runBlocking {
         val asset = player.awaitFirstView(StyledNestedComposableAsset.styledComposeToViewFlow)
         assertNotNull("Expected asset from flow", asset)
         val view = resolveView(asset?.render(appContext)) as ComposeView
@@ -129,11 +129,11 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
 
         val capturedContext = ContextCapturingAsset.lastCapturedContext
         assertNotNull(
-            "XML view should have been rendered through Compose→Compose→XML chain",
+            "XML view should have been rendered through Compose→XML chain",
             capturedContext,
         )
         assertTrue(
-            "XML view context should be a ContextThemeWrapper from xmlStyles propagated through LocalContext",
+            "XML view context should be a ContextThemeWrapper from xmlStyles passed via withStyles",
             capturedContext is ContextThemeWrapper,
         )
     }
