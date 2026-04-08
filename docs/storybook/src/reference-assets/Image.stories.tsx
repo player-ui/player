@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-webpack5";
+import type { Meta } from "@storybook/react-vite";
 import { createDSLStory } from "@player-ui/storybook";
 import { Image } from "@player-ui/reference-assets-plugin-react";
 
@@ -13,19 +13,19 @@ const meta: Meta<typeof Image> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/image/image-basic.tsx"),
+  () => import("@player-ui/mocks/image/image-basic.tsx?raw"),
 );
 
 export const Caption = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/image/image-with-caption.tsx"),
+  () => import("@player-ui/mocks/image/image-with-caption.tsx?raw"),
 );
 
 export const Accessibility = createDSLStory(
   () =>
-    import("!!raw-loader!@player-ui/mocks/image/image-with-accessibility.tsx"),
+    import("@player-ui/mocks/image/image-with-accessibility.tsx?raw"),
 );
 
 export const Placeholder = createDSLStory(
   () =>
-    import("!!raw-loader!@player-ui/mocks/image/image-with-placeholder.tsx"),
+    import("@player-ui/mocks/image/image-with-placeholder.tsx?raw"),
 );
