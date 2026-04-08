@@ -14,7 +14,7 @@ import org.junit.jupiter.api.assertNotNull
 
 @Serializable
 private data class TestSerializableClass(
-    val testProp: String
+    val testProp: String,
 )
 
 internal class InvokeTest : J2V8Test() {
