@@ -90,7 +90,7 @@ public class AndroidPlayer private constructor(
         (plugins.toList() + player.plugins).distinct(),
     )
 
-    override val plugins: List<Plugin> by player::plugins
+    override val plugins: List<Plugin> get() = player.plugins
 
     override val logger: TapableLogger by player::logger
 
@@ -302,8 +302,8 @@ public class AndroidPlayer private constructor(
     }
 
     /** Register and apply a [Plugin] to this player after instantiation. */
-    public fun registerPlugin(plugin: Plugin) {
-        plugins.add(plugin)
+    override fun registerPlugin(plugin: Plugin) {
+        player.registerPlugin(plugin)
         if (plugin is AndroidPlayerPlugin) {
             plugin.apply(this)
         } else {

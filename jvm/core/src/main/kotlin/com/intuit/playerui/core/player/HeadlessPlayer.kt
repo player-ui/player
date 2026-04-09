@@ -74,7 +74,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
     private val player: Node
 
-    override var plugins: List<Plugin> = plugins; private set
+    override var plugins: List<Plugin> = plugins
+        private set
 
     override val node: Node by ::player
 
@@ -200,17 +201,15 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     }
 
     /** Register and apply a [Plugin] to this player after instantiation. */
-    public fun registerPlugin(plugin: Plugin) {
+    override fun registerPlugin(plugin: Plugin) {
         plugins = plugins + plugin
-        when (plugin) {
-            is RuntimePlugin -> {
-                plugin.apply(runtime)
-                if (plugin is JSPluginWrapper) {
-                    registerPlugin.invoke(plugin.instance)
-                }
+        if (plugin is RuntimePlugin) {
+            plugin.apply(runtime)
+            if (plugin is JSPluginWrapper) {
+                registerPlugin.invoke(plugin.instance)
             }
-            is PlayerPlugin -> plugin.apply(this)
         }
+        if (plugin is PlayerPlugin) plugin.apply(this)
     }
 
     internal companion object {

@@ -639,7 +639,7 @@ internal class HeadlessPlayerTest :
                 applied = true
             }
         }
-        (player as HeadlessPlayer).registerPlugin(plugin)
+        player.registerPlugin(plugin)
         assertTrue(applied)
         assertTrue(player.plugins.contains(plugin))
     }
@@ -650,7 +650,7 @@ internal class HeadlessPlayerTest :
         val plugin = object : PlayerPlugin {
             override fun apply(player: Player) {}
         }
-        (player as HeadlessPlayer).registerPlugin(plugin)
+        player.registerPlugin(plugin)
         assertEquals(sizeBefore + 1, player.plugins.size)
     }
 
@@ -658,7 +658,7 @@ internal class HeadlessPlayerTest :
     fun `registerPlugin applies JSScriptPluginWrapper via BeaconPlugin`() {
         val sizeBefore = player.plugins.size
         val beaconPlugin2 = BeaconPlugin()
-        (player as HeadlessPlayer).registerPlugin(beaconPlugin2)
+        player.registerPlugin(beaconPlugin2)
         assertEquals(sizeBefore + 1, player.plugins.size)
         assertNotNull(player.findPlugin<BeaconPlugin>())
     }
