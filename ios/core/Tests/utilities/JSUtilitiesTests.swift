@@ -10,6 +10,7 @@ import Foundation
 import JavaScriptCore
 import XCTest
 @testable import PlayerUI
+import PlayerUILogger
 
 class JSUtilitiesTests: XCTestCase {
     func testPolyfill() {
