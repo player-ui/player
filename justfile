@@ -126,6 +126,10 @@ dev-ios: build-core-native
 start-ios-demo:
   bazel run //ios/demo:PlayerUIDemo
 
+[doc('Lint all iOS files')]
+lint-ios:
+  bazel test $(bazel query --noshow_progress --output=label "attr(name, '.*SwiftLint', //ios/... + //plugins/...)")
+
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 
 If you run them all at once locally, too many simulators will open and they'll all time out and fail.")]
@@ -153,6 +157,6 @@ clean: # Force delete all the local cached bazel stuff. Be careful!
   rm -rf .swiftpm/
 
   # Then expunge for good measure
-  bazel clean --expunge
+  bazel clean --expunge --async
 
 ### 🍎 End iOS ###
