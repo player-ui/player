@@ -350,12 +350,9 @@ val plugin = ExternalActionPlugin { state, options, transition ->
 // After — ExternalStatePlugin
 // Separate handler per ref; matched automatically
 val plugin = ExternalStatePlugin(
-  ExternalStateHandler(
-    ref = "my-action",
-    handlerFunction = ExternalStateHandler.Function { state, options, transition ->
-      transition("Next")
-    }
-  )
+  ExternalStateHandler(ref = "my-action") { state, options, transition ->
+    transition("Next")
+  }
 )
 ```
 

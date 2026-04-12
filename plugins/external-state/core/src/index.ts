@@ -5,7 +5,6 @@ import type {
   PlayerFlowState,
   NavigationFlowState,
   NavigationFlowExternalState,
-  NavigationFlowState,
 } from "@player-ui/player";
 import { Registry } from "@player-ui/partial-match-registry";
 import { ExternalStatePluginSymbol } from "./symbols.js";
@@ -18,8 +17,11 @@ export type ExternalStateHandlerFunction = (
 ) => string | undefined | Promise<string | undefined>;
 
 export type ExternalStateHandler = {
+  /** The name of the external state. This will appear as it's "ref" property in the DSL. */
   ref: string;
+  /** Additional properties to match against the external state. */
   match?: ExternalStateHandlerMatch;
+  /** The function to run when the external state is transitioned to. This should return the `ref` of the next state to transition to. */
   handlerFunction: ExternalStateHandlerFunction;
 };
 
@@ -58,14 +60,7 @@ export class ExternalStatePlugin implements PlayerPlugin {
    */
   private readonly handlers: ExternalStateHandler[];
 
-  /**
-   * Creates a new ExternalStatePlugin
-   *
-   * @param handlers - Array of ExternalStateHandler objects.
-   *                   Each object has a required `ref` (the external state reference),
-   *                   an optional `match` object for additional match criteria,
-   *                   and a `handlerFunction` to run when the external state is transitioned to.
-   */
+  /** Creates a new ExternalStatePlugin */
   constructor(handlers: ExternalStateHandler[]) {
     this.handlers = handlers;
   }
@@ -92,7 +87,8 @@ export class ExternalStatePlugin implements PlayerPlugin {
             isInProgress(currentState)
           ) {
             try {
-              const transitionValue = await this.registry?.get(toState.value)?.(
+              const handler = this.registry?.get(toState.value);
+              const transitionValue = await handler?.(
                 toState.value,
                 currentState.controllers,
               );
@@ -130,9 +126,6 @@ export class ExternalStatePlugin implements PlayerPlugin {
    * Uses the Player's plugin registry to find if another instance of ExternalStatePlugin
    * has already been registered. If found, this instance will share that plugin's registry.
    * Otherwise, this instance creates a new registry.
-   *
-   * @param player - The Player instance this plugin is being applied to
-   * @returns True if this is the first plugin instance, false otherwise
    */
   private createRegistry(player: Player): boolean {
     // Find the first instance of this plugin registered to the Player

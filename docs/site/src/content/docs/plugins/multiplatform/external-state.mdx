@@ -146,13 +146,10 @@ import com.intuit.playerui.plugins.externalState.ExternalStatePlugin
 
 val player = AndroidPlayer(
   ExternalStatePlugin(
-    ExternalStateHandler(
-      ref = "my-action",
-      handlerFunction = ExternalStateHandler.Function { state, options, transition ->
-        // options.data and options.expression are available here
-        transition("Next")
-      }
-    )
+    ExternalStateHandler(ref = "my-action") { state, options, transition ->
+      // options.data and options.expression are available here
+      transition("Next")
+    }
   )
 )
 ```

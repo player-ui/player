@@ -50,17 +50,14 @@ internal class ExternalStatePluginTest : PlayerTest() {
     @TestTemplate
     fun testExternalStateHandling() = runBlockingTest {
         val plugin = ExternalStatePlugin(
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { state, _, transition ->
-                    assertEquals(state.transitions, mapOf("Next" to "END_FWD", "Prev" to "END_BCK"))
-                    assertEquals(state.ref, "test-1")
+            ExternalStateHandler(ref = "test-1") { state, _, transition ->
+                assertEquals(state.transitions, mapOf("Next" to "END_FWD", "Prev" to "END_BCK"))
+                assertEquals(state.ref, "test-1")
 
-                    val extra = state["extraProperty"]
-                    assertEquals(extra, "extraValue")
-                    transition("Next")
-                },
-            ),
+                val extra = state["extraProperty"]
+                assertEquals(extra, "extraValue")
+                transition("Next")
+            },
         )
 
         setupPlayer(plugin)
@@ -71,12 +68,9 @@ internal class ExternalStatePluginTest : PlayerTest() {
     @TestTemplate
     fun testExternalStateHandlingThrows() = runBlockingTest {
         val plugin = ExternalStatePlugin(
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { _, _, _ ->
-                    throw Exception("Bad Code")
-                },
-            ),
+            ExternalStateHandler(ref = "test-1") { _, _, _ ->
+                throw Exception("Bad Code")
+            },
         )
 
         setupPlayer(plugin)
@@ -93,15 +87,12 @@ internal class ExternalStatePluginTest : PlayerTest() {
     @TestTemplate
     fun testExternalStateHandlingWithDelay() = runBlockingTest {
         val plugin = ExternalStatePlugin(
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { _, _, transition ->
-                    launch {
-                        delay(2000)
-                        transition("Next")
-                    }
-                },
-            ),
+            ExternalStateHandler(ref = "test-1") { _, _, transition ->
+                launch {
+                    delay(2000)
+                    transition("Next")
+                }
+            },
         )
 
         setupPlayer(plugin)
@@ -114,13 +105,10 @@ internal class ExternalStatePluginTest : PlayerTest() {
         var callbackOptions: ControllerState? = null
 
         val plugin = ExternalStatePlugin(
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { _, options, transition ->
-                    callbackOptions = options
-                    transition("Prev")
-                },
-            ),
+            ExternalStateHandler(ref = "test-1") { _, options, transition ->
+                callbackOptions = options
+                transition("Prev")
+            },
         )
 
         setupPlayer(plugin)
@@ -141,22 +129,15 @@ internal class ExternalStatePluginTest : PlayerTest() {
 
         val plugin = ExternalStatePlugin(
             // Less specific - only matches ref
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { _, _, transition ->
-                    lessSpecificCalled = true
-                    transition("Prev")
-                },
-            ),
+            ExternalStateHandler(ref = "test-1") { _, _, transition ->
+                lessSpecificCalled = true
+                transition("Prev")
+            },
             // More specific - matches ref and extraProperty
-            ExternalStateHandler(
-                ref = "test-1",
-                match = mapOf("extraProperty" to "extraValue"),
-                handlerFunction = { _, _, transition ->
-                    moreSpecificCalled = true
-                    transition("Next")
-                },
-            ),
+            ExternalStateHandler(ref = "test-1", match = mapOf("extraProperty" to "extraValue")) { _, _, transition ->
+                moreSpecificCalled = true
+                transition("Next")
+            },
         )
 
         setupPlayer(plugin)
@@ -171,21 +152,15 @@ internal class ExternalStatePluginTest : PlayerTest() {
     @TestTemplate
     fun testMultiplePluginsLastOneWins() = runBlockingTest {
         val plugin1 = ExternalStatePlugin(
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { _, _, transition ->
-                    transition("Next")
-                },
-            ),
+            ExternalStateHandler(ref = "test-1") { _, _, transition ->
+                transition("Next")
+            },
         )
 
         val plugin2 = ExternalStatePlugin(
-            ExternalStateHandler(
-                ref = "test-1",
-                handlerFunction = { _, _, transition ->
-                    transition("Prev")
-                },
-            ),
+            ExternalStateHandler(ref = "test-1") { _, _, transition ->
+                transition("Prev")
+            },
         )
 
         setupPlayer(plugin1, plugin2)
