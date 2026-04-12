@@ -3,17 +3,17 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "dependencies": {
-    "@player-ui/asset-transform-plugin": "workspace:*",
-    "@player-ui/beacon-plugin": "workspace:*",
-    "@player-ui/async-node-plugin": "workspace:*",
-    "@player-ui/expression-plugin": "workspace:*",
-    "@player-ui/meta-plugin": "workspace:*"
+    "@player-ui/asset-transform-plugin": "workspace:^",
+    "@player-ui/beacon-plugin": "workspace:^",
+    "@player-ui/async-node-plugin": "workspace:^",
+    "@player-ui/expression-plugin": "workspace:^",
+    "@player-ui/meta-plugin": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/asset-testing-library": "workspace:*",
-    "@player-ui/common-types-plugin": "workspace:*"
+    "@player-ui/asset-testing-library": "workspace:^",
+    "@player-ui/common-types-plugin": "workspace:^"
   },
   "peerDependencies": {
-    "@player-ui/player": "workspace:*"
+    "@player-ui/player": "workspace:^"
   }
 }

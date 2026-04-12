@@ -10,6 +10,7 @@ import Foundation
 import JavaScriptCore
 import XCTest
 @testable import PlayerUI
+import PlayerUILogger
 
 class JSUtilitiesTests: XCTestCase {
     func testPolyfill() {
@@ -67,47 +68,6 @@ class JSUtilitiesTests: XCTestCase {
         wait(for: [catchExpect], timeout: 1)
     }
 
-    func testJsonStringPretty() {
-        let context = JSContext()!
-
-        let obj = context.evaluateScript("({a: 1})")
-
-        let objWithNaN = context.evaluateScript("({a: NaN})")
-
-        let objWithFunction = context.evaluateScript("({a: () => {}})")
-
-        let array = context.evaluateScript("(['a', 'b'])")
-
-        let str = context.evaluateScript("('a')")
-
-        XCTAssertEqual(obj?.jsonDisplayString, """
-        {
-          "a": 1
-        }
-        """)
-
-        XCTAssertEqual(objWithNaN?.jsonDisplayString, """
-        {
-          "a": null
-        }
-        """)
-
-        XCTAssertEqual(objWithFunction?.jsonDisplayString, """
-        {
-          "a": {}
-        }
-        """)
-
-        XCTAssertEqual(array?.jsonDisplayString, """
-        [
-          "a",
-          "b"
-        ]
-        """)
-
-        XCTAssertEqual(str?.jsonDisplayString, "\"a\"")
-    }
-
     func testJsonData() throws {
         let context = JSContext()!
 
@@ -138,5 +98,64 @@ class JSUtilitiesTests: XCTestCase {
         """.data(using: .utf8))
 
         XCTAssertEqual(try str?.jsonData(), "\"a\"".data(using: .utf8))
+    }
+
+    func testDecodeLogsTruncatedPreviewForSmallPayload() throws {
+        let context = JSContext()!
+        let value = context.evaluateScript("({id: 'test', type: 'text'})")!
+
+        let logger = TapableLogger()
+        logger.logLevel = .trace
+
+        var loggedMessage: String?
+        logger.hooks.trace.tap(name: "test") { messages in
+            loggedMessage = messages.compactMap { $0 as? String }.joined()
+        }
+
+        let decoder = JSONDecoder()
+        decoder.setLogger(logger)
+
+        struct SimpleAsset: Decodable {
+            let id: String
+            let type: String
+        }
+
+        let decoded = try decoder.decode(SimpleAsset.self, from: value)
+        XCTAssertEqual(decoded.id, "test")
+
+        let message = try XCTUnwrap(loggedMessage)
+        XCTAssertTrue(message.contains("bytes)"), "Log should include byte count")
+        XCTAssertFalse(message.hasSuffix("..."), "Small payload should not be truncated")
+    }
+
+    func testDecodeLogsTruncatedPreviewForLargePayload() throws {
+        let context = JSContext()!
+        // Generate a JSON object larger than 500 bytes
+        let script = "({id: 'test', type: 'text', value: '\(String(repeating: "x", count: 600))'})"
+        let value = context.evaluateScript(script)!
+
+        let logger = TapableLogger()
+        logger.logLevel = .trace
+
+        var loggedMessage: String?
+        logger.hooks.trace.tap(name: "test") { messages in
+            loggedMessage = messages.compactMap { $0 as? String }.joined()
+        }
+
+        let decoder = JSONDecoder()
+        decoder.setLogger(logger)
+
+        struct SimpleAsset: Decodable {
+            let id: String
+            let type: String
+            let value: String
+        }
+
+        let decoded = try decoder.decode(SimpleAsset.self, from: value)
+        XCTAssertEqual(decoded.id, "test")
+
+        let message = try XCTUnwrap(loggedMessage)
+        XCTAssertTrue(message.contains("bytes)"), "Log should include byte count")
+        XCTAssertTrue(message.hasSuffix("..."), "Large payload should be truncated with ellipsis")
     }
 }

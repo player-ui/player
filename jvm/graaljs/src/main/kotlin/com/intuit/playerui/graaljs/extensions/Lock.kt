@@ -1,7 +1,6 @@
 package com.intuit.playerui.graaljs.extensions
 
-import com.intuit.playerui.core.bridge.PlayerRuntimeException
-import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime.Companion.isReleased
+import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException.Companion.ensureNotReleased
 import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime.Companion.runtime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -16,14 +15,15 @@ import org.graalvm.polyglot.Value
  * NOTE: Suspend methods are non-blocking by convention.
  */
 internal suspend fun <T> Value.lock(timeout: Long = 5000, block: suspend Value.() -> T): T = withTimeout(timeout) {
-    if (context.isReleased) throw PlayerRuntimeException(context.runtime, "Runtime object has been released!")
-    val runtimeLock = context.runtime.lock
-    val alreadyHadLock = runtimeLock.isHeldByCurrentThread
-    try {
-        while (!runtimeLock.tryLock()) delay(50)
-        block()
-    } finally {
-        if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+    context.runtime.ensureNotReleased {
+        val runtimeLock = context.runtime.lock
+        val alreadyHadLock = runtimeLock.isHeldByCurrentThread
+        try {
+            while (!runtimeLock.tryLock()) delay(50)
+            block()
+        } finally {
+            if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+        }
     }
 }
 
@@ -34,14 +34,15 @@ internal suspend fun <T> Value.lock(timeout: Long = 5000, block: suspend Value.(
  * NOTE: Suspend methods are non-blocking by convention.
  */
 internal suspend fun <T> Context.lock(timeout: Long = 5000, block: suspend Context.() -> T): T = withTimeout(timeout) {
-    if (isReleased) throw PlayerRuntimeException(runtime, "Runtime object has been released!")
-    val runtimeLock = runtime.lock
-    val alreadyHadLock = runtimeLock.isHeldByCurrentThread
-    try {
-        while (!runtimeLock.tryLock()) delay(50)
-        block()
-    } finally {
-        if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+    runtime.ensureNotReleased {
+        val runtimeLock = runtime.lock
+        val alreadyHadLock = runtimeLock.isHeldByCurrentThread
+        try {
+            while (!runtimeLock.tryLock()) delay(50)
+            block()
+        } finally {
+            if (!alreadyHadLock && runtimeLock.isHeldByCurrentThread) runtimeLock.unlock()
+        }
     }
 }
 
@@ -50,11 +51,8 @@ internal suspend fun <T> Context.lock(timeout: Long = 5000, block: suspend Conte
  * will block the calling thread.
  */
 internal fun <T> Value.blockingLock(block: Value.() -> T): T = when {
-    context.isReleased -> throw PlayerRuntimeException(context.runtime, "Runtime object has been released!")
     context.runtime.lock.isHeldByCurrentThread -> block()
-    else -> runBlocking {
-        lock { block() }
-    }
+    else -> runBlocking { context.runtime.ensureNotReleased { lock { block() } } }
 }
 
 /**
@@ -62,11 +60,8 @@ internal fun <T> Value.blockingLock(block: Value.() -> T): T = when {
  * will block the calling thread.
  */
 internal fun <T> Context.blockingLock(block: Context.() -> T): T = when {
-    isReleased -> throw PlayerRuntimeException(runtime, "Runtime object has been released!")
     runtime.lock.isHeldByCurrentThread -> block()
-    else -> runBlocking {
-        lock { block() }
-    }
+    else -> runBlocking { runtime.ensureNotReleased { lock { block() } } }
 }
 
 /** Special [blockingLock] helper to guard against undefined values */

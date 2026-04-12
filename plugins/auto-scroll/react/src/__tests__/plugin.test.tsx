@@ -387,6 +387,63 @@ describe("scroll reset on view transition", () => {
   });
 });
 
+describe("scroll reset on view transition cancels in-flight polyfill animation", () => {
+  test("dispatches a wheel event and calls scroll(0,0) on transition", async () => {
+    vitest.clearAllMocks();
+
+    const dispatchSpy = vitest
+      .spyOn(window, "dispatchEvent")
+      .mockImplementation(() => true);
+    const scrollSpy = vitest
+      .spyOn(window, "scroll")
+      .mockImplementation(() => {});
+
+    vitest.spyOn(document, "getElementById").mockReturnValue(null);
+
+    const wp = new ReactPlayer({
+      plugins: [
+        new AssetTransformPlugin([
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
+        ]),
+        new CommonTypesPlugin(),
+        new AutoScrollManagerPlugin({}),
+      ],
+    });
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, Input);
+
+    wp.start(twoViewFlow as any);
+
+    const { container } = render(
+      <div>
+        <React.Suspense fallback="loading...">
+          <wp.Component />
+        </React.Suspense>
+      </div>,
+    );
+
+    await act(() => waitFor(() => {}));
+
+    // navigate to page 2 — triggers the transition hook
+    const action = await findByRole(container, "button");
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    // wheel event must have been dispatched to cancel the polyfill's RAF
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "wheel" }),
+    );
+
+    // scroll must be reset to top
+    expect(scrollSpy).toHaveBeenCalledWith(0, 0);
+
+    vitest.restoreAllMocks();
+  });
+});
+
 describe("getFirstScrollableElement unit tests", () => {
   const defineGetElementId = (bcrValues: any[]) => {
     return (idIn: string): HTMLElement | null => {

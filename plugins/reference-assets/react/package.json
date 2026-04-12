@@ -3,15 +3,15 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.tsx",
   "dependencies": {
-    "@player-ui/asset-provider-plugin-react": "workspace:*",
-    "@player-ui/beacon-plugin-react": "workspace:*",
-    "@player-ui/partial-match-registry": "workspace:*",
-    "@player-ui/reference-assets-plugin": "workspace:*"
+    "@player-ui/asset-provider-plugin-react": "workspace:^",
+    "@player-ui/beacon-plugin-react": "workspace:^",
+    "@player-ui/partial-match-registry": "workspace:^",
+    "@player-ui/reference-assets-plugin": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/make-flow": "workspace:*"
+    "@player-ui/make-flow": "workspace:^"
   },
   "peerDependencies": {
-    "@player-ui/react": "workspace:*"
+    "@player-ui/react": "workspace:^"
   }
 }
