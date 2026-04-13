@@ -241,8 +241,8 @@ public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
         guard let flow = value?.objectForKeyedSubscript("flow") else { return nil }
 
         let message: String
-        if let errorValue = value?.objectForKeyedSubscript("error"), !errorValue.isUndefined, !errorValue.isNull {
-            if let msgValue = errorValue.objectForKeyedSubscript("message"), !msgValue.isUndefined, !msgValue.isNull {
+        if let errorValue = value?.objectForKeyedSubscript("error"), !errorValue.isUndefined {
+            if let msgValue = errorValue.objectForKeyedSubscript("message"), !msgValue.isUndefined {
                 message = msgValue.toString()
             } else {
                 message = errorValue.toString()
