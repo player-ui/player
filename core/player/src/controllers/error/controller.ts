@@ -79,13 +79,14 @@ export class ErrorController {
    * Capture an error and try to recover. Errors implementing the `PlayerErrorMetadata` interface will be added to history, fire hooks and update data model. As a fallback, all errors will try to trigger an errorTransition. If the error does not have a `type` property, it will default to only using the wildcard navigation.
    */
   public captureError(error: Error): boolean {
-    this.options.logger.debug("[ErrorController]: Found error");
     if (!isErrorWithMetadata(error)) {
-      this.options.logger.debug("[ErrorController]: Does not match structure");
+      this.options.logger.debug(
+        `[ErrorController] Captured error: ${error.message}\n`,
+        "Cannot determine optional error metadata, attempting default error navigation...",
+      );
       return this.tryNavigateToErrorState(error, "*");
     }
 
-    this.options.logger.debug("[ErrorController]: Implements interface");
     // Add to history
     this.errorHistory.push(error);
 

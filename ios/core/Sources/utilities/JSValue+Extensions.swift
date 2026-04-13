@@ -10,9 +10,8 @@ import JavaScriptCore
 
 extension JSValue {
     
-    public enum TryCatchResultKeys {
-        static let success = "success"
-        static let result = "result"
+    internal enum TryCatchResultKeys: String {
+        case success, result
     }
 
 
@@ -72,11 +71,8 @@ public struct JSValueError: Error, CreatedFromJSValue {
     
     public let originalJSError: JSValue
     
-    public enum JSKeys {
-        static let message = "message"
-        static let type = "type"
-        static let severity = "severity"
-        static let metadata = "metadata"
+    internal enum JSKeys: String {
+        case message, type, severity, metadata
     }
     
     public static func createInstance(value: JSValue) -> JSValueError {
