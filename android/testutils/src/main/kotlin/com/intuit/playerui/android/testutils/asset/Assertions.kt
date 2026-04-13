@@ -14,7 +14,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-public inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(block: T.() -> Unit = {}): T {
+public inline fun <reified T : RenderableAsset<*>> Any?.shouldBeAsset(block: T.() -> Unit = {}): T {
     shouldBeInstanceOf<T>(this)
     block()
     return this

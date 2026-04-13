@@ -30,11 +30,11 @@ import kotlinx.serialization.KSerializer
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
-/** Extension of [DecodableAsset] that provides suspendable [initView] and [hydrate] APIs that will provide an instance of [Data] to use during [View] updates */
+/** Extension of [RenderableAsset] that provides suspendable [initView] and [hydrate] APIs that will provide an instance of [Data] to use during [View] updates */
 public abstract class SuspendableAsset<Data>(
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
-) : DecodableAsset<Data>(assetContext, serializer) {
+) : RenderableAsset<Data>(assetContext, serializer) {
     // To be launched in Dispatchers.Default
     public abstract suspend fun initView(data: Data): View
 

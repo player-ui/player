@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
@@ -78,12 +79,12 @@ public abstract class ComposableAsset<Data>(
      * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
      */
     @Composable
-    public fun RenderableAsset.compose(
+    public fun GenericAsset.compose(
         modifier: Modifier = Modifier,
         styles: AssetStyle? = null,
         tag: String? = null,
     ) {
-        val assetTag = tag ?: asset.id
+        val assetTag = tag ?: assetContext.asset.id
         val containerModifier = Modifier.testTag(assetTag) then modifier
         assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
@@ -101,7 +102,7 @@ public abstract class ComposableAsset<Data>(
     }
 
     @Composable
-    private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
+    private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         AndroidView(factory = ::FrameLayout, modifier) {
             hydrationScope.launch(Dispatchers.Main) {
                 render(styles) into it

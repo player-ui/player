@@ -74,7 +74,7 @@ public abstract class AssetTest(
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    protected var currentAssetTree: RenderableAsset? = null
+    protected var currentAssetTree: RenderableAsset<*>? = null
         private set(value) {
             // reset view on new asset
             currentView = null

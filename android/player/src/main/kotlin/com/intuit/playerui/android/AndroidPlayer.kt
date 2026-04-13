@@ -8,6 +8,7 @@ import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
+import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.Styles
@@ -117,8 +118,8 @@ public class AndroidPlayer private constructor(
             }
         }
 
-        public class UpdateHook : SyncBailHook<(RenderableAsset?) -> BailResult<Unit>, Unit>() {
-            public fun call(asset: RenderableAsset?, default: (HookContext) -> Unit): Unit? = super.call(
+        public class UpdateHook : SyncBailHook<(RenderableAsset<*>?) -> BailResult<Unit>, Unit>() {
+            public fun call(asset: RenderableAsset<*>?, default: (HookContext) -> Unit): Unit? = super.call(
                 { f, _ ->
                     f(asset)
                 },
@@ -149,13 +150,13 @@ public class AndroidPlayer private constructor(
     private val assetSerializer = RenderableAsset.Serializer(this)
 
     /** [Registry] of [RenderableAsset] builders */
-    private val assetRegistry: RegistryPlugin<(AssetContext) -> RenderableAsset> = findPlugin()!!
+    private val assetRegistry: RegistryPlugin<(AssetContext) -> RenderableAsset<*>> = findPlugin()!!
 
-    public inline fun <reified T : RenderableAsset> registerAsset(type: String, noinline factory: (AssetContext) -> T): Unit =
+    public inline fun <reified T : RenderableAsset<*>> registerAsset(type: String, noinline factory: (AssetContext) -> T): Unit =
         registerAsset(T::class, type, factory)
 
     /** Helper provided to reduce overhead for simple asset registrations */
-    public fun <T : RenderableAsset> registerAsset(
+    public fun <T : RenderableAsset<*>> registerAsset(
         klass: KClass<T>,
         type: String,
         factory: (AssetContext) -> T,
@@ -163,14 +164,14 @@ public class AndroidPlayer private constructor(
         registerAsset(klass, mapOf(TYPE to type), factory)
     }
 
-    public inline fun <reified T : RenderableAsset> registerAsset(props: Map<String, Any>, noinline factory: (AssetContext) -> T): Unit =
+    public inline fun <reified T : RenderableAsset<*>> registerAsset(props: Map<String, Any>, noinline factory: (AssetContext) -> T): Unit =
         registerAsset(T::class, props, factory)
 
     /** Helper provided to reduce overhead for asset registrations with metaData */
-    public fun <T : RenderableAsset> registerAsset(
+    public fun <T : RenderableAsset<*>> registerAsset(
         klass: KClass<T>,
         props: Map<String, Any>,
-        factory: (AssetContext) -> RenderableAsset,
+        factory: (AssetContext) -> RenderableAsset<*>,
     ) {
         assetRegistry.register(props, factory)
         if (player.format.serializersModule.getContextual(klass) == null) {
@@ -180,7 +181,7 @@ public class AndroidPlayer private constructor(
 
     /** Apply [AndroidPlayerPlugin]s last */
     init {
-        player.format.registerContextualSerializer(assetSerializer.conform())
+        player.format.registerContextualSerializer(assetSerializer.conform<GenericAsset>())
 
         plugins
             .filterIsInstance<AndroidPlayerPlugin>()
@@ -191,7 +192,7 @@ public class AndroidPlayer private constructor(
      * Register a [assetHandler] to be called on each [View] update with
      * the [RenderableAsset] from [expandAsset].
      */
-    public fun onUpdate(assetHandler: (RenderableAsset?, Boolean) -> Unit) {
+    public fun onUpdate(assetHandler: (RenderableAsset<*>?, Boolean) -> Unit) {
         val transition = SingleAccessValue(false)
         player.hooks.viewController.tap { viewController ->
             viewController?.hooks?.view?.tap { view ->
@@ -306,7 +307,7 @@ public class AndroidPlayer private constructor(
      * parameter is configurable to allow for styles to cascade down through the
      * [Asset] tree.
      */
-    internal fun expandAsset(asset: Asset?, context: Context? = null): RenderableAsset? = asset?.let { (id, type) ->
+    internal fun expandAsset(asset: Asset?, context: Context? = null): RenderableAsset<*>? = asset?.let { (id, type) ->
         val factory = assetRegistry[id] ?: run {
             logger.warn("Warning in flow: $id of type $type is not registered")
             return@let null
@@ -335,7 +336,7 @@ public class AndroidPlayer private constructor(
             AsyncHydrationTrackerPlugin::class.java to AsyncHydrationTrackerPlugin(),
             PubSubPlugin::class.java to PubSubPlugin(),
             BeaconPlugin::class.java to BeaconPlugin(),
-            RegistryPlugin::class.java to RegistryPlugin<(AssetContext) -> RenderableAsset>(),
+            RegistryPlugin::class.java to RegistryPlugin<(AssetContext) -> RenderableAsset<*>>(),
             FlowScopePlugin::class.java to FlowScopePlugin(),
             LoggerPlugin::class.java to defaultLogger,
         )

@@ -57,7 +57,7 @@ internal abstract class BaseRenderableAssetTest {
     val appContext: Context = ApplicationProvider.getApplicationContext()
 
     @MockK
-    lateinit var mockRenderableAsset: RenderableAsset
+    lateinit var mockRenderableAsset: RenderableAsset<*>
 
     open val plugins: List<Plugin> by lazy {
         listOf(beaconPlugin, TestAssetsPlugin)

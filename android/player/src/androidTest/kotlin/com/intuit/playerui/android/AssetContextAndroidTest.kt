@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
+import kotlinx.serialization.serializer
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.MapBackedNode
 import org.junit.Assert.assertEquals
@@ -25,8 +26,7 @@ class AssetContextAndroidTest {
 
     private val assetMap = mapOf("id" to "first", "type" to "rando")
 
-    @Suppress("DEPRECATION_ERROR")
-    private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset(assetContext) {
+    private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset<Unit>(assetContext, serializer()) {
         override fun initView() = TextView(context)
 
         override fun View.hydrate() = Unit

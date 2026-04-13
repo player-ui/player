@@ -156,7 +156,7 @@ public abstract class PlayerFragment :
 
     /** Default suspendable implementation of [handleAssetUpdate] */
     @ExperimentalPlayerApi
-    protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset?, animateTransition: Boolean) {
+    protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         val startTime = System.currentTimeMillis()
         val view = asset?.render(requireContext())?.let {
             // unwrap if we know we have an async view stub, and just wait on the actual view
@@ -185,7 +185,7 @@ public abstract class PlayerFragment :
      * this will invoke [RenderableAsset.render] with no additional
      * styles and inject that into the view tree.
      */
-    protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
+    protected open fun handleAssetUpdate(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         renderingJob?.cancel("handling new update")
         renderingJob = lifecycleScope.launch {
             whenStarted {

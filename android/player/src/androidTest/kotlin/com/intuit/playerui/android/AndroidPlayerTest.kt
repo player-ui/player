@@ -121,11 +121,11 @@ internal class AndroidPlayerTest {
     @Test
     fun `cannot encode a renderable asset`() = runBlockingTest {
         val player = AndroidPlayer(TestAssetsPlugin)
-        val serializer = RenderableAsset.Serializer(player).conform<RenderableAsset>()
+        val serializer = RenderableAsset.Serializer(player).conform<RenderableAsset<*>>()
         player.registerAsset("simple", ::SimpleAsset)
         val asset = player.awaitFirstView(SimpleAsset.sampleFlow)!!
         assertEquals(
-            "DecodableAsset.Serializer.serialize is not supported",
+            "RenderableAsset.Serializer.serialize is not supported",
             assertThrows(SerializationException::class.java) {
                 Json.encodeToString(serializer, asset)
             }.message,

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.reference.assets.R
@@ -30,8 +30,8 @@ class Input(
         private val set: (String?) -> Unit,
         private val format: (String?) -> String?,
         /** Optional [label] that gives some semantic meaning to the field asset */
-        val label: RenderableAsset? = null,
-        val note: RenderableAsset? = null,
+        val label: GenericAsset? = null,
+        val note: GenericAsset? = null,
         /** The current value of the input from the data-model */
         val value: String? = null,
         val validation: Validation? = null,

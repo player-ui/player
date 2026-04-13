@@ -3,36 +3,37 @@ package com.intuit.playerui.android.utils
 import android.view.View
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.core.asset.Asset
-import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.utils.makeFlow
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-@Suppress("DEPRECATION_ERROR")
 internal class NestedAsset(
     assetContext: AssetContext,
-) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
-    val nested = expand("nested")
-    val nestedList = expandList("nestedAssets")
+) : SuspendableAsset<NestedAsset.Data>(assetContext, Data.serializer()) {
+    @Serializable
+    data class Data(
+        val nested: GenericAsset? = null,
+        val nestedAssets: List<GenericAsset> = emptyList(),
+    )
 
-    override suspend fun initView(data: Node) = LinearLayout(context)
+    override suspend fun initView(data: Data) = LinearLayout(context)
 
-    override suspend fun View.hydrate(data: Node) {
+    override suspend fun View.hydrate(data: Data) {
         require(this is LinearLayout)
-        nested?.render() into this
-        dummy = nested
-        nestedList
-            .map {
-                it.render(0)
-            }.forEach { it into this }
-        dummy2 = nestedList
+        data.nested?.render() into this
+        dummy = data.nested as? RenderableAsset<*>
+        data.nestedAssets.map {
+            it.render(0)
+        }.forEach { it into this }
+        dummy2 = data.nestedAssets.map { it as? RenderableAsset<*> }
     }
 
     companion object {
@@ -61,7 +62,7 @@ internal class NestedAsset(
         val sampleJson = Json.encodeToJsonElement(GenericSerializer(), sampleMap)
         val sampleFlow = makeFlow(sampleJson)
 
-        var dummy: RenderableAsset? = null
-        var dummy2: List<RenderableAsset?>? = null
+        var dummy: RenderableAsset<*>? = null
+        var dummy2: List<RenderableAsset<*>?>? = null
     }
 }

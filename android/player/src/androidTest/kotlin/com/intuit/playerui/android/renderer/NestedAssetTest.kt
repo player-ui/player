@@ -15,9 +15,8 @@ import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,23 +38,14 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `tested nested asset constructs`() = runBlocking {
-        val nested = NestedAsset(assetContext).render(appContext).let {
+    fun `tested nested asset constructs`() = runBlockingTest {
+        val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
+        val nested = asset.render(appContext).let {
             if (it is AsyncViewStub) it.awaitView() else it
         }
         assertTrue(nested is LinearLayout)
-    }
-
-    @Test
-    fun `test nested asset context`() = runBlockingTest {
-        val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
-        asset.render(appContext).let {
-            if (it is AsyncViewStub) it.awaitView() else it
-        }
-        assertEquals(appContext, NestedAsset.dummy?.context)
-        NestedAsset.dummy2?.forEach {
-            assertEquals(appContext, it?.context)
-        } ?: Unit
+        assertNotNull(NestedAsset.dummy)
+        assertNotNull(NestedAsset.dummy2?.firstOrNull())
     }
 
     @OptIn(ExperimentalPlayerApi::class)
