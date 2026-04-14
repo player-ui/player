@@ -100,13 +100,15 @@ class ErrorControllerTests: XCTestCase {
         let capturedErrorValue = errorController.getCurrentError()
         
         // Convert JSValue to PlayerErrorInfo
-        if let jsValue = capturedErrorValue {
-            let capturedError = JSValueError.createInstance(value: jsValue)
-            XCTAssertEqual(capturedError.message, "Error")
-            XCTAssertEqual(capturedError.type, ErrorTypes.network)
-            XCTAssertEqual(capturedError.severity, .error)
-            XCTAssertNotNil(capturedError.metadata)
+        guard let jsValue = capturedErrorValue else {
+            return XCTFail("No error captured")
         }
+        
+        let capturedError = JSValueError.createInstance(value: jsValue)
+        XCTAssertEqual(capturedError.message, "Error")
+        XCTAssertEqual(capturedError.type, ErrorTypes.network)
+        XCTAssertEqual(capturedError.severity, .error)
+        XCTAssertNotNil(capturedError.metadata)
     }
     
     func testCaptureErrorWithMinimalParameters() {
@@ -126,13 +128,15 @@ class ErrorControllerTests: XCTestCase {
         let capturedErrorValue = errorController.getCurrentError()
         
         // Convert JSValue to PlayerErrorInfo
-        if let jsValue = capturedErrorValue {
-            let capturedError = JSValueError.createInstance(value: jsValue)
-            XCTAssertEqual(capturedError.message, "Error")
-            XCTAssertEqual(capturedError.type, ErrorTypes.plugin)
-            XCTAssertNil(capturedError.severity)
-            XCTAssertNil(capturedError.metadata)
+        guard let jsValue = capturedErrorValue else {
+            return XCTFail("No error captured")
         }
+        
+        let capturedError = JSValueError.createInstance(value: jsValue)
+        XCTAssertEqual(capturedError.message, "Error")
+        XCTAssertEqual(capturedError.type, ErrorTypes.plugin)
+        XCTAssertNil(capturedError.severity)
+        XCTAssertNil(capturedError.metadata)
     }
     
     func testCaptureMultipleErrorsAndCurrentErrorUpdates() {
@@ -148,9 +152,11 @@ class ErrorControllerTests: XCTestCase {
         )
         
         // Verify current error is the first one
-        if let firstErrorValue = errorController.getCurrentError(), !firstErrorValue.isUndefined {
-            XCTAssertEqual(JSValueError.createInstance(value: firstErrorValue).message, "First Error")
+        guard let firstErrorValue = errorController.getCurrentError(), !firstErrorValue.isUndefined else {
+            return XCTFail("First error not found")
         }
+        
+        XCTAssertEqual(JSValueError.createInstance(value: firstErrorValue).message, "First Error")
         
         // Capture second error
         errorController.captureError(
@@ -158,9 +164,11 @@ class ErrorControllerTests: XCTestCase {
         )
         
         // Current error should be updated to the second one
-        if let secondErrorValue = errorController.getCurrentError(), !secondErrorValue.isUndefined {
-            XCTAssertEqual(JSValueError.createInstance(value: secondErrorValue).message, "Second Error")
+        guard let secondErrorValue = errorController.getCurrentError(), !secondErrorValue.isUndefined else {
+            return XCTFail("Second error not found")
         }
+        
+        XCTAssertEqual(JSValueError.createInstance(value: secondErrorValue).message, "Second Error")
         
         // Capture third error
         errorController.captureError(
@@ -168,9 +176,11 @@ class ErrorControllerTests: XCTestCase {
         )
         
         // Current error should be updated to the third one
-        if let thirdErrorValue = errorController.getCurrentError(), !thirdErrorValue.isUndefined {
-            XCTAssertEqual(JSValueError.createInstance(value: thirdErrorValue).message, "Third Error")
+        guard let thirdErrorValue = errorController.getCurrentError(), !thirdErrorValue.isUndefined else {
+            return XCTFail("Third error not found")
         }
+        
+        XCTAssertEqual(JSValueError.createInstance(value: thirdErrorValue).message, "Third Error")
         
         // Get all errors and verify history
         guard let errorsValue = errorController.getErrors(),

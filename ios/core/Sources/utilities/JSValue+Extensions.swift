@@ -28,13 +28,13 @@ extension JSValue {
                (fn, args) => {
                    try {
                        return {
-                           \(TryCatchResultKeys.result): fn(...args),
-                           \(TryCatchResultKeys.success): true
+                           \(TryCatchResultKeys.result.rawValue): fn(...args),
+                           \(TryCatchResultKeys.success.rawValue): true
                        }
                    } catch(error) {
                        return {
-                           \(TryCatchResultKeys.result): error,
-                           \(TryCatchResultKeys.success): false
+                           \(TryCatchResultKeys.result.rawValue): error,
+                           \(TryCatchResultKeys.success.rawValue): false
                        }
                    }
                }
@@ -43,8 +43,8 @@ extension JSValue {
         
         let result = tryCatchWrapper?.call(withArguments: [self, args])
         guard
-            let success = result?.objectForKeyedSubscript(TryCatchResultKeys.success)?.toBool(),
-            let resultValue = result?.objectForKeyedSubscript(TryCatchResultKeys.result)
+            let success = result?.objectForKeyedSubscript(TryCatchResultKeys.success.rawValue)?.toBool(),
+            let resultValue = result?.objectForKeyedSubscript(TryCatchResultKeys.result.rawValue)
         else {
             throw PlayerError.jsConversionFailure
         }
@@ -89,20 +89,20 @@ public struct JSValueError: Error, CreatedFromJSValue {
             return
         }
         
-        if let messageProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.message), messageProperty.isString == true {
+        if let messageProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.message.rawValue), messageProperty.isString == true {
             message = messageProperty.toString()
         } else {
             message = JSValueError.DEFAULT_MESSAGE
         }
         
-        if let typeProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.type), typeProperty.isString == true {
+        if let typeProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.type.rawValue), typeProperty.isString == true {
             type = typeProperty.toString()
         } else {
             type = JSValueError.DEFAULT_TYPE
         }
         
-        severity = ErrorSeverity(rawValue: jsErrorObject.objectForKeyedSubscript(JSKeys.severity)?.toString() ?? "")
-        metadata = jsErrorObject.objectForKeyedSubscript(JSKeys.metadata)?.toDictionary() as? [String: Any]
+        severity = ErrorSeverity(rawValue: jsErrorObject.objectForKeyedSubscript(JSKeys.severity.rawValue)?.toString() ?? "")
+        metadata = jsErrorObject.objectForKeyedSubscript(JSKeys.metadata.rawValue)?.toDictionary() as? [String: Any]
     }
 }
 
