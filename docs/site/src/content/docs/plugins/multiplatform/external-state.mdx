@@ -1,0 +1,160 @@
+---
+title: External State
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import SPM from "../../../../components/SPM.astro";
+import { PackageManagers } from "starlight-package-managers";
+
+The External State Plugin is an easy way to handle `EXTERNAL` states from the navigation
+of a Player flow.
+
+You provide an array of handlers, each specifying a `ref` to match against, an optional
+`match` object for additional properties, and a `handlerFunction` to run. When Player
+transitions to an `EXTERNAL` state, the plugin finds the best matching handler and calls
+it with the state and the player controllers.
+
+For react, the handler should return the transition to take. For mobile, the handler is 
+passed a callback to trigger the next transition.
+
+:::note[Handler Matching]
+Handlers are matched using the
+[Partial Match Registry](/plugins/multiplatform/partial-match-fingerprint/#partial-match-registry).
+More specific handlers (those with more matching properties) take precedence over less
+specific ones. See the registry documentation for full details on fuzzy matching and
+specificity.
+:::
+
+To register additional handlers after a plugin instance has been created, add a new
+`ExternalStatePlugin` instance to the Player.
+
+## Example flow
+
+An `EXTERNAL` state in a Player flow looks like this:
+
+```json
+{
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "my-action",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        }
+      },
+      "END_FWD": { "state_type": "END", "outcome": "FWD" },
+      "END_BCK": { "state_type": "END", "outcome": "BCK" }
+    }
+  }
+}
+```
+
+## Specificity
+
+You can register multiple handlers for the same `ref`. The most specific match wins:
+
+```typescript
+new ExternalStatePlugin([
+  // Matches any state with ref: 'my-action'
+  { ref: "my-action", handlerFunction: () => "default" },
+
+  // Takes precedence when type: 'special' is also present on the state
+  {
+    ref: "my-action",
+    match: { type: "special" },
+    handlerFunction: () => "special",
+  },
+]);
+```
+
+## Installation
+
+<PlatformTabs>
+  <Fragment slot="core">
+    <PackageManagers pkg="@player-ui/external-state-plugin" />
+  </Fragment>
+  <Fragment slot="ios">
+    <SPM product="ExternalStatePlugin" />
+  </Fragment>
+  <Fragment slot="android">
+
+```kotlin
+implementation("com.intuit.playerui.plugins:external-state:$PLAYER_VERSION")
+```
+
+  </Fragment>
+</PlatformTabs>
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot="core">
+
+```typescript
+import { ExternalStatePlugin } from "@player-ui/external-state-plugin";
+import { Player } from "@player-ui/player";
+
+const player = new Player({
+  plugins: [
+    new ExternalStatePlugin([
+      {
+        ref: "my-action",
+        handlerFunction: async (state, options) => {
+          // options.data and options.expression are available here
+          return "Next";
+        },
+      },
+    ]),
+  ],
+});
+```
+
+  </Fragment>
+  <Fragment slot="ios">
+
+```swift
+let plugin = ExternalStatePlugin(handlers: [
+  ExternalStateHandler(ref: "my-action") { state, options, transition in
+    // options.data and options.expression are available here
+    // Extra state properties are accessible via @dynamicMemberLookup:
+    let extraProperty: String? = state.extraProperty
+    transition("Next")
+  }
+])
+
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [plugin],
+    result: $resultBinding
+  )
+}
+```
+
+For SwiftUI flows that need to present native UI during an external state, see
+[External State View Modifier](/plugins/ios/external-state-view-modifier).
+
+  </Fragment>
+  <Fragment slot="android">
+
+```kotlin
+import com.intuit.playerui.plugins.externalState.ExternalStatePlugin
+
+val player = AndroidPlayer(
+  ExternalStatePlugin(
+    ExternalStateHandler(ref = "my-action") { state, options, transition ->
+      // options.data and options.expression are available here
+      transition("Next")
+    }
+  )
+)
+```
+
+[ExternalStatePlugin API source](https://github.com/player-ui/player/blob/main/plugins/external-state/jvm/src/main/kotlin/com/intuit/playerui/plugins/externalState/ExternalStatePlugin.kt)
+
+  </Fragment>
+</PlatformTabs>

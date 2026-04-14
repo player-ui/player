@@ -1,4 +1,4 @@
-import { test, expect, beforeEach } from "vitest";
+import { test, expect, beforeEach, vi } from "vitest";
 
 import { Registry } from "..";
 
@@ -96,4 +96,39 @@ test("replacement only replaces exact matches, not fuzzy matches", () => {
 
   // The exact match should still exist
   expect(registry.get({ foo: "bar" })).toBe("new-exact-match");
+});
+
+test("logs debug message when initialSet has duplicate keys", () => {
+  const mockDebug = vi.fn();
+  const logger = { debug: mockDebug };
+
+  // Create registry with duplicate keys in initialSet
+  const registryWithDuplicates = new Registry<string>(
+    [
+      [{ type: "action" }, "first-value"],
+      [{ type: "action" }, "second-value"], // Duplicate - should trigger log
+      [{ type: "other" }, "other-value"],
+      [{ type: "action" }, "third-value"], // Another duplicate - should trigger log again
+    ],
+    logger,
+  );
+
+  // Should have logged twice for the two replacements
+  expect(mockDebug).toHaveBeenCalledTimes(2);
+
+  // Verify the log messages
+  expect(mockDebug).toHaveBeenNthCalledWith(
+    1,
+    "Registry: Replacing existing entry for key ",
+    { type: "action" },
+  );
+  expect(mockDebug).toHaveBeenNthCalledWith(
+    2,
+    "Registry: Replacing existing entry for key ",
+    { type: "action" },
+  );
+
+  // Verify the final value is the last one set
+  expect(registryWithDuplicates.get({ type: "action" })).toBe("third-value");
+  expect(registryWithDuplicates.get({ type: "other" })).toBe("other-value");
 });

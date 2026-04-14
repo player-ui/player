@@ -9,7 +9,7 @@ import PlayerUIBeaconPlugin
 import PlayerUICommonExpressionsPlugin
 import PlayerUICommonTypesPlugin
 import PlayerUIExpressionPlugin
-import PlayerUIExternalActionPlugin
+import PlayerUIExternalStatePlugin
 import PlayerUIMetricsPlugin
 import PlayerUIPrintLoggerPlugin
 import PlayerUIPubSubPlugin
@@ -38,27 +38,35 @@ struct MainView: View {
         }
     }
 
-    let plugins: [NativePlugin] = [
-        PrintLoggerPlugin(level: .trace),
-        ReferenceAssetsPlugin(),
-        CommonTypesPlugin(),
-        ExpressionPlugin(),
-        CommonExpressionsPlugin(),
-        ExternalActionPlugin(handler: { _, _, _ in
-            print("external state")
-        }),
-        MetricsPlugin { timing, render, flow in
-            print(timing as Any)
-            print(render as Any)
-            print(flow as Any)
-        },
-        RequestTimePlugin { 5 },
-        PubSubPlugin([]),
-        TypesProviderPlugin(types: [], validators: [], formats: []),
-        TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
-    ]
+    private var plugins: [NativePlugin] {
+        [
+            PrintLoggerPlugin(level: .trace),
+            ReferenceAssetsPlugin(),
+            CommonTypesPlugin(),
+            ExpressionPlugin(),
+            CommonExpressionsPlugin(),
+            MetricsPlugin { timing, render, flow in
+                print(timing as Any)
+                print(render as Any)
+                print(flow as Any)
+            },
+            RequestTimePlugin { 5 },
+            PubSubPlugin([]),
+            TypesProviderPlugin(types: [], validators: [], formats: []),
+            TransitionPlugin(popTransition: .pop),
+            BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+            SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
+            ExternalStatePlugin(handlers: [
+                ExternalStateHandler(
+                    ref: "test-1",
+                    handlerFunction: { _, _, _ in
+                        print("MainView External State triggered")
+                    }
+                )
+            ])
+        ]
+    }
+
     var body: some View {
         SegmentControlView(
             plugins: plugins,
