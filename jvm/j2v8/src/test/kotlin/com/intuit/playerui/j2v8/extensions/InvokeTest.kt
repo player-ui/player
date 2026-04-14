@@ -42,7 +42,7 @@ internal class InvokeTest : J2V8Test() {
             val invokable = func.toInvokable(format, v8Object, ListSerializer(TestSerializableClass.serializer()))
 
             assertNotNull(invokable)
-            assertEquals(arrayListOf(TestSerializableClass("testValue")), invokable.invoke())
+            assertEquals(listOf(TestSerializableClass("testValue")), invokable.invoke())
         }
     }
 

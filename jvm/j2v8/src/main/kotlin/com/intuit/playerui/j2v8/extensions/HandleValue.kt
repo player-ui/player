@@ -18,14 +18,14 @@ import com.intuit.playerui.j2v8.v8Array
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.ArraySerializer
 
-internal fun <R> Any?.handleValue(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<R>?): Any? =
+internal fun Any?.handleValue(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? =
     when (this) {
         is V8Primitive -> value
         is V8Value -> transform(format, deserializationStrategy)
         else -> this
     }
 
-private fun <R> V8Value.transform(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<R>?): Any? =
+private fun V8Value.transform(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>?): Any? =
     evaluateInJSThreadIfDefinedBlocking(format.runtime) {
         when (this) {
             V8.getUndefined() -> null
@@ -36,8 +36,6 @@ private fun <R> V8Value.transform(format: RuntimeFormat<V8Value>, deserializatio
             else -> null
         }
     }
-
-internal fun Any?.handleValue(format: RuntimeFormat<V8Value>): Any? = handleValue<Any>(format, null)
 
 internal fun V8Array.toList(format: RuntimeFormat<V8Value>): List<Any?>? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     keys.map(::get).map { it.handleValue(format) }
