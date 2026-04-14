@@ -31,7 +31,7 @@ class JSValueExtensionsTests: XCTestCase {
                 return
             }
             
-            XCTAssertFalse(jsValueError.hasMetadata)
+            XCTAssertFalse(jsValueError.isErrorWithMetadata)
             XCTAssertEqual(jsValueError.message, "Fail")
         })
     }
@@ -63,7 +63,7 @@ class JSValueExtensionsTests: XCTestCase {
             XCTAssertEqual(jsValueError.severity, ErrorSeverity.error)
             XCTAssertNotNil(jsValueError.metadata)
             XCTAssertEqual(jsValueError.metadata?["property"] as? String, "value")
-            XCTAssertTrue(jsValueError.hasMetadata)
+            XCTAssertTrue(jsValueError.isErrorWithMetadata)
         })
     }
     
@@ -86,7 +86,7 @@ class JSValueExtensionsTests: XCTestCase {
             XCTAssertTrue(jsValueError.originalJSError.isBoolean)
             XCTAssertFalse(jsValueError.originalJSError.toBool())
             XCTAssertEqual(jsValueError.message, "Unknown JS Error")
-            XCTAssertFalse(jsValueError.hasMetadata)
+            XCTAssertFalse(jsValueError.isErrorWithMetadata)
         })
     }
 
@@ -124,7 +124,7 @@ class JSValueExtensionsTests: XCTestCase {
                             }
                             
                             XCTAssertEqual(jsValueError.message, "Transitioning while ongoing transition from VIEW_1 is in progress is not supported")
-                            XCTAssertFalse(jsValueError.hasMetadata)
+                            XCTAssertFalse(jsValueError.isErrorWithMetadata)
                             expectation.fulfill()
                         }
 

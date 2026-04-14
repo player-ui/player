@@ -18,7 +18,6 @@ private struct ErrorWithAnyMetadata: Error, ErrorWithMetadata, JSConvertibleErro
     public var severity: ErrorSeverity?
     public var metadata: [String : Any]?
     
-    public let hasMetadata: Bool = true
     public var jsDescription: String { get { message } }
 }
 
