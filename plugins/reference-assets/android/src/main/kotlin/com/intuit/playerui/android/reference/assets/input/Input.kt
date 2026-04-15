@@ -5,7 +5,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.GenericAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 
 class Input(
     assetContext: AssetContext,
-) : SuspendableAsset<Input.Data>(assetContext, Data.serializer()) {
+) : RenderableAsset<Input.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Validation(
         val message: String,

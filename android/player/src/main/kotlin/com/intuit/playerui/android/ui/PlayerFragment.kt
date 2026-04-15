@@ -16,7 +16,6 @@ import androidx.lifecycle.whenStarted
 import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
@@ -160,7 +159,7 @@ public abstract class PlayerFragment :
         val startTime = System.currentTimeMillis()
         val view = asset?.render(requireContext())?.let {
             // unwrap if we know we have an async view stub, and just wait on the actual view
-            if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
+            if (it is RenderableAsset.AsyncViewStub) it.awaitView() else it
         }
 
         view?.doOnLayout {
@@ -190,7 +189,7 @@ public abstract class PlayerFragment :
         renderingJob = lifecycleScope.launch {
             whenStarted {
                 // TODO: This'll go away when we can call a suspend version of this
-                withContext(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
+                withContext(Dispatchers.Default) {
                     try {
                         renderIntoPlayerCanvas(asset, animateTransition)
                     } catch (exception: Exception) {

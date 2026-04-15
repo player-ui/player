@@ -27,9 +27,9 @@ class AssetContextAndroidTest {
     private val assetMap = mapOf("id" to "first", "type" to "rando")
 
     private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset<Unit>(assetContext, serializer()) {
-        override fun initView() = TextView(context)
+        override suspend fun initView(data: Unit) = TextView(context)
 
-        override fun View.hydrate() = Unit
+        override suspend fun View.hydrate(data: Unit) = Unit
     }
 
     private val assetContext by lazy {

@@ -29,12 +29,12 @@ internal class ThrowingAsset(
         Linear,
     }
 
-    override fun initView() = when (data.layout) {
+    override suspend fun initView(data: Data) = when (data.layout) {
         Layout.Frame -> FrameLayout(requireContext())
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override fun View.hydrate() = throw Exception("Throwing during render")
+    override suspend fun View.hydrate(data: Data) = throw Exception("Throwing during render")
 
     companion object {
         val sampleMap = mapOf(

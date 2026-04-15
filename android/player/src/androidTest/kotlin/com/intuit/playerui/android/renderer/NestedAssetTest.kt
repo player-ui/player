@@ -4,7 +4,7 @@ import android.widget.LinearLayout
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.SuspendableAsset.AsyncViewStub
+import com.intuit.playerui.android.asset.RenderableAsset.AsyncViewStub
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.NestedAsset
 import com.intuit.playerui.android.utils.SimpleAsset

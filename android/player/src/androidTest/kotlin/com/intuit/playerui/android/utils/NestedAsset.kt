@@ -5,7 +5,6 @@ import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -17,7 +16,7 @@ import kotlinx.serialization.json.Json
 
 internal class NestedAsset(
     assetContext: AssetContext,
-) : SuspendableAsset<NestedAsset.Data>(assetContext, Data.serializer()) {
+) : RenderableAsset<NestedAsset.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         val nested: GenericAsset? = null,

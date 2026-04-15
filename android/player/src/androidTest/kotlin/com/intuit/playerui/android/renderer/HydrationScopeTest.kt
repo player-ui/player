@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -37,7 +37,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
 
     inner class TestAsset(
         assetContext: AssetContext,
-    ) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
+    ) : RenderableAsset<Node>(assetContext, NodeSerializer()) {
         override suspend fun initView(data: Node): View = TextView(context)
 
         override suspend fun View.hydrate(data: Node) {
@@ -76,7 +76,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test awaiting async view stub doesn't cancel parent scope`() = runBlocking {
         val test = TestAsset(assetContext)
-        val asyncView = test.render(appContext) as SuspendableAsset.AsyncViewStub
+        val asyncView = test.render(appContext) as RenderableAsset.AsyncViewStub
         test.currentHydrationScope.cancel("hello")
         assertNull(asyncView.awaitView())
     }
@@ -84,7 +84,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test hydration scope can launch coroutines`() = runBlocking {
         val test = TestAsset(assetContext)
-        val asyncView = test.render(appContext) as SuspendableAsset.AsyncViewStub
+        val asyncView = test.render(appContext) as RenderableAsset.AsyncViewStub
         asyncView.awaitView()
         waitForCompleted()
     }

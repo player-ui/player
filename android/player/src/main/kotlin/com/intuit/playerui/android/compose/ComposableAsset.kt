@@ -19,7 +19,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
@@ -40,7 +39,7 @@ import kotlinx.serialization.KSerializer
 public abstract class ComposableAsset<Data>(
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
-) : SuspendableAsset<Data>(assetContext, serializer) {
+) : RenderableAsset<Data>(assetContext, serializer) {
     override suspend fun initView(data: Data): View = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }

@@ -2,7 +2,6 @@ package com.intuit.playerui.android.testutils.asset
 
 import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import kotlinx.coroutines.delay
@@ -22,7 +21,7 @@ public inline fun <reified T : RenderableAsset<*>> Any?.shouldBeAsset(block: T.(
 
 @OptIn(ExperimentalContracts::class)
 public inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit = {}): T {
-    val view = if (T::class != SuspendableAsset.AsyncViewStub::class && this is SuspendableAsset.AsyncViewStub) {
+    val view = if (T::class != RenderableAsset.AsyncViewStub::class && this is RenderableAsset.AsyncViewStub) {
         runBlocking {
             awaitView()
         }
