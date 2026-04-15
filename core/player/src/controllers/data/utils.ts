@@ -8,9 +8,7 @@ import type {
 } from "../../data";
 
 /** Wrapper for the Data Controller Class that prevents writes */
-export class ReadOnlyDataController
-  implements DataModelWithParser<DataModelOptions>
-{
+export class ReadOnlyDataController implements DataModelWithParser<DataModelOptions> {
   private controller: DataController;
   private logger?: Logger;
 
