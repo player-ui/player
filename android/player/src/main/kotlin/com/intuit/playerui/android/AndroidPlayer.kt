@@ -306,8 +306,6 @@ public class AndroidPlayer private constructor(
         player.registerPlugin(plugin)
         if (plugin is AndroidPlayerPlugin) {
             plugin.apply(this)
-        } else {
-            player.registerPlugin(plugin)
         }
     }
 
