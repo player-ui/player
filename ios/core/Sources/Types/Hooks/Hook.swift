@@ -84,7 +84,7 @@ public class Hook<T>: BaseJSHook where T: CreatedFromJSValue {
 /**
  This class represents a JS Hook with the ability to return a result. This can work for a Waterfall or Bail hook.
  */
-public class HookWithResult<T, R>: BaseJSHook where T: CreatedFromJSValue, R: Encodable {
+public class HookWithResult<T, R>: BaseJSHook where T: CreatedFromJSValue {
     /**
      Attach a closure to the hook, so when the hook is fired in the JS runtime
      we receive the event in the native runtime and can return a value to bail
