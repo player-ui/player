@@ -10,7 +10,7 @@ import JavaScriptCore
 
 extension JSValue {
     
-    internal enum TryCatchResultKeys {
+    internal struct TryCatchResultKeys {
         static let success = "success"
         static let result = "result"
     }
@@ -62,8 +62,8 @@ extension JSValue {
  Represents the different errors that occur when evaluating JSValue
  */
 public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
-    private static let DEFAULT_MESSAGE: String  = "Unknown JS Error"
-    private static let DEFAULT_TYPE: String  = ""
+    private static let defaultMessage: String  = "Unknown JS Error"
+    private static let defaultType: String  = ""
     
     public let message: String
     public let type: String
@@ -75,7 +75,7 @@ public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
     
     public let originalJSError: JSValue
     
-    internal enum JSKeys {
+    internal struct JSKeys {
         static let message = "message"
         static let type = "type"
         static let severity = "severity"
@@ -88,9 +88,9 @@ public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
     
     public init(_ jsErrorObject: JSValue) {
         originalJSError = jsErrorObject
-        if !jsErrorObject.isInstance(of: jsErrorObject.context.getJSClass(.Error)) {
-            message = JSValueError.DEFAULT_MESSAGE
-            type = JSValueError.DEFAULT_TYPE
+        if !jsErrorObject.isInstance(of: jsErrorObject.context.getJSClass(.error)) {
+            message = JSValueError.defaultMessage
+            type = JSValueError.defaultType
             severity = nil
             metadata = nil
             isErrorWithMetadata = false
@@ -100,7 +100,7 @@ public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
         if let messageProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.message), messageProperty.isString == true {
             message = messageProperty.toString()
         } else {
-            message = JSValueError.DEFAULT_MESSAGE
+            message = JSValueError.defaultMessage
         }
         
         if let typeProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.type), typeProperty.isString == true {
@@ -108,7 +108,7 @@ public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
             type = typeProperty.toString()
         } else {
             isErrorWithMetadata = false
-            type = JSValueError.DEFAULT_TYPE
+            type = JSValueError.defaultType
         }
         
         severity = ErrorSeverity(rawValue: jsErrorObject.objectForKeyedSubscript(JSKeys.severity)?.toString() ?? "")

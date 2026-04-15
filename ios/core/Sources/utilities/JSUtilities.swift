@@ -55,15 +55,15 @@ public class JSUtilities {
         }
         guard
             let closure = JSValue(object: constructor, in: context),
-            let promise = context.constructClass(.Promise, withArguments: [closure])
+            let promise = context.constructClass(.promise, withArguments: [closure])
         else { return nil }
         return promise
     }
 }
 
 internal enum JSClass: String {
-    case Error
-    case Promise
+    case error = "Error"
+    case promise = "Promise"
 }
 
 internal extension JSContext {
@@ -80,7 +80,7 @@ internal extension JSContext {
             return jsValueError.originalJSError
         }
         
-        let errObj = constructClass(.Error, withArguments: [error.jsDescription])
+        let errObj = constructClass(.error, withArguments: [error.jsDescription])
         if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj {
             err.setValue(errorWithMetadata.type, forProperty: JSValueError.JSKeys.type)
             err.setValue(errorWithMetadata.severity?.rawValue, forProperty: JSValueError.JSKeys.severity)
