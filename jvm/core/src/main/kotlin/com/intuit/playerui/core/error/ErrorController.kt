@@ -7,21 +7,26 @@ import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 /** Severity levels for errors */
+@Serializable
 public enum class ErrorSeverity(
     public val value: String,
 ) {
     /** Cannot continue, flow must end */
+    @SerialName("fatal")
     FATAL("fatal"),
 
     /** Standard error, may allow recovery */
+    @SerialName("error")
     ERROR("error"),
 
     /** Non-blocking, logged for telemetry */
+    @SerialName("warning")
     WARNING("warning"),
 }
 
@@ -37,38 +42,7 @@ public object ErrorTypes {
     public const val SCHEMA: String = "schema"
     public const val NETWORK: String = "network"
     public const val PLUGIN: String = "plugin"
-}
-
-/**
- * Represents a Player error with metadata
- */
-@Serializable(with = PlayerErrorInfo.Serializer::class)
-public class PlayerErrorInfo internal constructor(
-    override val node: Node,
-) : NodeWrapper {
-    /** Nested error object containing message and name */
-    private val error: Node? by NodeSerializableField(Node.serializer().nullable)
-
-    /** The error message */
-    public val message: String
-        get() = error?.getString("message") ?: ""
-
-    /** The error name */
-    public val name: String
-        get() = error?.getString("name") ?: ""
-
-    /** Error category */
-    public val errorType: String by NodeSerializableField(String.serializer()) { "" }
-
-    /** Impact level */
-    public val severity: ErrorSeverity?
-        get() = node.getString("severity")?.let { ErrorSeverity.valueOf(it.uppercase()) }
-
-    /** Additional metadata */
-    public val metadata: Map<String, Any?>?
-        get() = node.getObject("metadata") as? Map<String, Any?>
-
-    internal object Serializer : NodeWrapperSerializer<PlayerErrorInfo>(::PlayerErrorInfo)
+    public const val RENDER: String = "render"
 }
 
 /**
@@ -78,9 +52,9 @@ public class PlayerErrorInfo internal constructor(
 public class ErrorController internal constructor(
     override val node: Node,
 ) : NodeWrapper {
-    private val captureError: Invokable<Node?>? by NodeSerializableFunction()
-    private val getCurrentError: Invokable<Node?>? by NodeSerializableFunction()
-    private val getErrors: Invokable<List<Node>?>? by NodeSerializableFunction()
+    private val captureError: Invokable<Boolean>? by NodeSerializableFunction()
+    private val getCurrentError: Invokable<Throwable?>? by NodeSerializableFunction()
+    private val getErrors: Invokable<List<Throwable>?>? by NodeSerializableFunction()
     private val clearErrors: Invokable<Unit>? by NodeSerializableFunction()
     private val clearCurrentError: Invokable<Unit>? by NodeSerializableFunction()
 
@@ -94,40 +68,19 @@ public class ErrorController internal constructor(
      * @param metadata Additional metadata map
      * @return The captured error as a Node
      */
-    public fun captureError(
-        error: Throwable,
-        errorType: String,
-        severity: ErrorSeverity? = null,
-        metadata: Map<String, Any?>? = null,
-    ): Node? {
-        val errorObj = mapOf(
-            "message" to error.message,
-            "name" to error::class.simpleName,
-        )
-
-        return when {
-            severity != null && metadata != null ->
-                captureError?.invoke(errorObj, errorType, severity.value, metadata)
-            severity != null ->
-                captureError?.invoke(errorObj, errorType, severity.value)
-            metadata != null ->
-                captureError?.invoke(errorObj, errorType, null, metadata)
-            else ->
-                captureError?.invoke(errorObj, errorType)
-        }
-    }
+    public fun captureError(error: Throwable): Boolean? = captureError?.invoke(error)
 
     /**
      * Get the most recent error
      * @return The current error as a Node if one exists
      */
-    public fun getCurrentError(): Node? = getCurrentError?.invoke()
+    public fun getCurrentError(): Throwable? = getCurrentError?.invoke()
 
     /**
      * Get the complete error history
      * @return List of all captured errors in chronological order
      */
-    public fun getErrors(): List<Node>? = getErrors?.invoke()
+    public fun getErrors(): List<Throwable>? = getErrors?.invoke()
 
     /**
      * Clear all errors (history + current + data model)
@@ -153,8 +106,8 @@ public class ErrorController internal constructor(
          * - Return true from the callback to bail and prevent error state navigation
          * - Return false/null to continue to next handler
          */
-        public val onError: NodeSyncBailHook1<PlayerErrorInfo, Boolean>
-            by NodeSerializableField(NodeSyncBailHook1.serializer(PlayerErrorInfo.serializer(), Boolean.serializer()))
+        public val onError: NodeSyncBailHook1<Throwable, Boolean>
+            by NodeSerializableField(NodeSyncBailHook1.serializer(ThrowableSerializer(), Boolean.serializer()))
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)
     }

@@ -17,6 +17,7 @@ export const ErrorTypes = {
   SCHEMA: "schema",
   NETWORK: "network",
   PLUGIN: "plugin",
+  RENDER: "render",
 } as const;
 
 /**
@@ -27,13 +28,14 @@ export interface ErrorMetadata {
   [key: string]: unknown;
 }
 
-export interface PlayerError {
-  /** Native Error object */
-  error: Error;
-  /** Error category (use ErrorTypes constants or custom plugin types) */
-  errorType: string;
-  /** Impact level */
+export interface PlayerErrorMetadata<
+  ErrorMetadataType extends ErrorMetadata = ErrorMetadata,
+> {
+  type: string;
   severity?: ErrorSeverity;
-  /** Additional metadata */
-  metadata?: ErrorMetadata;
+  metadata?: ErrorMetadataType;
 }
+
+export type PlayerError<
+  ErrorMetadataType extends ErrorMetadata = ErrorMetadata,
+> = Error & PlayerErrorMetadata<ErrorMetadataType>;

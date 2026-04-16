@@ -607,6 +607,9 @@ importers:
       '@player-ui/check-path-plugin':
         specifier: workspace:*
         version: link:../../check-path/core
+      '@player-ui/expression-plugin':
+        specifier: workspace:*
+        version: link:../../expression/core
       '@player-ui/partial-match-registry':
         specifier: workspace:*
         version: link:../../../core/partial-match-registry

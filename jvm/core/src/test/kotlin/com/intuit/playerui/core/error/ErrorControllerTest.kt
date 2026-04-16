@@ -1,5 +1,6 @@
 package com.intuit.playerui.core.error
 
+import com.intuit.playerui.core.player.PlayerExceptionMetadata
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
@@ -7,12 +8,19 @@ import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
+
+private class ExceptionWithAnyMetadata(
+    message: String,
+    override val type: String,
+    override val severity: ErrorSeverity? = null,
+    override val metadata: Map<String, Any?>? = null,
+) : Throwable(message),
+    PlayerExceptionMetadata
 
 internal class ErrorControllerTest : PlayerTest() {
     override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), CommonTypesPlugin())
@@ -73,36 +81,42 @@ internal class ErrorControllerTest : PlayerTest() {
 
     @TestTemplate
     fun `capture error with all parameters`() {
-        val testError = Exception("Not found")
-        val capturedError = errorController.captureError(
-            testError,
+        val testError = ExceptionWithAnyMetadata(
+            "Not found",
             ErrorTypes.NETWORK,
             ErrorSeverity.ERROR,
-            mapOf("url" to "https://example.com", "statusCode" to 404),
+            mapOf(
+                "url" to "https://example.com",
+                "statusCode" to 404,
+            ),
         )
+        val result = errorController.captureError(testError)
+
+        assertEquals(result, false)
+
+        val capturedError = errorController.getCurrentError()
 
         assertNotNull(capturedError)
-
-        val errorInfo = capturedError?.let { PlayerErrorInfo(it) }
-        assertEquals("Not found", errorInfo?.message)
-        assertEquals(ErrorTypes.NETWORK, errorInfo?.errorType)
+        val errorInfo = capturedError?.let { it as PlayerExceptionMetadata }
+        assertEquals("Not found", capturedError?.message)
+        assertEquals(ErrorTypes.NETWORK, errorInfo?.type)
         assertEquals(ErrorSeverity.ERROR, errorInfo?.severity)
         assertNotNull(errorInfo?.metadata)
     }
 
     @TestTemplate
     fun `capture error with minimal parameters`() {
-        val testError = Exception("Internal error")
-        val capturedError = errorController.captureError(
-            testError,
-            ErrorTypes.PLUGIN,
-        )
+        val testError = ExceptionWithAnyMetadata("Internal error", ErrorTypes.PLUGIN)
+        val result = errorController.captureError(testError)
+
+        assertEquals(result, false)
+
+        val capturedError = errorController.getCurrentError()
 
         assertNotNull(capturedError)
-
-        val errorInfo = capturedError?.let { PlayerErrorInfo(it) }
-        assertEquals("Internal error", errorInfo?.message)
-        assertEquals(ErrorTypes.PLUGIN, errorInfo?.errorType)
+        val errorInfo = capturedError?.let { it as PlayerExceptionMetadata }
+        assertEquals("Internal error", capturedError?.message)
+        assertEquals(ErrorTypes.PLUGIN, errorInfo?.type)
         assertNull(errorInfo?.severity)
     }
 
@@ -110,46 +124,47 @@ internal class ErrorControllerTest : PlayerTest() {
     fun `capture multiple errors with chronological history and current error updates`() {
         // Capture first error
         errorController.captureError(
-            Exception("First error"),
-            ErrorTypes.VALIDATION,
-            ErrorSeverity.WARNING,
+            ExceptionWithAnyMetadata("First error", ErrorTypes.VALIDATION, ErrorSeverity.WARNING),
         )
 
         // Verify current error is the first one
         var currentError = errorController.getCurrentError()
-        assertEquals("First error", currentError?.let { PlayerErrorInfo(it).message })
+        assertEquals("First error", currentError?.message)
 
         // Capture second error
         errorController.captureError(
-            Exception("Second error"),
-            ErrorTypes.BINDING,
-            ErrorSeverity.ERROR,
+            ExceptionWithAnyMetadata(
+                "Second error",
+                ErrorTypes.BINDING,
+                ErrorSeverity.ERROR,
+            ),
         )
 
         // Current error should be updated to the second one
         currentError = errorController.getCurrentError()
-        assertEquals("Second error", currentError?.let { PlayerErrorInfo(it).message })
+        assertEquals("Second error", currentError?.message)
 
         // Capture third error
         errorController.captureError(
-            Exception("Third error"),
-            ErrorTypes.VIEW,
-            ErrorSeverity.FATAL,
+            ExceptionWithAnyMetadata(
+                "Third error",
+                ErrorTypes.VIEW,
+                ErrorSeverity.FATAL,
+            ),
         )
 
         // Current error should be updated to the third one
         currentError = errorController.getCurrentError()
-        assertEquals("Third error", currentError?.let { PlayerErrorInfo(it).message })
+        assertEquals("Third error", currentError?.message)
 
         // Verify all errors are in chronological order
         val errors = errorController.getErrors()
         assertNotNull(errors)
         assertEquals(3, errors?.size)
 
-        val errorInfos = errors?.map { PlayerErrorInfo(it) }
-        assertEquals("First error", errorInfos?.get(0)?.message)
-        assertEquals("Second error", errorInfos?.get(1)?.message)
-        assertEquals("Third error", errorInfos?.get(2)?.message)
+        assertEquals("First error", errors?.get(0)?.message)
+        assertEquals("Second error", errors?.get(1)?.message)
+        assertEquals("Third error", errors?.get(2)?.message)
     }
 
     @TestTemplate
@@ -160,31 +175,36 @@ internal class ErrorControllerTest : PlayerTest() {
 
         // Capture an error
         errorController.captureError(
-            Exception("Current error"),
-            ErrorTypes.DATA,
-            ErrorSeverity.ERROR,
+            ExceptionWithAnyMetadata(
+                "Current error",
+                ErrorTypes.DATA,
+                ErrorSeverity.ERROR,
+            ),
         )
 
         // Now should have a current error
         val currentError = errorController.getCurrentError()
         assertNotNull(currentError)
-        assertFalse(currentError!!.isUndefined())
 
-        val errorInfo = PlayerErrorInfo(currentError)
-        assertEquals("Current error", errorInfo.message)
-        assertEquals(ErrorTypes.DATA, errorInfo.errorType)
+        val errorInfo = currentError as PlayerExceptionMetadata?
+        assertEquals("Current error", currentError?.message)
+        assertEquals(ErrorTypes.DATA, errorInfo?.type)
     }
 
     @TestTemplate
     fun `clear all errors`() {
         // Capture multiple errors
         errorController.captureError(
-            Exception("Error 1"),
-            ErrorTypes.VALIDATION,
+            ExceptionWithAnyMetadata(
+                "Error 1",
+                ErrorTypes.VALIDATION,
+            ),
         )
         errorController.captureError(
-            Exception("Error 2"),
-            ErrorTypes.BINDING,
+            ExceptionWithAnyMetadata(
+                "Error 2",
+                ErrorTypes.BINDING,
+            ),
         )
 
         val errorsBeforeClear = errorController.getErrors()
@@ -192,7 +212,6 @@ internal class ErrorControllerTest : PlayerTest() {
 
         val currentErrorBeforeClear = errorController.getCurrentError()
         assertNotNull(currentErrorBeforeClear)
-        assertFalse(currentErrorBeforeClear!!.isUndefined())
 
         // Clear all errors
         errorController.clearErrors()
@@ -209,12 +228,16 @@ internal class ErrorControllerTest : PlayerTest() {
     fun `clear current error preserves history`() {
         // Capture multiple errors
         errorController.captureError(
-            Exception("Error 1"),
-            ErrorTypes.VALIDATION,
+            ExceptionWithAnyMetadata(
+                "Error 1",
+                ErrorTypes.VALIDATION,
+            ),
         )
         errorController.captureError(
-            Exception("Error 2"),
-            ErrorTypes.BINDING,
+            ExceptionWithAnyMetadata(
+                "Error 2",
+                ErrorTypes.BINDING,
+            ),
         )
 
         val errorsBeforeClear = errorController.getErrors()
@@ -222,7 +245,6 @@ internal class ErrorControllerTest : PlayerTest() {
 
         val currentErrorBeforeClear = errorController.getCurrentError()
         assertNotNull(currentErrorBeforeClear)
-        assertFalse(currentErrorBeforeClear!!.isUndefined())
 
         // Clear only current error
         errorController.clearCurrentError()

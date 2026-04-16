@@ -55,15 +55,41 @@ public class JSUtilities {
         }
         guard
             let closure = JSValue(object: constructor, in: context),
-            let promise = context.evaluateScript("Promise")?.construct(withArguments: [closure])
+            let promise = context.constructClass(.promise, withArguments: [closure])
         else { return nil }
         return promise
     }
 }
 
+internal enum JSClass: String {
+    case error = "Error"
+    case promise = "Promise"
+}
+
 internal extension JSContext {
+    func getJSClass(_ jsClass: JSClass) -> JSValue {
+        objectForKeyedSubscript(jsClass.rawValue)
+    }
+    func constructClass(_ jsClass: JSClass, withArguments: [Any]?) -> JSValue? {
+        getJSClass(jsClass).construct(withArguments: withArguments)
+    }
+    
     func error<E>(for error: E) -> JSValue? where E: Error, E: JSConvertibleError {
-        objectForKeyedSubscript("Error").construct(withArguments: [error.jsDescription])
+        if let jsValueError = error as? JSValueError {
+            // If the error originated in JS, just return the original object
+            return jsValueError.originalJSError
+        }
+        
+        let errObj = constructClass(.error, withArguments: [error.jsDescription])
+        if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj {
+            err.setValue(errorWithMetadata.type, forProperty: JSValueError.JSKeys.type)
+            err.setValue(errorWithMetadata.severity?.rawValue, forProperty: JSValueError.JSKeys.severity)
+            if let metadata = errorWithMetadata.metadata {
+                err.setValue(metadata, forProperty: JSValueError.JSKeys.metadata)
+            }
+        }
+        
+        return errObj
     }
 }
 
@@ -71,4 +97,10 @@ internal extension JSContext {
 public protocol JSConvertibleError {
     /// The description to use when send to JavaScriptCore
     var jsDescription: String { get }
+}
+
+public protocol ErrorWithMetadata : Error {
+    var type: String { get }
+    var severity: ErrorSeverity? { get }
+    var metadata: [String: Any]? { get }
 }

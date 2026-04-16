@@ -34,68 +34,7 @@ public struct ErrorTypes {
     public static let schema = "schema"
     public static let network = "network"
     public static let plugin = "plugin"
-}
-
-/**
- Represents a Player error with metadata
- */
-public class PlayerErrorInfo: CreatedFromJSValue {
-    /// Typealias for associated type
-    public typealias T = PlayerErrorInfo
-    
-    /// The JSValue that backs this wrapper
-    private let value: JSValue
-    
-    /// The error message
-    public var message: String {
-        value.objectForKeyedSubscript("error")?.objectForKeyedSubscript("message")?.toString() ?? ""
-    }
-    
-    /// The error name
-    public var name: String {
-        value.objectForKeyedSubscript("error")?.objectForKeyedSubscript("name")?.toString() ?? ""
-    }
-    
-    /// Error category
-    public var errorType: String {
-        value.objectForKeyedSubscript("errorType")?.toString() ?? ""
-    }
-    
-    /// Impact level
-    public var severity: ErrorSeverity? {
-        guard let severityString = value.objectForKeyedSubscript("severity")?.toString() else {
-            return nil
-        }
-        return ErrorSeverity(rawValue: severityString)
-    }
-    
-    /// Additional metadata
-    public var metadata: [String: Any]? {
-        guard let metadataValue = value.objectForKeyedSubscript("metadata"),
-              !metadataValue.isUndefined,
-              !metadataValue.isNull else {
-            return nil
-        }
-        return metadataValue.toObject() as? [String: Any]
-    }
-    
-    /**
-     Creates an instance from a JSValue, used for generic construction
-     - parameters:
-        - value: The JSValue to construct from
-     */
-    public static func createInstance(value: JSValue) -> PlayerErrorInfo {
-        return PlayerErrorInfo(value)
-    }
-    
-    /**
-     Construct a PlayerErrorInfo from a JSValue
-     - parameters:
-        - value: The JSValue that is the error object
-     */
-    public init(_ value: JSValue) {
-        self.value = value
-    }
+    public static let render = "render"
 }
 
 /**
@@ -126,7 +65,7 @@ public class ErrorController: CreatedFromJSValue {
     public init(_ value: JSValue) {
         self.value = value
         hooks = ErrorControllerHooks(
-            onError: BailHook<PlayerErrorInfo>(baseValue: value, name: "onError")
+            onError: HookWithResult<JSValueError, Bool>(baseValue: value, name: "onError")
         )
     }
     
@@ -141,30 +80,22 @@ public class ErrorController: CreatedFromJSValue {
      */
     @discardableResult
     public func captureError(
-        error: Error,
-        errorType: String,
-        severity: ErrorSeverity? = nil,
-        metadata: [String: Any]? = nil
-    ) -> JSValue? {
-        var args: [Any] = [
-            [
-                "message": error.localizedDescription,
-                "name": String(describing: type(of: error))
-            ] as [String: Any],
-            errorType
-        ]
+        error: Error
+    ) -> Bool {
+        var args: [Any] = []
         
-        if let severity = severity {
-            args.append(severity.rawValue)
+        if let err = error as? JSConvertibleError & Error {
+            args.append(value.context.error(for: err) as Any)
         } else {
-            args.append(JSValue(undefinedIn: value.context) as Any)
+            args.append(value.context.error(for: PlayerError.unknownResponse(error)) as Any)
         }
         
-        if let metadata = metadata {
-            args.append(metadata)
+        let result = value.invokeMethod("captureError", withArguments: args)
+        if let boolResult = result, boolResult.isBoolean {
+            return boolResult.toBool()
         }
         
-        return value.invokeMethod("captureError", withArguments: args)
+        return false
     }
     
     /**

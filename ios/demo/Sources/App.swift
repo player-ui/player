@@ -94,7 +94,7 @@ extension Result where Success == CompletedState, Failure == PlayerError {
             guard case let .promiseRejected(error) = failure else {
                 return failure.playerDescription
             }
-            return error.error
+            return error.error.message
         }
     }
 }
