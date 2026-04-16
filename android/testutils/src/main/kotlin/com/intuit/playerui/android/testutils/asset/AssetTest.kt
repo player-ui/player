@@ -2,12 +2,9 @@ package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import androidx.core.view.children
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
-import com.intuit.playerui.android.R
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
@@ -22,11 +19,12 @@ import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow
 import com.intuit.playerui.utils.start
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -64,7 +62,6 @@ public abstract class AssetTest(
     private suspend fun consumeLatestView(timeout: Long = 5_000): View = try {
         withTimeout(timeout) {
             viewChannel.first().apply {
-                awaitCompleteHydration()
                 currentView = takeIf { it != emptyView }
                 viewChannel.resetReplayCache()
             }
@@ -80,10 +77,11 @@ public abstract class AssetTest(
 
             field = value
 
-            field?.let {
-                when (val view = it.render(context)) {
-                    is RenderableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
-                    else -> viewChannel.tryEmit(view)
+            field?.let { asset ->
+                CoroutineScope(Dispatchers.Main).launch {
+                    try {
+                        viewChannel.emit(asset.render(context))
+                    } catch (_: CancellationException) {}
                 }
             }
         }
@@ -149,15 +147,13 @@ public abstract class AssetTest(
         awaitRendered(timeout)
     }
 
-    /** Naive helper for suspending until hydration is complete, resolves async view stubs and recursively awaits all children for hydration */
-    private suspend fun View.awaitCompleteHydration() {
-        if (this is RenderableAsset.AsyncViewStub) {
-            awaitView()?.awaitCompleteHydration()
-            return
-        }
-
-        while (getTag(R.bool.view_hydrated) == false) delay(25)
-
-        if (this is ViewGroup) children.forEach { it.awaitCompleteHydration() }
-    }
+    // TODO: revisit whether awaitCompleteHydration is still needed now that render() is suspend
+    // private suspend fun View.awaitCompleteHydration() {
+    //     if (this is RenderableAsset.AsyncViewStub) {
+    //         awaitView()?.awaitCompleteHydration()
+    //         return
+    //     }
+    //     while (getTag(R.bool.view_hydrated) == false) delay(25)
+    //     if (this is ViewGroup) children.forEach { it.awaitCompleteHydration() }
+    // }
 }

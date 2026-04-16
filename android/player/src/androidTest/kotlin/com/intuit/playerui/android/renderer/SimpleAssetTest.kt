@@ -8,6 +8,7 @@ import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.SimpleAsset.Companion.sampleFlow
 import com.intuit.playerui.android.utils.stringify
 import com.intuit.playerui.android.withContext
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -23,13 +24,13 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with no styles`() {
+    fun `test rendering with no styles`() = runTest {
         val simple = SimpleAsset(assetContext).render(appContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with some styles`() {
+    fun `test rendering with some styles`() = runTest {
         val simple = SimpleAsset(assetContext.withContext(appContext)).run {
             render(R.style.Theme_AppCompat)
         }
@@ -37,7 +38,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with some styles using another render method`() {
+    fun `test rendering with some styles using another render method`() = runTest {
         val simple = SimpleAsset(assetContext.withContext(appContext)).run {
             render(listOf(R.style.Theme_AppCompat))
         }
@@ -45,7 +46,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with some styles and a tag`() {
+    fun `test rendering with some styles and a tag`() = runTest {
         val simple = SimpleAsset(assetContext.withContext(appContext)).run {
             render(R.style.Theme_AppCompat, tag = "tag")
         }
@@ -53,7 +54,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with some styles and a tag using another render method`() {
+    fun `test rendering with some styles and a tag using another render method`() = runTest {
         val simple = SimpleAsset(assetContext.withContext(appContext)).run {
             render(listOf(R.style.Theme_AppCompat), "tag")
         }
@@ -61,7 +62,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with tag`() {
+    fun `test rendering with tag`() = runTest {
         player.start(sampleFlow.stringify())
 
         val asset = SimpleAsset(assetContext.withContext(appContext))

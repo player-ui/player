@@ -11,6 +11,8 @@ import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.plugins.transactions.commitPendingTransaction
 import com.intuit.playerui.plugins.transactions.registerPendingTransaction
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -59,8 +61,9 @@ class Input(
             }
         }.rootView
 
-    override suspend fun View.hydrate(data: Data) {
-        data.label?.render(Text.Styles.Label) into findViewById(R.id.input_label_container)
+    override suspend fun View.hydrate(data: Data) = coroutineScope {
+        val label = async { data.label?.render(Text.Styles.Label) }
+        val note = async { data.note?.render(Text.Styles.Note) }
 
         findViewById<FormattedEditText>(R.id.input_field).run {
             error = data.validation?.message
@@ -101,6 +104,7 @@ class Input(
             if (hasFocus()) onFocusChangeListener.onFocusChange(this, true)
         }
 
-        data.note?.render(Text.Styles.Note) into findViewById(R.id.input_note_container)
+        label.await() into findViewById(R.id.input_label_container)
+        note.await() into findViewById(R.id.input_note_container)
     }
 }

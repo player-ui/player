@@ -15,13 +15,14 @@ import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertFailsWith
 
 @RunWith(AndroidJUnit4::class)
 internal class BrokenAssetTest {
@@ -43,21 +44,16 @@ internal class BrokenAssetTest {
     }
 
     @Test
-    fun `invalidate view should fail on first render`() {
-        var thrown: Throwable? = null
-        try {
+    fun `invalidate view should fail on first render`() = runTest {
+        val exception = assertFailsWith<AssetRenderException> {
             BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(appContext)
-        } catch (exception: Throwable) {
-            thrown = exception
         }
-
-        assertNotNull(thrown)
-        assertTrue(thrown is AssetRenderException)
-        assertTrue((thrown as AssetRenderException).cause is StaleViewException)
+        assertNotNull(exception)
+        assertTrue(exception.cause is StaleViewException)
     }
 
     @Test
-    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() {
+    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() = runTest {
         assertTrue(
             BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(appContext) is FrameLayout,
         )
@@ -67,7 +63,7 @@ internal class BrokenAssetTest {
     }
 
     @Test
-    fun `manual rehydration should fail the player on invalidate view`() {
+    fun `manual rehydration should fail the player on invalidate view`() = runTest {
         BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).apply {
             assertTrue(render(appContext) is FrameLayout)
             data.layout = BrokenAsset.Layout.Linear
@@ -80,7 +76,7 @@ internal class BrokenAssetTest {
     fun `cannot render without a context`() {
         assertEquals(
             "Android context not found! Ensure the asset is rendered with a valid Android context.",
-            assertThrows(PlayerException::class.java) {
+            org.junit.Assert.assertThrows(PlayerException::class.java) {
                 BrokenAsset(baseContext).requireContext()
             }.message,
         )

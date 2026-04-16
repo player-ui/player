@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -17,19 +16,21 @@ import com.intuit.playerui.plugins.coroutines.flowScope
 import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.start
 import com.intuit.playerui.utils.test.runBlockingTest
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json.Default.encodeToString
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertFailsWith
 
 @RunWith(AndroidJUnit4::class)
 internal class HydrationScopeTest : BaseRenderableAssetTest() {
@@ -73,19 +74,35 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         player.start(makeFlow(encodeToString(NodeSerializer(), asset)))
     }
 
+    // TODO: revisit this test
     @Test
-    fun `test awaiting async view stub doesn't cancel parent scope`() = runBlocking {
+    fun `test cancelling caller job during render propagates CancellationException`() = runBlocking {
         val test = TestAsset(assetContext)
-        val asyncView = test.render(appContext) as RenderableAsset.AsyncViewStub
-        test.currentHydrationScope.cancel("hello")
-        assertNull(asyncView.awaitView())
+        // First render to establish hydrationScope
+        test.render(appContext)
+        val hydrationScope = test.currentHydrationScope
+        assertTrue(hydrationScope.isActive)
+
+        // Cancel caller job before render — CancellationException propagates to the caller
+        var didThrow = false
+        val renderJob = launch {
+            coroutineContext.job.cancel("cancelled by test")
+            try {
+                test.render(appContext)
+            } catch (_: CancellationException) {
+                didThrow = true
+            }
+        }
+        renderJob.join()
+        assertTrue(didThrow)
+        // hydrationScope is a child of flowScope, not the caller — cancelling the caller must not cancel it
+        assertTrue(hydrationScope.isActive)
     }
 
     @Test
     fun `test hydration scope can launch coroutines`() = runBlocking {
         val test = TestAsset(assetContext)
-        val asyncView = test.render(appContext) as RenderableAsset.AsyncViewStub
-        asyncView.awaitView()
+        test.render(appContext)
         waitForCompleted()
     }
 

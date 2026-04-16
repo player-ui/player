@@ -157,10 +157,7 @@ public abstract class PlayerFragment :
     @ExperimentalPlayerApi
     protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         val startTime = System.currentTimeMillis()
-        val view = asset?.render(requireContext())?.let {
-            // unwrap if we know we have an async view stub, and just wait on the actual view
-            if (it is RenderableAsset.AsyncViewStub) it.awaitView() else it
-        }
+        val view = asset?.render(requireContext())
 
         view?.doOnLayout {
             playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
@@ -188,7 +185,6 @@ public abstract class PlayerFragment :
         renderingJob?.cancel("handling new update")
         renderingJob = lifecycleScope.launch {
             whenStarted {
-                // TODO: This'll go away when we can call a suspend version of this
                 withContext(Dispatchers.Default) {
                     try {
                         renderIntoPlayerCanvas(asset, animateTransition)

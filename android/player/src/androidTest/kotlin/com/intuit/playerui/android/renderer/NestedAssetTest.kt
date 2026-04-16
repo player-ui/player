@@ -4,7 +4,6 @@ import android.widget.LinearLayout
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset.AsyncViewStub
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.NestedAsset
 import com.intuit.playerui.android.utils.SimpleAsset
@@ -40,9 +39,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     @Test
     fun `tested nested asset constructs`() = runBlockingTest {
         val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
-        val nested = asset.render(appContext).let {
-            if (it is AsyncViewStub) it.awaitView() else it
-        }
+        val nested = asset.render(appContext)
         assertTrue(nested is LinearLayout)
         assertNotNull(NestedAsset.dummy)
         assertNotNull(NestedAsset.dummy2?.firstOrNull())
@@ -66,10 +63,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
         assertFalse(onHydrationStarted)
         assertFalse(onHydrationCompleted)
-        val view = asset.render(appContext) as AsyncViewStub
-        assertTrue(onHydrationStarted)
-        assertFalse(onHydrationCompleted)
-        view.awaitView()
+        asset.render(appContext)
         assertTrue(onHydrationStarted)
         assertTrue(onHydrationCompleted)
     }
