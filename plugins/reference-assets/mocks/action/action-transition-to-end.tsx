@@ -18,10 +18,10 @@ const flow: DSLFlow = {
               asset: {
                 id: "action-good-label",
                 type: "text",
-                value: "End the flow (success)"
-              }
-            }
-          }
+                value: "End the flow (success)",
+              },
+            },
+          },
         },
         {
           asset: {
@@ -32,13 +32,13 @@ const flow: DSLFlow = {
               asset: {
                 id: "action-bad-label",
                 type: "text",
-                value: "End the flow (error)"
-              }
-            }
-          }
-        }
-      ]
-    }
+                value: "End the flow (error)",
+              },
+            },
+          },
+        },
+      ],
+    },
   ],
   data: {},
   navigation: {

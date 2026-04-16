@@ -1,22 +1,22 @@
-import type { ReactPlayer, Player, ReactPlayerPlugin } from '@player-ui/react';
-import type { Timing } from '@player-ui/metrics-plugin-react';
-import { MetricsPlugin } from '@player-ui/metrics-plugin-react';
-import type { Dispatch } from 'redux';
+import type { ReactPlayer, Player, ReactPlayerPlugin } from "@player-ui/react";
+import type { Timing } from "@player-ui/metrics-plugin-react";
+import { MetricsPlugin } from "@player-ui/metrics-plugin-react";
+import type { Dispatch } from "redux";
 import type {
   DataChangeEventType,
   LogEventType,
   StateChangeEventType,
   MetricChangeEventType,
-} from '../state';
-import { createEvent } from '../state';
-import { addEvents, clearEvents } from '../redux';
+} from "../state";
+import { createEvent } from "../state";
+import { addEvents, clearEvents } from "../redux";
 
 /**
  *
  * A web plugin for interacting with storybook
  */
 export class StorybookPlayerPlugin implements ReactPlayerPlugin {
-  public readonly name = 'Storybook';
+  public readonly name = "Storybook";
 
   private dispatch: Dispatch;
   private metricsPlugin: MetricsPlugin;
@@ -29,10 +29,10 @@ export class StorybookPlayerPlugin implements ReactPlayerPlugin {
         // actions.setMetrics(metrics);
       },
       onRenderEnd: (timing) => {
-        this.onMetricChange(timing, 'render');
+        this.onMetricChange(timing, "render");
       },
       onUpdateEnd: (timing) => {
-        this.onMetricChange(timing, 'update');
+        this.onMetricChange(timing, "update");
       },
     });
   }
@@ -51,11 +51,11 @@ export class StorybookPlayerPlugin implements ReactPlayerPlugin {
         const events: Array<DataChangeEventType> = dataUpdates.map(
           (dataUpdate) =>
             createEvent({
-              type: 'dataChange',
+              type: "dataChange",
               binding: dataUpdate.binding.asString(),
               from: dataUpdate.oldValue,
               to: dataUpdate.newValue,
-            })
+            }),
         );
         this.dispatch(addEvents(events));
       });
@@ -65,43 +65,43 @@ export class StorybookPlayerPlugin implements ReactPlayerPlugin {
       this.dispatch(
         addEvents([
           createEvent<LogEventType>({
-            type: 'log',
+            type: "log",
             message: data,
             severity,
           }),
-        ])
+        ]),
       );
     });
 
     rp.player.hooks.state.tap(this.name, (newState) => {
-      if ('error' in newState) {
+      if ("error" in newState) {
         this.dispatch(
           addEvents([
             createEvent<StateChangeEventType>({
-              type: 'stateChange',
+              type: "stateChange",
               state: newState.status,
               error: newState.error.message,
             }),
-          ])
+          ]),
         );
-      } else if (newState.status === 'completed') {
+      } else if (newState.status === "completed") {
         this.dispatch(
           addEvents([
             createEvent<StateChangeEventType>({
-              type: 'stateChange',
+              type: "stateChange",
               state: newState.status,
               outcome: newState.endState.outcome,
             }),
-          ])
+          ]),
         );
       } else {
         this.dispatch(
           addEvents([
             createEvent<StateChangeEventType>({
-              type: 'stateChange',
+              type: "stateChange",
               state: newState.status,
             }),
-          ])
+          ]),
         );
       }
     });
@@ -115,11 +115,11 @@ export class StorybookPlayerPlugin implements ReactPlayerPlugin {
     this.dispatch(
       addEvents([
         createEvent<MetricChangeEventType>({
-          type: 'metric',
+          type: "metric",
           metricType,
           message: `Duration: ${timing.duration.toFixed(0)} ms`,
         }),
-      ])
+      ]),
     );
   }
 }
