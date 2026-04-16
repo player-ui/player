@@ -146,9 +146,7 @@ clean: # Force delete all the local cached bazel stuff. Be careful!
   rm -rf .bazel-*
 
   # Delete cached node_modules and re-resolve packages
-  rm -rf node_modules/
-  rm -rf pnpm-lock.yaml
-  pnpm install
+  pnpm install --frozen-lockfile
 
   # Delete iOS stuff
   rm -rf ios/demo/.build
