@@ -11,8 +11,9 @@ import type { BeaconMetaData } from "@player-ui/beacon-plugin";
  * A choice asset represents a single selection choice, often displayed as radio buttons in a web context.
  * This will allow users to test out more complex flows than just inputs + buttons.
  */
-export interface ChoiceAsset<AnyTextAsset extends Asset = Asset>
-  extends Asset<"choice"> {
+export interface ChoiceAsset<
+  AnyTextAsset extends Asset = Asset,
+> extends Asset<"choice"> {
   /** A text-like asset for the choice's label */
   title?: AssetWrapper<AnyTextAsset>;
 

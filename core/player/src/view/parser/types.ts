@@ -43,15 +43,13 @@ export declare namespace Node {
   }
 
   export interface Asset<T extends AnyAssetType = AnyAssetType>
-    extends BaseWithChildren<NodeType.Asset>,
-      PluginOptions {
+    extends BaseWithChildren<NodeType.Asset>, PluginOptions {
     /** Any asset nested within a view */
     value: T;
   }
 
   export interface View<T extends AnyAssetType = AnyAssetType>
-    extends BaseWithChildren<NodeType.View>,
-      PluginOptions {
+    extends BaseWithChildren<NodeType.View>, PluginOptions {
     /** The root of the parsed view */
     value: T;
   }
@@ -82,8 +80,7 @@ export declare namespace Node {
   }
 
   export interface Value
-    extends BaseWithChildren<NodeType.Value>,
-      PluginOptions {
+    extends BaseWithChildren<NodeType.Value>, PluginOptions {
     /** A simple node representing a value */
     value: any;
   }

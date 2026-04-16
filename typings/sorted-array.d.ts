@@ -1,4 +1,4 @@
-declare module 'sorted-array' {
+declare module "sorted-array" {
   export default class SortedArray<K> {
     constructor(values: K[], compare?: (val: K) => number);
     public readonly array: K[];
