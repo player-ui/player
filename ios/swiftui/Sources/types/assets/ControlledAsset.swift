@@ -17,6 +17,23 @@ public enum AssetRenderError: Error {
     case decodingFailure(innerError: Error, asset: AssetData? = nil, pathToAsset: [AssetData])
 }
 
+extension AssetRenderError: ErrorWithMetadata {
+    public var type: String {
+        ErrorTypes.render
+    }
+    
+    public var severity: ErrorSeverity? {
+        ErrorSeverity.error
+    }
+    
+    public var metadata: [String: Any]? {
+        switch self {
+            case .decodingFailure(_, let asset, _):
+                return ["assetId": asset?.id ?? ""]
+        }
+    }
+}
+
 extension AssetRenderError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
@@ -27,6 +44,12 @@ Caused by: \(innerError.playerDescription)
 Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?.type ?? "UNKNOWN")'\(pathToAsset.map({ "\n\tFound in (id: '\($0.id)', type: '\($0.type)')" }).joined())
 """
         }
+    }
+}
+
+extension AssetRenderError: JSConvertibleError {
+    public var jsDescription: String {
+        debugDescription
     }
 }
 

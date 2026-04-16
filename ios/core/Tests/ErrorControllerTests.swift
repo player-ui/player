@@ -12,6 +12,15 @@ import JavaScriptCore
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
 
+private struct ErrorWithAnyMetadata: Error, ErrorWithMetadata, JSConvertibleError {
+    public var message: String
+    public var type: String
+    public var severity: ErrorSeverity?
+    public var metadata: [String : Any]?
+    
+    public var jsDescription: String { get { message } }
+}
+
 class ErrorControllerTests: XCTestCase {
     var player: HeadlessPlayerImpl!
     
@@ -47,7 +56,7 @@ class ErrorControllerTests: XCTestCase {
         player.hooks?.errorController.tap { errorController in
             errorController.hooks.onError.tap { errorInfo in
                 XCTAssertNotNil(errorInfo)
-                XCTAssertEqual(errorInfo.errorType, ErrorTypes.validation)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.validation)
                 XCTAssertEqual(errorInfo.severity, .error)
                 XCTAssertFalse(errorInfo.message.isEmpty)
                 onErrorCalled.fulfill()
@@ -56,10 +65,7 @@ class ErrorControllerTests: XCTestCase {
             
             // Capture a test error
             errorController.captureError(
-                error: NSError(domain: "test", code: 123, userInfo: [NSLocalizedDescriptionKey: "Test error"]),
-                errorType: ErrorTypes.validation,
-                severity: .error,
-                metadata: ["testKey": "testValue"]
+                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.validation, severity: .error, metadata: ["testKey": "testValue"])
             )
         }
         
@@ -77,115 +83,106 @@ class ErrorControllerTests: XCTestCase {
             return XCTFail("Player not in progress")
         }
         
-        let errorController = state.controllers?.error
-        XCTAssertNotNil(errorController)
+        guard let errorController = state.controllers?.error else {
+            XCTFail("Error controller not found")
+            return
+        }
         
-        let testError = NSError(
-            domain: "com.test",
-            code: 404,
-            userInfo: [NSLocalizedDescriptionKey: "Not found"]
+        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.network, severity: .error, metadata: ["url": "https://example.com", "statusCode": 404])
+        
+        let result = errorController.captureError(
+            error: testError
         )
         
-        let capturedErrorValue = errorController?.captureError(
-            error: testError,
-            errorType: ErrorTypes.network,
-            severity: .error,
-            metadata: ["url": "https://example.com", "statusCode": 404]
-        )
+        XCTAssertFalse(result)
         
-        XCTAssertNotNil(capturedErrorValue)
+        let capturedErrorValue = errorController.getCurrentError()
         
         // Convert JSValue to PlayerErrorInfo
-        if let jsValue = capturedErrorValue {
-            let capturedError = PlayerErrorInfo(jsValue)
-            XCTAssertEqual(capturedError.message, "Not found")
-            XCTAssertEqual(capturedError.errorType, ErrorTypes.network)
-            XCTAssertEqual(capturedError.severity, .error)
-            XCTAssertNotNil(capturedError.metadata)
+        guard let jsValue = capturedErrorValue else {
+            return XCTFail("No error captured")
         }
+        
+        let capturedError = JSValueError.createInstance(value: jsValue)
+        XCTAssertEqual(capturedError.message, "Error")
+        XCTAssertEqual(capturedError.type, ErrorTypes.network)
+        XCTAssertEqual(capturedError.severity, .error)
+        XCTAssertNotNil(capturedError.metadata)
     }
     
     func testCaptureErrorWithMinimalParameters() {
         player.start(flow: FlowData.COUNTER) { _ in }
         
-        guard let state = player.state as? InProgressState else {
+        guard let state = player.state as? InProgressState, let errorController = state.controllers?.error else {
             return XCTFail("Player not in progress")
         }
         
-        let errorController = state.controllers?.error
-        XCTAssertNotNil(errorController)
+        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.plugin)
         
-        let testError = NSError(
-            domain: "com.test",
-            code: 500,
-            userInfo: [NSLocalizedDescriptionKey: "Internal error"]
+        let result = errorController.captureError(
+            error: testError
         )
         
-        let capturedErrorValue = errorController?.captureError(
-            error: testError,
-            errorType: ErrorTypes.plugin
-        )
-        
-        XCTAssertNotNil(capturedErrorValue)
+        XCTAssertFalse(result)
+        let capturedErrorValue = errorController.getCurrentError()
         
         // Convert JSValue to PlayerErrorInfo
-        if let jsValue = capturedErrorValue {
-            let capturedError = PlayerErrorInfo(jsValue)
-            XCTAssertEqual(capturedError.message, "Internal error")
-            XCTAssertEqual(capturedError.errorType, ErrorTypes.plugin)
-            XCTAssertNil(capturedError.severity)
-            XCTAssertNil(capturedError.metadata)
+        guard let jsValue = capturedErrorValue else {
+            return XCTFail("No error captured")
         }
+        
+        let capturedError = JSValueError.createInstance(value: jsValue)
+        XCTAssertEqual(capturedError.message, "Error")
+        XCTAssertEqual(capturedError.type, ErrorTypes.plugin)
+        XCTAssertNil(capturedError.severity)
+        XCTAssertNil(capturedError.metadata)
     }
     
     func testCaptureMultipleErrorsAndCurrentErrorUpdates() {
         player.start(flow: FlowData.COUNTER) { _ in }
         
-        guard let state = player.state as? InProgressState else {
+        guard let state = player.state as? InProgressState, let errorController = state.controllers?.error else {
             return XCTFail("Player not in progress")
         }
         
-        let errorController = state.controllers?.error
-        XCTAssertNotNil(errorController)
-        
         // Capture first error
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 1, userInfo: [NSLocalizedDescriptionKey: "First error"]),
-            errorType: ErrorTypes.validation,
-            severity: .warning
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "First Error", type: ErrorTypes.validation, severity: .warning)
         )
         
         // Verify current error is the first one
-        if let firstErrorValue = errorController?.getCurrentError(), !firstErrorValue.isUndefined {
-            XCTAssertEqual(PlayerErrorInfo(firstErrorValue).message, "First error")
+        guard let firstErrorValue = errorController.getCurrentError(), !firstErrorValue.isUndefined else {
+            return XCTFail("First error not found")
         }
         
+        XCTAssertEqual(JSValueError.createInstance(value: firstErrorValue).message, "First Error")
+        
         // Capture second error
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 2, userInfo: [NSLocalizedDescriptionKey: "Second error"]),
-            errorType: ErrorTypes.binding,
-            severity: .error
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Second Error", type: ErrorTypes.binding, severity: .error)
         )
         
         // Current error should be updated to the second one
-        if let secondErrorValue = errorController?.getCurrentError(), !secondErrorValue.isUndefined {
-            XCTAssertEqual(PlayerErrorInfo(secondErrorValue).message, "Second error")
+        guard let secondErrorValue = errorController.getCurrentError(), !secondErrorValue.isUndefined else {
+            return XCTFail("Second error not found")
         }
         
+        XCTAssertEqual(JSValueError.createInstance(value: secondErrorValue).message, "Second Error")
+        
         // Capture third error
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 3, userInfo: [NSLocalizedDescriptionKey: "Third error"]),
-            errorType: ErrorTypes.view,
-            severity: .fatal
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Third Error", type: ErrorTypes.view, severity: .fatal)
         )
         
         // Current error should be updated to the third one
-        if let thirdErrorValue = errorController?.getCurrentError(), !thirdErrorValue.isUndefined {
-            XCTAssertEqual(PlayerErrorInfo(thirdErrorValue).message, "Third error")
+        guard let thirdErrorValue = errorController.getCurrentError(), !thirdErrorValue.isUndefined else {
+            return XCTFail("Third error not found")
         }
         
+        XCTAssertEqual(JSValueError.createInstance(value: thirdErrorValue).message, "Third Error")
+        
         // Get all errors and verify history
-        guard let errorsValue = errorController?.getErrors(),
+        guard let errorsValue = errorController.getErrors(),
               let errorsArray = errorsValue.toArray() else {
             return XCTFail("Could not get errors array")
         }
@@ -194,13 +191,13 @@ class ErrorControllerTests: XCTestCase {
         XCTAssertEqual(errorsArray.count, 3, "Expected 3 errors in history")
         
         // Verify the errors by accessing them as JSValues directly from the errorsValue
-        let firstError = PlayerErrorInfo(errorsValue.atIndex(0))
-        let secondError = PlayerErrorInfo(errorsValue.atIndex(1))
-        let thirdError = PlayerErrorInfo(errorsValue.atIndex(2))
+        let firstError = JSValueError.createInstance(value: errorsValue.atIndex(0))
+        let secondError = JSValueError.createInstance(value: errorsValue.atIndex(1))
+        let thirdError = JSValueError.createInstance(value: errorsValue.atIndex(2))
         
-        XCTAssertEqual(firstError.message, "First error")
-        XCTAssertEqual(secondError.message, "Second error")
-        XCTAssertEqual(thirdError.message, "Third error")
+        XCTAssertEqual(firstError.message, "First Error")
+        XCTAssertEqual(secondError.message, "Second Error")
+        XCTAssertEqual(thirdError.message, "Third Error")
     }
     
     // MARK: - Get Current Error Tests
@@ -208,39 +205,30 @@ class ErrorControllerTests: XCTestCase {
     func testGetCurrentError() {
         player.start(flow: FlowData.COUNTER) { _ in }
         
-        guard let state = player.state as? InProgressState else {
+        guard let state = player.state as? InProgressState, let errorController = state.controllers?.error else {
             return XCTFail("Player not in progress")
         }
         
-        let errorController = state.controllers?.error
-        XCTAssertNotNil(errorController)
-        
         // Initially no current error
-        let initialError = errorController?.getCurrentError()
+        let initialError = errorController.getCurrentError()
         XCTAssertTrue(initialError?.isUndefined ?? false)
         
         // Capture an error
-        let testError = NSError(
-            domain: "test",
-            code: 100,
-            userInfo: [NSLocalizedDescriptionKey: "Current error"]
-        )
+        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.data, severity: .error)
         
-        errorController?.captureError(
-            error: testError,
-            errorType: ErrorTypes.data,
-            severity: .error
+        errorController.captureError(
+            error: testError
         )
         
         // Now should have a current error
-        guard let currentErrorValue = errorController?.getCurrentError(),
+        guard let currentErrorValue = errorController.getCurrentError(),
               !currentErrorValue.isUndefined else {
             return XCTFail("Current error should exist")
         }
         
-        let currentError = PlayerErrorInfo(currentErrorValue)
-        XCTAssertEqual(currentError.message, "Current error")
-        XCTAssertEqual(currentError.errorType, ErrorTypes.data)
+        let currentError = JSValueError.createInstance(value: currentErrorValue)
+        XCTAssertEqual(currentError.message, "Error")
+        XCTAssertEqual(currentError.type, ErrorTypes.data)
     }
     
     // MARK: - Clear Errors Tests
@@ -248,72 +236,64 @@ class ErrorControllerTests: XCTestCase {
     func testClearAllErrors() {
         player.start(flow: FlowData.COUNTER) { _ in }
         
-        guard let state = player.state as? InProgressState else {
+        guard let state = player.state as? InProgressState, let errorController = state.controllers?.error else {
             return XCTFail("Player not in progress")
         }
         
-        let errorController = state.controllers?.error
-        
         // Capture multiple errors
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 1, userInfo: [NSLocalizedDescriptionKey: "Error 1"]),
-            errorType: ErrorTypes.validation
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation)
         )
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error 2"]),
-            errorType: ErrorTypes.binding
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Error 2", type: ErrorTypes.binding)
         )
         
-        let errorsBeforeCount = errorController?.getErrors()?.toArray()?.count ?? 0
+        let errorsBeforeCount = errorController.getErrors()?.toArray()?.count ?? 0
         XCTAssertEqual(errorsBeforeCount, 2)
         
-        let currentErrorBefore = errorController?.getCurrentError()
+        let currentErrorBefore = errorController.getCurrentError()
         XCTAssertFalse(currentErrorBefore?.isUndefined ?? true)
         
         // Clear all errors
-        errorController?.clearErrors()
+        errorController.clearErrors()
         
-        let errorsAfterCount = errorController?.getErrors()?.toArray()?.count ?? 0
+        let errorsAfterCount = errorController.getErrors()?.toArray()?.count ?? 0
         XCTAssertEqual(errorsAfterCount, 0)
         
-        let currentErrorAfter = errorController?.getCurrentError()
+        let currentErrorAfter = errorController.getCurrentError()
         XCTAssertTrue(currentErrorAfter?.isUndefined ?? false)
     }
     
     func testClearCurrentError() {
         player.start(flow: FlowData.COUNTER) { _ in }
         
-        guard let state = player.state as? InProgressState else {
+        guard let state = player.state as? InProgressState, let errorController = state.controllers?.error else {
             return XCTFail("Player not in progress")
         }
         
-        let errorController = state.controllers?.error
-        
         // Capture multiple errors
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 1, userInfo: [NSLocalizedDescriptionKey: "Error 1"]),
-            errorType: ErrorTypes.validation
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation)
         )
-        errorController?.captureError(
-            error: NSError(domain: "test", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error 2"]),
-            errorType: ErrorTypes.binding
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Error 2", type: ErrorTypes.binding)
         )
         
-        let errorsBeforeCount = errorController?.getErrors()?.toArray()?.count ?? 0
+        let errorsBeforeCount = errorController.getErrors()?.toArray()?.count ?? 0
         XCTAssertEqual(errorsBeforeCount, 2)
         
-        let currentErrorBefore = errorController?.getCurrentError()
+        let currentErrorBefore = errorController.getCurrentError()
         XCTAssertFalse(currentErrorBefore?.isUndefined ?? true)
         
         // Clear only current error
-        errorController?.clearCurrentError()
+        errorController.clearCurrentError()
         
         // History should be preserved
-        let errorsAfterCount = errorController?.getErrors()?.toArray()?.count ?? 0
+        let errorsAfterCount = errorController.getErrors()?.toArray()?.count ?? 0
         XCTAssertEqual(errorsAfterCount, 2)
         
         // Current error should be cleared
-        let currentErrorAfter = errorController?.getCurrentError()
+        let currentErrorAfter = errorController.getCurrentError()
         XCTAssertTrue(currentErrorAfter?.isUndefined ?? false)
     }
 
@@ -340,11 +320,9 @@ class ErrorControllerTests: XCTestCase {
     func testErrorMetadataCapture() {
         player.start(flow: FlowData.COUNTER) { _ in }
         
-        guard let state = player.state as? InProgressState else {
+        guard let state = player.state as? InProgressState, let errorController = state.controllers?.error else {
             return XCTFail("Player not in progress")
         }
-        
-        let errorController = state.controllers?.error
         
         let metadata: [String: Any] = [
             "binding": "data.user.name",
@@ -354,18 +332,17 @@ class ErrorControllerTests: XCTestCase {
             "timestamp": Date().timeIntervalSince1970
         ]
         
-        let capturedErrorValue = errorController?.captureError(
-            error: NSError(domain: "test", code: 1, userInfo: [NSLocalizedDescriptionKey: "Validation failed"]),
-            errorType: ErrorTypes.validation,
-            severity: .error,
-            metadata: metadata
+        errorController.captureError(
+            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation, severity: .error, metadata: metadata)
         )
+        
+        let capturedErrorValue = errorController.getCurrentError()
         
         guard let jsValue = capturedErrorValue else {
             return XCTFail("Error should be captured")
         }
         
-        let capturedError = PlayerErrorInfo(jsValue)
+        let capturedError = JSValueError.createInstance(value: jsValue)
         XCTAssertNotNil(capturedError.metadata)
         XCTAssertEqual(capturedError.metadata?["binding"] as? String, "data.user.name")
         XCTAssertEqual(capturedError.metadata?["attemptedValue"] as? String, "invalid")
