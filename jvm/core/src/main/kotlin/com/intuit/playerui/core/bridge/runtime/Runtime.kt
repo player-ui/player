@@ -23,8 +23,7 @@ public interface Runtime<Value> : Node {
     override val format: RuntimeFormat<Value>
 
     @ExperimentalPlayerApi
-    public fun executeRaw(script: String): Value =
-        throw UnsupportedOperationException("This experimental method is not implemented for ${this::class.simpleName}")
+    public fun executeRaw(script: String): Value
 
     /** Execute some arbitrary [script] and return the deserialized result */
     public fun execute(script: String): Any?
