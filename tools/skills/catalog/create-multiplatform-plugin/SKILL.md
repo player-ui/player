@@ -1,0 +1,651 @@
+---
+name: Create Multiplatform Player Plugin
+description: Use when the user wants to create a Player UI plugin that works across multiple platforms (TypeScript, React, Android, iOS, SwiftUI). Explains the architecture, shared concepts, and how platform-specific wrappers connect to the core TypeScript plugin.
+version: "2.1"
+argument-hint: "[plugin-name e.g. analytics-tracker]"
+---
+
+# Create Multiplatform Player Plugin
+
+You are helping a developer create a Player UI plugin that works across multiple platforms. This skill explains how the pieces fit together and delegates to platform-specific skills for implementation details.
+
+---
+
+## Architecture Overview
+
+Player UI plugins can span up to five layers:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  1. Core (TypeScript)                                            │
+│     Runs everywhere — the canonical plugin logic                 │
+│     Package: @player-ui/player (npm)                             │
+└──────────────┬───────────────────────────────────────────────────┘
+               │ compiled to IIFE .native.js bundle
+               ├──────────────────┬────────────────────┐
+┌──────────────▼───────┐  ┌───────▼──────────┐  ┌──────▼──────────┐
+│ 2. JVM (Kotlin)      │  │ 3. iOS (Swift)   │  │ 5. React (TSX)  │
+│ JSScriptPlugin-      │  │ JSBasePlugin     │  │ ReactPlayer-    │
+│ Wrapper              │  │ + NativePlugin   │  │ Plugin          │
+│ Maven: com.intuit.   │  │ SPM/CocoaPods:   │  │ npm: @player-   │
+│ playerui             │  │ PlayerUI         │  │ ui/react        │
+└──────────────────────┘  └────────┬─────────┘  └─────────────────┘
+                                   │ depends on
+                          ┌────────▼─────────┐
+                          │ 4. SwiftUI       │
+                          │ SwiftUIPlayer    │
+                          │ hooks + Environ- │
+                          │ mentValues       │
+                          └──────────────────┘
+```
+
+**The core TypeScript plugin is the foundation.** JVM and iOS wrappers load the compiled JavaScript bundle (IIFE format) at runtime via an embedded JS engine. The React layer uses the TypeScript plugin directly via npm — no bundle needed. The SwiftUI layer builds on top of the base iOS layer to add SwiftUI-specific integration.
+
+---
+
+## Directory Structure
+
+Multiplatform plugins follow a standard layout. Add only the subdirectories you need:
+
+```
+plugins/<plugin-name>/
+  core/       # TypeScript source + package.json (required)
+  react/      # React bindings + package.json
+  jvm/        # Kotlin JVM wrapper (loads .native.js via JSScriptPluginWrapper)
+  ios/        # Swift base wrapper (loads .native.js via JSBasePlugin)
+  swiftui/    # SwiftUI integration (depends on ios/)
+  android/    # Android/Compose layer (optional — depends on jvm/)
+  mocks/      # Shared test mocks (optional — few plugins need this)
+```
+
+Each `core/` and `react/` subdirectory is its own npm package linked via `workspace:*` in the pnpm monorepo. JVM, iOS, SwiftUI, and Android subdirectories are built via Bazel.
+
+### Build System
+
+**In-repo builds** use Bazel exclusively — there is no Gradle in this project:
+
+| Layer   | Bazel macro / rule                              | Defined in                  |
+| ------- | ----------------------------------------------- | --------------------------- |
+| Core TS | `js_pipeline(native_bundle = "Name")`           | `@rules_player//javascript` |
+| JVM     | `kt_player_plugin` / `kt_player_plugin_wrapper` | `plugins/defs.bzl`          |
+| iOS     | `ios_plugin`                                    | `tools/ios/util.bzl`        |
+| SwiftUI | `swiftui_plugin`                                | `tools/ios/util.bzl`        |
+| Android | `kt_android`                                    | `@rules_player//kotlin`     |
+
+The `npm install`, Gradle `dependencies {}`, and SPM `.package()` examples in this document are for **external consumers** who add Player plugins to their own projects. For in-repo development, dependencies are expressed as Bazel target labels (e.g., `//jvm/core`, `//plugins/<name>/core:core_native_bundle`).
+
+Maven coordinates (`com.intuit.playerui.*`) are generated by Bazel via `pom_template` and `rules_player` distribution support, not by `maven-publish` in Gradle. JVM dependency versions come from the root `libs.versions.toml` consumed by `MODULE.bazel`.
+
+---
+
+## Shared Concepts
+
+### Plugin Interface
+
+Every platform implements the same fundamental contract:
+
+| Platform   | Interface / Base Class                             | Entry point                                          |
+| ---------- | -------------------------------------------------- | ---------------------------------------------------- |
+| TypeScript | `PlayerPlugin` (interface)                         | `apply(player: Player)`                              |
+| React      | `ReactPlayerPlugin` (interface)                    | `applyReact(reactPlayer)` + optional `apply(player)` |
+| Kotlin/JVM | `JSScriptPluginWrapper` (abstract class)           | `apply(runtime: Runtime<*>)` (loads JS bundle)       |
+| Swift/iOS  | `JSBasePlugin` (class) + `NativePlugin` (protocol) | Two phases (see below)                               |
+| SwiftUI    | extends iOS base + `NativePlugin`                  | `apply(player:)` on `SwiftUIPlayer`                  |
+
+**iOS two-phase lifecycle:** Swift plugins that wrap JS have two distinct phases:
+
+1. **JS wiring** — `JSBasePlugin.setup(context:)` runs when the `JSContext` is set. It loads the `.native.js` file, constructs the JS plugin, and stores it as `pluginRef`. Override `setup(context:)` to wire JS hooks to Swift properties (e.g., `Hook1`, `AsyncHook2`). Override `getArguments()` to pass constructor arguments to the JS plugin.
+2. **Player integration** — `NativePlugin.apply(player:)` runs when the plugin is registered with a `HeadlessPlayer`. Use this to tap Player-level hooks or (for SwiftUI) inject the plugin into `EnvironmentValues`.
+
+### Hook System
+
+All platforms tap into the same Player hook points (state, flowController, viewController, etc.), but the mechanism differs:
+
+| Platform   | Hook mechanism                                                                   |
+| ---------- | -------------------------------------------------------------------------------- |
+| TypeScript | Direct `tapable-ts` hooks on the Player instance                                 |
+| React      | Same as TypeScript, plus React-specific hooks: `webComponent`, `playerComponent` |
+| Kotlin/JVM | JS hooks bridged to Kotlin via `NodeSyncHook1`, `NodeAsyncWaterfallHook2`, etc.  |
+| Swift/iOS  | JS hooks bridged to Swift via `Hook1`, `Hook2`, `AsyncHook2` over JavaScriptCore |
+| SwiftUI    | `SwiftUIPlayer.hooks.view` for injecting views into the SwiftUI environment      |
+
+### Plugin Symbol / Name
+
+Use a consistent name across platforms so plugins can find each other:
+
+| Platform   | Identifier                                                                |
+| ---------- | ------------------------------------------------------------------------- |
+| TypeScript | `Symbol.for("<PluginName>")` in a `symbols.ts` file                       |
+| TypeScript | `name = "<PluginName>"` (used as the tap identifier)                      |
+| Kotlin     | `PLUGIN_NAME = "<PluginName>.<PluginName>"` (IIFE `globalName.ClassName`) |
+| Swift/iOS  | `pluginName: "<PluginName>.<PluginName>"` (IIFE `globalName.ClassName`)   |
+
+Use `Symbol.for()` (not `Symbol()`) so the symbol is globally shared across module boundaries — required for `findPlugin()` to work.
+
+The `"<PluginName>.<PluginName>"` format for JVM and iOS matches the IIFE bundle's `globalName` followed by the exported class name. The native JS runtime uses this path to locate the constructor in the global scope: `new globalName.ClassName()`.
+
+---
+
+## When to Create Each Layer
+
+| Need                                      | Layers to create                   |
+| ----------------------------------------- | ---------------------------------- |
+| Logic only (data transforms, expressions) | Core TypeScript only               |
+| React UI components                       | Core + React                       |
+| Headless JVM apps (server-side, testing)  | Core + JVM                         |
+| iOS apps (UIKit or headless)              | Core + iOS                         |
+| iOS apps with SwiftUI                     | Core + iOS + SwiftUI               |
+| Android apps with Jetpack Compose         | Core + JVM + Android               |
+| Full cross-platform                       | Core + React + JVM + iOS + SwiftUI |
+| Native-only behavior (no JS logic needed) | JVM, iOS, or SwiftUI only          |
+
+---
+
+## Step-by-Step: Full Multiplatform Plugin
+
+### Step 1: Core TypeScript Plugin
+
+See **create-core-plugin** skill for full details.
+
+```bash
+npm install @player-ui/player
+```
+
+```typescript
+// symbols.ts — export from a dedicated file so other plugins can import it
+export const <PluginName>Symbol = Symbol.for("<PluginName>");
+```
+
+```typescript
+// index.ts
+import type { Player, PlayerPlugin } from "@player-ui/player";
+import { <PluginName>Symbol } from "./symbols";
+
+export class <PluginName> implements PlayerPlugin {
+  name = "<PluginName>";
+  public readonly symbol = <PluginName>Symbol;
+
+  apply(player: Player): void {
+    // Core plugin logic — hook taps, expression registration, etc.
+  }
+}
+```
+
+The core plugin must also be compiled to a `.native.js` bundle for JVM and iOS consumption (see "The Native Bundle" below).
+
+### Step 2: React Layer (Optional)
+
+See **create-react-plugin** skill for full details.
+
+```bash
+npm install @player-ui/react @player-ui/asset-provider-plugin-react
+```
+
+The React plugin imports the core plugin directly via npm — no `.native.js` bundle needed.
+
+Two patterns are supported:
+
+**Pattern A — Separate plugin (composition):** The React plugin registers the core plugin internally:
+
+```tsx
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import { <PluginName> } from "@player-ui/<plugin-name>-plugin";
+
+export class <PluginName>ReactPlugin implements ReactPlayerPlugin {
+  name = "<plugin-name>-react";
+  applyReact(reactPlayer: ReactPlayer): void {
+    reactPlayer.registerPlugin(new <PluginName>());
+    // Register assets, context providers, etc.
+  }
+}
+```
+
+**Pattern B — Class inheritance:** The React plugin extends the core plugin class, inheriting its `apply()` hooks:
+
+```tsx
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import { <PluginName> as <PluginName>Core } from "@player-ui/<plugin-name>-plugin";
+
+export class <PluginName> extends <PluginName>Core implements ReactPlayerPlugin {
+  applyReact(reactPlayer: ReactPlayer): void {
+    // React-specific setup (e.g., context providers via webComponent hook)
+  }
+}
+```
+
+Pattern B is preferred when the React plugin needs to expose the same public API as the core plugin (e.g., `CheckPathPlugin`).
+
+### Step 3: JVM/Kotlin Layer (Optional)
+
+See **create-jvm-plugin** skill for full details.
+
+```kotlin
+dependencies {
+    implementation("com.intuit.playerui:core:<version>")
+}
+```
+
+The JVM plugin loads the core plugin's compiled `.native.js` bundle via `JSScriptPluginWrapper`. Two patterns exist:
+
+**Pattern A — No constructor args (most plugins):** Rely on the default `apply()` inherited from `JSScriptPluginWrapper`. The default loads the script and calls `(new $name())` where `$name` is `PLUGIN_NAME`:
+
+```kotlin
+class <PluginName> : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
+    private companion object {
+        private const val PLUGIN_NAME = "<PluginName>.<PluginName>"
+        private const val BUNDLED_SOURCE_PATH = "plugins/<plugin-name>/core/dist/<PluginName>.native.js"
+    }
+}
+```
+
+**Pattern B — With constructor args:** Set `PLUGIN_NAME` to the bare global name and override `apply()` to pass arguments. Use `$name.$name` to construct the `globalName.ClassName` expression:
+
+```kotlin
+class <PluginName>(private val config: Config? = null) :
+    JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
+
+    override fun apply(runtime: Runtime<*>) {
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+        config?.let { runtime.add("pluginConfig", it) }
+        instance = runtime.buildInstance("(new $name.$name(pluginConfig))")
+    }
+
+    private companion object {
+        private const val PLUGIN_NAME = "<PluginName>"
+        private const val BUNDLED_SOURCE_PATH = "plugins/<plugin-name>/core/dist/<PluginName>.native.js"
+    }
+}
+```
+
+**Important:** `buildInstance()` is an extension function on `Runtime<*>` that resolves `$name` from the wrapper's `name` property. In Pattern A, `name` is `"<PluginName>.<PluginName>"` so the default `(new $name())` produces `(new <PluginName>.<PluginName>())`. In Pattern B, `name` is `"<PluginName>"` so `(new $name.$name(...))` produces the same `(new <PluginName>.<PluginName>(...))`. Both result in `new globalName.ClassName()`.
+
+The `.native.js` file must be on the classpath at runtime (typically placed in `src/main/resources/` or included via the build system).
+
+**Accepting sub-plugins (Pluggable pattern):** If your JVM plugin needs to accept nested `JSPluginWrapper` sub-plugins (like `BeaconPlugin` does), implement `Pluggable` and pass the sub-plugins through to the JS constructor:
+
+```kotlin
+class <PluginName>(override val plugins: List<JSPluginWrapper>) :
+    JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH), Pluggable {
+
+    override fun apply(runtime: Runtime<*>) {
+        plugins.onEach { it.apply(runtime) }
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+        runtime.add("config", JSPluginConfig(plugins))
+        instance = runtime.buildInstance("(new $name.$name(config))")
+    }
+    // ...
+}
+```
+
+### Step 4: iOS/Swift Layer (Optional)
+
+See **create-swift-plugin** skill for full details.
+
+```swift
+.package(url: "https://github.com/player-ui/playerui-swift-package.git", from: "<version>")
+```
+
+The `NativePlugin` protocol requires two things:
+
+```swift
+public protocol NativePlugin {
+    var pluginName: String { get }
+    func apply<P: HeadlessPlayer>(player: P)
+}
+```
+
+The iOS plugin loads the `.native.js` bundle via `JSBasePlugin` (which handles JS loading) and conforms to `NativePlugin` (which integrates with Player):
+
+```swift
+class <PluginName>Plugin: JSBasePlugin, NativePlugin {
+    convenience init() {
+        self.init(fileName: "<PluginName>.native", pluginName: "<PluginName>.<PluginName>")
+    }
+
+    override func getUrlForFile(fileName: String) -> URL? {
+        #if SWIFT_PACKAGE
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        #else
+        ResourceUtilities.urlForFile(
+            name: fileName, ext: "js",
+            bundle: Bundle(for: <PluginName>Plugin.self),
+            pathComponent: "PlayerUI_<PluginName>Plugin.bundle"
+        )
+        #endif
+    }
+
+    func apply<P>(player: P) where P: HeadlessPlayer {
+        // Tap player-level hooks here (optional for base iOS plugins)
+    }
+}
+```
+
+Note that `fileName` omits the `.js` extension (`"<PluginName>.native"`, not `"<PluginName>.native.js"`).
+
+**Key override points on `JSBasePlugin`:**
+
+- **`getUrlForFile(fileName:)`** — (required) Return the URL to the `.native.js` file from your bundle. Guard with `#if SWIFT_PACKAGE` for SPM vs CocoaPods/framework builds.
+- **`getArguments()`** — Override to pass constructor arguments to the JS plugin. Return an array that will be spread into the JS constructor call (e.g., `[["callback": jsCallback]]`).
+- **`setup(context:)`** — Override to wire JS hooks to Swift after the plugin is constructed. Call `super.setup(context:)` first, then access `pluginRef` to create `Hook1`, `Hook2`, or `AsyncHook2` instances:
+
+```swift
+override func setup(context: JSContext) {
+    super.setup(context: context)
+    guard let ref = pluginRef else { return }
+    self.hooks = MyHooks(
+        onEvent: Hook1(baseValue: ref, name: "onEvent")
+    )
+}
+```
+
+### Step 5: SwiftUI Layer (Optional)
+
+See **create-swift-plugin** skill for SwiftUI details.
+
+The SwiftUI layer depends on the base iOS plugin and adds SwiftUI-specific integration — typically injecting the plugin into SwiftUI's `EnvironmentValues` so asset views can access it:
+
+```swift
+import Foundation
+import SwiftUI
+import PlayerUI
+import PlayerUISwiftUI
+
+class SwiftUI<PluginName>Plugin: Base<PluginName>Plugin, NativePlugin {
+    convenience init() {
+        self.init(fileName: "<PluginName>.native", pluginName: "<PluginName>.<PluginName>")
+    }
+
+    func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        player.hooks?.view.tap(name: self.pluginName) { [weak self] view in
+            AnyView(view.environment(\.<pluginKey>, self))
+        }
+    }
+}
+
+// Required boilerplate to expose the plugin via @Environment
+struct <PluginName>PluginKey: EnvironmentKey {
+    static var defaultValue: Base<PluginName>Plugin?
+}
+
+extension EnvironmentValues {
+    var <pluginKey>: Base<PluginName>Plugin? {
+        get { self[<PluginName>PluginKey.self] }
+        set { self[<PluginName>PluginKey.self] = newValue }
+    }
+}
+```
+
+Asset views then access the plugin via `@Environment(\.<pluginKey>) var plugin`.
+
+The SwiftUI plugin class typically extends a `Base<PluginName>Plugin` (which itself extends `JSBasePlugin`) from the `ios/` layer. This avoids duplicating the JS bridging logic.
+
+---
+
+## The Native Bundle
+
+For JVM and iOS layers to work, the core TypeScript plugin must be compiled into an **IIFE** (Immediately Invoked Function Expression) `.native.js` file. This bundle exposes the plugin class as a global variable that the native JS runtime can instantiate.
+
+### Bundle requirements
+
+- **Format:** IIFE with a `globalName` matching the plugin class name
+- **Self-contained:** No external imports at runtime (all dependencies bundled)
+- **Naming:** `<PluginName>.native.js` (e.g., `CheckPathPlugin.native.js`)
+- **Target:** ES5 (for broad JS engine compatibility)
+
+### In-repo: Bazel `native_bundle`
+
+In the Player monorepo, the IIFE build is driven by the `native_bundle` parameter on `js_pipeline`:
+
+```python
+# plugins/<plugin-name>/core/BUILD
+js_pipeline(
+    package_name = "@player-ui/<plugin-name>-plugin",
+    native_bundle = "<PluginName>",
+    # ...
+)
+```
+
+This produces `<PluginName>.native.js` in the build output. JVM and iOS targets depend on the `core_native_bundle` label to include it as a resource.
+
+### External projects: tsup config
+
+For plugins built outside the monorepo, use tsup (or any bundler that supports IIFE output):
+
+```typescript
+import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["iife"],
+  globalName: "<PluginName>",
+  target: "es5",
+  external: [],
+  outDir: "dist",
+  // Rename output to <PluginName>.native.js
+});
+```
+
+The `globalName` is critical — it determines the module name that JVM and iOS use in their `"<PluginName>.<PluginName>"` constructor path. The runtime evaluates `new globalName.ClassName()` to create the JS plugin instance.
+
+### How each platform loads the bundle
+
+| Platform | Loading mechanism                                                                     |
+| -------- | ------------------------------------------------------------------------------------- |
+| JVM      | `sourcePath` on the classpath (e.g., `"plugins/<name>/core/dist/<Plugin>.native.js"`) |
+| iOS      | `fileName` parameter (without `.js`): `"<PluginName>.native"`, loaded from app bundle |
+| SwiftUI  | Same as iOS — the SwiftUI layer reuses the iOS base class which loads the bundle      |
+| React    | Not used — React imports the TypeScript source directly via npm                       |
+
+---
+
+## Naming Conventions
+
+| Artifact          | Format                                | Example                                  |
+| ----------------- | ------------------------------------- | ---------------------------------------- |
+| TypeScript class  | `PascalCase`                          | `CheckPathPlugin`                        |
+| Core npm package  | `@player-ui/<kebab>-plugin`           | `@player-ui/check-path-plugin`           |
+| React npm package | `@player-ui/<kebab>-plugin-react`     | `@player-ui/check-path-plugin-react`     |
+| Kotlin class      | `PascalCase`                          | `CheckPathPlugin`                        |
+| Maven artifact    | `com.intuit.playerui.plugins:<kebab>` | `com.intuit.playerui.plugins:check-path` |
+| Swift/iOS class   | `PascalCase + "Plugin"`               | `CheckPathPlugin`                        |
+| iOS framework     | `PlayerUI<PluginName>`                | `PlayerUICheckPathPlugin`                |
+| SwiftUI class     | `SwiftUI<PluginName>Plugin`           | `SwiftUICheckPathPlugin`                 |
+| JS bundle         | `<PluginName>.native.js`              | `CheckPathPlugin.native.js`              |
+
+---
+
+## Real-World Example: check-path
+
+The `check-path` plugin spans all five layers. Here is how each layer connects:
+
+### Core (TypeScript)
+
+```typescript
+// plugins/check-path/core/src/symbols.ts
+export const CheckPathPluginSymbol = Symbol.for("CheckPathPlugin");
+
+// plugins/check-path/core/src/index.ts
+export class CheckPathPlugin implements PlayerPlugin {
+  name = "check-path";
+  public readonly symbol = CheckPathPluginSymbol;
+
+  apply(player: Player) {
+    player.hooks.viewController.tap(this.name, (viewController) => {
+      viewController.hooks.view.tap(this.name, (view) => {
+        view.hooks.resolver.tap(this.name, (resolver) => {
+          // Tracks resolved asset nodes for parent/child queries
+        });
+      });
+    });
+  }
+
+  public getParent(id: string, query?: Query): Asset | undefined {
+    /* ... */
+  }
+  public hasParentContext(id: string, query: Query): boolean {
+    /* ... */
+  }
+}
+```
+
+Built with `native_bundle = "CheckPathPlugin"` which produces `CheckPathPlugin.native.js`.
+
+### React
+
+```tsx
+// plugins/check-path/react/src/index.tsx
+import { CheckPathPlugin as CheckPathCorePlugin } from "@player-ui/check-path-plugin";
+
+export class CheckPathPlugin
+  extends CheckPathCorePlugin
+  implements ReactPlayerPlugin
+{
+  name = "check-path-web";
+
+  applyReact(rp: ReactPlayer) {
+    rp.hooks.webComponent.tap(this.name, (Comp) => {
+      const plugin = this;
+      return function CheckPathContextWrapper() {
+        return (
+          <CheckPathContext.Provider value={{ plugin }}>
+            <Comp />
+          </CheckPathContext.Provider>
+        );
+      };
+    });
+  }
+}
+```
+
+Extends the core class (Pattern B) — inherits `getParent()`, `hasParentContext()`, etc.
+
+### JVM (Kotlin)
+
+```kotlin
+// plugins/check-path/jvm/src/.../CheckPathPlugin.kt
+class CheckPathPlugin : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
+    fun getAsset(id: String): Asset? =
+        instance.getInvokable<Any?>("getAsset")?.invoke(id) as? Asset
+
+    private companion object {
+        private const val BUNDLED_SOURCE_PATH = "plugins/check-path/core/dist/CheckPathPlugin.native.js"
+        private const val PLUGIN_NAME = "CheckPathPlugin.CheckPathPlugin"
+    }
+}
+
+val Player.checkPathPlugin: CheckPathPlugin? get() = findPlugin()
+```
+
+### iOS (Swift)
+
+```swift
+// plugins/check-path/ios/Sources/CheckPathPlugin.swift
+open class BaseCheckPathPlugin: JSBasePlugin {
+    public func getParentContext(id: String, query: String? = nil) -> Any? {
+        let arguments = query != nil ? [id, query!] : [id]
+        return pluginRef?.invokeMethod("getParent", withArguments: arguments)?.toObject()
+    }
+
+    override open func getUrlForFile(fileName: String) -> URL? {
+        #if SWIFT_PACKAGE
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        #else
+        ResourceUtilities.urlForFile(name: fileName, ext: "js",
+            bundle: Bundle(for: BaseCheckPathPlugin.self),
+            pathComponent: "PlayerUI_CheckPathPlugin.bundle")
+        #endif
+    }
+}
+
+open class CheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
+    public convenience init() {
+        self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
+    }
+}
+```
+
+### SwiftUI
+
+```swift
+// plugins/check-path/swiftui/Sources/SwiftUICheckPathPlugin.swift
+public class SwiftUICheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
+    public convenience init() {
+        self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
+    }
+
+    public func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        player.hooks?.view.tap(name: self.pluginName) { [weak self] view in
+            AnyView(view.environment(\.checkPath, self))
+        }
+    }
+}
+
+struct CheckPathPluginKey: EnvironmentKey {
+    static var defaultValue: BaseCheckPathPlugin?
+}
+
+extension EnvironmentValues {
+    var checkPath: BaseCheckPathPlugin? {
+        get { self[CheckPathPluginKey.self] }
+        set { self[CheckPathPluginKey.self] = newValue }
+    }
+}
+```
+
+Both the iOS and SwiftUI classes extend `BaseCheckPathPlugin`, sharing the JS bridging and method implementations. The SwiftUI class adds the `EnvironmentValues` integration so SwiftUI asset views can access the plugin via `@Environment(\.checkPath)`. The `EnvironmentKey` struct and `EnvironmentValues` extension are required boilerplate for this pattern.
+
+---
+
+## Testing
+
+Each platform layer has its own test approach. See the platform-specific skills for full details.
+
+| Layer   | Framework / Approach           | Key utilities                                                                                                |
+| ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Core TS | Vitest                         | `@player-ui/make-flow` for flow fixtures                                                                     |
+| React   | Vitest + React Testing Library | `@player-ui/react` test helpers                                                                              |
+| JVM     | JUnit 5 with `@TestTemplate`   | `PlayerTest`, `RuntimePluginTest` from `jvm/testutils` — runs tests against each JS runtime on the classpath |
+| iOS     | XCTest                         | `HeadlessPlayerImpl(plugins:)` for integration tests                                                         |
+| SwiftUI | XCTest + ViewInspector         | `SwiftUIAssetUnitTestCase` base class                                                                        |
+
+**JVM testing example** (verifies the plugin loads and exposes its API):
+
+```kotlin
+class <PluginName>Test : PlayerTest() {
+    override val plugins = listOf(<PluginName>())
+
+    @TestTemplate
+    fun `plugin is registered`() {
+        assertNotNull(player.findPlugin<<PluginName>>())
+    }
+}
+```
+
+`PlayerTest` extends `RuntimeTest` which uses JUnit 5's `@TestTemplate` to parametrize each test across all available JS runtime implementations (e.g., J2V8, Hermes, GraalJS).
+
+**iOS testing example:**
+
+```swift
+class <PluginName>PluginTests: XCTestCase {
+    func testPluginApplies() {
+        let plugin = <PluginName>Plugin()
+        let player = HeadlessPlayerImpl(plugins: [plugin])
+        XCTAssertNotNil(player)
+    }
+}
+```
+
+---
+
+## Convenience Extensions
+
+A common pattern across platforms is to provide a convenience getter so consumers don't need to know the plugin type when retrieving it:
+
+| Platform   | Pattern                                                            |
+| ---------- | ------------------------------------------------------------------ |
+| TypeScript | `player.findPlugin<<PluginName>>(<PluginName>.Symbol)`             |
+| Kotlin/JVM | `val Player.<pluginName>: <PluginName>? get() = findPlugin()`      |
+| Swift/iOS  | `player.findPlugin(type: <PluginName>Plugin.self)`                 |
+| SwiftUI    | `@Environment(\.<pluginKey>) var plugin` (via `EnvironmentValues`) |

@@ -1,0 +1,190 @@
+---
+title: Claude Code Skills
+---
+
+The `@player-ui/skills` package provides [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) that guide AI assistants through common Player UI development tasks. Skills are markdown files that give Claude domain-specific knowledge for creating plugins, understanding hooks, and working across platforms.
+
+## Available Skills
+
+| Skill ID                      | Name                           | Description                                                                                                           |
+| ----------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `create-core-plugin`          | Create Core Player Plugin      | Create TypeScript plugins for the core Player runtime with hooks, expressions, schema/validation, and data middleware |
+| `create-react-plugin`         | Create React Player Plugin     | Create React plugins with asset registration, ReactPlayer hooks, context providers, and ReactAsset components         |
+| `create-android-plugin`       | Create Android Player Plugin   | Create Android/Kotlin plugins with AndroidPlayerPlugin, JVM hooks, JS-backed plugins, and Jetpack Compose assets      |
+| `create-jvm-plugin`           | Create JVM Player Plugin       | Create JVM/Kotlin plugins for server-side and testing with HeadlessPlayer, coroutines, and JS runtime bridging        |
+| `create-swift-plugin`         | Create Swift/iOS Player Plugin | Create Swift/iOS plugins with NativePlugin, JSBasePlugin, SwiftUI hooks, and ManagedPlayerPlugin                      |
+| `create-multiplatform-plugin` | Create Multiplatform Plugin    | Create plugins spanning TypeScript, React, Android, iOS, and SwiftUI with shared architecture and native bundles      |
+| `player-hooks-guide`          | Player Hooks Guide             | Complete reference for the Player UI hook system, tapable-ts patterns, and controller hooks                           |
+
+## Installation
+
+Install skills interactively using the CLI:
+
+```bash
+npx @player-ui/skills install
+```
+
+Or build from source in the monorepo:
+
+```bash
+bazel build //tools/skills:@player-ui/skills
+```
+
+## Usage
+
+### install
+
+Interactively select and install skills.
+
+```bash
+npx @player-ui/skills install
+```
+
+1. A multi-select list displays all available skills
+2. Toggle skills with **Space**, confirm with **Enter**
+3. Choose a scope:
+   - **Local**: Installs to `.claude/skills/` in the current repository
+   - **Global**: Installs to `~/.claude/skills/` in your home directory
+
+### list
+
+View and manage currently installed skills.
+
+```bash
+npx @player-ui/skills list
+```
+
+1. Choose a scope (local or global)
+2. A multi-select list shows all skills with installed ones pre-checked
+3. Toggle skills to add or remove them, then confirm with **Enter**
+
+Only skills from this package are managed - skills from other sources are never modified.
+
+## How Skills Work
+
+Skills are markdown files that Claude Code loads automatically to gain domain-specific knowledge. When a user's prompt matches a skill's description, Claude uses the skill's content to produce better, more accurate code.
+
+### Scope Precedence
+
+If a skill is installed in both local and global directories, the **local** copy takes precedence.
+
+### SKILL.md Format
+
+Each skill file has YAML front matter followed by the skill body:
+
+```markdown
+---
+name: Create Core Player Plugin
+description: Use when the user wants to create a Player UI plugin in TypeScript...
+version: "2.0"
+argument-hint: "[plugin-name e.g. analytics-tracker]"
+---
+
+# Create Core Player Plugin
+
+(detailed instructions, templates, API references, testing patterns...)
+```
+
+The installer reads `name` and `description` from the front matter. The `version` and `argument-hint` fields are informational.
+
+## Skill Reference
+
+### Create Core Player Plugin
+
+Guides creation of TypeScript plugins for the core Player runtime. Covers:
+
+- `PlayerPlugin` interface implementation
+- Hook system (11 top-level hooks including `state`, `flowController`, `viewController`, `dataController`)
+- Schema, validation, and data type management
+- Data controller middleware for intercepting operations
+- Plugin composition with `MetaPlugin`
+- Testing with Vitest and `@player-ui/make-flow`
+
+### Create React Player Plugin
+
+Guides creation of React-specific plugins. Covers:
+
+- `ReactPlayerPlugin` interface and React-specific hooks
+- Asset component registration via `AssetProviderPlugin`
+- React context providers wrapping the component tree
+- Child asset rendering with `ReactAsset` component
+- `usePlayer()`, `useReactPlayer()`, and custom hooks
+- Testing with Vitest and `@testing-library/react`
+
+### Create Android Player Plugin
+
+Guides creation of Android/Kotlin plugins. Covers:
+
+- `AndroidPlayerPlugin` interface for Android features
+- `JSScriptPluginWrapper` for JS bundle integration
+- `ComposableAsset` for Jetpack Compose UI
+- Plugin lifecycle (RuntimePlugin, JSPlugin, PlayerPlugin, AndroidPlayerPlugin)
+- Asset registration with `registerAsset()`
+- Testing with JUnit and instrumented tests
+
+### Create JVM Player Plugin
+
+Guides creation of headless JVM/Kotlin plugins. Covers:
+
+- `HeadlessPlayer` for server-side flow execution
+- `PlayerPlugin`, `RuntimePlugin`, and `LoggerPlugin` interfaces
+- Async flow results via `Completable<CompletedState>`
+- Coroutine integration with player lifecycle scope
+- JS hook bridging (`NodeSyncHook1`, `NodeAsyncWaterfallHook2`)
+- Testing with JUnit 5 and `PlayerTest` base class
+
+### Create Swift/iOS Player Plugin
+
+Guides creation of Swift/iOS plugins. Covers:
+
+- `NativePlugin` for pure Swift plugins
+- `JSBasePlugin` for wrapping JS bundles via JavaScriptCore
+- `ManagedPlayerPlugin` for lifecycle integration
+- SwiftUI hooks for view modification and transitions
+- Cross-plugin discovery via `WithSymbol` protocol
+- Testing with XCTest and `HeadlessPlayerImpl`
+
+### Create Multiplatform Player Plugin
+
+Comprehensive guide for plugins spanning all platforms. Covers:
+
+- Architecture: Core TypeScript compiled to native IIFE bundles
+- Directory structure for multi-platform plugins
+- Platform wrappers (JVM: `JSScriptPluginWrapper`, iOS: `JSBasePlugin`)
+- Consistent naming conventions across platforms
+- Build system configuration (Bazel, npm, Maven, SPM)
+- Real-world example: `check-path` plugin walkthrough
+
+### Player Hooks Guide
+
+Complete reference for the hook system. Covers:
+
+- All 11 top-level Player hooks
+- Controller-level hooks (ViewController, DataController, ValidationController, etc.)
+- Hook types from tapable-ts (SyncHook, AsyncSeriesHook, WaterfallHook, etc.)
+- When to use each hook
+- Hook registration patterns and best practices
+
+## Adding Custom Skills
+
+To add a new skill to the package:
+
+1. Create a directory under `skills/`:
+
+   ```
+   skills/my-new-skill/
+     SKILL.md
+   ```
+
+2. Add YAML front matter with `name` and `description`:
+
+   ```markdown
+   ---
+   name: My New Skill
+   description: Use when the user wants to...
+   ---
+   ```
+
+3. Write detailed guidance, templates, and references in the body.
+
+4. The skill is automatically discovered by the CLI.
