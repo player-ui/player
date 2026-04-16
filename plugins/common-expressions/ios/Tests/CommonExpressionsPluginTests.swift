@@ -13,9 +13,15 @@ import JavaScriptCore
 @testable import PlayerUICommonExpressionsPlugin
 
 class CommonExpressionsPluginTests: XCTestCase {
-    func testPluginConstructs() {
-        let context = JSContext()
+    var context: JSContext!
 
+    override func setUp() {
+        super.setUp()
+        context = JSContext()
+        context.loadCore()
+    }
+
+    func testPluginConstructs() {
         let plugin = CommonExpressionsPlugin()
         plugin.context = context
 

@@ -19,8 +19,15 @@ class BPPlugin: JSBasePlugin {
 }
 
 class BaseBeaconPluginTests: XCTestCase {
+    var context: JSContext!
+
+    override func setUp() {
+        super.setUp()
+        context = JSContext()
+        JSUtilities.polyfill(context)
+        context.loadCore()
+    }
     func testBundleLoadsSymbols() {
-        let context = JSContext()!
 
         let plugin = BaseBeaconPlugin<DefaultBeacon>() { _ in }
 
@@ -31,8 +38,6 @@ class BaseBeaconPluginTests: XCTestCase {
         XCTAssertFalse(context.objectForKeyedSubscript("BeaconPlugin").objectForKeyedSubscript("BeaconPluginSymbol").isUndefined)
     }
     func testBeaconPluginAppliesContextToPlugins() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
         let bpp = BPPlugin(fileName: "", pluginName: "")
 
         let plugin = BaseBeaconPlugin<DefaultBeacon>(plugins: [bpp]) { _ in }
@@ -42,8 +47,6 @@ class BaseBeaconPluginTests: XCTestCase {
     }
 
     func testBeaconFunction() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
 
         let beaconed = expectation(description: "Beacon sent")
 
@@ -55,8 +58,6 @@ class BaseBeaconPluginTests: XCTestCase {
     }
 
     func testBeaconPluginStringData() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
         let plugin = BaseBeaconPlugin<DefaultBeacon>( onBeacon: { (beacon) in
@@ -82,8 +83,6 @@ class BaseBeaconPluginTests: XCTestCase {
     }
 
     func testBeaconPluginDictionaryData() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
         let plugin = BaseBeaconPlugin<DefaultBeacon>(onBeacon: { (beacon) in
@@ -109,8 +108,6 @@ class BaseBeaconPluginTests: XCTestCase {
     }
 
     func testBeaconPluginAnyDictionaryData() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
         let plugin = BaseBeaconPlugin<DefaultBeacon>(onBeacon: { (beacon) in
@@ -138,8 +135,6 @@ class BaseBeaconPluginTests: XCTestCase {
     }
 
     func testCancelSpecificBeaconsUsingHooks() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
 
         let cancelBeaconHandler = expectation(description: "Cancel Beacon Handler called")
         let handlerExpectation = expectation(description: "Handler called")
@@ -184,8 +179,6 @@ class BaseBeaconPluginTests: XCTestCase {
     }
 
     func testBuildSpecificBeaconsUsingHooks() {
-        let context = JSContext()!
-        JSUtilities.polyfill(context)
         let buildBeaconHandler = expectation(description: "Build Beacon Handler called")
         let handlerExpectation = expectation(description: "Handler called")
         handlerExpectation.expectedFulfillmentCount = 1

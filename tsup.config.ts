@@ -68,7 +68,7 @@ function getStampedSubstitutions(): Record<string, string> {
   return substitutions;
 }
 
-export function createConfig(): ReturnType<typeof defineConfig> {
+export function createConfig(overrides: Options = {}): ReturnType<typeof defineConfig> {
   return defineConfig((options: Options) => {
     const pkgJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
@@ -77,6 +77,7 @@ export function createConfig(): ReturnType<typeof defineConfig> {
       sourcemap: true,
       define: getStampedSubstitutions(),
       ...options,
+      ...overrides,
     };
 
     if (process.env.PLAYER_NATIVE_BUNDLE) {

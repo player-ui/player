@@ -13,9 +13,16 @@ import JavaScriptCore
 @testable import PlayerUITypesProviderPlugin
 
 class TypesProviderPluginTests: XCTestCase {
+    var context: JSContext!
+
+    override func setUp() {
+        super.setUp()
+        context = JSContext()
+        context.loadCore()
+    }
     func testFormatReferenceConversion() {
         let plugin = TypesProviderPlugin(types: [], validators: [], formats: [])
-        plugin.context = JSContext()
+        plugin.context = context
 
         let formatRef = FormatReference(type: "test", options: ["someOption": "someValue"])
         XCTAssertEqual(
@@ -26,7 +33,7 @@ class TypesProviderPluginTests: XCTestCase {
 
     func testFormatReferenceDefaultOptionsConversion() {
         let plugin = TypesProviderPlugin(types: [], validators: [], formats: [])
-        plugin.context = JSContext()
+        plugin.context = context
 
         let formatRef = FormatReference(type: "test")
         XCTAssertEqual(
@@ -37,7 +44,7 @@ class TypesProviderPluginTests: XCTestCase {
 
     func testValidationReferenceConversion() {
         let plugin = TypesProviderPlugin(types: [], validators: [], formats: [])
-        plugin.context = JSContext()
+        plugin.context = context
 
         let validationRef = ValidationReference(type: "test", message: "Bad Value", severity: "error", trigger: "start", options: ["someOption": "someValue"])
 
@@ -57,7 +64,7 @@ class TypesProviderPluginTests: XCTestCase {
 
     func testCustomTypeConversion() {
         let plugin = TypesProviderPlugin(types: [], validators: [], formats: [])
-        plugin.context = JSContext()
+        plugin.context = context
 
         let customType = CustomType(type: "", validation: [], format: nil, isArray: false, defaultValue: 1)
         let customTypeExpect = Set([
@@ -76,7 +83,7 @@ class TypesProviderPluginTests: XCTestCase {
 
     func testValidationHandler() {
         let plugin = TypesProviderPlugin(types: [], validators: [], formats: [])
-        plugin.context = JSContext()
+        plugin.context = context
 
         let validationExpectation = XCTestExpectation(description: "Validation Called")
         let validation = ValidationDeclaration(type: "test", handler: {_, _, _ in
@@ -90,7 +97,7 @@ class TypesProviderPluginTests: XCTestCase {
 
     func testFormatHandlers() {
         let plugin = TypesProviderPlugin(types: [], validators: [], formats: [])
-        plugin.context = JSContext()
+        plugin.context = context
 
         let formatExpectation = XCTestExpectation(description: "Format Called")
         let deformatExpectation = XCTestExpectation(description: "Deformat Called")

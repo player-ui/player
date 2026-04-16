@@ -16,9 +16,15 @@ import JavaScriptCore
 @testable import PlayerUICheckPathPlugin
 
 class CheckPathPluginTests: XCTestCase {
-    func testCheckPathPluginConstructs() {
-        let context = JSContext()!
+    var context: JSContext!
 
+    override func setUp() {
+        super.setUp()
+        context = JSContext()
+        context.loadCore()
+    }
+
+    func testCheckPathPluginConstructs() {
         let plugin = CheckPathPlugin()
         plugin.context = context
 
