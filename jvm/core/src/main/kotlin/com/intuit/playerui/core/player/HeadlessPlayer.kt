@@ -1,6 +1,7 @@
 package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.Completable
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.Promise
@@ -13,6 +14,7 @@ import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
@@ -50,7 +52,7 @@ import java.net.URL
  */
 @Suppress("ktlint:standard:annotation") // To prevent class from being double indented
 public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public constructor(
-    override val plugins: List<Plugin>,
+    plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
@@ -71,6 +73,9 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     ) : this(plugins.toList(), explicitRuntime, config = explicitRuntime.config)
 
     private val player: Node
+
+    override var plugins: List<Plugin> = plugins
+        private set
 
     override val node: Node by ::player
 
@@ -171,6 +176,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
             .onEach { it.apply(this) }
     }
 
+    private val registerPlugin: Invokable<Unit> by NodeSerializableFunction()
+
     override fun start(flow: String): Completable<CompletedState> = try {
         start(runtime.execute("($flow)") as Node)
     } catch (exception: Exception) {
@@ -191,6 +198,18 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
             hooks.state.call(HashMap(), arrayOf(ReleasedState))
             runtime.release()
         }
+    }
+
+    /** Register and apply a [Plugin] to this player after instantiation. */
+    override fun registerPlugin(plugin: Plugin) {
+        plugins = plugins + plugin
+        if (plugin is RuntimePlugin) {
+            plugin.apply(runtime)
+            if (plugin is JSPluginWrapper) {
+                registerPlugin.invoke(plugin.instance)
+            }
+        }
+        if (plugin is PlayerPlugin) plugin.apply(this)
     }
 
     internal companion object {

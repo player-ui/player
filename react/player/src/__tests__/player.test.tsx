@@ -94,4 +94,69 @@ describe("ReactPlayer", () => {
       </Suspense>,
     );
   }
+
+  describe("registerPlugin", () => {
+    it("should call apply on the underlying core player for a plugin with only apply", () => {
+      let applyCalled = false;
+      const corePlugin: ReactPlayerPlugin = {
+        name: "core-only-plugin",
+        apply: () => {
+          applyCalled = true;
+        },
+      };
+
+      const rp = new ReactPlayer({ plugins: [] });
+      rp.registerPlugin(corePlugin);
+
+      expect(applyCalled).toBe(true);
+      expect(rp.options.plugins).toContain(corePlugin);
+    });
+
+    it("should call both apply and applyReact for a plugin with both", () => {
+      let applyCalled = false;
+      let applyReactCalled = false;
+      const dualPlugin: ReactPlayerPlugin = {
+        name: "dual-plugin",
+        apply: () => {
+          applyCalled = true;
+        },
+        applyReact: () => {
+          applyReactCalled = true;
+        },
+      };
+
+      const rp = new ReactPlayer({ plugins: [] });
+      rp.registerPlugin(dualPlugin);
+
+      expect(applyCalled).toBe(true);
+      expect(applyReactCalled).toBe(true);
+    });
+
+    it("should call applyReact for a plugin with only applyReact", () => {
+      let applyReactCalled = false;
+      const reactPlugin: ReactPlayerPlugin = {
+        name: "react-only-plugin",
+        applyReact: () => {
+          applyReactCalled = true;
+        },
+      };
+
+      const rp = new ReactPlayer({ plugins: [] });
+      rp.registerPlugin(reactPlugin);
+
+      expect(applyReactCalled).toBe(true);
+      expect(rp.options.plugins).toContain(reactPlugin);
+    });
+
+    it("should initialize plugins array if undefined", () => {
+      const plugin: ReactPlayerPlugin = {
+        name: "test-plugin",
+      };
+
+      const rp = new ReactPlayer({});
+      rp.registerPlugin(plugin);
+
+      expect(rp.options.plugins).toContain(plugin);
+    });
+  });
 });
