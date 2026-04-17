@@ -7,7 +7,7 @@ import type { Resolve } from "./types";
 export function caresAboutDataChanges(
   dataChanges?: Set<BindingInstance>,
   dependencies?: Set<BindingInstance>,
-) {
+): boolean {
   if (!dataChanges || !dependencies) {
     return true;
   }

@@ -3,7 +3,9 @@ package com.intuit.playerui.j2v8.bridge.serialization.serializers
 import com.eclipsesource.v8.V8Object
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer.SerializableStackTraceElement
+import com.intuit.playerui.core.error.ErrorSeverity
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.PlayerExceptionMetadata
 import com.intuit.playerui.j2v8.base.J2V8Test
 import com.intuit.playerui.j2v8.bridge.serialization.format.decodeFromV8Value
 import com.intuit.playerui.j2v8.extensions.evaluateInJSThreadBlocking
@@ -11,8 +13,21 @@ import com.intuit.playerui.utils.normalizeStackTraceElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 
 private inline fun currentStackTrace() = Exception().stackTrace
+
+private class ExceptionWithMetadata(
+    message: String,
+    cause: Throwable? = null,
+) : PlayerException(message, cause),
+    PlayerExceptionMetadata {
+    override val type: String = "TestError"
+    override val severity: ErrorSeverity = ErrorSeverity.ERROR
+    override val metadata: Map<String, Any?> = mapOf(
+        "testProperty" to "testValue",
+    )
+}
 
 // TODO: This should be a core [RuntimeTest]
 internal class ThrowableSerializerTest : J2V8Test() {
@@ -67,6 +82,48 @@ internal class ThrowableSerializerTest : J2V8Test() {
                         serializableStackTraceElement,
                     ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
+        }
+    }
+
+    @Test
+    fun `Additional PlayerExceptionMetadata properties are added to JS Error`() {
+        val stackTraceElement = currentStackTrace().first()
+        val className = stackTraceElement.className
+        val methodName = stackTraceElement.methodName
+        val fileName = stackTraceElement.fileName
+        val lineNumber = stackTraceElement.lineNumber
+        val serializableStackTraceElement = SerializableStackTraceElement(
+            className,
+            methodName,
+            fileName,
+            lineNumber,
+        )
+
+        val exception = ExceptionWithMetadata("world")
+        exception.stackTrace = arrayOf(stackTraceElement)
+        val error = format.encodeToRuntimeValue(ThrowableSerializer(), exception)
+
+        assertTrue(error is V8Object)
+        error as V8Object
+
+        error.evaluateInJSThreadBlocking(runtime) {
+            assertEquals("world", error.get("message"))
+            assertEquals(exception.stackTraceToString(), error.getString("stack"))
+
+            assertEquals(true, error.get("serialized"))
+            assertTrue(
+                format
+                    .encodeToRuntimeValue(
+                        SerializableStackTraceElement.serializer(),
+                        serializableStackTraceElement,
+                    ).jsEquals(error.getArray("stackTrace").getObject(0)),
+            )
+
+            assertEquals(ErrorSeverity.ERROR.value, error.get("severity"))
+            assertEquals("TestError", error.get("type"))
+            val metadata = error.get("metadata")
+            assertInstanceOf<V8Object>(metadata)
+            assertEquals("testValue", metadata.get("testProperty"))
         }
     }
 

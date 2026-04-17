@@ -3,7 +3,7 @@ import type { Flow, NavigationFlowViewState } from "@player-ui/types";
 import type { FlowController } from "../controllers";
 import TrackBindingPlugin from "./helpers/binding.plugin";
 import type { InProgressState } from "../types";
-import { Player } from "..";
+import { Player, PlayerPlugin } from "..";
 import { ActionExpPlugin } from "./helpers/action-exp.plugin";
 
 const minimal: Flow = {
@@ -710,6 +710,39 @@ describe("view update scheduling", () => {
           },
         },
       });
+    });
+  });
+});
+
+describe("view error capturing", () => {
+  test("should capture errors caused during view resolution and send them to the errorController", async () => {
+    const errorControllerSpy = vitest.fn(() => undefined);
+    const viewFailurePlugin: PlayerPlugin = {
+      name: "ViewFailurePlugin",
+      apply: (player) => {
+        // Force resolution failures to capture in the view controller
+        player.hooks.view.tap("fail", (view) => {
+          view.hooks.resolver.tap("fail", (resolver) => {
+            resolver.hooks.beforeResolve.tap("fail", () => {
+              throw new Error("ERROR!");
+            });
+          });
+        });
+
+        player.hooks.errorController.tap("fail", (controller) => {
+          controller.hooks.onError.tap("fail", errorControllerSpy);
+        });
+      },
+    };
+
+    const player = new Player({ plugins: [viewFailurePlugin] });
+    player.start(minimal).catch(() => {});
+    await vitest.waitFor(() => {
+      expect(errorControllerSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          cause: new Error("ERROR!"),
+        }),
+      );
     });
   });
 });

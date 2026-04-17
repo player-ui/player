@@ -48,7 +48,7 @@ class SwiftUIPlayerTests: XCTestCase {
             guard
                 case let .failure(error) = $0,
                 case let .promiseRejected(errorState) = error,
-                errorState.error.contains("Key not found at coding path label.asset.value")
+                errorState.error.message.contains("Key not found at coding path label.asset.value")
             else { return }
             failed.fulfill()
         })

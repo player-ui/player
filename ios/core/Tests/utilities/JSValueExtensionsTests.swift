@@ -15,7 +15,8 @@ import JavaScriptCore
 
 class JSValueExtensionsTests: XCTestCase {
     let context: JSContext = JSContext()
-    func testTryCatchWrapperReturningError() {
+    /// Test case for base JS Errors
+    func testTryCatchThrowsSimpleError() {
 
         let functionReturningError = self.context
             .evaluateScript("""
@@ -24,11 +25,69 @@ class JSValueExtensionsTests: XCTestCase {
                              })
                            """)
 
-        do {
-            let _ = try functionReturningError?.tryCatch(args: [] as [String])
-        } catch let error {
-            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Fail"))
-        }
+        XCTAssertThrowsError(try functionReturningError?.tryCatch(args: [] as [String]), "", { error in
+            guard let jsValueError = error as? JSValueError else {
+                XCTFail("Should throw a JSValueError")
+                return
+            }
+            
+            XCTAssertFalse(jsValueError.isErrorWithMetadata)
+            XCTAssertEqual(jsValueError.message, "Fail")
+        })
+    }
+    
+    /// Test case for errors thrown with error controller metadata. Check that metadata is preserved
+    func testTryCatchThrowsErrorWithMetadata() {
+
+        let functionReturningError = self.context
+            .evaluateScript("""
+                             (() => {
+                                const error = new Error("Fail")
+                                error.type = "Error Type"
+                                error.severity = "error"
+                                error.metadata = {
+                                  property: "value"
+                                }
+                                throw error
+                             })
+                           """)
+
+        XCTAssertThrowsError(try functionReturningError?.tryCatch(args: [] as [String]), "", { error in
+            guard let jsValueError = error as? JSValueError else {
+                XCTFail("Should throw a JSValueError")
+                return
+            }
+            
+            XCTAssertEqual(jsValueError.message, "Fail")
+            XCTAssertEqual(jsValueError.type, "Error Type")
+            XCTAssertEqual(jsValueError.severity, ErrorSeverity.error)
+            XCTAssertNotNil(jsValueError.metadata)
+            XCTAssertEqual(jsValueError.metadata?["property"] as? String, "value")
+            XCTAssertTrue(jsValueError.isErrorWithMetadata)
+        })
+    }
+    
+    /// Test case for non-Errror throws in JS. Need to ensure we still throw something
+    func testTryCatchThrowsUnknownError() {
+
+        let functionReturningError = self.context
+            .evaluateScript("""
+                             (() => {
+                                throw false
+                             })
+                           """)
+
+        XCTAssertThrowsError(try functionReturningError?.tryCatch(args: [] as [String]), "", { error in
+            guard let jsValueError = error as? JSValueError else {
+                XCTFail("Should throw a JSValueError")
+                return
+            }
+            
+            XCTAssertTrue(jsValueError.originalJSError.isBoolean)
+            XCTAssertFalse(jsValueError.originalJSError.toBool())
+            XCTAssertEqual(jsValueError.message, "Unknown JS Error")
+            XCTAssertFalse(jsValueError.isErrorWithMetadata)
+        })
     }
 
     func testTryCatchWrapperReturningNumber() {
@@ -59,7 +118,13 @@ class JSValueExtensionsTests: XCTestCase {
                         do {
                             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
                         } catch let error {
-                            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"))
+                            guard let jsValueError = error as? JSValueError else {
+                                XCTFail("Should throw a JSValueError")
+                                return
+                            }
+                            
+                            XCTAssertEqual(jsValueError.message, "Transitioning while ongoing transition from VIEW_1 is in progress is not supported")
+                            XCTAssertFalse(jsValueError.isErrorWithMetadata)
                             expectation.fulfill()
                         }
 

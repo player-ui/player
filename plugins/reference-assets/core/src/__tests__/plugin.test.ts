@@ -16,7 +16,7 @@ const makeFlow = (asyncNodeCount: number, useDemoId = true): Flow => ({
   id: "flow-with-async",
   views: [
     {
-      id: useDemoId ? "collection-async-chat-demo" : "view",
+      id: useDemoId ? "chat-view" : "view",
       type: "view",
       values: Array.from({ length: asyncNodeCount }, (_, index) => ({
         async: true,
@@ -30,7 +30,44 @@ const makeFlow = (asyncNodeCount: number, useDemoId = true): Flow => ({
       startState: "VIEW_1",
       VIEW_1: {
         state_type: "VIEW",
-        ref: useDemoId ? "collection-async-chat-demo" : "view",
+        ref: useDemoId ? "chat-view" : "view",
+        transitions: {
+          "*": "END_DONE",
+        },
+      },
+      END_DONE: {
+        state_type: "END",
+        outcome: "DONE",
+      },
+    },
+  },
+});
+
+const makeBrokenFlow = (asyncNodeCount: number, useDemoId = true): Flow => ({
+  id: "flow-with-async",
+  views: [
+    {
+      id: useDemoId ? "chat-view" : "view",
+      type: "view",
+      collection: {
+        asset: {
+          type: "collection",
+          id: "collection-async-chat-demo",
+          values: Array.from({ length: asyncNodeCount }, (_, index) => ({
+            async: true,
+            id: `id-${index}`,
+          })),
+        },
+      },
+    },
+  ],
+  navigation: {
+    BEGIN: "FlowStart",
+    FlowStart: {
+      startState: "VIEW_1",
+      VIEW_1: {
+        state_type: "VIEW",
+        ref: useDemoId ? "chat-view" : "view",
         transitions: {
           "*": "END_DONE",
         },
@@ -282,6 +319,129 @@ describe("ReferenceAssetsPlugin", () => {
       // tap should complete immediately
       await vi.waitFor(() => {
         expect(asyncHookTap).toHaveBeenCalled();
+      });
+    });
+
+    // This test succeeds because the `sendBroken` content is meant to fail at render-time. Need to render in any framework to see issues.
+    it("should resolve allow for single resolution by id with sendBroken", async () => {
+      const asyncHookTap = vi.fn();
+      asyncPlugin.hooks.onAsyncNode.intercept({
+        context: false,
+        call: asyncHookTap,
+      });
+      player.start(makeFlow(2));
+
+      await vi.waitFor(() => {
+        expect(asyncHookTap).toHaveBeenCalledTimes(2);
+      });
+
+      const state = player.getState();
+
+      expect(state.status).toBe("in-progress");
+      // resolve the second async node by targeting it by id
+      (state as InProgressState).controllers.expression.evaluate(
+        "sendBroken('first resolve', 'id-1')",
+      );
+
+      await vi.waitFor(() => {
+        const nextState = player.getState();
+        expect(nextState.status).toBe("in-progress");
+        const inProgress = nextState as InProgressState;
+        const view = inProgress.controllers.view.currentView?.lastUpdate;
+        expect(view).toBeDefined();
+        // Don't need to test the whole view, just that the values array has been updated with the results of the 'send' command
+        expect(view).toStrictEqual(
+          expect.objectContaining({
+            values: [
+              {
+                asset: expect.objectContaining({
+                  id: "chat-demo-0",
+                  type: "input",
+                  binding: "binding",
+                  label: 100,
+                }),
+              },
+            ],
+          }),
+        );
+      });
+    });
+  });
+
+  describe("ErrorRecoveryPlugin", () => {
+    it("should not recover from errors in views other than the 'chat-view' demo", async () => {
+      const asyncHookTap = vi.fn();
+      asyncPlugin.hooks.onAsyncNode.intercept({
+        context: false,
+        call: asyncHookTap,
+      });
+      // Catch the exception to ensure vitest does not report unresolved exceptions. can also be used to compare with the final error state.
+      player.start(makeBrokenFlow(2, false)).catch(() => {});
+
+      await vi.waitFor(() => {
+        expect(asyncHookTap).toHaveBeenCalledTimes(2);
+      });
+
+      const state = player.getState();
+
+      expect(state.status).toBe("in-progress");
+      (state as InProgressState).controllers.expression.evaluate(
+        "sendBrokenTransform('message')",
+      );
+
+      await vi.waitFor(() => {
+        const nextState = player.getState();
+        expect(nextState.status).toBe("in-progress");
+      });
+    });
+
+    it("should recover from errors in 'chat-view'", async () => {
+      const asyncHookTap = vi.fn();
+      asyncPlugin.hooks.onAsyncNode.intercept({
+        context: false,
+        call: asyncHookTap,
+      });
+      player.start(makeFlow(1));
+
+      await vi.waitFor(() => {
+        expect(asyncHookTap).toHaveBeenCalledTimes(1);
+      });
+
+      const state = player.getState();
+
+      expect(state.status).toBe("in-progress");
+      (state as InProgressState).controllers.expression.evaluate(
+        "sendBrokenTransform('message')",
+      );
+
+      await vi.waitFor(() => {
+        const nextState = player.getState();
+        expect(nextState.status).toBe("in-progress");
+        const inProgress = nextState as InProgressState;
+        const view = inProgress.controllers.view.currentView?.lastUpdate;
+        expect(view).toBeDefined();
+        // Don't need to test the whole view, just that the values array has been updated with the results of the 'send' command
+        expect(view).toStrictEqual(
+          expect.objectContaining({
+            values: [
+              {
+                asset: {
+                  type: "collection",
+                  id: "collection-async-id-0-recovery",
+                  values: [
+                    {
+                      asset: {
+                        id: "id-0-recovery-text",
+                        type: "text",
+                        value: "Something went wrong, please try again.",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        );
       });
     });
   });

@@ -200,3 +200,16 @@ export declare namespace Resolve {
     afterResolve?: NodeResolveFunction;
   }
 }
+
+export enum ResolverStage {
+  ResolveOptions = "resolveOptions",
+  SkipResolve = "skipResolve",
+  BeforeResolve = "beforeResolve",
+  Resolve = "resolve",
+  AfterResolve = "afterResolve",
+  AfterNodeUpdate = "afterNodeUpdate",
+}
+
+export type ResolverErrorMetadata = {
+  node: Node.Node;
+};
