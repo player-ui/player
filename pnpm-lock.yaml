@@ -509,10 +509,10 @@ importers:
   core/player:
     dependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../make-flow
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../partial-match-registry
       '@player-ui/types':
         specifier: workspace:*
@@ -526,70 +526,70 @@ importers:
         specifier: workspace:*
         version: link:../../core/player
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../react/player
       '@player-ui/reference-assets-plugin-components':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/reference-assets/components
       '@player-ui/reference-assets-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/reference-assets/react
 
   docs/storybook:
     dependencies:
       '@player-ui/async-node-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/async-node/core
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/common-types/core
       '@player-ui/computed-properties-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/computed-properties/core
       '@player-ui/data-change-listener-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/data-change-listener/core
       '@player-ui/expression-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/expression/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/make-flow
       '@player-ui/mocks':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tools/mocks
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../core/player
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../react/player
       '@player-ui/reference-assets-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/reference-assets/core
       '@player-ui/reference-assets-plugin-components':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/reference-assets/components
       '@player-ui/reference-assets-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/reference-assets/react
       '@player-ui/storybook':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tools/storybook
 
   plugins/asset-provider/react:
     dependencies:
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/player
       '@player-ui/react-subscribe':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/subscribe
 
   plugins/asset-transform/core:
     dependencies:
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
         specifier: workspace:*
@@ -605,35 +605,35 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/check-path-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../check-path/core
       '@player-ui/expression-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../expression/core
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
 
   plugins/auto-scroll/react:
     dependencies:
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-types/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/reference-assets-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../reference-assets/core
       '@player-ui/reference-assets-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../reference-assets/react
       '@player-ui/types':
         specifier: workspace:*
@@ -649,65 +649,65 @@ importers:
         version: link:../../../core/types
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/beacon/react:
     dependencies:
       '@player-ui/beacon-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/player
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/check-path/core:
     dependencies:
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/check-path/react:
     dependencies:
       '@player-ui/check-path-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/player
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/common-expressions/core:
     dependencies:
       '@player-ui/expression-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../expression/core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/common-types/core:
@@ -716,17 +716,17 @@ importers:
         specifier: workspace:*
         version: link:../../../core/player
       '@player-ui/types-provider-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../types-provider/core
     devDependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
 
   plugins/computed-properties/core:
@@ -736,19 +736,19 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/common-expressions-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-expressions/core
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-types/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
 
   plugins/console-logger/core:
@@ -764,19 +764,19 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/common-expressions-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-expressions/core
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-types/core
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/reference-assets-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../reference-assets/core
 
   plugins/data-filter/core:
@@ -786,7 +786,7 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/expression/core:
@@ -814,10 +814,10 @@ importers:
         version: link:../../../core/types
     devDependencies:
       '@player-ui/partial-match-fingerprint-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../partial-match-fingerprint/core
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
 
   plugins/meta-plugin/core:
@@ -829,7 +829,7 @@ importers:
   plugins/metrics/core:
     dependencies:
       '@player-ui/beacon-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../beacon/core
       '@player-ui/player':
         specifier: workspace:*
@@ -838,26 +838,26 @@ importers:
   plugins/metrics/react:
     dependencies:
       '@player-ui/metrics-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/player
 
   plugins/partial-match-fingerprint/core:
     dependencies:
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/pubsub/core:
@@ -869,7 +869,7 @@ importers:
   plugins/reference-assets/cli-preset:
     dependencies:
       '@player-ui/reference-assets-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@player-ui/types':
         specifier: workspace:*
@@ -878,72 +878,72 @@ importers:
   plugins/reference-assets/components:
     dependencies:
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-types/core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
       '@player-ui/reference-assets-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
 
   plugins/reference-assets/core:
     dependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/async-node-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../async-node/core
       '@player-ui/beacon-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../beacon/core
       '@player-ui/expression-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../expression/core
       '@player-ui/meta-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../meta-plugin/core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-testing-library':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../tools/asset-testing-library/core
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-types/core
 
   plugins/reference-assets/mocks:
     dependencies:
       '@player-ui/reference-assets-cli-preset':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../cli-preset
       '@player-ui/reference-assets-plugin-components':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../components
 
   plugins/reference-assets/react:
     dependencies:
       '@player-ui/asset-provider-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-provider/react
       '@player-ui/beacon-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../beacon/react
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../react/player
       '@player-ui/reference-assets-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/shared-constants/core:
@@ -953,10 +953,10 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/common-types-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../common-types/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
 
   plugins/stage-revert-data/core:
@@ -966,7 +966,7 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/types':
         specifier: workspace:*
@@ -979,32 +979,32 @@ importers:
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../asset-transform/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/partial-match-registry
 
   react/player:
     dependencies:
       '@player-ui/metrics-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/metrics/core
       '@player-ui/partial-match-registry':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/partial-match-registry
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../core/player
       '@player-ui/react-subscribe':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../subscribe
     devDependencies:
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/make-flow
 
   react/subscribe: {}
@@ -1012,10 +1012,10 @@ importers:
   tools/asset-testing-library/core:
     dependencies:
       '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../plugins/asset-transform/core
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/player':
         specifier: workspace:*
@@ -1026,16 +1026,16 @@ importers:
   tools/storybook:
     dependencies:
       '@player-ui/beacon-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/beacon/react
       '@player-ui/make-flow':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/make-flow
       '@player-ui/metrics-plugin-react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../plugins/metrics/react
       '@player-ui/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../react/player
 
 packages:
