@@ -189,6 +189,9 @@ describe("ReactPlayer", () => {
       rp.registerPlugin(plugin);
 
       expect(rp.options.plugins).toContain(plugin);
+    });
+  });
+
   describe("Error Handling", () => {
     it("should render nothing when an unrecoverable error occurs", async () => {
       let rp: ReactPlayer;

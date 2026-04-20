@@ -15,7 +15,6 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializabl
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataController
 import com.intuit.playerui.core.data.ReadOnlyDataController
-import com.intuit.playerui.core.data.DataModelWithParser
 import com.intuit.playerui.core.error.ErrorController
 import com.intuit.playerui.core.experimental.RuntimeClassDiscriminator
 import com.intuit.playerui.core.expressions.ExpressionController
