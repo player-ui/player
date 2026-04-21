@@ -164,11 +164,11 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         class HasTransitionedPlugin: NativePlugin {
             var pluginName: String = "HasTransitioned"
 
-            var expected: String
+            var expected: NavigationFlowStateType
 
             var expectation: XCTestExpectation
 
-            init(expected: String, expectation: XCTestExpectation) {
+            init(expected: NavigationFlowStateType, expectation: XCTestExpectation) {
                 self.expected = expected
                 self.expectation = expectation
             }
@@ -190,7 +190,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
 
         let context = SwiftUIPlayer.Context()
 
-        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin, HasTransitionedPlugin(expected: "VIEW", expectation: viewTransition)], result: Binding(get: {nil}, set: { (result) in
+        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin, HasTransitionedPlugin(expected: .view, expectation: viewTransition)], result: Binding(get: {nil}, set: { (result) in
             switch result {
             case .success:
                 completionExpectation.fulfill()
@@ -212,7 +212,7 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         wait(for: [viewTransition], timeout: 10)
         let state = player.state as? InProgressState
         XCTAssertNotNil(state)
-        XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, "VIEW")
+        XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, .view)
         XCTAssertNil(plugin.state)
         XCTAssertFalse(plugin.isExternalState)
         do {
