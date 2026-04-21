@@ -5,7 +5,7 @@ context: fork
 ---
 
 ## Current diff (when reviewing a PR)
-- Diff: !`git diff HEAD~1 2>/dev/null || echo "No diff available"`
+- Diff: !`git diff $(git log --oneline --decorate --simplify-by-decoration HEAD | awk 'NR>1{for(i=3;i<=NF;i++) if($i ~ /^origin\// || ($i !~ /HEAD/ && $i !~ /tag:/)) {gsub(/[,)]/,"",$i); print $i; exit}}')...HEAD 2>/dev/null || echo "No diff available"`
 
 # iOS Code Review — Team Conventions
 
@@ -66,33 +66,19 @@ Correct order within a type:
 
 **Why:** Public APIs are hard to change post-release. Placing them at the top makes the contract immediately visible to reviewers without scrolling past implementation details.
 
-### 6. No force-unwrap (`!`) in production code — stricter than Google guide
+### 5. No force-unwrap (`!`) in production code — stricter than Google guide
 Force-unwrap is **forbidden** in production code. Use `guard let`, `if let`, or `??` with an appropriate default. The only acceptable use of `!` is in test code (where crashes surface bugs immediately).
 
 This is stricter than the Google Swift Style Guide, which allows force-unwrap with a safety comment. We do not permit that escape hatch in production.
 
 **Why:** Force-unwrap turns a recoverable nil into an unrecoverable crash. Production code should handle unexpected nils gracefully rather than terminating.
 
-### 7. Use `private extension String` for string constants (not bare literals or `enum`)
-Define file-scoped string constants as a `private extension String` at the bottom of the file:
-```swift
-// ✅ Prefer
-private extension String {
-    static let submitTitle = "Submit"
-}
-// Usage — shorthand works wherever String is accepted
-button.setTitle(.submitTitle)
-```
-Exception: use an `enum` (not `String` extension) for **closed, finite sets** where the compiler should enforce exhaustiveness — e.g. state type discriminators (`VIEW`, `ACTION`, `EXTERNAL`).
-
-**Why:** The `private extension String` pattern enables the clean `.foo` shorthand at every call site without polluting the global namespace. Enums are reserved for cases where exhaustiveness matters.
-
-### 8. Always use `[weak self]` in closures
+### 6. Always use `[weak self]` in closures
 Any closure that captures `self` must use `[weak self]`, regardless of whether a retain cycle is obvious. This includes completion handlers, notification callbacks, and any escaping closure.
 
 **Why:** Retain cycles through closures are easy to introduce and hard to spot in review. Requiring `[weak self]` universally eliminates the need to reason about object lifetimes on a case-by-case basis.
 
-### 9. Always capture `[weak self]` explicitly inside `Task` closures
+### 7. Always capture `[weak self]` explicitly inside `Task` closures
 `Task { }` creates its own capture scope and does **not** inherit `[weak self]` from an enclosing closure. Always re-declare it:
 ```swift
 // ❌ Wrong — self is strongly captured inside the Task
@@ -118,7 +104,7 @@ doSomething { [weak self] in
 
 > Only apply these rules if the diff includes SwiftUI view code.
 
-### 10. Avoid if/else branching on SwiftUI Views
+### 8. Avoid if/else branching on SwiftUI Views
 In SwiftUI, views inside `if/else` branches have different structural identities even if they look identical. Instead of branching on views, branch on *properties* (color, size, text, etc.):
 ```swift
 // ❌ Avoid
@@ -138,7 +124,7 @@ Use `@ViewBuilder` when you genuinely need to return different view types from a
 
 Reference: [Demystify SwiftUI — WWDC21](https://developer.apple.com/videos/play/wwdc2021/10022/)
 
-### 11. Use generics (`<Content: View>`) instead of `AnyView`
+### 9. Use generics (`<Content: View>`) instead of `AnyView`
 `AnyView` erases type information and reduces performance. Prefer generics:
 ```swift
 // ❌ Avoid
