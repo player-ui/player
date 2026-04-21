@@ -102,9 +102,10 @@ public abstract class ComposableAsset<Data>(
 
     @Composable
     private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
-        AndroidView(factory = ::FrameLayout, modifier) {
-            hydrationScope.launch(Dispatchers.Main) {
-                render(styles) into it
+        val childAsset = this
+        AndroidView(factory = ::FrameLayout, modifier) { container ->
+            this@ComposableAsset.hydrationScope.launch {
+                this@ComposableAsset.run { childAsset.renderInto(container, styles) }
             }
         }
     }

@@ -23,6 +23,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
         AssetContext(appContext, asset, player, ::SimpleAsset)
     }
 
+    // TODO: these tests use render() which returns View — revisit once renderInto replacement is settled
     @Test
     fun `test rendering with no styles`() = runTest {
         val simple = SimpleAsset(assetContext).render(appContext)

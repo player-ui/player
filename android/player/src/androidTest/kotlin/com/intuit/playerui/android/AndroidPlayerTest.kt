@@ -111,6 +111,7 @@ internal class AndroidPlayerTest {
         player.registerAsset("simple", ::SimpleAsset)
         val asset = player.awaitFirstView(SimpleAsset.sampleFlow)!!
         assertNull(player.getCachedAssetView(asset.assetContext))
+        // TODO: uses render() which returns View — revisit once renderInto replacement is settled
         assertNotNull(asset.render(ApplicationProvider.getApplicationContext()))
         assertNotNull(player.getCachedAssetView(asset.assetContext))
         player.recycle()

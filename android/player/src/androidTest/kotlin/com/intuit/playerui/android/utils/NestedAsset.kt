@@ -5,7 +5,6 @@ import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.runtime.serialize
@@ -27,11 +26,9 @@ internal class NestedAsset(
 
     override suspend fun View.hydrate(data: Data) {
         require(this is LinearLayout)
-        data.nested?.render() into this
+        data.nested?.renderInto(this)
         dummy = data.nested as? RenderableAsset<*>
-        data.nestedAssets.map {
-            it.render(0)
-        }.forEach { it into this }
+        data.nestedAssets.forEach { it.renderInto(this) }
         dummy2 = data.nestedAssets.map { it as? RenderableAsset<*> }
     }
 

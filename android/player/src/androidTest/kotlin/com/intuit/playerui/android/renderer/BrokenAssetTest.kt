@@ -43,6 +43,7 @@ internal class BrokenAssetTest {
         player.start(BrokenAsset.sampleFlow)
     }
 
+    // TODO: these tests use render() which returns View — revisit once renderInto replacement is settled
     @Test
     fun `invalidate view should fail on first render`() = runTest {
         val exception = assertFailsWith<AssetRenderException> {

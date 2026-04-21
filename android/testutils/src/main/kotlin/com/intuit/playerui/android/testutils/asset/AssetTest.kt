@@ -2,6 +2,8 @@ package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
@@ -78,6 +80,7 @@ public abstract class AssetTest(
             field = value
 
             field?.let { asset ->
+                // TODO: renderInto is fire-and-forget (Unit), need a way to get the rendered View for test assertion
                 CoroutineScope(Dispatchers.Main).launch {
                     try {
                         viewChannel.emit(asset.render(context))

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -16,6 +15,7 @@ import androidx.lifecycle.whenStarted
 import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
@@ -153,46 +153,48 @@ public abstract class PlayerFragment :
         playerViewModel.start()
     }
 
-    /** Default suspendable implementation of [handleAssetUpdate] */
+    /** Default implementation of [handleAssetUpdate] */
     @ExperimentalPlayerApi
     protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         val startTime = System.currentTimeMillis()
-        val view = asset?.render(requireContext())
+        val tracker = asset?.player?.asyncHydrationTrackerPlugin
 
-        view?.doOnLayout {
+        tracker?.hooks?.onHydrationComplete?.tap("renderIntoPlayerCanvas-timing") {
             playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
         }
 
-        // swap to main
-        withContext(Dispatchers.Main) {
-            if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
+        if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
 
-            animateTransition
-                .takeIf { it }
-                ?.let { binding.scrollContainer.scrollTo(0, 0) }
-                ?.let { buildTransitionAnimation() }
-                ?.let { view.transitionInto(binding.playerCanvas, it) }
-                ?: (view into binding.playerCanvas)
+        val transition = if (animateTransition) {
+            binding.scrollContainer.scrollTo(0, 0)
+            buildTransitionAnimation()
+        } else null
+
+        // TODO: with transition, renderInto inserts the view immediately then transitionInto re-inserts it — view is populated twice, causing a visual flash. Need to skip renderInto and only insert via transitionInto once hydration is complete, but that requires render() to return a View.
+        if (transition != null) {
+            tracker?.hooks?.onHydrationComplete?.tap("renderIntoPlayerCanvas-transition") {
+                binding.playerCanvas.getChildAt(0).transitionInto(binding.playerCanvas, transition)
+            }
         }
+
+        asset?.renderInto(binding.playerCanvas, requireContext())
+            ?: withContext(Dispatchers.Main) { null into binding.playerCanvas }
     }
 
     /**
      * Handle [asset] updates from the [PlayerViewModel]. By default,
-     * this will invoke [RenderableAsset.render] with no additional
-     * styles and inject that into the view tree.
+     * this will invoke [RenderableAsset.renderInto] and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         renderingJob?.cancel("handling new update")
         renderingJob = lifecycleScope.launch {
             whenStarted {
-                withContext(Dispatchers.Default) {
-                    try {
-                        renderIntoPlayerCanvas(asset, animateTransition)
-                    } catch (exception: Exception) {
-                        if (exception is CancellationException) throw exception
-                        exception.printStackTrace()
-                        playerViewModel.fail("Error rendering asset", exception)
-                    }
+                try {
+                    renderIntoPlayerCanvas(asset, animateTransition)
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+                    exception.printStackTrace()
+                    playerViewModel.fail("Error rendering asset", exception)
                 }
             }
         }

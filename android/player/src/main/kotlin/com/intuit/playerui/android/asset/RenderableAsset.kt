@@ -2,6 +2,8 @@ package com.intuit.playerui.android.asset
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.StyleRes
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncHook
@@ -11,6 +13,7 @@ import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Style
 import com.intuit.playerui.android.extensions.Styles
+import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.removeSelf
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withStyles
@@ -214,57 +217,116 @@ public abstract class RenderableAsset<Data>(
 
     // ── Public render entry points ────────────────────────────────────────────
 
-    public suspend fun render(context: Context): View = assetContext
-        .withContext(player.hooks.context.call(context))
-        .build()
-        .render()
+    /** Render this asset into [container], inheriting context from the calling asset. Launches into [hydrationScope] — returns after scheduling, not after completion. */
+    public suspend fun GenericAsset.renderInto(container: ViewGroup) {
+        val asset = assetContext
+            .withContext(this@RenderableAsset.requireContext())
+            .build()
+        hydrationScope.launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
+    }
 
-    public suspend fun GenericAsset.render(): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .build()
-        .render()
-
-    public suspend fun GenericAsset.render(
+    /** Render this asset into [container] with [styles]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
+    public suspend fun GenericAsset.renderInto(
+        container: ViewGroup,
         @StyleRes vararg styles: Style?,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withStyles(*styles)
-        .build()
-        .render()
+    ) {
+        val asset = assetContext
+            .withContext(this@RenderableAsset.requireContext())
+            .withStyles(*styles)
+            .build()
+        hydrationScope.launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
+    }
 
-    public suspend fun GenericAsset.render(
+    /** Render this asset into [container] with [styles]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
+    public suspend fun GenericAsset.renderInto(
+        container: ViewGroup,
         @StyleRes styles: Styles?,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withStyles(styles)
-        .build()
-        .render()
+    ) {
+        val asset = assetContext
+            .withContext(this@RenderableAsset.requireContext())
+            .withStyles(styles)
+            .build()
+        hydrationScope.launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
+    }
 
-    public suspend fun GenericAsset.render(tag: String): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withTag(tag)
-        .build()
-        .render()
+    /** Render this asset into [container] with a [tag]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
+    public suspend fun GenericAsset.renderInto(
+        container: ViewGroup,
+        tag: String,
+    ) {
+        val asset = assetContext
+            .withContext(this@RenderableAsset.requireContext())
+            .withTag(tag)
+            .build()
+        hydrationScope.launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
+    }
 
-    public suspend fun GenericAsset.render(
+    /** Render this asset into [container] with [styles] and a [tag]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
+    public suspend fun GenericAsset.renderInto(
+        container: ViewGroup,
         @StyleRes vararg styles: Style?,
         tag: String,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withTag(tag)
-        .withStyles(*styles)
-        .build()
-        .render()
+    ) {
+        val asset = assetContext
+            .withContext(this@RenderableAsset.requireContext())
+            .withTag(tag)
+            .withStyles(*styles)
+            .build()
+        hydrationScope.launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
+    }
 
-    public suspend fun GenericAsset.render(
+    /** Render this asset into [container] with [styles] and a [tag]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
+    public suspend fun GenericAsset.renderInto(
+        container: ViewGroup,
         @StyleRes styles: Styles?,
         tag: String,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withTag(tag)
-        .withStyles(styles)
-        .build()
-        .render()
+    ) {
+        val asset = assetContext
+            .withContext(this@RenderableAsset.requireContext())
+            .withTag(tag)
+            .withStyles(styles)
+            .build()
+        hydrationScope.launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
+    }
+
+    /** Root entry point — render this asset into [container] using [context] to bootstrap the context chain. */
+    public suspend fun renderInto(container: FrameLayout, context: Context) {
+        val asset = assetContext
+            .withContext(player.hooks.context.call(context))
+            .build()
+        val view = asset.render()
+        withContext(Dispatchers.Main) { view into container }
+    }
 
     // ── Expansion helpers ─────────────────────────────────────────────────────
 

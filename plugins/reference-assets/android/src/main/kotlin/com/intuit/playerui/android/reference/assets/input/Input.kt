@@ -6,13 +6,10 @@ import android.view.inputmethod.EditorInfo
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.plugins.transactions.commitPendingTransaction
 import com.intuit.playerui.plugins.transactions.registerPendingTransaction
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -61,9 +58,9 @@ class Input(
             }
         }.rootView
 
-    override suspend fun View.hydrate(data: Data) = coroutineScope {
-        val label = async { data.label?.render(Text.Styles.Label) }
-        val note = async { data.note?.render(Text.Styles.Note) }
+    override suspend fun View.hydrate(data: Data) {
+        data.label?.renderInto(findViewById(R.id.input_label_container), Text.Styles.Label)
+        data.note?.renderInto(findViewById(R.id.input_note_container), Text.Styles.Note)
 
         findViewById<FormattedEditText>(R.id.input_field).run {
             error = data.validation?.message
@@ -103,8 +100,5 @@ class Input(
             // need to refresh registered pending transaction if we have focus
             if (hasFocus()) onFocusChangeListener.onFocusChange(this, true)
         }
-
-        label.await() into findViewById(R.id.input_label_container)
-        note.await() into findViewById(R.id.input_note_container)
     }
 }

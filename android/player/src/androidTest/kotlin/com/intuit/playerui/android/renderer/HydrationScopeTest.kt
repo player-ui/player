@@ -74,7 +74,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         player.start(makeFlow(encodeToString(NodeSerializer(), asset)))
     }
 
-    // TODO: revisit this test
+    // TODO: revisit this test — uses render() which returns View, revisit once renderInto replacement is settled
     @Test
     fun `test cancelling caller job during render propagates CancellationException`() = runBlocking {
         val test = TestAsset(assetContext)

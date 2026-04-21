@@ -36,6 +36,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
         AssetContext(appContext, asset, player, ::NestedAsset)
     }
 
+    // TODO: uses render() which returns View — revisit once renderInto replacement is settled
     @Test
     fun `tested nested asset constructs`() = runBlockingTest {
         val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
