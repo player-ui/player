@@ -8,7 +8,7 @@ The `ErrorController` manages error handling throughout the flow lifecycle. It c
 
 ### Key Features
 
-- **Error Capture**: Capture errors with type, severity, and custom metadata
+- **Error Capture**: Capture errors that implement the `PlayerErrorMetadata` interface
 - **Error History**: Maintain a complete history of all captured errors in chronological order
 - **Protected State**: Automatically manages `errorState` in the data model with middleware protection
 - **Hook System**: Allows plugins to observe errors and optionally prevent error state navigation
@@ -16,7 +16,7 @@ The `ErrorController` manages error handling throughout the flow lifecycle. It c
 
 ## Error Types & Severity
 
-Player provides standard error types: `expression`, `binding`, `view`, `asset`, `navigation`, `validation`, `data`, `schema`, `network`, `plugin`. Plugins can define custom types.
+Player provides standard error types: `expression`, `binding`, `view`, `asset`, `navigation`, `validation`, `data`, `schema`, `network`, `plugin`, `render`. Plugins can define custom types.
 
 **Severity Levels:**
 - `fatal` - Cannot continue, flow must end
@@ -25,18 +25,38 @@ Player provides standard error types: `expression`, `binding`, `view`, `asset`, 
 
 ## API Reference
 
+### PlayerErrorMetadata Interface
+
+Errors passed to `captureError` must implement the `PlayerErrorMetadata` interface:
+
+```typescript
+interface PlayerErrorMetadata {
+  type: string;           // required — error type, e.g. ErrorTypes.VIEW
+  severity?: ErrorSeverity; // optional — defaults to ERROR
+  metadata?: Record<string, unknown>; // optional — domain-specific fields
+}
+```
+
+The built-in error classes (`AssetRenderError`, `AsyncNodeError`, `ResolverError`) all implement this interface. For custom errors, extend `Error` and implement `PlayerErrorMetadata`:
+
+```typescript
+class MyPluginError extends Error implements PlayerErrorMetadata {
+  type = "my-plugin";
+  severity = ErrorSeverity.ERROR;
+  metadata = { detail: "something went wrong" };
+}
+```
+
 ### Capturing Errors
 
 ```typescript
-errorController.captureError(
-  new Error("Failed to load view"),
-  ErrorTypes.VIEW,
-  ErrorSeverity.ERROR,
-  { viewId: "my-view" }
-);
+// captureError returns true if recovery succeeded, false if the flow was failed
+const recovered = errorController.captureError(new MyPluginError("msg"));
 ```
 
-The same API is available on Kotlin (`ErrorTypes.VIEW`, `ErrorSeverity.ERROR`) and Swift (`ErrorTypes.view`, `.error`).
+Errors that do not implement `PlayerErrorMetadata` are still accepted: `captureError` will attempt a wildcard `"*"` errorTransition as a fallback, but the `onError` hook will **not** fire and the error will not appear in history or `errorState`.
+
+The same API is available on Kotlin and Swift.
 
 ### Retrieving Errors
 
@@ -97,12 +117,12 @@ This protection ensures error state integrity and prevents accidental overwrites
 
 ### onError Hook
 
-The `onError` hook fires whenever an error is captured, allowing plugins to observe errors and optionally prevent the error from being exposed to views.
+The `onError` hook fires when an error implementing `PlayerErrorMetadata` is captured. Errors without metadata skip this hook.
 
 **Hook Behavior:**
 - Called in order for each tapped plugin
-- Return `true` to bail and prevent the error from being set in `errorState` (for custom error handling)
-- Return `undefined` or `false` to continue - error will be set in `errorState` and trigger navigation if `errorState` property is defined
+- Return `true` to bail: skip `errorState` data model update and `errorTransitions` navigation (plugin takes ownership of the error)
+- Return `undefined` or `false` to continue: error is written to `errorState` and navigation proceeds if `errorTransitions` is defined
 - Once `true` is returned, no further plugins are called
 
 ### Example: Error Logging
@@ -113,12 +133,12 @@ export class ErrorLoggingPlugin implements Plugin {
 
   apply(player) {
     player.hooks.errorController.tap(this.name, (errorController) => {
-      errorController.hooks.onError.tap(this.name, (playerError) => {
-        // Log to external service
+      errorController.hooks.onError.tap(this.name, (error) => {
+        // error is PlayerError = Error & PlayerErrorMetadata
         logToService({
-          message: playerError.error.message,
-          type: playerError.errorType,
-          severity: playerError.severity
+          message: error.message,
+          type: error.type,
+          severity: error.severity,
         });
 
         // Return undefined to allow error state navigation
@@ -133,13 +153,11 @@ export class ErrorLoggingPlugin implements Plugin {
 
 ```typescript
 errorController.hooks.onError.tap("custom-handler", (error) => {
-  // Handle specific error types with custom logic
-  if (error.errorType === "network" && error.severity === "warning") {
-    console.warn("Network warning:", error.error.message);
-    return true; // Prevent errorState from being set
+  if (error.type === "network" && error.severity === "warning") {
+    console.warn("Network warning:", error.message);
+    return true; // Take ownership — skip errorState and navigation
   }
 
-  // Allow other errors to proceed normally
   return undefined;
 });
 ```
@@ -149,26 +167,57 @@ errorController.hooks.onError.tap("custom-handler", (error) => {
 ```typescript
 // TypeScript
 errorController.hooks.onError.tap("logger", (error) => {
-  console.log(error.error.message);
+  console.log(error.message, error.type);
   return undefined;
 });
 ```
 
 ```kotlin
 // Kotlin
-player.errorController?.hooks?.onError?.tap { errorInfo ->
-    println("Error: ${errorInfo.message}")
+errorController.hooks.onError.tap("logger") { error ->
+    println("Error: ${error.message} type: ${error.type}")
     null // Return null to continue
 }
 ```
 
 ```swift
 // Swift
-errorController.hooks.onError.tap(name: "logger") { errorInfo in
-    print("Error: \(errorInfo.message)")
+errorController.hooks.onError.tap(name: "logger") { error in
+    print("Error: \(error.message) type: \(error.type)")
     return nil // Return nil to continue
 }
 ```
+
+## (iOS) Accessing ErrorState After Flow Failure
+
+When a flow ends in an error, the player state is an `ErrorState` with an `error: JSValueError` property exposing the full error metadata from the JS layer:
+
+```swift
+switch player.state {
+case let errorState as ErrorState:
+    print(errorState.error.message)          // error message string
+    print(errorState.error.type)             // error type, e.g. "render"
+    print(errorState.error.severity)         // ErrorSeverity? e.g. .error
+    print(errorState.error.metadata)         // [String: Any]? domain-specific fields
+    print(errorState.error.isErrorWithMetadata) // false if the JS error lacked metadata
+default:
+    break
+}
+```
+
+The `originalJSError: JSValue` property on `JSValueError` gives access to the raw JS error object if needed.
+
+## Render-Time Error Capture
+
+All platforms automatically capture asset render errors via platform-specific error classes, all implementing the `PlayerErrorMetadata` interface with `type: "render"`. These are passed to `captureError()` automatically — you do not construct them directly.
+
+| Platform | Class | Triggered when |
+|---|---|---|
+| React | `AssetRenderError` | Any exception thrown inside an asset component |
+| iOS (SwiftUI) | `AssetRenderError.decodingFailure` | Asset data fails to decode from JS |
+| Android (Compose) | `AssetRenderException` | `getData()` throws in `ComposableAsset` |
+
+All include `metadata.assetId` and a human-readable message with the full asset parent path.
 
 ## Error Navigation Pattern
 
