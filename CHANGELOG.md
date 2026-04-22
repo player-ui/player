@@ -1,3 +1,19 @@
+# 0.15.3-next.2 (Wed Apr 22 2026)
+
+#### 🐛 Bug Fix
+
+- Refactor stateType from String to NavigationFlowStateType enum [#850](https://github.com/player-ui/player/pull/850) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Add ios-review skill with iOS code conventions [#848](https://github.com/player-ui/player/pull/848) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Restore Xcode local development [#847](https://github.com/player-ui/player/pull/847) ([@KVSRoyal](https://github.com/KVSRoyal) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 3
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.15.3-next.1 (Thu Apr 16 2026)
 
 #### 🐛 Bug Fix
