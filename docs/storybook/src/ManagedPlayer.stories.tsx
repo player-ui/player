@@ -4,10 +4,10 @@ import { SuspenseSpinner } from "@player-ui/storybook";
 import { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
 import {
-    createFlowManager,
-    ERROR_ASSET_FLOW,
-    ERROR_CONTENT_FLOW,
-    SIMPLE_FLOWS,
+  createFlowManager,
+  ERROR_ASSET_FLOW,
+  ERROR_CONTENT_FLOW,
+  SIMPLE_FLOWS,
 } from "./flows/managed";
 
 const meta: Meta = {
