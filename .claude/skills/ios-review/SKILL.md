@@ -5,7 +5,7 @@ context: fork
 ---
 
 ## Current diff (when reviewing a PR)
-- Diff: !`git diff $(git log --oneline --decorate --simplify-by-decoration HEAD | awk 'NR>1{for(i=3;i<=NF;i++) if($i ~ /^origin\// || ($i !~ /HEAD/ && $i !~ /tag:/)) {gsub(/[,)]/,"",$i); print $i; exit}}')...HEAD 2>/dev/null || echo "No diff available"`
+Get the diff between this branch and its parent branch (NOT always main). If this has no parent branch, stop.
 
 # iOS Code Review — Team Conventions
 
