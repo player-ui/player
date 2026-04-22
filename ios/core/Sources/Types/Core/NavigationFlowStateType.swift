@@ -33,7 +33,6 @@ public enum NavigationFlowStateType: Equatable {
         case "EXTERNAL": self = .external
         case "END": self = .end
         default:
-            assertionFailure("Unrecognized state_type: \(rawValue)")
             self = .unknown(rawValue)
         }
     }
