@@ -1,0 +1,113 @@
+import Foundation
+import XCTest
+import JavaScriptCore
+import Combine
+
+@testable import PlayerUI
+@testable import PlayerUISwiftUI
+@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
+
+class ManagedPlayerJSContextLifecycleTests: XCTestCase {
+
+    /// Verifies that the old JSContext is properly released when
+    /// SwiftUIPlayer.Context loads a new flow after unloading the previous one.
+    ///
+    /// The contextBuilder creates a new JSContext each time load() is called.
+    /// After unload() + reload, the old JSContext should be deallocated.
+    /// Ensures no cross-runtime retain cycles survive between Swift closures
+    /// captured in JS hook taps and JSValues referencing the old context.
+    func testOldJSContextDeallocatedAfterUnloadAndReload() {
+        weak var weakOldContext: JSContext?
+
+        var contextCount = 0
+        let context = SwiftUIPlayer.Context {
+            contextCount += 1
+            let ctx = JSContext()!
+            if contextCount == 1 {
+                weakOldContext = ctx
+            }
+            return ctx
+        }
+
+        autoreleasepool {
+            let player1 = SwiftUIPlayer(
+                flow: FlowData.COUNTER,
+                plugins: [],
+                result: .constant(nil),
+                context: context
+            )
+            _ = player1
+        }
+
+        XCTAssertNotNil(weakOldContext, "First JSContext should exist while loaded")
+        XCTAssertTrue(context.isLoaded, "Context should be loaded after init")
+
+        context.unload()
+        XCTAssertFalse(context.isLoaded, "Context should not be loaded after unload")
+
+        autoreleasepool {
+            let player2 = SwiftUIPlayer(
+                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                plugins: [],
+                result: .constant(nil),
+                context: context
+            )
+            _ = player2
+        }
+
+        XCTAssertEqual(contextCount, 2, "contextBuilder should have been called twice")
+        XCTAssertNil(
+            weakOldContext,
+            "Old JSContext was not deallocated after unload + reload — " +
+            "cross-runtime retain cycle between Swift closures and JSContext"
+        )
+    }
+
+    /// Verifies that the shared JSVirtualMachine does not accumulate orphaned
+    /// JSContexts across multiple flow loads, simulating the ManagedPlayer
+    /// navigation pattern. Each flow load creates a new JSContext on the same VM.
+    /// After unload, the previous context should be released.
+    func testSharedVMDoesNotAccumulateContexts() {
+        let vm = JSVirtualMachine()!
+        var createdContexts: [Weak<JSContext>] = []
+
+        let context = SwiftUIPlayer.Context {
+            let ctx = JSContext(virtualMachine: vm)!
+            createdContexts.append(Weak(ctx))
+            return ctx
+        }
+
+        for i in 0..<5 {
+            autoreleasepool {
+                let flow = FlowData.COUNTER.replacingOccurrences(
+                    of: "counter-flow",
+                    with: "counter-flow-\(i)"
+                )
+                let player = SwiftUIPlayer(
+                    flow: flow,
+                    plugins: [],
+                    result: .constant(nil),
+                    context: context
+                )
+                _ = player
+            }
+
+            context.unload()
+        }
+
+        XCTAssertEqual(createdContexts.count, 5, "Should have created 5 JSContexts")
+
+        let leakedCount = createdContexts.filter { $0.value != nil }.count
+        XCTAssertEqual(
+            leakedCount, 0,
+            "\(leakedCount) of 5 JSContexts still alive after unload — " +
+            "orphaned contexts accumulating on shared JSVirtualMachine"
+        )
+    }
+}
+
+private class Weak<T: AnyObject> {
+    weak var value: T?
+    init(_ value: T) { self.value = value }
+}
