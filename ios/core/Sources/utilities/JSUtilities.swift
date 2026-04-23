@@ -82,7 +82,7 @@ internal extension JSContext {
         
         let errObj = constructClass(.error, withArguments: [error.jsDescription])
         if let errorWithMetadata = error as? ErrorWithMetadata, let err = errObj {
-            err.setValue(errorWithMetadata.type, forProperty: JSValueError.JSKeys.type)
+            err.setValue(errorWithMetadata.type.rawValue, forProperty: JSValueError.JSKeys.type)
             err.setValue(errorWithMetadata.severity?.rawValue, forProperty: JSValueError.JSKeys.severity)
             if let metadata = errorWithMetadata.metadata {
                 err.setValue(metadata, forProperty: JSValueError.JSKeys.metadata)
