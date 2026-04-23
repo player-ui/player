@@ -16,7 +16,7 @@ public enum AssetRenderError: Error {
 }
 
 extension AssetRenderError: ErrorWithMetadata {
-    public var type: String { ErrorTypes.render.rawValue }
+    public var type: ErrorTypes { .render }
     public var severity: ErrorSeverity? { ErrorSeverity.error }
     public var metadata: [String: Any]? {
         switch self {
