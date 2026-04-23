@@ -127,6 +127,7 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                     PlayerExceptionWithMetadata(message, type, severity, metadata, cause)
                 }
             } else {
+                // TODO: pass cause into JSErrorException
                 val error = decoder.requireNodeDecoder().decodeNode()
                 stackTrace = decodeStackTraceFromStack(error.getString("stack"))
                 if (type == null) {

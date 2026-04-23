@@ -16,20 +16,15 @@ public enum AssetRenderError: Error {
 }
 
 extension AssetRenderError: ErrorWithMetadata {
-    public var type: String {
-        ErrorTypes.render
-    }
-    
-    public var severity: ErrorSeverity? {
-        ErrorSeverity.error
-    }
-    
+    public var type: String { ErrorTypes.render.rawValue }
+    public var severity: ErrorSeverity? { ErrorSeverity.error }
     public var metadata: [String: Any]? {
         switch self {
-            case .decodingFailure(_, let asset, _):
-                return ["assetId": asset?.id ?? ""]
+        case .decodingFailure(_, let asset, _):
+            return ["assetId": asset?.id ?? ""]
         }
     }
+    public var jsDescription: String { debugDescription }
 }
 
 extension AssetRenderError: CustomDebugStringConvertible {
@@ -45,11 +40,6 @@ Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset
     }
 }
 
-extension AssetRenderError: JSConvertibleError {
-    public var jsDescription: String {
-        debugDescription
-    }
-}
 
 struct MinimumAssetData: AssetData {
     public var id: String

@@ -27,7 +27,7 @@ class AssetRenderException :
     val initialMessage: String
     override var message: String = ""
 
-    override val type: String = ErrorTypes.RENDER
+    override val type: String = ErrorTypes.RENDER.value
     override val severity: ErrorSeverity = ErrorSeverity.ERROR
     override val metadata: Map<String, Any?>
 

@@ -10,20 +10,17 @@ import JavaScriptCore
 
 extension JSValue {
     
-    internal struct TryCatchResultKeys {
+    internal enum TryCatchResultKeys {
         static let success = "success"
         static let result = "result"
     }
 
 
-    /**
-     A way to catch errors for functions not called inside a player process. Can be called on functions with a return value and void with discardableResult.
-     - parameters:
-        - args: List of arguments taken by the function
-     */
+    /// Calls the JS function with error handling. Throws a `JSValueError` if the JS function throws.
+    /// - Parameter args: List of arguments taken by the function
     @discardableResult
-    public func tryCatch(args: Any...) throws -> JSValue? {
-        var tryCatchWrapper: JSValue? {
+    public func callWithErrorHandling(args: Any...) throws -> JSValue? {
+        var wrapper: JSValue? {
             self.context.evaluateScript(
             """
                (fn, args) => {
@@ -41,8 +38,8 @@ extension JSValue {
                }
             """)
         }
-        
-        let result = tryCatchWrapper?.call(withArguments: [self, args])
+
+        let result = wrapper?.call(withArguments: [self, args])
         guard
             let success = result?.objectForKeyedSubscript(TryCatchResultKeys.success)?.toBool(),
             let resultValue = result?.objectForKeyedSubscript(TryCatchResultKeys.result)
@@ -61,34 +58,39 @@ extension JSValue {
 /**
  Represents the different errors that occur when evaluating JSValue
  */
-public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
+public struct JSValueError: CreatedFromJSValue, ErrorWithMetadata {
     private static let defaultMessage: String  = "Unknown JS Error"
     private static let defaultType: String  = ""
-    
+
     public let message: String
     public let type: String
     public let severity: ErrorSeverity?
     public let metadata: [String: Any]?
-    
+    public var jsDescription: String { message }
+
     /// Flag to determine if the javascript error conformed to the ErrorWithMetadata protocol
     public let isErrorWithMetadata: Bool
-    
+
     public let originalJSError: JSValue
-    
-    internal struct JSKeys {
+
+    internal enum JSKeys {
         static let message = "message"
         static let type = "type"
         static let severity = "severity"
         static let metadata = "metadata"
     }
-    
+
     public static func createInstance(value: JSValue) -> JSValueError {
         return JSValueError(value)
     }
-    
+
     public init(_ jsErrorObject: JSValue) {
         originalJSError = jsErrorObject
-        if !jsErrorObject.isInstance(of: jsErrorObject.context.getJSClass(.error)) {
+        guard
+            let context = jsErrorObject.context,
+            let errorClass = context.getJSClass(.error),
+            jsErrorObject.isInstance(of: errorClass)
+        else {
             message = JSValueError.defaultMessage
             type = JSValueError.defaultType
             severity = nil
@@ -116,8 +118,3 @@ public struct JSValueError: Error, CreatedFromJSValue, ErrorWithMetadata {
     }
 }
 
-extension JSValueError: JSConvertibleError {
-    public var jsDescription: String {
-        message
-    }
-}

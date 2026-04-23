@@ -104,9 +104,8 @@ export const ReactAsset = (
   return (
     <ErrorBoundary
       fallbackRender={(props) => {
-        const { error, resetErrorBoundary } = props;
+        const { error } = props;
 
-        resetErrorBoundary();
         if (error instanceof AssetRenderError) {
           error.addAssetParent(unwrapped);
           throw error;

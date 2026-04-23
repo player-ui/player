@@ -67,11 +67,11 @@ internal enum JSClass: String {
 }
 
 internal extension JSContext {
-    func getJSClass(_ jsClass: JSClass) -> JSValue {
+    func getJSClass(_ jsClass: JSClass) -> JSValue? {
         objectForKeyedSubscript(jsClass.rawValue)
     }
     func constructClass(_ jsClass: JSClass, withArguments: [Any]?) -> JSValue? {
-        getJSClass(jsClass).construct(withArguments: withArguments)
+        getJSClass(jsClass)?.construct(withArguments: withArguments)
     }
     
     func error<E>(for error: E) -> JSValue? where E: Error, E: JSConvertibleError {
@@ -99,8 +99,12 @@ public protocol JSConvertibleError {
     var jsDescription: String { get }
 }
 
-public protocol ErrorWithMetadata : Error {
+/// Metadata associated with a player error
+public protocol ErrorWithMetadata: Error, JSConvertibleError {
+    /// The error category (e.g., "network", "validation")
     var type: String { get }
+    /// The severity of the error
     var severity: ErrorSeverity? { get }
+    /// Additional domain-specific metadata
     var metadata: [String: Any]? { get }
 }

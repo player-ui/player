@@ -83,7 +83,7 @@ internal class ErrorControllerTest : PlayerTest() {
     fun `capture error with all parameters`() {
         val testError = ExceptionWithAnyMetadata(
             "Not found",
-            ErrorTypes.NETWORK,
+            ErrorTypes.NETWORK.value,
             ErrorSeverity.ERROR,
             mapOf(
                 "url" to "https://example.com",
@@ -99,14 +99,14 @@ internal class ErrorControllerTest : PlayerTest() {
         assertNotNull(capturedError)
         val errorInfo = capturedError?.let { it as PlayerExceptionMetadata }
         assertEquals("Not found", capturedError?.message)
-        assertEquals(ErrorTypes.NETWORK, errorInfo?.type)
+        assertEquals(ErrorTypes.NETWORK.value, errorInfo?.type)
         assertEquals(ErrorSeverity.ERROR, errorInfo?.severity)
         assertNotNull(errorInfo?.metadata)
     }
 
     @TestTemplate
     fun `capture error with minimal parameters`() {
-        val testError = ExceptionWithAnyMetadata("Internal error", ErrorTypes.PLUGIN)
+        val testError = ExceptionWithAnyMetadata("Internal error", ErrorTypes.PLUGIN.value)
         val result = errorController.captureError(testError)
 
         assertEquals(result, false)
@@ -116,7 +116,7 @@ internal class ErrorControllerTest : PlayerTest() {
         assertNotNull(capturedError)
         val errorInfo = capturedError?.let { it as PlayerExceptionMetadata }
         assertEquals("Internal error", capturedError?.message)
-        assertEquals(ErrorTypes.PLUGIN, errorInfo?.type)
+        assertEquals(ErrorTypes.PLUGIN.value, errorInfo?.type)
         assertNull(errorInfo?.severity)
     }
 
@@ -124,7 +124,7 @@ internal class ErrorControllerTest : PlayerTest() {
     fun `capture multiple errors with chronological history and current error updates`() {
         // Capture first error
         errorController.captureError(
-            ExceptionWithAnyMetadata("First error", ErrorTypes.VALIDATION, ErrorSeverity.WARNING),
+            ExceptionWithAnyMetadata("First error", ErrorTypes.VALIDATION.value, ErrorSeverity.WARNING),
         )
 
         // Verify current error is the first one
@@ -135,7 +135,7 @@ internal class ErrorControllerTest : PlayerTest() {
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Second error",
-                ErrorTypes.BINDING,
+                ErrorTypes.BINDING.value,
                 ErrorSeverity.ERROR,
             ),
         )
@@ -148,7 +148,7 @@ internal class ErrorControllerTest : PlayerTest() {
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Third error",
-                ErrorTypes.VIEW,
+                ErrorTypes.VIEW.value,
                 ErrorSeverity.FATAL,
             ),
         )
@@ -177,7 +177,7 @@ internal class ErrorControllerTest : PlayerTest() {
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Current error",
-                ErrorTypes.DATA,
+                ErrorTypes.DATA.value,
                 ErrorSeverity.ERROR,
             ),
         )
@@ -188,7 +188,7 @@ internal class ErrorControllerTest : PlayerTest() {
 
         val errorInfo = currentError as PlayerExceptionMetadata?
         assertEquals("Current error", currentError?.message)
-        assertEquals(ErrorTypes.DATA, errorInfo?.type)
+        assertEquals(ErrorTypes.DATA.value, errorInfo?.type)
     }
 
     @TestTemplate
@@ -197,13 +197,13 @@ internal class ErrorControllerTest : PlayerTest() {
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Error 1",
-                ErrorTypes.VALIDATION,
+                ErrorTypes.VALIDATION.value,
             ),
         )
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Error 2",
-                ErrorTypes.BINDING,
+                ErrorTypes.BINDING.value,
             ),
         )
 
@@ -230,13 +230,13 @@ internal class ErrorControllerTest : PlayerTest() {
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Error 1",
-                ErrorTypes.VALIDATION,
+                ErrorTypes.VALIDATION.value,
             ),
         )
         errorController.captureError(
             ExceptionWithAnyMetadata(
                 "Error 2",
-                ErrorTypes.BINDING,
+                ErrorTypes.BINDING.value,
             ),
         )
 

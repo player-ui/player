@@ -12,13 +12,12 @@ import JavaScriptCore
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
 
-private struct ErrorWithAnyMetadata: Error, ErrorWithMetadata, JSConvertibleError {
+private struct ErrorWithAnyMetadata: ErrorWithMetadata {
     public var message: String
     public var type: String
     public var severity: ErrorSeverity?
-    public var metadata: [String : Any]?
-    
-    public var jsDescription: String { get { message } }
+    public var metadata: [String: Any]?
+    public var jsDescription: String { message }
 }
 
 class HooksTests: XCTestCase {
@@ -113,7 +112,7 @@ class HooksTests: XCTestCase {
         playerHooks.errorController.tap { errorController in
             // First handler - returns true to bail
             errorController.hooks.onError.tap { errorInfo -> Bool? in
-                XCTAssertEqual(errorInfo.type, ErrorTypes.network)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.network.rawValue)
                 firstHandlerCalled.fulfill()
                 return true  // BAIL - should prevent second handler from being called
             }
@@ -136,7 +135,7 @@ class HooksTests: XCTestCase {
             
             // Capture error to trigger the hooks
             errorController.captureError(
-                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.network, severity: .fatal)
+                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.network.rawValue, severity: .fatal)
             )
             
             // Verify error was captured
@@ -165,21 +164,21 @@ class HooksTests: XCTestCase {
         player.hooks?.errorController.tap { errorController in
             // First handler - returns nil to continue
             errorController.hooks.onError.tap { errorInfo -> Bool? in
-                XCTAssertEqual(errorInfo.type, ErrorTypes.data)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.data.rawValue)
                 firstHandlerCalled.fulfill()
                 return nil  // Continue to next handler
             }
             
             // Second handler - should be called
             errorController.hooks.onError.tap { errorInfo -> Bool? in
-                XCTAssertEqual(errorInfo.type, ErrorTypes.data)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.data.rawValue)
                 secondHandlerCalled.fulfill()
                 return nil
             }
             
             // Capture error to trigger the hooks
             errorController.captureError(
-                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.data, severity: .error)
+                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.data.rawValue, severity: .error)
             )
         }
         

@@ -1,6 +1,5 @@
 package com.intuit.playerui.core.error
 
-import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
@@ -31,18 +30,42 @@ public enum class ErrorSeverity(
 }
 
 /** Known error types for Player */
-public object ErrorTypes {
-    public const val EXPRESSION: String = "expression"
-    public const val BINDING: String = "binding"
-    public const val VIEW: String = "view"
-    public const val ASSET: String = "asset"
-    public const val NAVIGATION: String = "navigation"
-    public const val VALIDATION: String = "validation"
-    public const val DATA: String = "data"
-    public const val SCHEMA: String = "schema"
-    public const val NETWORK: String = "network"
-    public const val PLUGIN: String = "plugin"
-    public const val RENDER: String = "render"
+@Serializable
+public enum class ErrorTypes(
+    public val value: String,
+) {
+    @SerialName("expression")
+    EXPRESSION("expression"),
+
+    @SerialName("binding")
+    BINDING("binding"),
+
+    @SerialName("view")
+    VIEW("view"),
+
+    @SerialName("asset")
+    ASSET("asset"),
+
+    @SerialName("navigation")
+    NAVIGATION("navigation"),
+
+    @SerialName("validation")
+    VALIDATION("validation"),
+
+    @SerialName("data")
+    DATA("data"),
+
+    @SerialName("schema")
+    SCHEMA("schema"),
+
+    @SerialName("network")
+    NETWORK("network"),
+
+    @SerialName("plugin")
+    PLUGIN("plugin"),
+
+    @SerialName("render")
+    RENDER("render"),
 }
 
 /**
@@ -52,48 +75,45 @@ public object ErrorTypes {
 public class ErrorController internal constructor(
     override val node: Node,
 ) : NodeWrapper {
-    private val captureError: Invokable<Boolean>? by NodeSerializableFunction()
-    private val getCurrentError: Invokable<Throwable?>? by NodeSerializableFunction()
-    private val getErrors: Invokable<List<Throwable>?>? by NodeSerializableFunction()
-    private val clearErrors: Invokable<Unit>? by NodeSerializableFunction()
-    private val clearCurrentError: Invokable<Unit>? by NodeSerializableFunction()
+    private val captureError: (error: Throwable) -> Boolean by NodeSerializableFunction<Boolean>()
+    private val getCurrentError: () -> Throwable? by NodeSerializableFunction<Throwable?>()
+    private val getErrors: () -> List<Throwable>? by NodeSerializableFunction<List<Throwable>?>()
+    private val clearErrors: () -> Unit by NodeSerializableFunction<Unit>()
+    private val clearCurrentError: () -> Unit by NodeSerializableFunction<Unit>()
 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
     /**
-     * Capture an error with metadata
+     * Capture an error
      * @param error The error/exception object
-     * @param errorType Error category (use ErrorTypes constants)
-     * @param severity Impact level
-     * @param metadata Additional metadata map
-     * @return The captured error as a Node
+     * @return Whether the error was handled
      */
-    public fun captureError(error: Throwable): Boolean? = captureError?.invoke(error)
+    public fun captureError(error: Throwable): Boolean = captureError.invoke(error)
 
     /**
      * Get the most recent error
-     * @return The current error as a Node if one exists
+     * @return The current error if one exists
      */
-    public fun getCurrentError(): Throwable? = getCurrentError?.invoke()
+    public fun getCurrentError(): Throwable? = getCurrentError.invoke()
 
     /**
      * Get the complete error history
      * @return List of all captured errors in chronological order
      */
-    public fun getErrors(): List<Throwable>? = getErrors?.invoke()
+    public fun getErrors(): List<Throwable>? = getErrors.invoke()
 
     /**
      * Clear all errors (history + current + data model)
      */
     public fun clearErrors() {
-        clearErrors?.invoke()
+        clearErrors.invoke()
     }
 
     /**
      * Clear only current error and remove from data model, preserve history
      */
     public fun clearCurrentError() {
-        clearCurrentError?.invoke()
+        clearCurrentError.invoke()
     }
 
     @Serializable(Hooks.Serializer::class)

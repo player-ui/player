@@ -12,13 +12,12 @@ import JavaScriptCore
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
 
-private struct ErrorWithAnyMetadata: Error, ErrorWithMetadata, JSConvertibleError {
+private struct ErrorWithAnyMetadata: ErrorWithMetadata {
     public var message: String
     public var type: String
     public var severity: ErrorSeverity?
-    public var metadata: [String : Any]?
-    
-    public var jsDescription: String { get { message } }
+    public var metadata: [String: Any]?
+    public var jsDescription: String { message }
 }
 
 class ErrorControllerTests: XCTestCase {
@@ -56,7 +55,7 @@ class ErrorControllerTests: XCTestCase {
         player.hooks?.errorController.tap { errorController in
             errorController.hooks.onError.tap { errorInfo in
                 XCTAssertNotNil(errorInfo)
-                XCTAssertEqual(errorInfo.type, ErrorTypes.validation)
+                XCTAssertEqual(errorInfo.type, ErrorTypes.validation.rawValue)
                 XCTAssertEqual(errorInfo.severity, .error)
                 XCTAssertFalse(errorInfo.message.isEmpty)
                 onErrorCalled.fulfill()
@@ -65,7 +64,7 @@ class ErrorControllerTests: XCTestCase {
             
             // Capture a test error
             errorController.captureError(
-                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.validation, severity: .error, metadata: ["testKey": "testValue"])
+                error: ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.validation.rawValue, severity: .error, metadata: ["testKey": "testValue"])
             )
         }
         
@@ -88,7 +87,7 @@ class ErrorControllerTests: XCTestCase {
             return
         }
         
-        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.network, severity: .error, metadata: ["url": "https://example.com", "statusCode": 404])
+        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.network.rawValue, severity: .error, metadata: ["url": "https://example.com", "statusCode": 404])
         
         let result = errorController.captureError(
             error: testError
@@ -105,7 +104,7 @@ class ErrorControllerTests: XCTestCase {
         
         let capturedError = JSValueError.createInstance(value: jsValue)
         XCTAssertEqual(capturedError.message, "Error")
-        XCTAssertEqual(capturedError.type, ErrorTypes.network)
+        XCTAssertEqual(capturedError.type, ErrorTypes.network.rawValue)
         XCTAssertEqual(capturedError.severity, .error)
         XCTAssertNotNil(capturedError.metadata)
     }
@@ -117,7 +116,7 @@ class ErrorControllerTests: XCTestCase {
             return XCTFail("Player not in progress")
         }
         
-        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.plugin)
+        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.plugin.rawValue)
         
         let result = errorController.captureError(
             error: testError
@@ -133,7 +132,7 @@ class ErrorControllerTests: XCTestCase {
         
         let capturedError = JSValueError.createInstance(value: jsValue)
         XCTAssertEqual(capturedError.message, "Error")
-        XCTAssertEqual(capturedError.type, ErrorTypes.plugin)
+        XCTAssertEqual(capturedError.type, ErrorTypes.plugin.rawValue)
         XCTAssertNil(capturedError.severity)
         XCTAssertNil(capturedError.metadata)
     }
@@ -147,7 +146,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Capture first error
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "First Error", type: ErrorTypes.validation, severity: .warning)
+            error: ErrorWithAnyMetadata(message: "First Error", type: ErrorTypes.validation.rawValue, severity: .warning)
         )
         
         // Verify current error is the first one
@@ -159,7 +158,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Capture second error
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Second Error", type: ErrorTypes.binding, severity: .error)
+            error: ErrorWithAnyMetadata(message: "Second Error", type: ErrorTypes.binding.rawValue, severity: .error)
         )
         
         // Current error should be updated to the second one
@@ -171,7 +170,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Capture third error
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Third Error", type: ErrorTypes.view, severity: .fatal)
+            error: ErrorWithAnyMetadata(message: "Third Error", type: ErrorTypes.view.rawValue, severity: .fatal)
         )
         
         // Current error should be updated to the third one
@@ -214,7 +213,7 @@ class ErrorControllerTests: XCTestCase {
         XCTAssertTrue(initialError?.isUndefined ?? false)
         
         // Capture an error
-        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.data, severity: .error)
+        let testError = ErrorWithAnyMetadata(message: "Error", type: ErrorTypes.data.rawValue, severity: .error)
         
         errorController.captureError(
             error: testError
@@ -228,7 +227,7 @@ class ErrorControllerTests: XCTestCase {
         
         let currentError = JSValueError.createInstance(value: currentErrorValue)
         XCTAssertEqual(currentError.message, "Error")
-        XCTAssertEqual(currentError.type, ErrorTypes.data)
+        XCTAssertEqual(currentError.type, ErrorTypes.data.rawValue)
     }
     
     // MARK: - Clear Errors Tests
@@ -242,10 +241,10 @@ class ErrorControllerTests: XCTestCase {
         
         // Capture multiple errors
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation)
+            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation.rawValue)
         )
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Error 2", type: ErrorTypes.binding)
+            error: ErrorWithAnyMetadata(message: "Error 2", type: ErrorTypes.binding.rawValue)
         )
         
         let errorsBeforeCount = errorController.getErrors()?.toArray()?.count ?? 0
@@ -273,10 +272,10 @@ class ErrorControllerTests: XCTestCase {
         
         // Capture multiple errors
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation)
+            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation.rawValue)
         )
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Error 2", type: ErrorTypes.binding)
+            error: ErrorWithAnyMetadata(message: "Error 2", type: ErrorTypes.binding.rawValue)
         )
         
         let errorsBeforeCount = errorController.getErrors()?.toArray()?.count ?? 0
@@ -333,7 +332,7 @@ class ErrorControllerTests: XCTestCase {
         ]
         
         errorController.captureError(
-            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation, severity: .error, metadata: metadata)
+            error: ErrorWithAnyMetadata(message: "Error 1", type: ErrorTypes.validation.rawValue, severity: .error, metadata: metadata)
         )
         
         let capturedErrorValue = errorController.getCurrentError()

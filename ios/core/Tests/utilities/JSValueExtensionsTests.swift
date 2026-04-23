@@ -25,7 +25,7 @@ class JSValueExtensionsTests: XCTestCase {
                              })
                            """)
 
-        XCTAssertThrowsError(try functionReturningError?.tryCatch(args: [] as [String]), "", { error in
+        XCTAssertThrowsError(try functionReturningError?.callWithErrorHandling(args: [] as [String]), "", { error in
             guard let jsValueError = error as? JSValueError else {
                 XCTFail("Should throw a JSValueError")
                 return
@@ -52,7 +52,7 @@ class JSValueExtensionsTests: XCTestCase {
                              })
                            """)
 
-        XCTAssertThrowsError(try functionReturningError?.tryCatch(args: [] as [String]), "", { error in
+        XCTAssertThrowsError(try functionReturningError?.callWithErrorHandling(args: [] as [String]), "", { error in
             guard let jsValueError = error as? JSValueError else {
                 XCTFail("Should throw a JSValueError")
                 return
@@ -77,7 +77,7 @@ class JSValueExtensionsTests: XCTestCase {
                              })
                            """)
 
-        XCTAssertThrowsError(try functionReturningError?.tryCatch(args: [] as [String]), "", { error in
+        XCTAssertThrowsError(try functionReturningError?.callWithErrorHandling(args: [] as [String]), "", { error in
             guard let jsValueError = error as? JSValueError else {
                 XCTFail("Should throw a JSValueError")
                 return
@@ -99,7 +99,7 @@ class JSValueExtensionsTests: XCTestCase {
                            """)
 
         do {
-            let result = try functionReturningInt?.tryCatch(args: [] as [String])
+            let result = try functionReturningInt?.callWithErrorHandling(args: [] as [String])
             XCTAssertEqual(result?.toInt32(), 1)
         } catch let error {
             XCTFail("Should have returned Int but failed with \(error)")
