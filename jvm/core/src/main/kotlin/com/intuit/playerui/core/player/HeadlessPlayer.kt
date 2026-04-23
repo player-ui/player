@@ -3,6 +3,7 @@ package com.intuit.playerui.core.player
 import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
@@ -86,7 +87,12 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     override val state: PlayerFlowState get() = if (player.isReleased()) {
         ReleasedState
     } else {
-        player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+        try {
+            player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+        } catch (exception: PlayerRuntimeReleasedException) {
+            // If the runtime is released async
+            ReleasedState
+        }
     }
 
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
