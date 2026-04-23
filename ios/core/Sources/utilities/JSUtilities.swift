@@ -101,8 +101,8 @@ public protocol JSConvertibleError {
 
 /// Metadata associated with a player error
 public protocol ErrorWithMetadata: Error, JSConvertibleError {
-    /// The error category (e.g., "network", "validation")
-    var type: String { get }
+    /// The error category (e.g., .network, .validation)
+    var type: ErrorTypes { get }
     /// The severity of the error
     var severity: ErrorSeverity? { get }
     /// Additional domain-specific metadata

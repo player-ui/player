@@ -19,7 +19,7 @@ public enum ErrorSeverity: String {
 }
 
 /// Known error types for Player
-public enum ErrorTypes: String {
+public enum ErrorTypes: Equatable {
     case expression
     case binding
     case view
@@ -31,6 +31,42 @@ public enum ErrorTypes: String {
     case network
     case plugin
     case render
+    /// An error type not recognized by this version of the SDK.
+    case unknown(String)
+
+    public init(_ rawValue: String) {
+        switch rawValue {
+        case "expression": self = .expression
+        case "binding": self = .binding
+        case "view": self = .view
+        case "asset": self = .asset
+        case "navigation": self = .navigation
+        case "validation": self = .validation
+        case "data": self = .data
+        case "schema": self = .schema
+        case "network": self = .network
+        case "plugin": self = .plugin
+        case "render": self = .render
+        default: self = .unknown(rawValue)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .expression: return "expression"
+        case .binding: return "binding"
+        case .view: return "view"
+        case .asset: return "asset"
+        case .navigation: return "navigation"
+        case .validation: return "validation"
+        case .data: return "data"
+        case .schema: return "schema"
+        case .network: return "network"
+        case .plugin: return "plugin"
+        case .render: return "render"
+        case .unknown(let value): return value
+        }
+    }
 }
 
 /// A wrapper around the JS ErrorController in the core player

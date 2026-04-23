@@ -59,7 +59,7 @@ class JSValueExtensionsTests: XCTestCase {
             }
             
             XCTAssertEqual(jsValueError.message, "Fail")
-            XCTAssertEqual(jsValueError.type, "Error Type")
+            XCTAssertEqual(jsValueError.type, .unknown("Error Type"))
             XCTAssertEqual(jsValueError.severity, ErrorSeverity.error)
             XCTAssertNotNil(jsValueError.metadata)
             XCTAssertEqual(jsValueError.metadata?["property"] as? String, "value")

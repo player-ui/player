@@ -60,10 +60,10 @@ extension JSValue {
  */
 public struct JSValueError: CreatedFromJSValue, ErrorWithMetadata {
     private static let defaultMessage: String  = "Unknown JS Error"
-    private static let defaultType: String  = ""
+    private static let defaultType: ErrorTypes  = .unknown("")
 
     public let message: String
-    public let type: String
+    public let type: ErrorTypes
     public let severity: ErrorSeverity?
     public let metadata: [String: Any]?
     public var jsDescription: String { message }
@@ -107,7 +107,7 @@ public struct JSValueError: CreatedFromJSValue, ErrorWithMetadata {
         
         if let typeProperty = jsErrorObject.objectForKeyedSubscript(JSKeys.type), typeProperty.isString == true {
             isErrorWithMetadata = true
-            type = typeProperty.toString()
+            type = ErrorTypes(typeProperty.toString())
         } else {
             isErrorWithMetadata = false
             type = JSValueError.defaultType
