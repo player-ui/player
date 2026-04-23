@@ -1,3 +1,19 @@
+# 0.15.3-next.1 (Thu Apr 16 2026)
+
+#### 🐛 Bug Fix
+
+- fix: create ErrorState with error.message is undefined [#845](https://github.com/player-ui/player/pull/845) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Use Xcode 26.4.0 in CI/CD [#779](https://github.com/player-ui/player/pull/779) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Fix the memory leak for large payloads [#841](https://github.com/player-ui/player/pull/841) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 3
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 0.15.3-next.0 (Tue Apr 07 2026)
 
 ### Release Notes

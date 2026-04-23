@@ -5,10 +5,10 @@ module(
 
 bazel_dep(name = "rules_player")
 archive_override(
-    module_name = "rules_player",
-    integrity = "sha256-+8W4qKFiv8zQy+NyXcWqULo49VqwTuf/DIMg2ikwvho=",
-    strip_prefix = "rules_player-2.2.3",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.3.tar.gz"],
+  module_name = "rules_player",
+  strip_prefix = "rules_player-2.2.1",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.1.tar.gz"],
+  integrity = "sha256-vRyADsmF6vA865X9euZw5Z4KnGgpht5qzaa/vLxSkYQ="
 )
 
 bazel_dep(name = "platforms", version = "1.0.0")
@@ -36,13 +36,13 @@ register_toolchains("@local_shell_config//:local_sh_toolchain")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_xcodeproj", version = "3.6.0")
+bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
 bazel_dep(name = "rules_shell", version = "0.7.1")
 bazel_dep(name = "rules_apple", version = "4.3.3", repo_name = "build_bazel_rules_apple")
 bazel_dep(name = "apple_support", version = "2.5.2", repo_name = "build_bazel_apple_support")
-bazel_dep(name = "rules_swift", version = "3.4.2")
+bazel_dep(name = "rules_swift", version = "2.9.0")
 bazel_dep(name = "rules_swift_package_manager", version = "1.11.1")
-bazel_dep(name = "swiftlint", version = "0.63.2", repo_name = "SwiftLint")
+bazel_dep(name = "swiftlint", version = "0.59.1", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
@@ -110,13 +110,6 @@ register_toolchains("//jvm:kotlin_toolchain")
 
 # Android
 bazel_dep(name = "rules_android", version = "0.6.5")
-archive_override(
-    module_name = "rules_android", 
-    urls = ["https://github.com/bazelbuild/rules_android/releases/download/v0.6.5/rules_android-v0.6.5.tar.gz"],
-    integrity = "sha256-WlGCx0go2lMWUiGYc5UmTUpc7owQwXF4oNXhI7vRYjw=",
-    strip_prefix = "rules_android-0.6.5",
-    patches = ["//patches:rules_android.mirror.patch"],
-)
 bazel_dep(name = "rules_android_ndk", version = "0.1.3")
 git_override(
     module_name = "rules_android_ndk",

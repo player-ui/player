@@ -7,8 +7,6 @@ settings:
 overrides:
   esbuild: 0.19.8
   jackspeak: 2.1.1
-  '@player-ui/player': workspace:*
-  '@player-ui/types': workspace:*
 
 importers:
 
@@ -254,9 +252,6 @@ importers:
       eslint-plugin-react:
         specifier: ^7.37.4
         version: 7.37.5(eslint@9.33.0(jiti@2.5.1))
-      fast-sort:
-        specifier: ^3.4.1
-        version: 3.4.1
       github-slugger:
         specifier: ^1.0.0
         version: 1.5.0
@@ -401,6 +396,9 @@ importers:
       signale:
         specifier: ^1.4.0
         version: 1.4.0
+      sorted-array:
+        specifier: ^2.0.4
+        version: 2.0.4
       source-map-js:
         specifier: ^1.0.2
         version: 1.2.1
@@ -501,7 +499,7 @@ importers:
   core/make-flow:
     dependencies:
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../types
 
   core/partial-match-registry: {}
@@ -515,7 +513,7 @@ importers:
         specifier: workspace:^
         version: link:../partial-match-registry
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../types
 
   core/types: {}
@@ -523,7 +521,7 @@ importers:
   docs/site:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/player
       '@player-ui/react':
         specifier: workspace:^
@@ -559,7 +557,7 @@ importers:
         specifier: workspace:^
         version: link:../../tools/mocks
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/player
       '@player-ui/react':
         specifier: workspace:^
@@ -592,16 +590,16 @@ importers:
         specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/types
 
   plugins/async-node/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/check-path-plugin':
@@ -636,16 +634,16 @@ importers:
         specifier: workspace:^
         version: link:../../reference-assets/react
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/types
 
   plugins/beacon/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/types
     devDependencies:
       '@player-ui/make-flow':
@@ -658,7 +656,7 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/react':
         specifier: workspace:^
@@ -674,7 +672,7 @@ importers:
         specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
@@ -703,7 +701,7 @@ importers:
         specifier: workspace:^
         version: link:../../expression/core
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
@@ -713,7 +711,7 @@ importers:
   plugins/common-types/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/types-provider-plugin':
         specifier: workspace:^
@@ -732,7 +730,7 @@ importers:
   plugins/computed-properties/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
@@ -754,13 +752,13 @@ importers:
   plugins/console-logger/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   plugins/data-change-listener/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
@@ -782,7 +780,7 @@ importers:
   plugins/data-filter/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
@@ -792,7 +790,7 @@ importers:
   plugins/expression/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   plugins/external-state/core:
@@ -801,16 +799,16 @@ importers:
         specifier: workspace:*
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   plugins/markdown/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/types
     devDependencies:
       '@player-ui/partial-match-fingerprint-plugin':
@@ -823,7 +821,7 @@ importers:
   plugins/meta-plugin/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   plugins/metrics/core:
@@ -832,7 +830,7 @@ importers:
         specifier: workspace:^
         version: link:../../beacon/core
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   plugins/metrics/react:
@@ -841,7 +839,7 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/react':
         specifier: workspace:^
@@ -853,7 +851,7 @@ importers:
         specifier: workspace:^
         version: link:../../../core/partial-match-registry
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
@@ -863,7 +861,7 @@ importers:
   plugins/pubsub/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   plugins/reference-assets/cli-preset:
@@ -872,7 +870,7 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/types
 
   plugins/reference-assets/components:
@@ -881,7 +879,7 @@ importers:
         specifier: workspace:^
         version: link:../../common-types/core
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
       '@player-ui/reference-assets-plugin':
         specifier: workspace:^
@@ -905,7 +903,7 @@ importers:
         specifier: workspace:^
         version: link:../../meta-plugin/core
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-testing-library':
@@ -949,7 +947,7 @@ importers:
   plugins/shared-constants/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/common-types-plugin':
@@ -962,20 +960,20 @@ importers:
   plugins/stage-revert-data/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/make-flow':
         specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/types
 
   plugins/types-provider/core:
     dependencies:
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
     devDependencies:
       '@player-ui/asset-transform-plugin':
@@ -997,7 +995,7 @@ importers:
         specifier: workspace:^
         version: link:../../core/partial-match-registry
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/player
       '@player-ui/react-subscribe':
         specifier: workspace:^
@@ -1018,7 +1016,7 @@ importers:
         specifier: workspace:^
         version: link:../../../core/make-flow
       '@player-ui/player':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../../core/player
 
   tools/mocks: {}
@@ -5134,9 +5132,6 @@ packages:
 
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==, tarball: https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz}
-
-  fast-sort@3.4.1:
-    resolution: {integrity: sha512-76uvGPsF6So53sZAqenP9UVT3p5l7cyTHkLWVCMinh41Y8NDrK1IYXJgaBMfc1gk7nJiSRZp676kddFG2Aa5+A==, tarball: https://registry.npmjs.org/fast-sort/-/fast-sort-3.4.1.tgz}
 
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==, tarball: https://registry.npmjs.org/fast-uri/-/fast-uri-3.0.6.tgz}
@@ -14553,8 +14548,6 @@ snapshots:
   fast-json-stable-stringify@2.1.0: {}
 
   fast-levenshtein@2.0.6: {}
-
-  fast-sort@3.4.1: {}
 
   fast-uri@3.0.6: {}
 
