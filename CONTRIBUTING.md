@@ -166,15 +166,19 @@ iOS Development requires a bit more set-up.
 
    These hooks include auto-formatting and will run for all staged files pre-commit.
 
-1. Install [Mint](https://github.com/yonaskolb/Mint) and bootstrap SwiftFormat tooling:
+1. Install [Mint](https://github.com/yonaskolb/Mint) and bootstrap Swift tooling:
 
    ```bash
    brew install mint
    mint bootstrap
    ```
 
-   This installs the pinned version of SwiftFormat used by the project. This is needed by the pre-commit hook to auto-fix formatting.
-   Run `just swift-format` to auto-format Swift files, or `just swift-format-lint` to check without modifying.
+   This installs the pinned versions of SwiftFormat and SwiftLint used by the project. Both are needed by the pre-commit hook to auto-fix formatting.
+
+   | Command               | Description                      |
+   | --------------------- | -------------------------------- |
+   | `just swift-format`   | Auto-format Swift files in-place |
+   | `just swift-lint-fix` | Auto-fix fixable lint errors     |
 
 ### To Run
 

@@ -126,17 +126,13 @@ dev-ios: build-core-native
 start-ios-demo:
   bazel run //ios/demo:PlayerUIDemo
 
-[doc('Lint all iOS files')]
-lint-ios:
-  bazel test $(bazel query --noshow_progress --output=label "attr(name, '.*SwiftLint', //ios/... + //plugins/...)")
+[doc('Fix all auto-fixable Swift lint errors')]
+swift-lint-fix:
+  mint run swiftlint --fix ios plugins
 
 [doc('Format all Swift files in-place')]
 swift-format:
   mint run swiftformat ios plugins
-
-[doc('Check Swift formatting without modifying files (used in CI)')]
-swift-format-lint:
-  mint run swiftformat ios plugins --lint
 
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 

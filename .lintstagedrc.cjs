@@ -8,6 +8,6 @@ module.exports = {
   },
   '*.swift': (filenames) => {
     const files = filenames.join(' ');
-    return [`mint run swiftformat ${files}`];
+    return [`mint run swiftformat ${files}`, `mint run swiftlint --fix`];
   },
 };

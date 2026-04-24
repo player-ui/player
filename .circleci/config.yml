@@ -164,9 +164,7 @@ jobs:
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
+              $(bazel query "kind(ios_ui_test, //plugins/...)")
       - run:
           name: Tests
           command: |
@@ -181,18 +179,11 @@ jobs:
               $(bazel query "kind(ios_ui_test, //ios/...)") \
               $(bazel query "kind(ios_ui_test, //plugins/...)")
       - run:
-          name: Lint
-          command: |
-            bazel test \
-              --config=ci-mac \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
-
-      - run:
-          name: SwiftFormat
+          name: Swift Lint and Format
           command: |
             mint bootstrap
-            just swift-format-lint
+            mint run swiftlint lint --strict
+            mint run swiftformat ios plugins --lint
 
       - run:
           when: always
