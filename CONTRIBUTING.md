@@ -175,10 +175,11 @@ iOS Development requires a bit more set-up.
 
    This installs the pinned versions of SwiftFormat and SwiftLint used by the project. Both are needed by the pre-commit hook to auto-fix formatting.
 
-   | Command               | Description                      |
-   | --------------------- | -------------------------------- |
-   | `just swift-format`   | Auto-format Swift files in-place |
-   | `just swift-lint-fix` | Auto-fix fixable lint errors     |
+   | Command                      | Description                                  |
+   | ---------------------------- | -------------------------------------------- |
+   | `just format-ios`            | Auto-fix all lint and format errors in-place |
+   | `just swift-lint-ios`        | Check lint (strict, no modifications)        |
+   | `just swift-format-lint-ios` | Check formatting (no modifications)          |
 
 ### To Run
 
