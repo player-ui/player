@@ -6,4 +6,8 @@ module.exports = {
   '*.md': (filenames) => {
     return [`prettier --write ${filenames.join(' ')}`];
   },
+  '*.swift': (filenames) => {
+    const files = filenames.join(' ');
+    return [`mint run swiftformat ${files}`];
+  },
 };

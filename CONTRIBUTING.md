@@ -126,7 +126,6 @@ iOS Development requires a bit more set-up.
    - If you instead have `/usr/local` or something similar, you have the Intel chip homebrew.
      You need Apple Silicon homebrew. This will let you run the project without Rosetta. Follow the next step.
 1. If you need to replace Intel homebrew, do the following. Keep in mind that this will remove everything you have installed through homebrew. E.g. existing installations of VSCode, xcodes, rsync, etc.
-
    1. Delete all your formulas and casks. This is to ensure no conflicts with the new homebrew. If you don’t feel comfortable deleting everything, delete at least bazelisk.
 
       ````bash
@@ -158,6 +157,24 @@ iOS Development requires a bit more set-up.
 1. `brew install rsync`. This fixes a bunch of permission denied issues.
    1. Close and re-open the terminal.
    1. Run `which rsync` to make sure you’re using the homebrew one. If it’s not the homebrew rsync, something is wrong and needs to be fixed.
+
+1. Install git hooks:
+
+   ```bash
+   pnpm run prepare
+   ```
+
+   These hooks include auto-formatting and will run for all staged files pre-commit.
+
+1. Install [Mint](https://github.com/yonaskolb/Mint) and bootstrap SwiftFormat tooling:
+
+   ```bash
+   brew install mint
+   mint bootstrap
+   ```
+
+   This installs the pinned version of SwiftFormat used by the project. This is needed by the pre-commit hook to auto-fix formatting.
+   Run `just swift-format` to auto-format Swift files, or `just swift-format-lint` to check without modifying.
 
 ### To Run
 

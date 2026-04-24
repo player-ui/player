@@ -130,6 +130,14 @@ start-ios-demo:
 lint-ios:
   bazel test $(bazel query --noshow_progress --output=label "attr(name, '.*SwiftLint', //ios/... + //plugins/...)")
 
+[doc('Format all Swift files in-place')]
+swift-format:
+  mint run swiftformat ios plugins
+
+[doc('Check Swift formatting without modifying files (used in CI)')]
+swift-format-lint:
+  mint run swiftformat ios plugins --lint
+
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 
 If you run them all at once locally, too many simulators will open and they'll all time out and fail.")]
