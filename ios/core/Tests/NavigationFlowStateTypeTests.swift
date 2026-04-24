@@ -11,7 +11,7 @@ class NavigationFlowStateTypeTests: XCTestCase {
             ("ASYNC_ACTION", .asyncAction),
             ("FLOW", .flow),
             ("EXTERNAL", .external),
-            ("END", .end),
+            ("END", .end)
         ]
 
         for (raw, expected) in cases {
