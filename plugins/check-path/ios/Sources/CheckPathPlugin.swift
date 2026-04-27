@@ -24,6 +24,7 @@ open class BaseCheckPathPlugin: JSBasePlugin {
     ///   - id: The ID of the asset to check
     ///   - query: The type of the parent to check for
     public func getParentContext(id: String, query: String? = nil) -> Any? {
+        // swiftlint:disable:next force_unwrapping
         let arguments = query != nil ? [id, query!] : [id]
         return pluginRef?.invokeMethod("getParent", withArguments: arguments)?.toObject()
     }

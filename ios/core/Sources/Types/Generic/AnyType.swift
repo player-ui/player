@@ -49,7 +49,7 @@ public enum AnyType: Hashable {
     /// The underlying data was not in a known format
     case unknownData
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     public func hash(into hasher: inout Hasher) {
         switch self {
         case let .string(data):
@@ -81,7 +81,7 @@ public enum AnyType: Hashable {
 }
 
 extension AnyType: Equatable {
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     public static func == (lhs: AnyType, rhs: AnyType) -> Bool {
         switch (lhs, rhs) {
         case let (.string(lhv), .string(rhv)): return lhv == rhv
@@ -107,7 +107,7 @@ extension AnyType: Decodable {
     /// Construct AnyType by decoding
     /// - parameters:
     ///   - decoder: A decoder to decode from
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     public init(from decoder: Decoder) throws {
         if let dictionary = try? decoder.singleValueContainer().decode([String: String].self) {
             self = .dictionary(data: dictionary)
@@ -194,6 +194,7 @@ extension AnyType: Encodable {
     /// Encode to an encoder
     /// - parameters:
     ///   - encoder: The encoder to encode the value to
+    // swiftlint:disable:next cyclomatic_complexity
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -239,7 +240,8 @@ extension AnyType: Encodable {
 }
 
 public struct AnyTypeDecodingContext {
-    static let key: CodingUserInfoKey = (rawValue: "AnyTypeDecodingContext")!
+    // swiftlint:disable:next force_unwrapping
+    static let key: CodingUserInfoKey = .init(rawValue: "AnyTypeDecodingContext")!
 
     public var rawData: Data
 

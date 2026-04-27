@@ -119,6 +119,7 @@ public enum FlowLoader {
                     )
                     if !isDir.boolValue {
                         let data = fileManager.contents(atPath: "\(subdirectory)/\(name)")
+                        // swiftlint:disable:next force_unwrapping
                         let json = String(data: data!, encoding: .utf8)!
                         return [(
                             name: name.lowercased().replacingOccurrences(of: ".json", with: ""),

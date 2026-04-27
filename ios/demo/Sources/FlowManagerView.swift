@@ -74,6 +74,7 @@ public struct FlowManagerView: View {
                         }
                     )
 
+                    // swiftlint:disable:next multiple_closures_with_trailing_closure
                     Button(action: { complete = true }) {
                         Text("Terminate Flow")
                     }

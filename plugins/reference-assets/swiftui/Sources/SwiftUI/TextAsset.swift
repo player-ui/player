@@ -50,6 +50,7 @@ struct LinkModifier: ViewModifier {
     /// - parameters:
     ///   - destination: A string URL destination
     init(_ destination: String) {
+        // swiftlint:disable:next force_unwrapping
         self.destination = URL(string: destination)!
     }
 

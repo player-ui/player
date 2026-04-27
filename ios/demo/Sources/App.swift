@@ -70,6 +70,7 @@ struct MainView: View {
     }
 
     var showAlert: Binding<Bool> {
+        // swiftlint:disable:next multiple_closures_with_trailing_closure
         Binding(get: { result != nil }) { newValue in
             guard !newValue else { return }
             result = nil
