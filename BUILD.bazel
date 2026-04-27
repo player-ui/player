@@ -159,10 +159,6 @@ assemble_ios_release(
         "//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources": "plugins/reference-assets/swiftui/Resources/",
         "//plugins/reference-assets/core:core_native_bundle": "plugins/reference-assets/swiftui/Resources/js/",
 
-        # Stage Revert Data
-        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPlugin_Sources": "plugins/stage-revert-data/ios/",
-        "//plugins/stage-revert-data/core:core_native_bundle": "plugins/stage-revert-data/ios/Resources/",
-
         # Transition
         "//plugins/transition/swiftui:PlayerUITransitionPlugin_Sources": "plugins/transition/swiftui",
 

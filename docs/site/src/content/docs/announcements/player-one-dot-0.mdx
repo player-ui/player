@@ -254,10 +254,9 @@ public suspend fun terminate(data: Data? = null) {}
 
 **Migration**: Provide the `Data` type appropriate for your use case. If `terminate` will always be called with `nill`, use `Nothing`.
 
-### (iOS) `CommonExpressionsPlugin` and `ComputedPropertiesPlugin` removed
+### (iOS) `CommonExpressionsPlugin`, `ComputedPropertiesPlugin`, and `StageRevertDataPlugin` removed
 
-These plugins are now **core-only** and no longer have iOS-specific implementations. They operate at the shared JS core layer and do 
-not need to be registered per-platform.
+These plugins are now **core-only** and no longer have iOS-specific implementations. They operate at the shared JS core layer and do not need to be registered per-platform.
 
 #### Migration
 
@@ -268,11 +267,16 @@ Remove any direct registration of these plugins in your iOS code:
 plugins: [
   CommonExpressionsPlugin(),
   ComputedPropertiesPlugin(),
+  StageRevertDataPlugin(),
 ]
 ```
 
 Instead, register these plugins once in the shared core layer of your Player plugin, following the process described in the
-[Common Expressions Plugin](../../plugins/core/common-expressions) or [Computed Properties Plugin](../../plugins/core/computed-properties) docs, respectively.
+corresponding docs:
+
+- [Common Expressions Plugin](../../plugins/core/common-expressions)
+- [Computed Properties Plugin](../../plugins/core/computed-properties)
+- [Stage Revert Data Plugin](../../plugins/core/stage-revert-data)
 
 ### (iOS) Dropped CocoaPods Support
 

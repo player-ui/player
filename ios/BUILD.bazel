@@ -46,8 +46,6 @@ xcodeproj(
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsViewInspectorTests",
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsUITests",
 
-        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPluginTests",
-
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"
     ],
