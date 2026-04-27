@@ -126,6 +126,10 @@ dev-ios: build-core-native
 start-ios-demo:
   bazel run //ios/demo:PlayerUIDemo
 
+[doc('Lint all iOS files')]
+lint-ios:
+  bazel test $(bazel query --noshow_progress --output=label "attr(name, '.*SwiftLint', //ios/... + //plugins/...)")
+
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 
 If you run them all at once locally, too many simulators will open and they'll all time out and fail.")]
@@ -136,15 +140,17 @@ list-test-ios:
   echo '🍎 UI tests:'
   bazel query "kind(ios_ui_test, //...)"
 
+### 🍎 End iOS ###
+
 clean: # Force delete all the local cached bazel stuff. Be careful!
   # Delete all the bazel build artifacts
   rm -rf .build
   rm -rf .bazel-*
 
-  # Delete cached node_modules and re-resolve packages
-  rm -rf node_modules/
-  rm -rf pnpm-lock.yaml
-  pnpm install
+  # PNPM has individual node_modules per folder, find and destroy them all
+  find . -name "node_modules" -type d -exec rm -rf {} +
+  # Only bump based on lockfile
+  pnpm install --frozen-lockfile
 
   # Delete iOS stuff
   rm -rf ios/demo/.build
@@ -153,6 +159,4 @@ clean: # Force delete all the local cached bazel stuff. Be careful!
   rm -rf .swiftpm/
 
   # Then expunge for good measure
-  bazel clean --expunge
-
-### 🍎 End iOS ###
+  bazel clean --expunge --async

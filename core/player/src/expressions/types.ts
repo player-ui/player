@@ -129,15 +129,13 @@ export interface LiteralNode extends BaseNode<"Literal"> {
 }
 
 export interface BinaryNode
-  extends BaseNode<"BinaryExpression">,
-    DirectionalNode {
+  extends BaseNode<"BinaryExpression">, DirectionalNode {
   /** The operation to perform on the nodes */
   operator: string;
 }
 
 export interface LogicalNode
-  extends BaseNode<"LogicalExpression">,
-    DirectionalNode {
+  extends BaseNode<"LogicalExpression">, DirectionalNode {
   /** The logical operation to perform on the nodes */
   operator: string;
 }
@@ -179,8 +177,7 @@ export interface MemberExpressionNode extends BaseNode<"MemberExpression"> {
   property: ExpressionNode;
 }
 
-export interface ConditionalExpressionNode
-  extends BaseNode<"ConditionalExpression"> {
+export interface ConditionalExpressionNode extends BaseNode<"ConditionalExpression"> {
   /** The test for the ternary */
   test: ExpressionNode;
 
@@ -217,8 +214,7 @@ export interface IdentifierNode extends BaseNode<"Identifier"> {
 export type AssignmentNode = BaseNode<"Assignment"> & DirectionalNode;
 
 export interface ModificationNode
-  extends BaseNode<"Modification">,
-    DirectionalNode {
+  extends BaseNode<"Modification">, DirectionalNode {
   /** The operator for the modification */
   operator: string;
 }

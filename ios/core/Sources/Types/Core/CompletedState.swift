@@ -238,10 +238,19 @@ public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     - returns: A ErrorState object if the JSValue was one
     */
     public static func createInstance(from value: JSValue?) -> ErrorState? {
-        guard
-            let flow = value?.objectForKeyedSubscript("flow"),
-            let message = value?.objectForKeyedSubscript("error")?.objectForKeyedSubscript("message")?.toString()
-        else { return nil }
+        guard let flow = value?.objectForKeyedSubscript("flow") else { return nil }
+
+        let message: String
+        if let errorValue = value?.objectForKeyedSubscript("error"), !errorValue.isUndefined {
+            if let msgValue = errorValue.objectForKeyedSubscript("message"), !msgValue.isUndefined {
+                message = msgValue.toString()
+            } else {
+                message = errorValue.toString()
+            }
+        } else {
+            message = "Unknown error"
+        }
+
         return ErrorState(flow: Flow.createInstance(value: flow), error: message)
     }
 

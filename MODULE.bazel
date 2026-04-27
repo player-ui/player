@@ -10,6 +10,7 @@ archive_override(
   urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.1.tar.gz"],
   integrity = "sha256-vRyADsmF6vA865X9euZw5Z4KnGgpht5qzaa/vLxSkYQ="
 )
+
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
 bazel_dep(name = "aspect_rules_js", version = "2.3.8")
@@ -36,12 +37,11 @@ register_toolchains("@local_shell_config//:local_sh_toolchain")
 ###### Start iOS ######
 ## Rule Dependencies
 bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
-bazel_dep(name = "rules_shell", version = "0.5.0")
-bazel_dep(name = "rules_apple", version = "4.1.0", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "apple_support", version = "1.22.0", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_shell", version = "0.7.1")
+bazel_dep(name = "rules_apple", version = "4.3.3", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "apple_support", version = "2.5.2", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_swift", version = "2.9.0")
-bazel_dep(name = "gazelle", version = "0.42.0", repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_swift_package_manager", version = "1.0.0")
+bazel_dep(name = "rules_swift_package_manager", version = "1.11.1")
 bazel_dep(name = "swiftlint", version = "0.59.1", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
@@ -101,9 +101,9 @@ build_constants(
 bazel_dep(name = "rules_java", version = "8.13.0")
 bazel_dep(name = "rules_kotlin", version = "2.1.8")
 archive_override(
-    module_name = "rules_kotlin", 
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
+    module_name = "rules_kotlin",
     patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
 )
 
 register_toolchains("//jvm:kotlin_toolchain")

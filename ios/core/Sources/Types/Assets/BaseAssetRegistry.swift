@@ -203,14 +203,6 @@ extension AnyTypeDecodingContext {
 }
 
 extension JSValue {
-    var jsonDisplayString: String {
-        do {
-            return try String(data: jsonData(pretty: true), encoding: .utf8) ?? "notuf8"
-        } catch {
-            return error.localizedDescription
-        }
-    }
-
     /// Returns the contents of this value encoded into UTF-8 string data. Throws DecodingError.malformedData
     /// if this value can't be transformed.
     func jsonData(pretty: Bool = false) throws -> Data {
@@ -291,8 +283,13 @@ extension JSONDecoder {
         setRootJS(value)
         defer { setRootJS(nil) }
 
-        logger?.t("Decoding: \(value.jsonDisplayString)")
-        return try decode(T.self, from: value.jsonData())
+        let data = try value.jsonData()
+        // Log a truncated preview to aid debugging without re-serializing the full tree.
+        let truncated = data.count > 500
+        if let preview = String(data: data.prefix(500), encoding: .utf8) {
+            logger?.t("Decoding (\(data.count) bytes): \(preview)\(truncated ? "..." : "")")
+        }
+        return try decode(T.self, from: data)
     }
 
     func setDecodeAssetFunction<Asset>(_ function: @escaping DecodeAssetFunction<Asset>) {

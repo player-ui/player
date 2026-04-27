@@ -41,47 +41,44 @@ export * from "./formats/utils";
 /**
  * Exposes a lot of common DataTypes, validations, and formats to Player instance.
  */
-export class CommonTypesPlugin
-  implements
-    ExtendedPlayerPlugin<
-      [],
-      [],
-      [],
-      [
-        typeof BooleanType,
-        typeof IntegerType,
-        typeof IntegerPosType,
-        typeof IntegerNNType,
-        typeof StringType,
-        typeof CollectionType,
-        typeof DateType,
-        typeof PhoneType,
-      ],
-      [
-        typeof commaNumber,
-        typeof currency,
-        typeof date,
-        typeof integer,
-        typeof phone,
-      ],
-      [
-        typeof collection,
-        typeof email,
-        typeof expression,
-        typeof vinteger,
-        typeof length,
-        typeof max,
-        typeof min,
-        typeof oneOf,
-        typeof vphone,
-        typeof readonly,
-        typeof regex,
-        typeof required,
-        typeof string,
-        typeof zip,
-      ]
-    >
-{
+export class CommonTypesPlugin implements ExtendedPlayerPlugin<
+  [],
+  [],
+  [],
+  [
+    typeof BooleanType,
+    typeof IntegerType,
+    typeof IntegerPosType,
+    typeof IntegerNNType,
+    typeof StringType,
+    typeof CollectionType,
+    typeof DateType,
+    typeof PhoneType,
+  ],
+  [
+    typeof commaNumber,
+    typeof currency,
+    typeof date,
+    typeof integer,
+    typeof phone,
+  ],
+  [
+    typeof collection,
+    typeof email,
+    typeof expression,
+    typeof vinteger,
+    typeof length,
+    typeof max,
+    typeof min,
+    typeof oneOf,
+    typeof vphone,
+    typeof readonly,
+    typeof regex,
+    typeof required,
+    typeof string,
+    typeof zip,
+  ]
+> {
   name = "CommonTypes";
 
   apply(player: Player): void {
