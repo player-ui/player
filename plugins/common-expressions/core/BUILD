@@ -1,6 +1,6 @@
 load("@rules_player//player:defs.bzl", "js_xlr_pipeline")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//tools:defs.bzl", "NATIVE_BUILD_DEPS", "tsup_config", "vitest_config")
+load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -10,7 +10,6 @@ vitest_config(name = "vitest_config")
 
 js_xlr_pipeline(
     package_name = "@player-ui/common-expressions-plugin",
-    build_deps = NATIVE_BUILD_DEPS,
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

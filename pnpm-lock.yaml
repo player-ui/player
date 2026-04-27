@@ -399,9 +399,6 @@ importers:
       signale:
         specifier: ^1.4.0
         version: 1.4.0
-      sorted-array:
-        specifier: ^2.0.4
-        version: 2.0.4
       source-map-js:
         specifier: ^1.0.2
         version: 1.2.1
@@ -505,11 +502,7 @@ importers:
         specifier: workspace:^
         version: link:../types
 
-  core/partial-match-registry:
-    dependencies:
-      fast-sort:
-        specifier: ^3.4.1
-        version: 3.4.1
+  core/partial-match-registry: {}
 
   core/player:
     dependencies:
