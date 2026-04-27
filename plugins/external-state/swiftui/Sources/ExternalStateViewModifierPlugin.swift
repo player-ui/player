@@ -138,7 +138,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
 
             return JSValue(object: [
                 "ref": handler.ref,
-                "match": handler.match,
+                "match": handler.match as Any,
                 "handlerFunction": JSValue(object: callback, in: context) as Any
             ], in: context)
         }
