@@ -235,7 +235,6 @@ public extension HeadlessPlayer {
      */
     func start(flow: String, completion: @escaping (Result<CompletedState, PlayerError>) -> Void) {
         // declare these variables outside and reference them inside the errorHandler to prevent retain cycle
-        let playerRef = jsPlayerReference
         let loggerRef = logger
 
         let promiseHandler: @convention(block) (JSValue?) -> Void = { completedState in
@@ -246,9 +245,10 @@ public extension HeadlessPlayer {
             }
             completion(.success(result))
         }
-        let errorHandler: @convention(block) (JSValue?) -> Void = { _ in
+        let errorHandler: @convention(block) (JSValue?) -> Void = { [weak jsPlayerReference] _ in
             guard
-                let result = playerRef?.getState() as? ErrorState else {
+                let playerRef = jsPlayerReference,
+                let result = playerRef.getState() as? ErrorState else {
                 return completion(.failure(PlayerError.jsConversionFailure))
             }
 
@@ -258,7 +258,7 @@ public extension HeadlessPlayer {
 
         // Ensure these get created because otherwise we will never know when the flow ends/errors
         guard
-            let context = playerRef?.context,
+            let context = jsPlayerReference?.context,
             let flowObject = context.evaluateScript("(\(flow))"),
             !flowObject.isUndefined,
             let callback = JSValue(object: promiseHandler, in: context),
@@ -268,7 +268,7 @@ public extension HeadlessPlayer {
         }
 
         // Should not be possible due to fatalError in constructor, but just for handling optionals safely
-        guard let player = playerRef else { return completion(.failure(PlayerError.playerNotInstantiated)) }
+        guard let player = jsPlayerReference else { return completion(.failure(PlayerError.playerNotInstantiated)) }
         player
             .invokeMethod("start", withArguments: [flowObject])
             .invokeMethod("then", withArguments: [callback])
@@ -290,10 +290,11 @@ public extension HeadlessPlayer {
         - context: The context to attach the exception handler to
      */
     private func attachExceptionHandler(to context: JSContext) {
+        let loggerRef = logger
         context.exceptionHandler = { (_: JSContext!, value: JSValue!) in
             let stacktrace = value.objectForKeyedSubscript("stack").toString()
             let moreInfo = "in method \(String(describing: stacktrace))"
-            logger.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
+            loggerRef.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
         }
     }
 

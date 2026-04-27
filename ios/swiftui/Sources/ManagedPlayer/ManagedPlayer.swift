@@ -150,7 +150,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     public var body: some View {
         bodyContent(viewModel.stateTransition.call() ?? .identity)
             .onDisappear {
-                context.clearExceptionHandler()
+                context.unload()
             }
     }
 
