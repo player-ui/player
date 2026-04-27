@@ -9,11 +9,8 @@ import SwiftUI
 import JavaScriptCore
 import Combine
 import SwiftHooks
-
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUILogger
-#endif
 
 /**
  A `HeadlessPlayer` implementation that renders itself as a SwiftUI View
@@ -74,13 +71,15 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             self.player = playerValue
             self.flow = flow
             self.hooks = hooks
-            DispatchQueue.main.async { self.result = nil }
+            DispatchQueue.main.async { [weak self] in
+                self?.result = nil 
+            }
 
             for plugin in allPlugins { plugin.apply(player: player) }
             registry.partialMatchRegistry = partialMatchPlugin
 
-            hooks.viewController.tap { [weak self] controller in
-                guard let self = self, self.player == playerValue else { return }
+            hooks.viewController.tap { [weak self, weak playerValue] controller in
+                guard let self, let playerValue, self.player == playerValue else { return }
                 self.onViewController(controller)
             }
 
@@ -93,19 +92,30 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 return
             }
 
-            player.start(flow: flow) { [weak self] (result) in
-                guard let self = self, self.player == playerValue else { return }
-                DispatchQueue.main.async { self.result = result }
+            player.start(flow: flow) { [weak self, weak playerValue] (result) in
+                guard let self, let playerValue, self.player == playerValue else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.result = result 
+                }
             }
         }
 
         /// Unload the context. This will release the current javascript player/context and clear the current
-        /// result.
+        /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
+        /// by clearing the exceptionHandler and any exported objects on the context.
         public func unload() {
+            if let ctx = player?.context {
+                ctx.exceptionHandler = nil
+                ctx.setObject(nil, forKeyedSubscript: "player" as NSString)
+            }
+            partialMatchPlugin.pluginRef = nil
             player = nil
             hooks = nil
             flow = nil
-            DispatchQueue.main.async { self.result = nil }
+            state = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.result = nil 
+             }
             registry.resetView()
         }
 
@@ -128,9 +138,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             - viewController: The new ViewController instance
          */
         private func onViewController(_ viewController: ViewController) {
-            let playerValue = expectedPlayer
-            viewController.hooks.view.tap { [weak self] view in
-                guard let self = self, self.player == playerValue else { return }
+            viewController.hooks.view.tap { [weak self, weak expectedPlayer] view in
+                guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
                 self.onView(view)
             }
         }
@@ -141,10 +150,9 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             - view: The new View in the ViewController
          */
         private func onView(_ view: PlayerView) {
-            let playerValue = expectedPlayer
-            view.hooks.onUpdate.tap { [weak self] value in
+            view.hooks.onUpdate.tap { [weak self, weak expectedPlayer] value in
                 Task { @MainActor [weak self] in
-                    guard let self = self, self.player == playerValue else { return }
+                    guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
                     self.onUpdate(value)
                 }
             }
@@ -381,4 +389,4 @@ public struct PlayerViewTransition: Equatable {
     }
 }
 
-extension InProgressState: ObservableObject {}
+extension InProgressState: @retroactive ObservableObject {}

@@ -246,8 +246,9 @@ public class AsyncHook<T>: BaseAsyncJSHook where T: CreatedFromJSValue {
      - hook: A function to run when the JS hook is fired
      */
     public func tap(_ hook: @escaping AsyncHookHandler) {
-        let tapMethod: @convention(block) (JSValue?) -> JSValue = { value in
+        let tapMethod: @convention(block) (JSValue?) -> JSValue = { [weak self] value in
             guard
+                let self = self,
                 let val = value,
                 let hookValue = T.createInstance(value: val) as? T
             else { return JSValue() }
@@ -277,8 +278,9 @@ public class AsyncHook2<T, U>: BaseAsyncJSHook where T: CreatedFromJSValue, U: C
      - hook: A function to run when the JS hook is fired
      */
     public func tap(_ hook: @escaping AsyncHookHandler) {
-        let tapMethod: @convention(block) (JSValue?,JSValue?) -> JSValue = { value, value2 in
+        let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue = { [weak self] value, value2 in
             guard
+                let self = self,
                 let val = value,
                 let val2 = value2,
                 let hookValue = T.createInstance(value: val) as? T,
