@@ -110,27 +110,23 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             autoreleasepool {
                 if let ctx = player?.context {
                     ctx.exceptionHandler = nil
-                    ctx.setObject(nil, forKeyedSubscript: "player" as NSString)
                     ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
+                // Break plugin → JSContext/JSValue references
                 partialMatchPlugin.pluginRef = nil
                 partialMatchPlugin.context = nil
+                // Release the JS player instance and all hook JSValues
                 player = nil
                 hooks = nil
                 flow = nil
+                // Release InProgressState which holds PlayerControllers (JSValues)
                 state = nil
             }
             DispatchQueue.main.async { [weak self] in
                 self?.result = nil 
              }
             registry.resetView()
-        }
-
-        /// Clear the exceptionHandler of the context to remove reference to the logger
-        /// should be called when ManagedPlayer gets tore down
-        public func clearExceptionHandler() {
-            player?.context.exceptionHandler = nil
         }
 
         /// Returns `player` but asserts that it is not nil. Used from methods that should not be called
