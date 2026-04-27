@@ -39,7 +39,8 @@ class HeadlessPlayerTests: XCTestCase {
 
     func testUpdateHook() {
         let player = HeadlessPlayerImpl(plugins: [])
-        /// this func only exists because the compiler thinks XCTAssertThrowsError throws when it does not
+        /// this func only exists because the compiler thinks XCTAssertThrowsError throws
+        /// when it does not
         func checkUnregisteredAssetDecodeFails(_ assetJsValue: JSValue) {
             XCTAssertThrowsError(try player.assetRegistry.decode(assetJsValue))
         }
