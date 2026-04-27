@@ -9,36 +9,36 @@ import Combine
 import SwiftUI
 
 #if SWIFT_PACKAGE
-import PlayerUI
+    import PlayerUI
 #endif
 
 public enum AssetRenderError: Error {
-    // Thrown when the asset fails to decode its data from the JS runtime into its swift data type
+    /// Thrown when the asset fails to decode its data from the JS runtime into its swift data type
     case decodingFailure(innerError: Error, asset: AssetData? = nil, pathToAsset: [AssetData])
 }
 
 extension AssetRenderError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
-        case .decodingFailure(let innerError, let asset, let pathToAsset):
+        case let .decodingFailure(innerError, asset, pathToAsset):
             return """
-An error occured while decoding an asset.
-Caused by: \(innerError.playerDescription)
-Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?.type ?? "UNKNOWN")'\(pathToAsset.map({ "\n\tFound in (id: '\($0.id)', type: '\($0.type)')" }).joined())
-"""
+            An error occured while decoding an asset.
+            Caused by: \(innerError.playerDescription)
+            Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?
+                .type ?? "UNKNOWN")'\(pathToAsset
+                .map { "\n\tFound in (id: '\($0.id)', type: '\($0.type)')" }
+                .joined())
+            """
         }
     }
 }
 
 struct MinimumAssetData: AssetData {
-    public var id: String
-    public var type: String
+    var id: String
+    var type: String
 }
 
-
-/**
- A ViewModel that contains decoded AssetData for an Asset
- */
+/// A ViewModel that contains decoded AssetData for an Asset
 open class AssetViewModel<T: AssetData>: ObservableObject {
     /// The decoded data
     @Published public var data: T
@@ -47,46 +47,45 @@ open class AssetViewModel<T: AssetData>: ObservableObject {
     public var userInfo: [CodingUserInfoKey: Any]
 
     /// Set to store subscriptions in for cancellation
-    public var bag = Set<AnyCancellable>()
+    public var bag: Set<AnyCancellable> = []
 
-    /**
-     Constructs an instance of this ViewModel with the given data
-     - parameters:
-        - data: The data to publish from this ViewModel
-        - userInfo:  Any contextual information set by the user
-     */
+    /// Constructs an instance of this ViewModel with the given data
+    /// - parameters:
+    ///   - data: The data to publish from this ViewModel
+    ///   - userInfo:  Any contextual information set by the user
     public required init(_ data: T, userInfo: [CodingUserInfoKey: Any] = [:]) {
-        self._data = Published(initialValue: data)
+        _data = Published(initialValue: data)
         self.userInfo = userInfo
     }
 }
 
-/**
- An Asset with a default ViewModel
- */
-open class UncontrolledAsset<DataType: AssetData>: ControlledAsset<DataType, AssetViewModel<DataType>> {}
+/// An Asset with a default ViewModel
+open class UncontrolledAsset<DataType: AssetData>: ControlledAsset<
+    DataType,
+    AssetViewModel<DataType>
+> {}
 
-/**
- An Asset with a custom ViewModel that extends the default one to receive data updates
- */
-open class ControlledAsset<DataType: AssetData, ModelType>: SwiftUIAsset where ModelType: AssetViewModel<DataType> {
+/// An Asset with a custom ViewModel that extends the default one to receive data updates
+open class ControlledAsset<DataType: AssetData, ModelType: AssetViewModel<DataType>>: SwiftUIAsset {
     /// The ViewModel associated with this asset
     public let model: ModelType
 
     /// The decoded data associated with this asset
-    override open var valueData: AssetData { model.data }
+    override open var valueData: AssetData {
+        model.data
+    }
 
-    override var modelObject: AnyObject { model }
+    override var modelObject: AnyObject {
+        model
+    }
 
-    /**
-     Constructs a SwiftUIAsset from a decoder
-     - parameters:
-        - from: The decoder to decode from
-     */
+    /// Constructs a SwiftUIAsset from a decoder
+    /// - parameters:
+    ///   - from: The decoder to decode from
     public required init(from decoder: Decoder) throws {
         do {
             let data = try decoder.singleValueContainer().decode(DataType.self)
-            
+
             // When we have a plain old AssetViewModel, not a subclass with custom
             // properties, we want to bypass the model cache altogether.
             //
@@ -101,7 +100,10 @@ open class ControlledAsset<DataType: AssetData, ModelType>: SwiftUIAsset where M
             //
             let needsModelCache = (ModelType.self != AssetViewModel<DataType>.self)
             let modelCache = needsModelCache ? try decoder.getModelCache() : nil
-            if let model: ModelType = modelCache?.entry(forKey: data.id, codingPath: decoder.codingPath) {
+            if let model: ModelType = modelCache?.entry(
+                forKey: data.id,
+                codingPath: decoder.codingPath
+            ) {
                 // we can't safely take advantage of AssetData.isEqual here because
                 // the process of decoding can alter the contents of previously
                 // cached model data (because AssetData can contain reference types)
@@ -110,25 +112,31 @@ open class ControlledAsset<DataType: AssetData, ModelType>: SwiftUIAsset where M
                 model.data = data
                 model.userInfo = decoder.userInfo
             } else {
-                self.model = ModelType(data, userInfo: decoder.userInfo)
+                model = ModelType(data, userInfo: decoder.userInfo)
                 decoder.logger?.t("Creating model for \(data.id)")
                 modelCache?.set(model, forKey: data.id, codingPath: decoder.codingPath)
             }
-            
+
             try super.init(from: decoder)
-        }
-        catch AssetRenderError.decodingFailure(let innerError, let asset, let pathToAsset) {
+        } catch let AssetRenderError.decodingFailure(innerError, asset, pathToAsset) {
             let basicData = try? decoder.singleValueContainer().decode(MinimumAssetData.self)
             var newPath = pathToAsset
             if let basicData {
                 newPath = pathToAsset + [basicData]
             }
-            throw AssetRenderError.decodingFailure(innerError: innerError, asset: asset, pathToAsset: newPath)
-            
-        }
-        catch {
+            throw AssetRenderError.decodingFailure(
+                innerError: innerError,
+                asset: asset,
+                pathToAsset: newPath
+            )
+
+        } catch {
             let basicData = try? decoder.singleValueContainer().decode(MinimumAssetData.self)
-            throw AssetRenderError.decodingFailure(innerError: error, asset: basicData, pathToAsset: [])
+            throw AssetRenderError.decodingFailure(
+                innerError: error,
+                asset: basicData,
+                pathToAsset: []
+            )
         }
     }
 }

@@ -7,10 +7,10 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUICommonTypesPlugin
+import XCTest
 
 class CommonTypesPluginTests: XCTestCase {
     func testPluginConstructs() {

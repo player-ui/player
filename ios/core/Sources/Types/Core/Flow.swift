@@ -8,53 +8,64 @@
 import Foundation
 import JavaScriptCore
 
-/**
-A wrapper around the JS Flow in the core player
-*/
+/// A wrapper around the JS Flow in the core player
 public class Flow: CreatedFromJSValue {
-    /// Typealias for associated type
-    public typealias T = Flow
-
-    /// The ID of this flow
-    public var id: String? { value.objectForKeyedSubscript("id")?.toString() }
-
-    /// The original data associated with this flow
-    public var data: [String: Any]? { value.objectForKeyedSubscript("data")?.toObject() as? [String: Any] }
-
-    /// The name of this flow
-    public var currentState: NamedState? { value.objectForKeyedSubscript("currentState").map { NamedState($0) } }
-
     /// Lifecycle hooks
     public let hooks: FlowHooks
-
-    /**
-    Creates an instance from a JSValue, used for generic construction
-    - parameters:
-       - value: The JSValue to construct from
-    */
-    public static func createInstance(value: JSValue) -> Flow { Flow(value) }
 
     /// The JSValue that backs this wrapper
     private let value: JSValue
 
-    /**
-    Construct a Flow from a JSValue
-    - parameters:
-       - value: The JSValue that is the Flow
-    */
+    /// The ID of this flow
+    public var id: String? {
+        value.objectForKeyedSubscript("id")?.toString()
+    }
+
+    /// The original data associated with this flow
+    public var data: [String: Any]? {
+        value.objectForKeyedSubscript("data")?.toObject() as? [String: Any]
+    }
+
+    /// The name of this flow
+    public var currentState: NamedState? {
+        value.objectForKeyedSubscript("currentState").map { NamedState($0) }
+    }
+
+    /// Construct a Flow from a JSValue
+    /// - parameters:
+    ///   - value: The JSValue that is the Flow
     public init(_ value: JSValue) {
         self.value = value
         hooks = FlowHooks(
-            beforeTransition: SyncWaterfallHook2JS<NavigationBaseState, NavigationBaseState, String>(baseValue: value, name: "beforeTransition"),
+            beforeTransition: SyncWaterfallHook2JS<NavigationBaseState, NavigationBaseState,
+                String>(
+                baseValue: value,
+                name: "beforeTransition"
+            ),
             transition: Hook2(baseValue: value, name: "transition"),
             afterTransition: Hook(baseValue: value, name: "afterTransition")
         )
     }
+
+    /// Creates an instance from a JSValue, used for generic construction
+    /// - parameters:
+    ///   - value: The JSValue to construct from
+    public static func createInstance(value: JSValue) -> Flow {
+        Flow(value)
+    }
+
+    /// Typealias for associated type
+    public typealias T = Flow
 }
 
 public struct FlowHooks {
-    /// Fires before a transition with (state, transitionValue); return state (pass-through or modified).
-    public var beforeTransition: SyncWaterfallHook2JS<NavigationBaseState, NavigationBaseState, String>
+    /// Fires before a transition with (state, transitionValue); return state (pass-through or
+    /// modified).
+    public var beforeTransition: SyncWaterfallHook2JS<
+        NavigationBaseState,
+        NavigationBaseState,
+        String
+    >
 
     /// A hook that fires when transitioning states and giving the old and new states as parameters
     public var transition: Hook2<NamedState?, NamedState>
@@ -64,10 +75,6 @@ public struct FlowHooks {
 }
 
 public struct NamedState: CreatedFromJSValue {
-    public typealias T = NamedState
-
-    public static func createInstance(value: JSValue) -> NamedState { .init(value) }
-
     /// The name of the navigation node
     public let name: String
 
@@ -75,7 +82,14 @@ public struct NamedState: CreatedFromJSValue {
     public let value: NavigationBaseState?
 
     init(_ value: JSValue) {
-        self.name = value.objectForKeyedSubscript("name").toString()
-        self.value = NavigationBaseState.createInstance(value: value.objectForKeyedSubscript("value"))
+        name = value.objectForKeyedSubscript("name").toString()
+        self.value = NavigationBaseState
+            .createInstance(value: value.objectForKeyedSubscript("value"))
     }
+
+    public static func createInstance(value: JSValue) -> NamedState {
+        .init(value)
+    }
+
+    public typealias T = NamedState
 }

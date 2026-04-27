@@ -2,23 +2,21 @@ import Foundation
 import SwiftUI
 
 #if SWIFT_PACKAGE
-import PlayerUI
-import PlayerUISwiftUI
-import PlayerUICheckPathPlugin
+    import PlayerUI
+    import PlayerUICheckPathPlugin
+    import PlayerUISwiftUI
 #endif
 
 /// SwiftUI Version of `CheckPathPlugin` that puts itself into `\.checkPath` in EnvironmentValues
 public class SwiftUICheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
-    /**
-     Constructs the SwiftUICheckPathPlugin
-     */
+    /// Constructs the SwiftUICheckPathPlugin
     public convenience init() {
         self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
     }
 
-    public func apply<P>(player: P) where P: HeadlessPlayer {
+    public func apply<P: HeadlessPlayer>(player: P) {
         guard let player = player as? SwiftUIPlayer else { return }
-        player.hooks?.view.tap(name: self.pluginName) { [weak self] view in
+        player.hooks?.view.tap(name: pluginName) { [weak self] view in
             AnyView(view.environment(\.checkPath, self))
         }
     }

@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import XCTest
 @testable import PlayerUI
+import XCTest
 
 class AnyTypeTests: XCTestCase {
     func testStringData() {
@@ -18,7 +18,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .string(let result):
+        case let .string(result):
             XCTAssertEqual("test", result)
         default:
             XCTFail("data was not string")
@@ -32,7 +32,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .bool(let result):
+        case let .bool(result):
             XCTAssertEqual(true, result)
         default:
             XCTFail("data was not string")
@@ -46,7 +46,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .number(let result):
+        case let .number(result):
             XCTAssertEqual(1, result)
         default:
             XCTFail("data was not string")
@@ -60,7 +60,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .number(let result):
+        case let .number(result):
             XCTAssertEqual(1.5, result)
         default:
             XCTFail("data was not string")
@@ -74,7 +74,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .array(let result):
+        case let .array(result):
             XCTAssertEqual(["test", "data"], result)
         default:
             XCTFail("data was not array")
@@ -88,7 +88,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .numberArray(let result):
+        case let .numberArray(result):
             XCTAssertEqual([1, 2], result)
         default:
             XCTFail("data was not array")
@@ -102,7 +102,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .booleanArray(let result):
+        case let .booleanArray(result):
             XCTAssertEqual([false, true], result)
         default:
             XCTFail("data was not array")
@@ -116,7 +116,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .dictionary(let result):
+        case let .dictionary(result):
             XCTAssertEqual("value", result["key"])
         default:
             XCTFail("data was not dictionary")
@@ -130,7 +130,7 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .numberDictionary(let result):
+        case let .numberDictionary(result):
             XCTAssertEqual(1, result["key"])
         default:
             XCTFail("data was not dictionary")
@@ -144,21 +144,27 @@ class AnyTypeTests: XCTestCase {
             let anyType = try? JSONDecoder().decode(AnyType.self, from: data)
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .booleanDictionary(let result):
+        case let .booleanDictionary(result):
             XCTAssertEqual(false, result["key"])
         default:
             XCTFail("data was not dictionary")
         }
     }
 
-    func testAnyDictionaryData() {
+    func testAnyDictionaryData() throws {
         let string = "{\"key\":false,\"key2\":1}"
         guard
             let data = string.data(using: .utf8),
-            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+            let anyType =
+            try? AnyTypeDecodingContext(rawData: try XCTUnwrap(string.data(using: .utf8)))
+                .inject(to: JSONDecoder())
+                .decode(
+                    AnyType.self,
+                    from: data
+                )
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .anyDictionary(let result):
+        case let .anyDictionary(result):
             XCTAssertEqual(false, result["key"] as? Bool)
             XCTAssertEqual(1, result["key2"] as? Double)
         default:
@@ -166,14 +172,20 @@ class AnyTypeTests: XCTestCase {
         }
     }
 
-    func testAnyArray() {
+    func testAnyArray() throws {
         let string = "[1, true]"
         guard
             let data = string.data(using: .utf8),
-            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+            let anyType =
+            try? AnyTypeDecodingContext(rawData: try XCTUnwrap(string.data(using: .utf8)))
+                .inject(to: JSONDecoder())
+                .decode(
+                    AnyType.self,
+                    from: data
+                )
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .anyArray(let result):
+        case let .anyArray(result):
             XCTAssertEqual(1, result[0] as? Int)
             XCTAssertEqual(true, result[1] as? Bool)
         default:
@@ -181,14 +193,20 @@ class AnyTypeTests: XCTestCase {
         }
     }
 
-    func testAnyDictionaryDataWithArray() {
+    func testAnyDictionaryDataWithArray() throws {
         let string = "{\"key2\":1,\"key\":[false]}"
         guard
             let data = string.data(using: .utf8),
-            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+            let anyType =
+            try? AnyTypeDecodingContext(rawData: try XCTUnwrap(string.data(using: .utf8)))
+                .inject(to: JSONDecoder())
+                .decode(
+                    AnyType.self,
+                    from: data
+                )
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .anyDictionary(let result):
+        case let .anyDictionary(result):
             XCTAssertEqual(false, (result["key"] as? [Bool])?.first)
             XCTAssertEqual(1, result["key2"] as? Double)
         default:
@@ -196,14 +214,20 @@ class AnyTypeTests: XCTestCase {
         }
     }
 
-    func testAnyDictionaryDataWithDeepNestedTypes() {
+    func testAnyDictionaryDataWithDeepNestedTypes() throws {
         let string = "{\"container\":{\"key2\":1,\"key\":[{\"nestedKey\": \"nestedValue\"}]}}"
         guard
             let data = string.data(using: .utf8),
-            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+            let anyType =
+            try? AnyTypeDecodingContext(rawData: try XCTUnwrap(string.data(using: .utf8)))
+                .inject(to: JSONDecoder())
+                .decode(
+                    AnyType.self,
+                    from: data
+                )
         else { return XCTFail("could not decode") }
         switch anyType {
-        case .anyDictionary(let result):
+        case let .anyDictionary(result):
             let container = result["container"] as? [String: Any]
             let nestedArray = container?["key"] as? [Any]
             let nestedDict = nestedArray?.first as? [String: Any]
@@ -250,17 +274,18 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual("[\"test\",\"data\"]", doEncode(AnyType.array(data: ["test", "data"])))
         XCTAssertEqual("[1,2]", doEncode(AnyType.numberArray(data: [1, 2])))
         XCTAssertEqual("[false,true]", doEncode(AnyType.booleanArray(data: [false, true])))
-        XCTAssertEqual("{\"a\":false,\"b\":1}", doEncode(AnyType.anyDictionary(data: ["a": false, "b": 1])))
+        XCTAssertEqual(
+            "{\"a\":false,\"b\":1}",
+            doEncode(AnyType.anyDictionary(data: ["a": false, "b": 1]))
+        )
         XCTAssertEqual("[1,\"a\",true]", doEncode(AnyType.anyArray(data: [1, "a", true])))
-        XCTAssertEqual("{\"key\":[{\"nestedKey\":\"nestedValue\"},1,{}],\"key2\":1}", doEncode(AnyType.anyDictionary(data: ["key2": 1, "key": AnyType.anyArray(data: [["nestedKey": "nestedValue"], 1, [:] as Any])])))
-    }
-
-    func doEncode(_ data: AnyType) -> String? {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .sortedKeys
-        let data = try? encoder.encode(data)
-        guard let data = data else { return nil }
-        return String(data: data, encoding: .utf8)
+        XCTAssertEqual(
+            "{\"key\":[{\"nestedKey\":\"nestedValue\"},1,{}],\"key2\":1}",
+            doEncode(AnyType.anyDictionary(data: [
+                "key2": 1,
+                "key": AnyType.anyArray(data: [["nestedKey": "nestedValue"], 1, [:] as Any]),
+            ]))
+        )
     }
 
     func testCustomEncodable() {
@@ -290,15 +315,36 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual(AnyType.number(data: 1), AnyType.number(data: 1))
         XCTAssertEqual(AnyType.number(data: 1.5), AnyType.number(data: 1.5))
         XCTAssertEqual(AnyType.bool(data: false), AnyType.bool(data: false))
-        XCTAssertEqual(AnyType.dictionary(data: ["key": "value"]), AnyType.dictionary(data: ["key": "value"]))
-        XCTAssertEqual(AnyType.numberDictionary(data: ["key": 1]), AnyType.numberDictionary(data: ["key": 1]))
-        XCTAssertEqual(AnyType.numberDictionary(data: ["key": 1.5]), AnyType.numberDictionary(data: ["key": 1.5]))
-        XCTAssertEqual(AnyType.booleanDictionary(data: ["key": false]), AnyType.booleanDictionary(data: ["key": false]))
+        XCTAssertEqual(
+            AnyType.dictionary(data: ["key": "value"]),
+            AnyType.dictionary(data: ["key": "value"])
+        )
+        XCTAssertEqual(
+            AnyType.numberDictionary(data: ["key": 1]),
+            AnyType.numberDictionary(data: ["key": 1])
+        )
+        XCTAssertEqual(
+            AnyType.numberDictionary(data: ["key": 1.5]),
+            AnyType.numberDictionary(data: ["key": 1.5])
+        )
+        XCTAssertEqual(
+            AnyType.booleanDictionary(data: ["key": false]),
+            AnyType.booleanDictionary(data: ["key": false])
+        )
         XCTAssertEqual(AnyType.array(data: ["test", "data"]), AnyType.array(data: ["test", "data"]))
         XCTAssertEqual(AnyType.numberArray(data: [1, 2]), AnyType.numberArray(data: [1, 2]))
-        XCTAssertEqual(AnyType.booleanArray(data: [false, true]), AnyType.booleanArray(data: [false, true]))
-        XCTAssertEqual(AnyType.anyDictionary(data: ["key": false, "key2": 1]), AnyType.anyDictionary(data: ["key": false, "key2": 1]))
-        XCTAssertEqual(AnyType.anyArray(data: [1, "a", true]), AnyType.anyArray(data: [1, "a", true]))
+        XCTAssertEqual(
+            AnyType.booleanArray(data: [false, true]),
+            AnyType.booleanArray(data: [false, true])
+        )
+        XCTAssertEqual(
+            AnyType.anyDictionary(data: ["key": false, "key2": 1]),
+            AnyType.anyDictionary(data: ["key": false, "key2": 1])
+        )
+        XCTAssertEqual(
+            AnyType.anyArray(data: [1, "a", true]),
+            AnyType.anyArray(data: [1, "a", true])
+        )
         XCTAssertNotEqual(AnyType.unknownData, AnyType.string(data: "test"))
         XCTAssertEqual(AnyType.unknownData, AnyType.unknownData)
     }
@@ -307,9 +353,9 @@ class AnyTypeTests: XCTestCase {
         let structure = [
             "object": [
                 "key1": [
-                    5
-                ]
-            ]
+                    5,
+                ],
+            ],
         ]
 
         struct TestCodingKey: CodingKey {
@@ -330,11 +376,19 @@ class AnyTypeTests: XCTestCase {
         let context = AnyTypeDecodingContext(rawData: data)
 
         let object = try context.objectFor(path: [
-            TestCodingKey(stringValue: "object")!,
-            TestCodingKey(stringValue: "key1")!,
-            TestCodingKey(intValue: 0)!
+            XCTUnwrap(TestCodingKey(stringValue: "object")),
+            XCTUnwrap(TestCodingKey(stringValue: "key1")),
+            XCTUnwrap(TestCodingKey(intValue: 0)),
         ])
 
         XCTAssertEqual(object as? Double, 5)
+    }
+
+    private func doEncode(_ data: AnyType) -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let data = try? encoder.encode(data)
+        guard let data = data else { return nil }
+        return String(data: data, encoding: .utf8)
     }
 }

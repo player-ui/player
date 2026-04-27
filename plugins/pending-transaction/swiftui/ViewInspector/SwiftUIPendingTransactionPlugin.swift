@@ -1,21 +1,24 @@
 //
-//  SwiftUIPendingTransactionPluginTests.swift
+//  SwiftUIPendingTransactionPlugin.swift
 //  iOSPlayer
 //
 //  Created by Zhao Xia Wu on 2023-09-28.
 //
 
 import Foundation
-import XCTest
-import SwiftUI
-import ViewInspector
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUISwiftUIPendingTransactionPlugin
+import SwiftUI
+import ViewInspector
+import XCTest
 
 class SwiftUIPendingTransactionPluginTests: XCTestCase {
     func testContextAttachment() throws {
-        let player = SwiftUIPlayer(flow: "", plugins: [SwiftUIPendingTransactionPlugin(keyPath: \.transactionContext)])
+        let player = SwiftUIPlayer(
+            flow: "",
+            plugins: [SwiftUIPendingTransactionPlugin(keyPath: \.transactionContext)]
+        )
 
         guard let view: AnyView = player.hooks?.view.call(AnyView(TestButtons())) else {
             return XCTFail("no view returned from hook")
@@ -25,7 +28,7 @@ class SwiftUIPendingTransactionPluginTests: XCTestCase {
         _ = try view.inspect().anyView().anyView().view(TestButtons.self)
     }
 
-    func testAddPendingTransactionAndCallCommitCallbackSingleNamespace() throws {
+    func testAddPendingTransactionAndCallCommitCallbackSingleNamespace() {
         var tree = TestButtons()
 
         let appear = tree.on(\.didAppear) { view in
@@ -51,7 +54,7 @@ class SwiftUIPendingTransactionPluginTests: XCTestCase {
         wait(for: [appear], timeout: 2)
     }
 
-    func testAddPendingTransactionAndCallCommitCallbackMultipleNamespaces() throws {
+    func testAddPendingTransactionAndCallCommitCallbackMultipleNamespaces() {
         var tree = TestButtons2()
 
         let appear = tree.on(\.didAppear) { view in
@@ -91,7 +94,8 @@ private struct TestButtons: View {
 
     @State var button1Text = "Button 1"
 
-    internal var didAppear: ((Self) -> Void)?
+    var didAppear: ((Self) -> Void)?
+
     var body: some View {
         VStack {
             Button(action: {
@@ -101,13 +105,13 @@ private struct TestButtons: View {
 
                 button1Text = "Button 1 Transaction Registered"
 
-            }, label: {Text(button1Text)}).id("button-1")
+            }, label: { Text(button1Text) }).id("button-1")
 
             Button(action: {
                 // clicking second button will trigger callback registered in first button
                 transactionContext.commit(.button1)
                 transactionContext.clear(.button1)
-            }, label: {Text("Button 2")}).id("button-2")
+            }, label: { Text("Button 2") }).id("button-2")
         }
         .onAppear { didAppear?(self) }
     }
@@ -119,7 +123,8 @@ private struct TestButtons2: View {
     @State var button1Text = "Button 1"
     @State var button2Text = "Button 2"
 
-    internal var didAppear: ((Self) -> Void)?
+    var didAppear: ((Self) -> Void)?
+
     var body: some View {
         VStack {
             Button(action: {
@@ -133,7 +138,7 @@ private struct TestButtons2: View {
 
                 button1Text = "Button 1 Transaction Registered"
 
-            }, label: {Text(button1Text)}).id("button-1")
+            }, label: { Text(button1Text) }).id("button-1")
 
             Button(action: {
                 transactionContext.register(.button2) {
@@ -142,19 +147,19 @@ private struct TestButtons2: View {
 
                 button2Text = "Button 2 Transaction Registered"
 
-            }, label: {Text(button2Text)}).id("button-2")
+            }, label: { Text(button2Text) }).id("button-2")
 
             Button(action: {
                 // clicking button 3 will commit transactions registered in button 1 and button 2
                 transactionContext.commit([.button1, .button2])
                 transactionContext.clear([.button1, .button2])
-            }, label: {Text("Button 3")}).id("button3")
+            }, label: { Text("Button 3") }).id("button3")
         }
         .onAppear { didAppear?(self) }
     }
 }
 
-extension PendingTransactionPhases {
-    public static let button1 = PendingTransactionPhases(rawValue: "button1")
-    public static let button2 = PendingTransactionPhases(rawValue: "button2")
+public extension PendingTransactionPhases {
+    static let button1: PendingTransactionPhases = .init(rawValue: "button1")
+    static let button2: PendingTransactionPhases = .init(rawValue: "button2")
 }

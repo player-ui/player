@@ -7,11 +7,11 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIPubSubPlugin
+@testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class PubSubPluginTests: XCTestCase {
     func testPubSubPluginFromContent() {
@@ -44,10 +44,10 @@ class PubSubPluginTests: XCTestCase {
         """
 
         let expectation = XCTestExpectation(description: "publish callback called")
-        let subscription: PubSubSubscription = ("test", { (_, data) in
+        let subscription: PubSubSubscription = ("test", { _, data in
             guard let eventData = data else { return XCTFail("data did not exist") }
             switch eventData {
-            case .string(let result):
+            case let .string(result):
                 XCTAssertEqual(result, "example")
             default:
                 XCTFail("data was not a string")
@@ -57,7 +57,7 @@ class PubSubPluginTests: XCTestCase {
 
         let plugin = PubSubPlugin([subscription])
         let player = HeadlessPlayerImpl(plugins: [plugin])
-        player.start(flow: flow, completion: {_ in})
+        player.start(flow: flow, completion: { _ in })
         wait(for: [expectation], timeout: 3)
     }
 
@@ -91,10 +91,10 @@ class PubSubPluginTests: XCTestCase {
         """
 
         let expectation = XCTestExpectation(description: "publish callback called")
-        let subscription: PubSubSubscription = ("test", { (_, data) in
+        let subscription: PubSubSubscription = ("test", { _, data in
             guard let eventData = data else { return XCTFail("data did not exist") }
             switch eventData {
-            case .string(let result):
+            case let .string(result):
                 XCTAssertEqual(result, "example")
             default:
                 XCTFail("data was not a string")
@@ -102,20 +102,24 @@ class PubSubPluginTests: XCTestCase {
             expectation.fulfill()
         })
 
-        let plugin = PubSubPlugin([subscription], options: PubSubPluginOptions(expressionName: "customPublish"))
+        let plugin = PubSubPlugin(
+            [subscription],
+            options: PubSubPluginOptions(expressionName: "customPublish")
+        )
         let player = HeadlessPlayerImpl(plugins: [plugin])
-        player.start(flow: flow, completion: {_ in})
+        player.start(flow: flow, completion: { _ in })
         wait(for: [expectation], timeout: 3)
     }
-    func testPubSubPluginStringData() {
-        let context = JSContext()!
+
+    func testPubSubPluginStringData() throws {
+        let context = try XCTUnwrap(JSContext())
         JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
-        let subscription: PubSubSubscription = ("test", { (_, data) in
+        let subscription: PubSubSubscription = ("test", { _, data in
             guard let eventData = data else { return XCTFail("data did not exist") }
             switch eventData {
-            case .string(let result):
+            case let .string(result):
                 XCTAssertEqual(result, "example")
             default:
                 XCTFail("data was not a string")
@@ -130,15 +134,15 @@ class PubSubPluginTests: XCTestCase {
         wait(for: [expectation], timeout: 2)
     }
 
-    func testPubSubPluginArrayData() {
-        let context = JSContext()!
+    func testPubSubPluginArrayData() throws {
+        let context = try XCTUnwrap(JSContext())
         JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
-        let subscription: PubSubSubscription = ("test", { (_, data) in
+        let subscription: PubSubSubscription = ("test", { _, data in
             guard let eventData = data else { return XCTFail("data did not exist") }
             switch eventData {
-            case .array(let result):
+            case let .array(result):
                 XCTAssertEqual(result, ["example", "data"])
             default:
                 XCTFail("data was not an array")
@@ -153,15 +157,15 @@ class PubSubPluginTests: XCTestCase {
         wait(for: [expectation], timeout: 2)
     }
 
-    func testPubSubPluginDictionaryData() {
-        let context = JSContext()!
+    func testPubSubPluginDictionaryData() throws {
+        let context = try XCTUnwrap(JSContext())
         JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
-        let subscription: PubSubSubscription = ("test", { (_, data) in
+        let subscription: PubSubSubscription = ("test", { _, data in
             guard let eventData = data else { return XCTFail("data did not exist") }
             switch eventData {
-            case .dictionary(let result):
+            case let .dictionary(result):
                 XCTAssertEqual(result, ["example": "data"])
             default:
                 XCTFail("data was not a dictionary")
@@ -176,15 +180,15 @@ class PubSubPluginTests: XCTestCase {
         wait(for: [expectation], timeout: 2)
     }
 
-    func testPubSubPluginAnyDictionaryData() {
-        let context = JSContext()!
+    func testPubSubPluginAnyDictionaryData() throws {
+        let context = try XCTUnwrap(JSContext())
         JSUtilities.polyfill(context)
 
         let expectation = XCTestExpectation(description: "beacon callback called")
-        let subscription: PubSubSubscription = ("test", { (_, data) in
+        let subscription: PubSubSubscription = ("test", { _, data in
             guard let eventData = data else { return XCTFail("data did not exist") }
             switch eventData {
-            case .anyDictionary(let dict):
+            case let .anyDictionary(dict):
                 XCTAssertEqual(2, dict.keys.count)
                 XCTAssertEqual("example", dict["data"] as? String)
                 XCTAssertEqual(3, dict["value"] as? Double)
@@ -197,7 +201,10 @@ class PubSubPluginTests: XCTestCase {
         let plugin = PubSubPlugin([subscription])
         plugin.context = context
 
-        plugin.publish(eventName: "test", eventData: .anyDictionary(data: ["data": "example", "value": 3]))
+        plugin.publish(
+            eventName: "test",
+            eventData: .anyDictionary(data: ["data": "example", "value": 3])
+        )
         wait(for: [expectation], timeout: 2)
     }
 }

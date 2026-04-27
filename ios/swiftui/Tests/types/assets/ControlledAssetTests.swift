@@ -6,39 +6,32 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import Foundation
-import XCTest
-import JavaScriptCore
 import Combine
+import Foundation
+import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUILogger
+@testable import PlayerUISwiftUI
+import XCTest
 
 class ControlledAssetTests: XCTestCase {
-    let context: JSContext = JSContext()
-
-    struct SomeData: AssetData {
-        var id: String
-        var type: String
-        var value: String
-        var nested: WrappedAsset?
-    }
-
-    struct SomeOtherData: AssetData {
-        var id: String
-        var type: String
-        var value: String
-    }
+    private let context: JSContext = .init()
 
     func testAssetViewModel() {
-        let viewModel = AssetViewModel<SomeData>(SomeData(id: "someId", type: "someType", value: "test"))
+        let viewModel = AssetViewModel<SomeData>(SomeData(
+            id: "someId",
+            type: "someType",
+            value: "test"
+        ))
 
         let updated = expectation(description: "data updated")
-        viewModel.$data.sink { newData in
-            if newData.value == "tested" {
-                updated.fulfill()
+        viewModel.$data
+            .sink { newData in
+                if newData.value == "tested" {
+                    updated.fulfill()
+                }
             }
-        }.store(in: &viewModel.bag)
+            .store(in: &viewModel.bag)
 
         viewModel.data = SomeData(id: "someId", type: "someType", value: "tested")
         wait(for: [updated], timeout: 1)
@@ -57,17 +50,21 @@ class ControlledAssetTests: XCTestCase {
 
         guard let value = val else { return XCTFail("value should not have been nil") }
 
-        guard let asset = try? registry.decode(value) as? SomeAsset else { return XCTFail("could not decode asset") }
+        guard let asset = try? registry.decode(value) as? SomeAsset
+        else { return XCTFail("could not decode asset") }
 
         XCTAssertEqual(asset.valueData.id, "someId")
         XCTAssertEqual(asset.valueData.type, "someType")
 
         let updated = expectation(description: "data updated")
-        asset.model.$data.sink { newData in
-            if newData.value == "tested" {
-                updated.fulfill()
+        asset.model
+            .$data
+            .sink { newData in
+                if newData.value == "tested" {
+                    updated.fulfill()
+                }
             }
-        }.store(in: &asset.model.bag)
+            .store(in: &asset.model.bag)
 
         asset.model.data = SomeData(id: "someId", type: "someType", value: "tested")
 
@@ -112,10 +109,10 @@ class ControlledAssetTests: XCTestCase {
         XCTAssertFalse(model === model2)
         watchData.cancel()
     }
-    
+
     func testDecoderError() throws {
         class SomeAsset: ControlledAsset<SomeData, AssetViewModel<SomeData>> {}
-        
+
         let val = context.evaluateScript("({id: 'someId', type: 'someType', value: 123 })")
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
@@ -123,25 +120,30 @@ class ControlledAssetTests: XCTestCase {
         let registry = SwiftUIRegistry(logger: TapableLogger())
         registry.register("someType", asset: SomeAsset.self)
         registry.partialMatchRegistry = partialMatch
-        
+
         guard let value = val else { return XCTFail("value should not have been nil") }
-        
+
         var thrownError: Error?
-        
+
         do {
             try registry.decode(value)
         } catch {
             thrownError = error
         }
-        
-        guard let err = thrownError else { return XCTFail("expected asset to throw error while decoding") }
-        XCTAssertTrue(err.playerDescription.contains("Exception occurred in asset with id 'someId' of type 'someType'"))
+
+        guard let err = thrownError
+        else { return XCTFail("expected asset to throw error while decoding") }
+        XCTAssertTrue(err.playerDescription
+            .contains("Exception occurred in asset with id 'someId' of type 'someType'"))
     }
-    
+
     func testNestedDecoderError() throws {
         class SomeAsset: ControlledAsset<SomeData, AssetViewModel<SomeData>> {}
-        
-        let val = context.evaluateScript("({id: 'someId', type: 'someType', value: '123', nested: { asset: { id: 'nestedId', type: 'someType', value: 123  }}})")
+
+        let val = context
+            .evaluateScript(
+                "({id: 'someId', type: 'someType', value: '123', nested: { asset: { id: 'nestedId', type: 'someType', value: 123  }}})"
+            )
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
         partialMatch.setMapping(assetId: "someId", index: 0)
@@ -149,20 +151,41 @@ class ControlledAssetTests: XCTestCase {
         let registry = SwiftUIRegistry(logger: TapableLogger())
         registry.register("someType", asset: SomeAsset.self)
         registry.partialMatchRegistry = partialMatch
-        
+
         guard let value = val else { return XCTFail("value should not have been nil") }
-        
+
         var thrownError: Error?
-        
+
         do {
             try registry.decode(value)
         } catch {
             thrownError = error
         }
-        
-        guard let err = thrownError else { return XCTFail("expected asset to throw error while decoding") }
-        XCTAssertTrue(err.playerDescription.contains("Exception occurred in asset with id 'nestedId' of type 'someType'"), err.playerDescription)
-        XCTAssertTrue(err.playerDescription.contains("Found in (id: 'someId', type: 'someType')"), err.playerDescription)
+
+        guard let err = thrownError
+        else { return XCTFail("expected asset to throw error while decoding") }
+        XCTAssertTrue(
+            err.playerDescription
+                .contains("Exception occurred in asset with id 'nestedId' of type 'someType'"),
+            err.playerDescription
+        )
+        XCTAssertTrue(
+            err.playerDescription.contains("Found in (id: 'someId', type: 'someType')"),
+            err.playerDescription
+        )
+    }
+
+    struct SomeData: AssetData {
+        var id: String
+        var type: String
+        var value: String
+        var nested: WrappedAsset?
+    }
+
+    struct SomeOtherData: AssetData {
+        var id: String
+        var type: String
+        var value: String
     }
 }
 
@@ -180,7 +203,7 @@ private extension String {
     static let asset12 = """
     { "id": "abc", "type": "Equatable", "value": "value2" }
     """
-    
+
     static let asset13 = """
     { "id": 12, "type": { "value": "Equatable" } }
     """
@@ -188,6 +211,9 @@ private extension String {
 
 private struct EquatableAssetData: AssetData, Equatable {
     var id: String
-    var type: String { "Equatable" }
     var value: String
+
+    var type: String {
+        "Equatable"
+    }
 }

@@ -1,15 +1,11 @@
 import Foundation
 #if SWIFT_PACKAGE
-import PlayerUI
+    import PlayerUI
 #endif
 
-/**
- Wrapper to instantiate @player-ui/common-expressions-plugin
- */
+/// Wrapper to instantiate @player-ui/common-expressions-plugin
 public class CommonExpressionsPlugin: JSBasePlugin, NativePlugin {
-    /**
-     Constructs a PartialMatchRegistry JS object
-     */
+    /// Constructs a PartialMatchRegistry JS object
     public convenience init() {
         self.init(
             fileName: "CommonExpressionsPlugin.native",
@@ -19,9 +15,14 @@ public class CommonExpressionsPlugin: JSBasePlugin, NativePlugin {
 
     override open func getUrlForFile(fileName: String) -> URL? {
         #if SWIFT_PACKAGE
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+            ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonExpressionsPlugin.self), pathComponent: "PlayerUI_CommonExpressionsPlugin.bundle")
+            ResourceUtilities.urlForFile(
+                name: fileName,
+                ext: "js",
+                bundle: Bundle(for: CommonExpressionsPlugin.self),
+                pathComponent: "PlayerUI_CommonExpressionsPlugin.bundle"
+            )
         #endif
     }
 }

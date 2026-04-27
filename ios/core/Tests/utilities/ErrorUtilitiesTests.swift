@@ -5,13 +5,11 @@
 //  Created by bcallaghan  on 5/27/21.
 //
 
-import XCTest
 @testable import PlayerUI
+import XCTest
 
 class ErrorUtilitiesTestCase: XCTestCase {
-
     func testDecodingErrors() {
-
         struct Foo: Codable {
             var aaa: String
             var bar: Bar
@@ -22,7 +20,7 @@ class ErrorUtilitiesTestCase: XCTestCase {
         }
 
         let decoder = JSONDecoder()
-        let decodeFoo = { (jsonString: String) throws -> Void in
+        let decodeFoo = { (jsonString: String) throws in
             guard let data = jsonString.data(using: .utf8) else {
                 return XCTFail("could not get dat")
             }
@@ -35,7 +33,10 @@ class ErrorUtilitiesTestCase: XCTestCase {
             XCTFail("DecodingError expected")
         } catch {
             let message = error.playerDescription
-            XCTAssertEqual(message, "Expected to decode Int but found a string instead. (coding path bar.bbb)")
+            XCTAssertEqual(
+                message,
+                "Expected to decode Int but found a string instead. (coding path bar.bbb)"
+            )
         }
 
         // keyNotFound

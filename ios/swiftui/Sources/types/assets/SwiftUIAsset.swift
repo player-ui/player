@@ -9,24 +9,48 @@ import JavaScriptCore
 import SwiftUI
 
 #if SWIFT_PACKAGE
-import PlayerUI
+    import PlayerUI
 #endif
 
-/**
- A base class representing a Player Asset that will be rendering using SwiftUI
- */
+/// A base class representing a Player Asset that will be rendering using SwiftUI
 open class SwiftUIAsset: Decodable, PlayerAsset, Identifiable {
     /// UUID of this Asset for identifying the instance
-    public var uuid = UUID()
+    public var uuid: UUID = .init()
+
+    /// Decoded `Data`
+    public var baseData: Data
+
+    /// Full data decoded by the implementation of this asset
+    open var valueData: AssetData {
+        baseData
+    }
+
+    /// A type erased SwiftUI view to use for rendering this asset
+    open var view: AnyView {
+        AnyView(EmptyView())
+    }
 
     /// id of the asset
-    public var id: String { valueData.id }
+    public var id: String {
+        valueData.id
+    }
 
     /// type of the asset
-    public var type: String { valueData.type }
+    public var type: String {
+        valueData.type
+    }
 
     /// Used for model cache testing
-    var modelObject: AnyObject { self }
+    var modelObject: AnyObject {
+        self
+    }
+
+    /// Decodes an asset to create an instance
+    /// - parameters:
+    ///   - decoder: The decoder to decode from
+    public required init(from decoder: Decoder) throws {
+        baseData = try decoder.singleValueContainer().decode(Data.self)
+    }
 
     /// Default data that an asset will contain
     public struct Data: AssetData, Codable {
@@ -37,22 +61,4 @@ open class SwiftUIAsset: Decodable, PlayerAsset, Identifiable {
         /// MetaData associated with this asset
         public var metaData: MetaData?
     }
-
-    /// Decoded `Data`
-    public var baseData: Data
-
-    /// Full data decoded by the implementation of this asset
-    open var valueData: AssetData { baseData }
-
-    /**
-     Decodes an asset to create an instance
-      - parameters:
-        - decoder: The decoder to decode from
-     */
-    public required init(from decoder: Decoder) throws {
-        baseData = try decoder.singleValueContainer().decode(Data.self)
-    }
-
-    /// A type erased SwiftUI view to use for rendering this asset
-    open var view: AnyView { AnyView(EmptyView()) }
 }

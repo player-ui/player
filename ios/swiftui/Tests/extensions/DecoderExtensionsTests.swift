@@ -7,10 +7,10 @@
 //
 
 import Foundation
-import XCTest
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUISwiftUI
+import XCTest
 
 class DecoderExtensionsTests: XCTestCase {
     func testNotAnAssetDecoderForSUIDecodeFunction() {

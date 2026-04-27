@@ -7,19 +7,16 @@
 //
 
 import Foundation
+@testable import PlayerUI
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
 import SwiftUI
 import ViewInspector
 import XCTest
 
-@testable import PlayerUI
-@testable import PlayerUITestUtilities
-@testable import PlayerUIReferenceAssets
-@testable import PlayerUISwiftUI
-
 @MainActor
 class InfoAssetTests: SwiftUIAssetUnitTestCase {
-    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
-
     func testDecoding() async throws {
         let json = """
         {
@@ -51,16 +48,20 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let info: InfoAsset = await getAsset(json) else { return XCTFail("could not get asset") }
+        guard let info: InfoAsset = await getAsset(json)
+        else { return XCTFail("could not get asset") }
 
         _ = try info.view.inspect().find(InfoAssetView.self)
     }
 
     func testView() async throws {
         guard
-            let title: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
-            let action1: ActionAsset = await getAsset("{\"id\": \"action1\", \"type\": \"action\", \"value\":\"next\"}"),
-            let action2: ActionAsset = await getAsset("{\"id\": \"action2\", \"type\": \"action\", \"value\":\"prev\"}")
+            let title: TextAsset =
+            await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
+            let action1: ActionAsset =
+            await getAsset("{\"id\": \"action1\", \"type\": \"action\", \"value\":\"next\"}"),
+            let action2: ActionAsset =
+            await getAsset("{\"id\": \"action2\", \"type\": \"action\", \"value\":\"prev\"}")
         else { return XCTFail("could not get assets") }
 
         let data = InfoData(
@@ -69,7 +70,7 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
             title: WrappedAsset(forAsset: title),
             actions: [
                 WrappedAsset(forAsset: action1),
-                WrappedAsset(forAsset: action2)
+                WrappedAsset(forAsset: action2),
             ]
         )
         let model = AssetViewModel<InfoData>(data)
@@ -84,5 +85,9 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
         XCTAssertEqual(forEach.count, 2)
 
         _ = try forEach.anyView(0).find(ActionAssetView.self).button()
+    }
+
+    override open func plugins() -> [NativePlugin] {
+        [ReferenceAssetsPlugin()]
     }
 }

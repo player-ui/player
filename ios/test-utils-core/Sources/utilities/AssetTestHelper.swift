@@ -2,14 +2,15 @@ import Foundation
 import JavaScriptCore
 
 #if SWIFT_PACKAGE
-import PlayerUI
-import PlayerUILogger
-import PlayerUISwiftUI
+    import PlayerUI
+    import PlayerUILogger
+    import PlayerUISwiftUI
 #endif
 
 extension JSContext {
     func createAssetJsValue(string: String) -> JSValue {
-        guard let container = self.evaluateScript("(\(string))") else { fatalError("JSON was malformed") }
+        guard let container = evaluateScript("(\(string))")
+        else { fatalError("JSON was malformed") }
         return container
     }
 
@@ -24,25 +25,27 @@ extension JSContext {
 
     var bundleUrl: URL? {
         #if SWIFT_PACKAGE
-        ResourceUtilities.urlForFile(name: "MakeFlow.native", ext: "js", bundle: Bundle.module)
+            ResourceUtilities.urlForFile(name: "MakeFlow.native", ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(
-            name: "MakeFlow.native",
-            ext: "js",
-            bundle: Bundle(for: MakeFlowResourceShim.self), 
-            pathComponent: "TestUtilities.bundle"
-        )
+            ResourceUtilities.urlForFile(
+                name: "MakeFlow.native",
+                ext: "js",
+                bundle: Bundle(for: MakeFlowResourceShim.self),
+                pathComponent: "TestUtilities.bundle"
+            )
         #endif
     }
 }
 
 class MakeFlowResourceShim {}
 
-open class AssetTestHelper<WrapperType: AssetContainer & Decodable, Registry> where Registry: BaseAssetRegistry<WrapperType> {
-
+open class AssetTestHelper<
+    WrapperType: AssetContainer & Decodable,
+    Registry: BaseAssetRegistry<WrapperType>
+> {
     /// The JSContext where utilities are loaded
     /// and asset resolution is performed
-    public var context: JSContext = JSContext()
+    public var context: JSContext = .init()
 
     /// A closure to create the registry for this instance of the AssetTestHelper
     public var makeRegistry: () -> Registry
@@ -70,15 +73,15 @@ open class AssetTestHelper<WrapperType: AssetContainer & Decodable, Registry> wh
             )
 
             let root: JSValue? = try? await withCheckedThrowingContinuation { result in
-                player.hooks?.viewController.tap({ (viewController) in
-                    viewController.hooks.view.tap { (view) in
+                player.hooks?.viewController.tap { viewController in
+                    viewController.hooks.view.tap { view in
                         view.hooks.onUpdate.tap { val in
                             result.resume(returning: val)
                         }
                     }
-                })
+                }
                 player.start(flow: flow) { res in
-                    guard case .failure(let error) = res else { return }
+                    guard case let .failure(error) = res else { return }
                     result.resume(throwing: error)
                 }
             }
@@ -89,20 +92,18 @@ open class AssetTestHelper<WrapperType: AssetContainer & Decodable, Registry> wh
             } catch {
                 // If the user passed in an entire flow, decode the asset that was the root of
                 // the flow
-                guard let root = root else { return nil }
+                guard let root else { return nil }
                 return try? player.assetRegistry.decode(root) as? Asset
             }
         }.value
     }
 
-    /**
-     Turns a single Asset JSON definition into a full flow
-     - parameters:
-        - json: The JSON definition of a single asset
-     - returns: A string that is a full JSON flow containing the single asset
-     */
+    /// Turns a single Asset JSON definition into a full flow
+    /// - parameters:
+    ///   - json: The JSON definition of a single asset
+    /// - returns: A string that is a full JSON flow containing the single asset
     public func makeFlow(_ json: String) -> String? {
-        return context.evaluateScript("JSON.stringify(MakeFlow.makeFlow(\(json)))")?.toString()
+        context.evaluateScript("JSON.stringify(MakeFlow.makeFlow(\(json)))")?.toString()
     }
 }
 
@@ -116,13 +117,12 @@ public extension AssetTestHelper where WrapperType == WrappedAsset, Registry == 
 }
 
 public extension AssetTestHelper where WrapperType == WrappedAsset {
-    /**
-     Wraps a completion handler into a WrappedFunction for using XCTestExpectations to test functions
-     that are added to assets via a JS transform
-     - parameters:
-        - completion: A completion handler to run when the function is invoked
-     - returns: A WrappedFunction that will call your completion handler
-     */
+    /// Wraps a completion handler into a WrappedFunction for using XCTestExpectations to test
+    /// functions
+    /// that are added to assets via a JS transform
+    /// - parameters:
+    ///   - completion: A completion handler to run when the function is invoked
+    /// - returns: A WrappedFunction that will call your completion handler
     func getWrappedFunction<T>(completion: @escaping () -> Void) -> WrappedFunction<T>? {
         let callback: @convention(block) (JSValue) -> JSValue = { value in
             completion()

@@ -6,23 +6,18 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import Foundation
-import XCTest
-import SwiftUI
-import ViewInspector
 import Combine
-
+import Foundation
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 @testable import PlayerUITransitionPlugin
+import SwiftUI
+import ViewInspector
+import XCTest
 
 class TransitionPluginTests: XCTestCase {
-    open override func setUp() {
-        XCUIApplication().terminate()
-    }
-
     func testTransitionPluginStateTransitions() {
         let flow = TestFlowManager()
         let model = ManagedPlayerViewModel(manager: flow) { _ in }
@@ -33,25 +28,33 @@ class TransitionPluginTests: XCTestCase {
 
     func testTransitionPluginDefaultTransitions() throws {
         let plugin = TransitionPlugin(pushTransition: .test1, popTransition: .test2)
-        let player = SwiftUIPlayer(flow: FlowData.MULTIPAGE, plugins: [ReferenceAssetsPlugin(), plugin])
+        let player = SwiftUIPlayer(
+            flow: FlowData.MULTIPAGE,
+            plugins: [ReferenceAssetsPlugin(), plugin]
+        )
 
         ViewHosting.host(view: player)
 
-        func callTransitionAndAssert(expectedTransition: PlayerViewTransition, description: String) {
+        func callTransitionAndAssert(expectedTransition: PlayerViewTransition,
+                                     description: String) {
             let transitionExpectation = XCTestExpectation(description: "Waiting for \(description)")
             var capturedTransition: PlayerViewTransition?
 
-            DispatchQueue.main.async {
-                capturedTransition = player.hooks?.transition.call()
-                // Delay the assertion to allow for any post-call processing
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    XCTAssertEqual(capturedTransition, expectedTransition, "Transition for \(description) should be \(expectedTransition)")
-                    transitionExpectation.fulfill()
+            DispatchQueue.main
+                .async {
+                    capturedTransition = player.hooks?.transition.call()
+                    // Delay the assertion to allow for any post-call processing
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        XCTAssertEqual(
+                            capturedTransition,
+                            expectedTransition,
+                            "Transition for \(description) should be \(expectedTransition)"
+                        )
+                        transitionExpectation.fulfill()
+                    }
                 }
-            }
             wait(for: [transitionExpectation], timeout: 3.0)
         }
-
 
         // Check initial transition
         callTransitionAndAssert(expectedTransition: .identity, description: "initial state")
@@ -77,14 +80,26 @@ class TransitionPluginTests: XCTestCase {
         ViewHosting.expel()
     }
 
+    override open func setUp() {
+        XCUIApplication().terminate()
+    }
+
     struct TestFlowManager: FlowManager {
-        func next(_ result: CompletedState?) async throws -> NextState {
-            return .flow("")
+        func next(_: CompletedState?) async throws -> NextState {
+            .flow("")
         }
     }
 }
 
 private extension PlayerViewTransition {
-    static let test1 = PlayerViewTransition(name: Name(rawValue: "test1"), transition: .opacity, animationCurve: .default)
-    static let test2 = PlayerViewTransition(name: Name(rawValue: "test2"), transition: .identity, animationCurve: .default)
+    static let test1: PlayerViewTransition = .init(
+        name: Name(rawValue: "test1"),
+        transition: .opacity,
+        animationCurve: .default
+    )
+    static let test2: PlayerViewTransition = .init(
+        name: Name(rawValue: "test2"),
+        transition: .identity,
+        animationCurve: .default
+    )
 }

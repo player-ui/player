@@ -1,9 +1,9 @@
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIComputedPropertiesPlugin
+@testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class ComputedPropertiesPluginTests: XCTestCase {
     func testPluginConstructs() {
@@ -60,7 +60,7 @@ class ComputedPropertiesPluginTests: XCTestCase {
 
         player.start(flow: flow) { result in
             guard
-                case .success(let success) = result
+                case let .success(success) = result
             else {
                 return XCTFail("Flow Failed")
             }
@@ -70,6 +70,5 @@ class ComputedPropertiesPluginTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1)
-
     }
 }

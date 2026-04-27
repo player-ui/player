@@ -5,44 +5,46 @@
 //  Created by Zhao Xia Wu on 2024-01-22.
 //
 
-
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class JSValueExtensionsTests: XCTestCase {
-    let context: JSContext = JSContext()
-    func testTryCatchWrapperReturningError() {
+    private let context: JSContext = .init()
 
-        let functionReturningError = self.context
+    func testTryCatchWrapperReturningError() {
+        let functionReturningError = context
             .evaluateScript("""
-                             (() => {
-                                throw new Error("Fail")
-                             })
-                           """)
+              (() => {
+                 throw new Error("Fail")
+              })
+            """)
 
         do {
-            let _ = try functionReturningError?.tryCatch(args: [] as [String])
-        } catch let error {
-            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Fail"))
+            _ = try functionReturningError?.tryCatch(args: [] as [String])
+        } catch {
+            XCTAssertEqual(
+                error as? JSValueError,
+                JSValueError.thrownFromJS(message: "Error: Fail")
+            )
         }
     }
 
     func testTryCatchWrapperReturningNumber() {
-        let functionReturningInt = self.context
+        let functionReturningInt = context
             .evaluateScript("""
-                            (() => {
-                               return 1
-                            })
-                           """)
+             (() => {
+                return 1
+             })
+            """)
 
         do {
             let result = try functionReturningInt?.tryCatch(args: [] as [String])
             XCTAssertEqual(result?.toInt32(), 1)
-        } catch let error {
+        } catch {
             XCTFail("Should have returned Int but failed with \(error)")
         }
     }
@@ -54,12 +56,20 @@ class JSValueExtensionsTests: XCTestCase {
 
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
-                view.hooks.onUpdate.tap { value in
+                view.hooks.onUpdate.tap { _ in
                     guard view.id == "view-2" else {
                         do {
-                            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
-                        } catch let error {
-                            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"))
+                            try (player.state as? InProgressState)?.controllers?
+                                .flow
+                                .transition(with: "NEXT")
+                        } catch {
+                            XCTAssertEqual(
+                                error as? JSValueError,
+                                JSValueError
+                                    .thrownFromJS(
+                                        message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"
+                                    )
+                            )
                             expectation.fulfill()
                         }
 
@@ -69,7 +79,7 @@ class JSValueExtensionsTests: XCTestCase {
             }
         }
 
-        player.start(flow: FlowData.MULTIPAGE, completion: {_ in})
+        player.start(flow: FlowData.MULTIPAGE, completion: { _ in })
         wait(for: [expectation], timeout: 1)
     }
 }

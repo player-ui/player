@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+import XCTest
 
 class DebugValueTests: XCTestCase {
     func testDebugValue() {

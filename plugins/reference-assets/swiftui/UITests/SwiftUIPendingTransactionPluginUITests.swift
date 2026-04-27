@@ -2,10 +2,6 @@ import Foundation
 import XCTest
 
 class SwiftUIPendingTransactionPluginUITests: BaseTestCase {
-    override func navigateToAssetCollection() {
-        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
-    }
-
     func testInputAssetPendingTransaction() {
         openFlow("input asset pending transaction")
 
@@ -40,5 +36,9 @@ class SwiftUIPendingTransactionPluginUITests: BaseTestCase {
 
         app.buttons["OK"].firstMatch.tap()
         XCTAssertTrue(app.staticTexts["You made it!"].firstMatch.exists)
+    }
+
+    override func navigateToAssetCollection() {
+        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 }

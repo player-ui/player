@@ -7,11 +7,11 @@
 //
 
 import Foundation
-import XCTest
 @testable import PlayerUI
+import XCTest
 
 class ModifierTests: XCTestCase {
-    // this is really just for coverage because structs dont get public inits for free
+    /// this is really just for coverage because structs dont get public inits for free
     func testModifier() {
         let meta = ModifierMetaData(ref: "ref")
         let mod = Modifier(type: "type", value: "value", name: "name", metaData: meta)
@@ -42,7 +42,12 @@ class ModifierTests: XCTestCase {
     func testDecodeFullMetaDataModifier() throws {
         let data = String.fullMetadata.data(using: .utf8) ?? Data()
         let modifier = try JSONDecoder().decode(Modifier.self, from: data)
-        let metadata = ModifierMetaData(ref: "someref", source: "somesource", mimeType: "somemime", maxLine: 5)
+        let metadata = ModifierMetaData(
+            ref: "someref",
+            source: "somesource",
+            mimeType: "somemime",
+            maxLine: 5
+        )
         XCTAssertEqual(modifier.metaData, metadata)
     }
 

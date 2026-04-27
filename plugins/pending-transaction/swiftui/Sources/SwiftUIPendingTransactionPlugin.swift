@@ -9,72 +9,76 @@ import Foundation
 import SwiftUI
 
 #if SWIFT_PACKAGE
-import PlayerUI
-import PlayerUISwiftUI
+    import PlayerUI
+    import PlayerUISwiftUI
 #endif
 
-/**
- A plugin that allows TransactionContext objects to be registered into the decoder's userInfo that is used to decode the view updates.
- Allows for handling pending transactions on the assets side so users can decide when and where to add new callbacks and commit them
- */
-public class SwiftUIPendingTransactionPlugin<T>: NativePlugin where T: Identifiable, T: Hashable {
+/// A plugin that allows TransactionContext objects to be registered into the decoder's userInfo
+/// that is used to decode the view updates.
+/// Allows for handling pending transactions on the assets side so users can decide when and where
+/// to add new callbacks and commit them
+public class SwiftUIPendingTransactionPlugin<T: Identifiable & Hashable>: NativePlugin {
     public var pluginName: String = "SwiftUIPendingTransactionPlugin"
 
-    /**
-     Constructs the SwiftUIPendingTransactionPlugin
-     - parameters:
-        - keypath: Takes a keypath from the EnvironmentValues extension with generics of the TransactionContext<T> matching a user defined object,
-                   `\.transactionContext` which uses TransactionContext<PendingTransactionPhases> is the default.
-     */
+    let keyPath: WritableKeyPath<EnvironmentValues, TransactionContext<T>>
+
+    private let transactionContext: TransactionContext<T> = .init()
+
+    /// Constructs the SwiftUIPendingTransactionPlugin
+    /// - parameters:
+    ///   - keypath: Takes a keypath from the EnvironmentValues extension with generics of the
+    /// TransactionContext<T> matching a user defined object,
+    ///              `\.transactionContext` which uses TransactionContext<PendingTransactionPhases>
+    /// is the default.
     public init(keyPath: WritableKeyPath<EnvironmentValues, TransactionContext<T>>) {
         self.keyPath = keyPath
     }
 
-    private let transactionContext = TransactionContext<T>()
-
-    let keyPath: WritableKeyPath<EnvironmentValues, TransactionContext<T>>
-
-    public func apply<P>(player: P) where P: HeadlessPlayer {
+    public func apply<P: HeadlessPlayer>(player: P) {
         guard let player = player as? SwiftUIPlayer else { return }
 
         // transactionContext should attach to decoder prior to decoding a view
         player.assetRegistry.decoder.setPendingTransaction(transactionContext)
 
-        player.hooks?.view.tap(name: "SwiftUIPendingTransactionPlugin", { view in
+        player.hooks?.view.tap(name: "SwiftUIPendingTransactionPlugin") { view in
             let keyPath = self.keyPath
             return AnyView(view.environment(keyPath, self.transactionContext))
-        })
+        }
     }
 }
 
-// typealias which uses default PendingTransactionPhases as the generic
-public typealias PendingTransactionPhasesPlugin = SwiftUIPendingTransactionPlugin<PendingTransactionPhases>
+/// typealias which uses default PendingTransactionPhases as the generic
+public typealias PendingTransactionPhasesPlugin =
+    SwiftUIPendingTransactionPlugin<PendingTransactionPhases>
 
-extension SwiftUIPendingTransactionPlugin where T == PendingTransactionPhases {
-    /**
-     Convenience init which takes no parameters and uses the \.transactionContext keypath as default if user would like to use PendingTransactionPhases as the Namespace for TransactionContext
-     */
-    public convenience init() {
+public extension SwiftUIPendingTransactionPlugin where T == PendingTransactionPhases {
+    /// Convenience init which takes no parameters and uses the \.transactionContext keypath as
+    /// default if user would like to use PendingTransactionPhases as the Namespace for
+    /// TransactionContext
+    convenience init() {
         self.init(keyPath: \.transactionContext)
     }
 }
 
-/// Represents a specific namespace which is a group of transactions that should be performed together.
+/// Represents a specific namespace which is a group of transactions that should be performed
+/// together.
 /// Extend this struct to add new PendingTransactionPhases
 public struct PendingTransactionPhases: RawRepresentable, Identifiable, Hashable {
-    public var id: Self { self }
     public var rawValue: String
+
+    public var id: Self {
+        self
+    }
 
     public init(rawValue: String) {
         self.rawValue = rawValue
     }
 }
 
-/**
- Context object that contains functions to get/set a pending transaction and to call the commit callbacks
- */
-public class TransactionContext<Namespace> where Namespace: Identifiable, Namespace: Hashable {
-    // Assumes each namespace can have multiple callbacks
+/// Context object that contains functions to get/set a pending transaction and to call the commit
+/// callbacks
+public class TransactionContext<Namespace: Identifiable & Hashable> {
+    /// Assumes each namespace can have multiple callbacks
     public var callbacks: [Namespace: [() -> Void]] = [:]
 
     /// Register a pending transaction to the namespace
@@ -100,19 +104,19 @@ public class TransactionContext<Namespace> where Namespace: Identifiable, Namesp
 
     /// Clear transactions belonging to the namespace
     public func clear(_ namespace: Namespace) {
-       callbacks.removeValue(forKey: namespace)
+        callbacks.removeValue(forKey: namespace)
     }
 
     /// Clear transactions belonging to the namespaces
     public func clear(_ namespaces: [Namespace]) {
-        namespaces.forEach {callbacks.removeValue(forKey: $0)}
+        namespaces.forEach { callbacks.removeValue(forKey: $0) }
     }
 }
 
 /// EnvironmentKey for setting a `TransactionContextKey`
-internal struct TransactionContextKey: EnvironmentKey {
+struct TransactionContextKey: EnvironmentKey {
     /// Default value for this key
-    public static let defaultValue: TransactionContext<PendingTransactionPhases> = .init()
+    static let defaultValue: TransactionContext<PendingTransactionPhases> = .init()
 }
 
 /// EnvironmentValue for `TransactionContext` for the `SwiftUIPendingTransactionPlugin`
@@ -129,12 +133,14 @@ public typealias CallbackHandler = () -> Void
 /// Callback structure used to preserve registration order in callbacks
 public struct Callback {
     public var id: String
+
     let callback: CallbackHandler
 }
 
 public extension CodingUserInfoKey {
     /// A `CodingUserInfoKey` to fetch the pendingTransactionContext for this decoder
-    static let pendingTransactionContext: CodingUserInfoKey! = CodingUserInfoKey(rawValue: "pendingTransactionContext")
+    static let pendingTransactionContext: CodingUserInfoKey! =
+        CodingUserInfoKey(rawValue: "pendingTransactionContext")
 }
 
 extension JSONDecoder {
