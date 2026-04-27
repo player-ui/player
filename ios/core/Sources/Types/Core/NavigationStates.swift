@@ -6,7 +6,7 @@ open class NavigationBaseState: CreatedFromJSValue, JSValueProviding {
     public typealias T = NavigationBaseState
 
     /// A property to determine the type of state this is
-    public let stateType: String
+    public let stateType: NavigationFlowStateType
 
     internal let rawValue: JSValue
 
@@ -16,19 +16,19 @@ open class NavigationBaseState: CreatedFromJSValue, JSValueProviding {
     public static func createInstance(value: JSValue) -> NavigationBaseState {
         let base = NavigationBaseState(value)
         switch base.stateType {
-        case "VIEW": return NavigationFlowViewState(value)
-        case "ACTION": return NavigationFlowActionState(value)
-        case "ASYNC_ACTION": return NavigationFlowAsyncActionState(value)
-        case "FLOW": return NavigationFlowFlowState(value)
-        case "EXTERNAL": return NavigationFlowExternalState(value)
-        case "END": return NavigationFlowEndState(value)
+        case .view: return NavigationFlowViewState(value)
+        case .action: return NavigationFlowActionState(value)
+        case .asyncAction: return NavigationFlowAsyncActionState(value)
+        case .flow: return NavigationFlowFlowState(value)
+        case .external: return NavigationFlowExternalState(value)
+        case .end: return NavigationFlowEndState(value)
         default: return base
         }
     }
 
     public init(_ value: JSValue) {
         rawValue = value
-        stateType = value.objectForKeyedSubscript("state_type").toString()
+        stateType = NavigationFlowStateType(value.objectForKeyedSubscript("state_type").toString())
     }
 }
 

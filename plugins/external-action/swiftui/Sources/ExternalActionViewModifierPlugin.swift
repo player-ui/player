@@ -53,8 +53,8 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap {[weak self] old, newState in
                     guard
-                        old?.value?.stateType == "EXTERNAL",
-                        newState.value?.stateType != "EXTERNAL"
+                        old?.value?.stateType == .external,
+                        newState.value?.stateType != .external
                     else { return }
                     self?.isExternalState = false
                     self?.state = nil
