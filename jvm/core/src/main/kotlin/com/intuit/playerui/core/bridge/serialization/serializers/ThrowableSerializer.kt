@@ -1,15 +1,20 @@
 package com.intuit.playerui.core.bridge.serialization.serializers
 
 import com.intuit.playerui.core.bridge.JSErrorException
+import com.intuit.playerui.core.bridge.JSErrorExceptionWithMetadata
 import com.intuit.playerui.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeDecoder
 import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeEncoder
+import com.intuit.playerui.core.error.ErrorSeverity
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.PlayerExceptionMetadata
+import com.intuit.playerui.core.player.PlayerExceptionWithMetadata
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -31,6 +36,9 @@ public class ThrowableSerializer : KSerializer<Throwable> {
         element("stack", String.serializer().descriptor.nullable, isOptional = true)
         element("stackTrace", serializedStackTraceSerializer.descriptor.nullable, isOptional = true)
         element("cause", defer { ThrowableSerializer().descriptor.nullable }, isOptional = true)
+        element("type", String.serializer().descriptor.nullable, isOptional = true)
+        element("severity", ErrorSeverity.serializer().descriptor.nullable, isOptional = true)
+        element("metadata", MapSerializer(String.serializer(), GenericSerializer()).descriptor.nullable, isOptional = true)
     }
 
     override fun deserialize(decoder: Decoder): PlayerException {
@@ -48,6 +56,9 @@ public class ThrowableSerializer : KSerializer<Throwable> {
             var message = ""
             var stackTrace: Array<StackTraceElement> = emptyArray()
             var cause: Throwable? = null
+            var type: String? = null
+            var severity: ErrorSeverity? = null
+            var metadata: Map<String, Any?>? = null
 
             fun decodeStackTraceFromStack(
                 stack: String? = decodeNullableSerializableElement(descriptor, 2, String.serializer().nullable),
@@ -72,17 +83,36 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                     message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
                     stackTrace = decodeSerializedStackTrace()
                     cause = decodeNullableSerializableElement(descriptor, 4, nullable)
+                    type = decodeNullableSerializableElement(descriptor, 5, String.serializer().nullable)
+                    severity = decodeNullableSerializableElement(descriptor, 6, ErrorSeverity.serializer().nullable)
+                    metadata = decodeNullableSerializableElement(descriptor, 7, GenericSerializer()) as? Map<String, Any>
                 } else {
                     stackTrace = decodeStackTraceFromStack()
                 }
             } else {
                 while (true) {
                     when (val index = decodeElementIndex(descriptor)) {
-                        0 -> serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
-                        1 -> message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
+                        0 ->
+                            serialized =
+                                decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
+
+                        1 ->
+                            message =
+                                decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
+
                         2 -> stackTrace = decodeStackTraceFromStack()
                         3 -> stackTrace = decodeSerializedStackTrace()
                         4 -> cause = decodeNullableSerializableElement(descriptor, 4, nullable)
+                        5 -> type = decodeNullableSerializableElement(descriptor, 5, String.serializer().nullable)
+                        6 ->
+                            severity =
+                                decodeNullableSerializableElement(descriptor, 6, ErrorSeverity.serializer().nullable)
+                        7 -> metadata = decodeNullableSerializableElement(
+                            descriptor,
+                            7,
+                            MapSerializer(String.serializer(), GenericSerializer()).nullable,
+                        )
+
                         CompositeDecoder.DECODE_DONE -> break
                         else -> error("Unexpected index: $index")
                     }
@@ -90,11 +120,21 @@ public class ThrowableSerializer : KSerializer<Throwable> {
             }
 
             if (serialized) {
-                PlayerException(message, cause)
+                // TODO: Solve for serialized exceptions with specific types defining their error type, severity and metadata
+                if (type == null) {
+                    PlayerException(message, cause)
+                } else {
+                    PlayerExceptionWithMetadata(message, type, severity, metadata, cause)
+                }
             } else {
+                // TODO: pass cause into JSErrorException
                 val error = decoder.requireNodeDecoder().decodeNode()
                 stackTrace = decodeStackTraceFromStack(error.getString("stack"))
-                JSErrorException(error)
+                if (type == null) {
+                    JSErrorException(error)
+                } else {
+                    JSErrorExceptionWithMetadata(error, type = type, severity = severity, metadata = metadata)
+                }
             }.apply { setStackTrace(stackTrace) }
         }
     }
@@ -120,6 +160,22 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                     },
                 )
                 encodeNullableSerializableElement(descriptor, 4, nullable, value.cause)
+                if (value is PlayerExceptionMetadata) {
+                    val severity = value.severity
+                    val metadata = value.metadata
+                    encodeStringElement(descriptor, 5, value.type)
+                    if (severity != null) {
+                        encodeNullableSerializableElement(descriptor, 6, String.serializer(), severity.value)
+                    }
+                    if (metadata != null) {
+                        encodeNullableSerializableElement(
+                            descriptor,
+                            7,
+                            MapSerializer(String.serializer(), GenericSerializer()),
+                            metadata,
+                        )
+                    }
+                }
             }
         }
     }

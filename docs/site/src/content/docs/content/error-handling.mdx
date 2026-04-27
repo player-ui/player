@@ -1,0 +1,449 @@
+---
+title: Error Handling
+---
+
+## Overview
+
+The `ErrorController` manages error handling throughout the flow lifecycle. It captures errors with metadata, maintains error history, and exposes errors to views via the protected `errorState` binding. The ErrorController is automatically instantiated by Player when a flow starts and is accessible through the `error` property in the controller state.
+
+### Key Features
+
+- **Error Capture**: Capture errors that implement the `PlayerErrorMetadata` interface
+- **Error History**: Maintain a complete history of all captured errors in chronological order
+- **Protected State**: Automatically manages `errorState` in the data model with middleware protection
+- **Hook System**: Allows plugins to observe errors and optionally prevent error state navigation
+- **Cross-Platform**: Available on TypeScript/React, iOS, and JVM platforms
+
+## Error Types & Severity
+
+Player provides standard error types: `expression`, `binding`, `view`, `asset`, `navigation`, `validation`, `data`, `schema`, `network`, `plugin`, `render`. Plugins can define custom types.
+
+**Severity Levels:**
+- `fatal` - Cannot continue, flow must end
+- `error` - Standard error, may allow recovery
+- `warning` - Non-blocking, logged for telemetry
+
+## API Reference
+
+### PlayerErrorMetadata Interface
+
+Errors passed to `captureError` must implement the `PlayerErrorMetadata` interface:
+
+```typescript
+interface PlayerErrorMetadata {
+  type: string;           // required — error type, e.g. ErrorTypes.VIEW
+  severity?: ErrorSeverity; // optional — defaults to ERROR
+  metadata?: Record<string, unknown>; // optional — domain-specific fields
+}
+```
+
+The built-in error classes (`AssetRenderError`, `AsyncNodeError`, `ResolverError`) all implement this interface. For custom errors, extend `Error` and implement `PlayerErrorMetadata`:
+
+```typescript
+class MyPluginError extends Error implements PlayerErrorMetadata {
+  type = "my-plugin";
+  severity = ErrorSeverity.ERROR;
+  metadata = { detail: "something went wrong" };
+}
+```
+
+### Capturing Errors
+
+```typescript
+// captureError returns true if recovery succeeded, false if the flow was failed
+const recovered = errorController.captureError(new MyPluginError("msg"));
+```
+
+Errors that do not implement `PlayerErrorMetadata` are still accepted: `captureError` will attempt a wildcard `"*"` errorTransition as a fallback, but the `onError` hook will **not** fire and the error will not appear in history or `errorState`.
+
+The same API is available on Kotlin and Swift.
+
+### Retrieving Errors
+
+```typescript
+// Get the most recent error
+const currentError = errorController.getCurrentError();
+
+// Get complete error history
+const allErrors = errorController.getErrors();
+```
+
+### Clearing Errors
+
+```typescript
+// Clear all errors (history + current + data model)
+errorController.clearErrors();
+
+// Clear only current error (preserve history)
+errorController.clearCurrentError();
+```
+
+## Accessing Error State in Views
+
+When an error is captured, the ErrorController automatically sets `errorState` in the data model. This makes error information accessible to views using bindings:
+
+```json
+{
+  "id": "error-view",
+  "type": "text",
+  "value": "Error: {{errorState.message}}"
+}
+```
+
+### Error State Structure
+
+```json
+{
+  "errorState": {
+    "message": "Failed to load view",
+    "name": "Error",
+    "errorType": "view",
+    "severity": "error",
+    "viewId": "my-view"
+  }
+}
+```
+
+## Protected ErrorState
+
+The `errorState` binding in the data model is **protected** by middleware:
+
+- ✅ Views can **read** `errorState` using bindings like `{{errorState.message}}`
+- ❌ Only the ErrorController can **write** to `errorState` - views, expressions, and plugins cannot modify it directly
+
+This protection ensures error state integrity and prevents accidental overwrites. Expressions like `{{errorState}} = null` will be blocked. To clear errors, use `clearCurrentError()` or `clearErrors()` methods.
+
+## Hooks
+
+### onError Hook
+
+The `onError` hook fires when an error implementing `PlayerErrorMetadata` is captured. Errors without metadata skip this hook.
+
+**Hook Behavior:**
+- Called in order for each tapped plugin
+- Return `true` to bail: skip `errorState` data model update and `errorTransitions` navigation (plugin takes ownership of the error)
+- Return `undefined` or `false` to continue: error is written to `errorState` and navigation proceeds if `errorTransitions` is defined
+- Once `true` is returned, no further plugins are called
+
+### Example: Error Logging
+
+```typescript
+export class ErrorLoggingPlugin implements Plugin {
+  name = "error-logging";
+
+  apply(player) {
+    player.hooks.errorController.tap(this.name, (errorController) => {
+      errorController.hooks.onError.tap(this.name, (error) => {
+        // error is PlayerError = Error & PlayerErrorMetadata
+        logToService({
+          message: error.message,
+          type: error.type,
+          severity: error.severity,
+        });
+
+        // Return undefined to allow error state navigation
+        return undefined;
+      });
+    });
+  }
+}
+```
+
+### Example: Custom Error Handler
+
+```typescript
+errorController.hooks.onError.tap("custom-handler", (error) => {
+  if (error.type === "network" && error.severity === "warning") {
+    console.warn("Network warning:", error.message);
+    return true; // Take ownership — skip errorState and navigation
+  }
+
+  return undefined;
+});
+```
+
+### Cross-Platform Hook Examples
+
+```typescript
+// TypeScript
+errorController.hooks.onError.tap("logger", (error) => {
+  console.log(error.message, error.type);
+  return undefined;
+});
+```
+
+```kotlin
+// Kotlin
+errorController.hooks.onError.tap("logger") { error ->
+    println("Error: ${error.message} type: ${error.type}")
+    null // Return null to continue
+}
+```
+
+```swift
+// Swift
+errorController.hooks.onError.tap(name: "logger") { error in
+    print("Error: \(error.message) type: \(error.type)")
+    return nil // Return nil to continue
+}
+```
+
+## (iOS) Accessing ErrorState After Flow Failure
+
+When a flow ends in an error, the player state is an `ErrorState` with an `error: JSValueError` property exposing the full error metadata from the JS layer:
+
+```swift
+switch player.state {
+case let errorState as ErrorState:
+    print(errorState.error.message)          // error message string
+    print(errorState.error.type)             // error type, e.g. "render"
+    print(errorState.error.severity)         // ErrorSeverity? e.g. .error
+    print(errorState.error.metadata)         // [String: Any]? domain-specific fields
+    print(errorState.error.isErrorWithMetadata) // false if the JS error lacked metadata
+default:
+    break
+}
+```
+
+The `originalJSError: JSValue` property on `JSValueError` gives access to the raw JS error object if needed.
+
+## Render-Time Error Capture
+
+All platforms automatically capture asset render errors via platform-specific error classes, all implementing the `PlayerErrorMetadata` interface with `type: "render"`. These are passed to `captureError()` automatically — you do not construct them directly.
+
+| Platform | Class | Triggered when |
+|---|---|---|
+| React | `AssetRenderError` | Any exception thrown inside an asset component |
+| iOS (SwiftUI) | `AssetRenderError.decodingFailure` | Asset data fails to decode from JS |
+| Android (Compose) | `AssetRenderException` | `getData()` throws in `ComposableAsset` |
+
+All include `metadata.assetId` and a human-readable message with the full asset parent path.
+
+## Error Navigation Pattern
+
+Errors can trigger automatic navigation using the `errorTransitions` map at node or flow level. This provides a dedicated error routing mechanism separate from regular transitions.
+
+### errorTransitions Map
+
+The `errorTransitions` property maps error types directly to state names:
+
+```json
+{
+  "errorTransitions": {
+    "binding": "BINDING_ERROR_VIEW",
+    "validation": "VALIDATION_ERROR_VIEW",
+    "*": "GENERIC_ERROR_VIEW"
+  }
+}
+```
+
+The `"*"` wildcard matches any error type not explicitly defined.
+
+### Navigation Fallback Pattern
+
+When an error is captured, the ErrorController uses `errorTransition()` to navigate following this hierarchical fallback:
+
+1. **Node-level `errorTransitions`** - If defined on the current state, navigate to the mapped state for the error type
+2. **Flow-level `errorTransitions`** - If node-level not found or current state doesn't have a match, use flow-level mapping
+3. **No Navigation** - If neither level has a match, log a warning and stay on the current state (or reject flow if critical)
+
+### Node-Level Error Transitions
+
+Define `errorTransitions` on individual states to handle errors specific to that state:
+
+```json
+{
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "main-view",
+        "errorTransitions": {
+          "binding": "BINDING_ERROR_VIEW",
+          "validation": "VALIDATION_ERROR_VIEW",
+          "*": "GENERIC_ERROR_VIEW"
+        },
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "BINDING_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "binding-error-view",
+        "transitions": { "*": "END_Error" }
+      },
+      "VALIDATION_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "validation-error-view",
+        "transitions": { "*": "END_Error" }
+      },
+      "GENERIC_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "generic-error-view",
+        "transitions": { "*": "END_Error" }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      },
+      "END_Error": {
+        "state_type": "END",
+        "outcome": "error"
+      }
+    }
+  }
+}
+```
+
+When a `binding` error is captured on `VIEW_1`, Player automatically navigates to `BINDING_ERROR_VIEW`.
+
+### Flow-Level Error Transitions
+
+Define `errorTransitions` at the flow level as a fallback for states without their own error handling:
+
+```json
+{
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "errorTransitions": {
+        "binding": "BINDING_ERROR_VIEW",
+        "validation": "VALIDATION_ERROR_VIEW",
+        "*": "GENERIC_ERROR_VIEW"
+      },
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "main-view",
+        "transitions": {
+          "*": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "state_type": "VIEW",
+        "ref": "second-view",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "BINDING_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "binding-error-view",
+        "transitions": {
+          "*": "END_Error"
+        }
+      },
+      "VALIDATION_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "validation-error-view",
+        "transitions": {
+          "*": "END_Error"
+        }
+      },
+      "GENERIC_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "generic-error-view",
+        "transitions": {
+          "*": "END_Error"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      },
+      "END_Error": {
+        "state_type": "END",
+        "outcome": "error"
+      }
+    }
+  }
+}
+```
+
+Any error captured on `VIEW_1` or `VIEW_2` will use the flow-level `errorTransitions` since they don't define their own.
+
+### Wildcard Support
+
+The `"*"` wildcard matches any error type not explicitly mapped:
+
+```json
+{
+  "errorTransitions": {
+    "network": "NETWORK_ERROR_VIEW",
+    "validation": "VALIDATION_ERROR_VIEW",
+    "*": "GENERIC_ERROR_VIEW"
+  }
+}
+```
+
+A `binding` error would navigate to `GENERIC_ERROR_VIEW` via the wildcard.
+
+### Combining Node and Flow Level
+
+Node-level takes precedence, with flow-level as fallback:
+
+```json
+{
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "errorTransitions": {
+        "*": "GENERIC_ERROR_VIEW"
+      },
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "main-view",
+        "errorTransitions": {
+          "validation": "CUSTOM_VALIDATION_ERROR"
+        },
+        "transitions": {
+          "*": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "state_type": "VIEW",
+        "ref": "second-view",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "CUSTOM_VALIDATION_ERROR": {
+        "state_type": "VIEW",
+        "ref": "custom-validation-error",
+        "transitions": { "*": "END_Error" }
+      },
+      "GENERIC_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "generic-error-view",
+        "transitions": { "*": "END_Error" }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      },
+      "END_Error": {
+        "state_type": "END",
+        "outcome": "error"
+      }
+    }
+  }
+}
+```
+
+**Behavior:**
+- On `VIEW_1`: `validation` error → `CUSTOM_VALIDATION_ERROR` (node-level)
+- On `VIEW_1`: `binding` error → `GENERIC_ERROR_VIEW` (flow-level fallback)
+- On `VIEW_2`: any error → `GENERIC_ERROR_VIEW` (flow-level fallback)
+
+### Key Differences from Regular Transitions
+
+`errorTransitions` differs from regular `transitions`:
+
+1. **Direct Navigation**: Maps error types directly to state names (no intermediate transition values)
+2. **Bypasses Hooks**: Skips `skipTransition` and `beforeTransition` hooks for immediate error handling
+3. **No Expression Resolution**: State names are used as-is without expression evaluation
+4. **Two-Level Fallback**: Supports both node-level and flow-level with automatic fallback
+5. **Protected Writes**: ErrorController writes to `errorState` in the data model using protected middleware

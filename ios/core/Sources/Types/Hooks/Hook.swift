@@ -82,6 +82,32 @@ public class Hook<T>: BaseJSHook where T: CreatedFromJSValue {
 }
 
 /**
+ This class represents a JS Hook with the ability to return a result. This can work for a Waterfall or Bail hook.
+ */
+public class HookWithResult<T, R>: BaseJSHook where T: CreatedFromJSValue {
+    /**
+     Attach a closure to the hook, so when the hook is fired in the JS runtime
+     we receive the event in the native runtime and can return a value to bail
+     
+     - parameters:
+     - hook: A function to run when the JS hook is fired, return Bool? to bail (return nil to continue)
+     */
+    public func tap(_ hook: @escaping (T) -> R?) {
+        let tapMethod: @convention(block) (JSValue?) -> Any? = { value in
+            guard
+                let val = value,
+                let hookValue = T.createInstance(value: val) as? T
+            else { return nil }
+            
+            return hook(hookValue)
+            
+        }
+        
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/**
  This class represents an object in the JS runtime that can be tapped into
  to receive JS events that has 2 parameters
  */

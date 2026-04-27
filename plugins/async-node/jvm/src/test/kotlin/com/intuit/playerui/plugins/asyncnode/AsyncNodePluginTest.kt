@@ -2,6 +2,7 @@ package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
@@ -200,12 +201,13 @@ internal class AsyncNodePluginTest : PlayerTest() {
             throw Exception("This is an error message from onAsyncNode")
         }
 
-        val errorMessage = assertThrows<Exception> {
+        val err = assertThrows<JSErrorException> {
             runBlockingTest {
                 player.start(chatMessageContent).await()
             }
-        }.message
-        assertEquals("This is an error message from onAsyncNode", errorMessage)
+        }
+        assertEquals("Error: An error occured during async node resolution. See cause for details.", err.message)
+        assertEquals("This is an error message from onAsyncNode", err.node.getObject("cause")?.getString("message"))
     }
 
     @TestTemplate

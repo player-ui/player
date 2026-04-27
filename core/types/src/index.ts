@@ -116,12 +116,25 @@ export interface NavigationFlow {
   /** An optional expression to run when this Flow ends */
   onEnd?: Expression | ExpressionObject;
 
+  /**
+   * An optional flow-level transitions map (fallback when node-level is not defined).
+   * Used as a fallback when the current state doesn't have a transition defined.
+   */
+  transitions?: NavigationFlowTransition;
+
+  /**
+   * Optional flow-level error transitions map.
+   * Maps error types directly to state names (no indirection through transitions map).
+   */
+  errorTransitions?: Record<string, string>;
+
   [key: string]:
     | undefined
     | string
     | Expression
     | ExpressionObject
-    | NavigationFlowState;
+    | NavigationFlowState
+    | NavigationFlowTransition;
 }
 
 export type NavigationFlowTransition = Record<string, string>;
@@ -150,15 +163,21 @@ export interface NavigationBaseState<T extends string> extends CommentBase {
 }
 
 /** A generic state that can transition to another state */
-export interface NavigationFlowTransitionableState<
-  T extends string,
-> extends NavigationBaseState<T> {
+export interface NavigationFlowTransitionableState<T extends string>
+  extends NavigationBaseState<T> {
   /** A mapping of transition-name to FlowState name */
   transitions: NavigationFlowTransition;
+
+  /**
+   * Optional error transitions map.
+   * Maps error types directly to state names (no indirection through transitions map).
+   */
+  errorTransitions?: Record<string, string>;
 }
 
 /** A state representing a view  */
-export interface NavigationFlowViewState extends NavigationFlowTransitionableState<"VIEW"> {
+export interface NavigationFlowViewState
+  extends NavigationFlowTransitionableState<"VIEW"> {
   /** An id corresponding to a view from the 'views' array */
   ref: string;
 
@@ -186,7 +205,8 @@ export interface NavigationFlowEndState extends NavigationBaseState<"END"> {
 }
 
 /** Action states execute an expression to determine the next state to transition to */
-export interface NavigationFlowActionState extends NavigationFlowTransitionableState<"ACTION"> {
+export interface NavigationFlowActionState
+  extends NavigationFlowTransitionableState<"ACTION"> {
   /**
    * An expression to execute.
    * The return value determines the transition to take
@@ -195,7 +215,8 @@ export interface NavigationFlowActionState extends NavigationFlowTransitionableS
 }
 
 /** Action states execute an expression to determine the next state to transition to */
-export interface NavigationFlowAsyncActionState extends NavigationFlowTransitionableState<"ASYNC_ACTION"> {
+export interface NavigationFlowAsyncActionState
+  extends NavigationFlowTransitionableState<"ASYNC_ACTION"> {
   /**
    * An expression to execute.
    * The return value determines the transition to take
@@ -210,14 +231,16 @@ export interface NavigationFlowAsyncActionState extends NavigationFlowTransition
  * External Flow states represent states in the FSM that can't be resolved internally in Player.
  * The flow will wait for the embedded application to manage moving to the next state via a transition
  */
-export interface NavigationFlowExternalState extends NavigationFlowTransitionableState<"EXTERNAL"> {
+export interface NavigationFlowExternalState
+  extends NavigationFlowTransitionableState<"EXTERNAL"> {
   /** A reference for this external state */
   ref: string;
   /** Any additional properties are forwarded as options */
   [key: string]: unknown;
 }
 
-export interface NavigationFlowFlowState extends NavigationFlowTransitionableState<"FLOW"> {
+export interface NavigationFlowFlowState
+  extends NavigationFlowTransitionableState<"FLOW"> {
   /** A reference to a FLOW id state to run */
   ref: string;
 }

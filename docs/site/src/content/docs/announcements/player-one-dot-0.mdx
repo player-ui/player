@@ -273,6 +273,23 @@ targets: [
 ]
 ```
 
+### (iOS) `ErrorState.error` is now `JSValueError` instead of `String`
+
+`ErrorState.error` previously held the raw error message as a `String`. It is now a `JSValueError` struct that exposes the full error metadata from the JS layer:
+
+```swift
+// Before
+let message: String = errorState.error
+
+// After
+let message: String = errorState.error.message
+let type: String = errorState.error.type
+let severity: ErrorSeverity? = errorState.error.severity
+let metadata: [String: Any]? = errorState.error.metadata
+```
+
+**Migration:** Replace direct string usage of `errorState.error` with `errorState.error.message`.
+
 ### `ExternalActionPlugin` renamed to `ExternalStatePlugin` with new handler API
 
 **The plugin has been renamed** from `ExternalActionPlugin` to `ExternalStatePlugin`.
@@ -475,3 +492,18 @@ if case let .anyDictionary(myDict) = anyType,
 // After
 let title: String? = anyType["title"]?.as(String.self)
 ```
+
+### ErrorController
+
+Player now includes a built-in `ErrorController` for structured error handling across the flow lifecycle. It is automatically instantiated when a flow starts and accessible via `controllers.error` in the `InProgressState`.
+
+Key capabilities:
+
+- **`captureError(error)`** — captures any `Error` implementing `PlayerErrorMetadata` (`type`, optional `severity`, optional `metadata`). Returns `true` if recovery succeeded via `errorTransitions`, `false` if the flow was failed.
+- **`onError` hook** — plugins can tap to observe errors; return `true` to take ownership and skip `errorState` navigation.
+- **`errorState` binding** — errors are automatically written to `errorState` in the data model, readable in views via `{{errorState.message}}`, `{{errorState.errorType}}`, etc.
+- **`errorTransitions` map** — flows can define per-state or flow-level error routing to navigate to dedicated error views instead of failing.
+
+**Render-time error recovery** — All platforms provide the ability to recover from render-time errors by calling `captureError(error)`
+
+See the [Error Handling docs](/content/error-handling) for the full API reference.
