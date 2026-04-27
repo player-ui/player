@@ -74,11 +74,9 @@ public class ErrorController: CreatedFromJSValue {
     /// Typealias for associated type
     public typealias T = ErrorController
 
-    /**
-     Creates an instance from a JSValue, used for generic construction
-     - parameters:
-        - value: The JSValue to construct from
-     */
+    /// Creates an instance from a JSValue, used for generic construction
+    /// - Parameters:
+    ///   - value: The JSValue to construct from
     public static func createInstance(value: JSValue) -> ErrorController { ErrorController(value) }
 
     /// The JSValue that backs this wrapper
@@ -87,11 +85,9 @@ public class ErrorController: CreatedFromJSValue {
     /// The hooks that can be tapped into
     public let hooks: ErrorControllerHooks
 
-    /**
-     Construct an ErrorController from a JSValue
-     - parameters:
-        - value: The JSValue that is the ErrorController
-     */
+    /// Construct an ErrorController from a JSValue
+    /// - Parameters:
+    ///   - value: The JSValue that is the ErrorController
     public init(_ value: JSValue) {
         self.value = value
         hooks = ErrorControllerHooks(
@@ -99,12 +95,10 @@ public class ErrorController: CreatedFromJSValue {
         )
     }
 
-    /**
-     Capture an error
-     - parameters:
-        - error: The native Error object
-     - returns: Whether the error was successfully captured
-     */
+    /// Capture an error
+    /// - Parameters:
+    ///   - error: The native Error object
+    /// - Returns: Whether the error was successfully captured
     @discardableResult
     public func captureError(
         error: Error
@@ -118,18 +112,14 @@ public class ErrorController: CreatedFromJSValue {
         return result.toBool()
     }
 
-    /**
-     Get the most recent error
-     - returns: The current error as a JSValue if one exists
-     */
+    /// Get the most recent error
+    /// - Returns: The current error as a JSValue if one exists
     public func getCurrentError() -> JSValue? {
         return value.invokeMethod("getCurrentError", withArguments: [])
     }
 
-    /**
-     Get the complete error history
-     - returns: JSValue representing the array of errors
-     */
+    /// Get the complete error history
+    /// - Returns: JSValue representing the array of errors
     public func getErrors() -> JSValue? {
         return value.invokeMethod("getErrors", withArguments: [])
     }
