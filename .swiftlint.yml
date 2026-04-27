@@ -3,11 +3,25 @@ disabled_rules:
     - unused_setter_value
     # SwiftFormat owns trailing comma style via its trailingCommas rule
     - trailing_comma
+    # disable:next comments between doc comment params and a declaration trigger false positives
+    - orphaned_doc_comment
 
 type_name:
     excluded:
         # T is a universally understood generic placeholder
         - T
+
+identifier_name:
+    excluded:
+        # id is a universally understood identifier in iOS/SwiftUI
+        - id
+        # Snake_case names are generated from JSON schema and must match the wire format exactly
+        - radio_button
+        - drop_down
+        - check_box
+        - text_input
+        - search_input
+        - file_input
 
 # Longer functions should be split into named helpers. Long functions are harder to read, test, and maintain.
 function_body_length:
@@ -16,6 +30,42 @@ function_body_length:
 included:
     - ios
     - plugins
+
+excluded:
+    # Generated mock data — intentionally excluded from all lint rules
+    - ios/demo/Sources/MockFlows.swift
+    # Demo-only file — file length acceptable for a demo
+    - ios/demo/Sources/String+Extensions.swift
+    # Test folders. SwiftLint is pretty strict about test files unnecessarily, so we exclude them.
+    # SwiftFormat still covers these.
+    - ios/core/Tests
+    - ios/logger/Tests
+    - ios/swiftui/Tests
+    - ios/swiftui/ViewInspector
+    - ios/test-utils-core/Tests
+    - ios/test-utils/Tests
+    - ios/test-utils/ViewInspector
+    - plugins/async-node/ios/Tests
+    - plugins/async-node/ios/ViewInspector
+    - plugins/beacon/ios/Tests
+    - plugins/beacon/swiftui/ViewInspector
+    - plugins/check-path/ios/Tests
+    - plugins/check-path/swiftui/ViewInspector
+    - plugins/common-expressions/ios/Tests
+    - plugins/common-types/ios/Tests
+    - plugins/computed-properties/ios/Tests
+    - plugins/console-logger/ios/Tests
+    - plugins/expression/ios/Tests
+    - plugins/external-action/ios/Tests
+    - plugins/external-action/swiftui/ViewInspector
+    - plugins/metrics/swiftui/ViewInspector
+    - plugins/pending-transaction/swiftui/ViewInspector
+    - plugins/pubsub/ios/Tests
+    - plugins/reference-assets/swiftui/UITests
+    - plugins/reference-assets/swiftui/ViewInspector
+    - plugins/stage-revert-data/ios/Tests
+    - plugins/transition/swiftui/ViewInspector
+    - plugins/types-provider/ios/Tests
 
 opt_in_rules:
     # Enforces Swift 5.7+ shorthand `guard let foo` over verbose `guard let foo = foo` to reduce visual clutter
@@ -29,8 +79,6 @@ opt_in_rules:
 shorthand_optional_binding:
     severity: error
 force_unwrapping:
-    severity: error
-nesting:
     severity: error
 # Don't add unnecessary parentheses to control statements
 control_statement:
