@@ -290,10 +290,11 @@ public extension HeadlessPlayer {
         - context: The context to attach the exception handler to
      */
     private func attachExceptionHandler(to context: JSContext) {
+        let loggerRef = logger
         context.exceptionHandler = { (_: JSContext!, value: JSValue!) in
             let stacktrace = value.objectForKeyedSubscript("stack").toString()
             let moreInfo = "in method \(String(describing: stacktrace))"
-            logger.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
+            loggerRef.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
         }
     }
 

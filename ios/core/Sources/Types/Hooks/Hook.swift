@@ -248,7 +248,7 @@ public class AsyncHook<T>: BaseAsyncJSHook where T: CreatedFromJSValue {
     public func tap(_ hook: @escaping AsyncHookHandler) {
         let tapMethod: @convention(block) (JSValue?) -> JSValue = { [weak self] value in
             guard
-                let self = self,
+                let self,
                 let val = value,
                 let hookValue = T.createInstance(value: val) as? T
             else { return JSValue() }

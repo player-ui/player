@@ -104,15 +104,23 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
         /// by clearing the exceptionHandler and any exported objects on the context.
         public func unload() {
-            if let ctx = player?.context {
-                ctx.exceptionHandler = nil
-                ctx.setObject(nil, forKeyedSubscript: "player" as NSString)
+            // ObjC property accessors (e.g. JSValue.context) return autoreleased
+            // objects. Without an explicit pool, those temporaries prevent the
+            // JSContext from deallocating until the next run-loop drain.
+            autoreleasepool {
+                if let ctx = player?.context {
+                    ctx.exceptionHandler = nil
+                    ctx.setObject(nil, forKeyedSubscript: "player" as NSString)
+                    ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
+                    JSGarbageCollect(ctx.jsGlobalContextRef)
+                }
+                partialMatchPlugin.pluginRef = nil
+                partialMatchPlugin.context = nil
+                player = nil
+                hooks = nil
+                flow = nil
+                state = nil
             }
-            partialMatchPlugin.pluginRef = nil
-            player = nil
-            hooks = nil
-            flow = nil
-            state = nil
             DispatchQueue.main.async { [weak self] in
                 self?.result = nil 
              }

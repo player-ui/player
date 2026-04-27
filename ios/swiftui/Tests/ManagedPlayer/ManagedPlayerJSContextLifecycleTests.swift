@@ -43,8 +43,14 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertNotNil(weakOldContext, "First JSContext should exist while loaded")
         XCTAssertTrue(context.isLoaded, "Context should be loaded after init")
 
-        context.unload()
+        autoreleasepool {
+            context.unload()
+        }
         XCTAssertFalse(context.isLoaded, "Context should not be loaded after unload")
+
+        // Drain pending GCD blocks (setTimeout polyfill dispatches
+        // background→main) that may still hold JSValue refs to the old context.
+        waitForDeallocation(of: { weakOldContext }, timeout: 2.0)
 
         autoreleasepool {
             let player2 = SwiftUIPlayer(
@@ -93,7 +99,11 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
                 _ = player
             }
 
-            context.unload()
+            autoreleasepool {
+                context.unload()
+            }
+
+            waitForDeallocation(of: { createdContexts[i].value }, timeout: 2.0)
         }
 
         XCTAssertEqual(createdContexts.count, 5, "Should have created 5 JSContexts")
@@ -104,6 +114,16 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
             "\(leakedCount) of 5 JSContexts still alive after unload — " +
             "orphaned contexts accumulating on shared JSVirtualMachine"
         )
+    }
+
+    /// Spins the run loop until `object()` returns nil or `timeout` elapses.
+    /// The setTimeout polyfill dispatches via GCD (background → main), so
+    /// the run loop must tick to let those blocks execute and release JSValues.
+    private func waitForDeallocation(of object: @escaping () -> AnyObject?, timeout: TimeInterval) {
+        let deadline = Date(timeIntervalSinceNow: timeout)
+        while object() != nil && Date() < deadline {
+            RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.01))
+        }
     }
 }
 
