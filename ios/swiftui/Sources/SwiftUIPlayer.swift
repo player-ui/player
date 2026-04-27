@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 //
 //  SwiftUIPlayer.swift
 //  PlayerUI
@@ -5,40 +6,130 @@
 //  Created by Harris Borawski on 2/26/21.
 //
 
-import SwiftUI
-import JavaScriptCore
 import Combine
-import SwiftHooks
+import JavaScriptCore
 import PlayerUI
 import PlayerUILogger
+import SwiftHooks
+import SwiftUI
 
-/**
- A `HeadlessPlayer` implementation that renders itself as a SwiftUI View
- */
+/// A `HeadlessPlayer` implementation that renders itself as a SwiftUI View
 public struct SwiftUIPlayer: View, HeadlessPlayer {
-    /// A SwiftUIPlayer Context maintains the current javascript state of Player. This includes providing
+    /// For ViewInspector testing
+    let inspection: Inspection<Self> = .init()
+
+    private let unloadOnDisappear: Bool
+
+    @ObservedObject private var context: Context
+    @Binding private var result: Result<CompletedState, PlayerError>?
+
+    /// The SwiftUI View that is this Player flow
+    public var body: some View {
+        bodyContent
+            .environment(\.inProgressState, (state as? InProgressState))
+            .environment(\.constantsController, constantsController)
+            // forward results from our Context along to our result binding
+            .onReceive(context.$result.debounce(for: 0.1, scheduler: RunLoop.main)) {
+                result = $0
+            }
+            .onReceive(inspection.notice) { inspection.visit(self, $0) }
+            .onDisappear {
+                guard unloadOnDisappear else { return }
+                context.unload()
+            }
+    }
+
+    private var bodyContent: some View {
+        bodyContent(hooks?.transition.call() ?? .identity)
+    }
+
+    /// A reference to the shared logger
+    public var logger: TapableLogger {
+        context.logger
+    }
+
+    /// A read only reference to the platform shared core player value in the `JSContext`
+    public var jsPlayerReference: JSValue? {
+        context.player
+    }
+
+    /// Lifecycle hooks exposed from the platform shared core player
+    public var hooks: SwiftUIPlayerHooks? {
+        context.hooks
+    }
+
+    /// The registry for registering assets to be used for rendering
+    public var assetRegistry: SwiftUIRegistry {
+        context.registry
+    }
+
+    /// Constructs a `SwiftUIPlayer` with the given flow and plugins
+    /// - parameters:
+    ///   - flow: The JSON flow to run
+    ///   - plugins: Any plugins to add to Player
+    ///   - context: An optional JSContext to use for loading platform shared code
+    public init(
+        flow: String,
+        plugins: [NativePlugin],
+        result: Binding<Result<CompletedState, PlayerError>?>,
+        context: Context = .shared,
+        unloadOnDisappear: Bool = true
+    ) {
+        _result = result
+        _context = ObservedObject(initialValue: context)
+        self.unloadOnDisappear = unloadOnDisappear
+        context.load(flow: flow, plugins: plugins, player: self)
+    }
+
+    private func bodyContent(_ transitionInfo: PlayerViewTransition) -> some View {
+        // use a VStack to provide a container for our view transitions to run inside
+        VStack {
+            hooks?.view
+                .call(context.registry.root?.view ?? AnyView(Color.clear))
+                .transition(transitionInfo.transition)
+                .id(context.registry.root?.id)
+        }
+        // only apply our transition animation when the root view is changing
+        .animation(transitionInfo.animationCurve, value: context.registry.root?.id)
+    }
+
+    /// A SwiftUIPlayer Context maintains the current javascript state of Player. This includes
+    /// providing
     /// stable storage for Player JSValue across SwiftUI View updates.
     ///
     public final class Context: ObservableObject {
-        /// A global context that can be managed by a single SwiftUIPlayer at a time. This may be useful
+        /// A global context that can be managed by a single SwiftUIPlayer at a time. This may be
+        /// useful
         /// for fullscreen player views when @StateObject is not available to the host application.
-        public static let shared = Context()
+        public static let shared: Context = .init()
+
+        public let logger: TapableLogger = .init()
+
+        fileprivate(set) var hooks: SwiftUIPlayerHooks?
+
+        fileprivate var player: JSValue?
+        fileprivate let registry: SwiftUIRegistry = .init()
+
+        @Published fileprivate var result: Result<CompletedState, PlayerError>?
 
         private var contextBuilder: () -> JSContext
-        private let partialMatchPlugin = PartialMatchFingerprintPlugin()
-        public let logger = TapableLogger()
+        private let partialMatchPlugin: PartialMatchFingerprintPlugin = .init()
         private var flow: String?
         private var registryWatch: AnyCancellable?
         private var state: BaseFlowState?
 
-        fileprivate var player: JSValue?
-        fileprivate(set) var hooks: SwiftUIPlayerHooks?
-        fileprivate let registry = SwiftUIRegistry()
+        /// Returns true iff there is a non-nil player.
+        public var isLoaded: Bool {
+            player != nil
+        }
 
-        @Published fileprivate var result: Result<CompletedState, PlayerError>?
-
-        /// Returns true iff there is a non-nil player. 
-        public var isLoaded: Bool { player != nil }
+        /// Returns `player` but asserts that it is not nil. Used from methods that should not be
+        /// called
+        /// when we are unloaded.
+        private var expectedPlayer: JSValue? {
+            assert(player != nil, "should have a player value here")
+            return player
+        }
 
         /// Create a new context that generates JSContexts using the supplied contextBuilder.
         public init(contextBuilder: @escaping () -> JSContext = { JSContext() }) {
@@ -50,57 +141,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
         }
 
-        /// Load the supplied flow into this context. If the currently loaded flow is supplied this will do nothing.
-        /// If a new flow is supplied then the javascript environment is created or rebuilt around the new flow.
-        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
-            registry.logger = logger
-            guard self.player == nil || flow != self.flow else {
-                logger.d("Reusing already loaded flow")
-                return
-            }
-
-            let context: JSContext = contextBuilder()
-
-            let allPlugins = plugins + [partialMatchPlugin]
-            guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
-                return logger.e("Failed to load player")
-            }
-
-            let hooks = SwiftUIPlayerHooks(from: playerValue)
-
-            self.player = playerValue
-            self.flow = flow
-            self.hooks = hooks
-            DispatchQueue.main.async { [weak self] in
-                self?.result = nil 
-            }
-
-            for plugin in allPlugins { plugin.apply(player: player) }
-            registry.partialMatchRegistry = partialMatchPlugin
-
-            hooks.viewController.tap { [weak self, weak playerValue] controller in
-                guard let self, let playerValue, self.player == playerValue else { return }
-                self.onViewController(controller)
-            }
-
-            hooks.state.tap { [weak self] newState in
-                self?.state = newState
-            }
-
-            guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                logger.d("Empty flow, not loading")
-                return
-            }
-
-            player.start(flow: flow) { [weak self, weak playerValue] (result) in
-                guard let self, let playerValue, self.player == playerValue else { return }
-                DispatchQueue.main.async { [weak self] in
-                    self?.result = result 
-                }
-            }
-        }
-
-        /// Unload the context. This will release the current javascript player/context and clear the current
+        /// Unload the context. This will release the current javascript player/context and clear
+        /// the current
         /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
         /// by clearing the exceptionHandler and any exported objects on the context.
         public func unload() {
@@ -122,8 +164,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 state = nil
             }
             DispatchQueue.main.async { [weak self] in
-                self?.result = nil 
-             }
+                self?.result = nil
+            }
             registry.resetView()
         }
 
@@ -133,18 +175,63 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             player?.context.exceptionHandler = nil
         }
 
-        /// Returns `player` but asserts that it is not nil. Used from methods that should not be called
-        /// when we are unloaded.
-        private var expectedPlayer: JSValue? {
-            assert(player != nil, "should have a player value here")
-            return player
+        /// Load the supplied flow into this context. If the currently loaded flow is supplied this
+        /// will do nothing.
+        /// If a new flow is supplied then the javascript environment is created or rebuilt around
+        /// the new flow.
+        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
+            registry.logger = logger
+            guard self.player == nil || flow != self.flow else {
+                logger.d("Reusing already loaded flow")
+                return
+            }
+
+            let context: JSContext = contextBuilder()
+
+            let allPlugins = plugins + [partialMatchPlugin]
+            guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
+                return logger.e("Failed to load player")
+            }
+
+            let hooks = SwiftUIPlayerHooks(from: playerValue)
+
+            self.player = playerValue
+            self.flow = flow
+            self.hooks = hooks
+            DispatchQueue.main.async { [weak self] in
+                self?.result = nil
+            }
+
+            for plugin in allPlugins {
+                plugin.apply(player: player)
+            }
+            registry.partialMatchRegistry = partialMatchPlugin
+
+            hooks.viewController.tap { [weak self, weak playerValue] controller in
+                guard let self, let playerValue, self.player == playerValue else { return }
+                self.onViewController(controller)
+            }
+
+            hooks.state.tap { [weak self] newState in
+                self?.state = newState
+            }
+
+            guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                logger.d("Empty flow, not loading")
+                return
+            }
+
+            player.start(flow: flow) { [weak self, weak playerValue] result in
+                guard let self, let playerValue, self.player == playerValue else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.result = result
+                }
+            }
         }
 
-        /**
-         Handler for when the ViewController in the core player changes
-         - parameters:
-            - viewController: The new ViewController instance
-         */
+        /// Handler for when the ViewController in the core player changes
+        /// - parameters:
+        ///   - viewController: The new ViewController instance
         private func onViewController(_ viewController: ViewController) {
             viewController.hooks.view.tap { [weak self, weak expectedPlayer] view in
                 guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
@@ -152,25 +239,22 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
         }
 
-        /**
-         Handler for when the View changes in the ViewController
-         - parameters:
-            - view: The new View in the ViewController
-         */
+        /// Handler for when the View changes in the ViewController
+        /// - parameters:
+        ///   - view: The new View in the ViewController
         private func onView(_ view: PlayerView) {
             view.hooks.onUpdate.tap { [weak self, weak expectedPlayer] value in
                 Task { @MainActor [weak self] in
-                    guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
+                    guard let self, let expectedPlayer,
+                          self.player == expectedPlayer else { return }
                     self.onUpdate(value)
                 }
             }
         }
 
-        /**
-         Handler for when there is an update to the asset tree in the current `PlayerView`
-         - parameters:
-            - value: JSValue that is the root of the resolved asset tree
-         */
+        /// Handler for when there is an update to the asset tree in the current `PlayerView`
+        /// - parameters:
+        ///   - value: JSValue that is the root of the resolved asset tree
         private func onUpdate(_ value: JSValue) {
             JSGarbageCollect(value.context.jsGlobalContextRef)
             do {
@@ -179,75 +263,6 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 (state as? InProgressState)?.fail(PlayerError.unknownResponse(error))
             }
         }
-    }
-
-    @ObservedObject private var context: Context
-    @Binding private var result: Result<CompletedState, PlayerError>?
-    private let unloadOnDisappear: Bool
-    /// A reference to the shared logger
-    public var logger: TapableLogger { context.logger }
-
-    /// A read only reference to the platform shared core player value in the `JSContext`
-    public var jsPlayerReference: JSValue? { context.player }
-
-    /// Lifecycle hooks exposed from the platform shared core player
-    public var hooks: SwiftUIPlayerHooks? { context.hooks }
-
-    /// The registry for registering assets to be used for rendering
-    public var assetRegistry: SwiftUIRegistry { context.registry }
-
-    // For ViewInspector testing
-    internal let inspection = Inspection<Self>()
-
-    /**
-     Constructs a `SwiftUIPlayer` with the given flow and plugins
-     - parameters:
-        - flow: The JSON flow to run
-        - plugins: Any plugins to add to Player
-        - context: An optional JSContext to use for loading platform shared code
-     */
-    public init(
-        flow: String,
-        plugins: [NativePlugin],
-        result: Binding<Result<CompletedState, PlayerError>?>,
-        context: Context = .shared,
-        unloadOnDisappear: Bool = true
-    ) {
-        self._result = result
-        self._context = ObservedObject(initialValue: context)
-        self.unloadOnDisappear = unloadOnDisappear
-        context.load(flow: flow, plugins: plugins, player: self)
-    }
-
-    /// The SwiftUI View that is this Player flow
-    public var body: some View {
-        bodyContent
-            .environment(\.inProgressState, (state as? InProgressState))
-            .environment(\.constantsController, constantsController)
-            // forward results from our Context along to our result binding
-            .onReceive(context.$result.debounce(for: 0.1, scheduler: RunLoop.main)) {
-                self.result = $0
-            }
-            .onReceive(inspection.notice) { self.inspection.visit(self, $0) }
-            .onDisappear {
-                guard unloadOnDisappear else { return }
-                context.unload()
-            }
-    }
-
-    private var bodyContent: some View {
-        bodyContent(hooks?.transition.call() ?? .identity)
-    }
-
-    private func bodyContent(_ transitionInfo: PlayerViewTransition) -> some View {
-        // use a VStack to provide a container for our view transitions to run inside
-        VStack {
-            hooks?.view.call(context.registry.root?.view ?? AnyView(Color.clear))
-                .transition(transitionInfo.transition)
-                .id(context.registry.root?.id)
-        }
-        // only apply our transition animation when the root view is changing
-        .animation(transitionInfo.animationCurve, value: context.registry.root?.id)
     }
 }
 
@@ -260,7 +275,7 @@ struct InProgressStateKey: EnvironmentKey {
 /// EnvironmentKey for storing `constantsController`
 struct ConstantsControllerStateKey: EnvironmentKey {
     /// The default value for `@Environment(\.constantsController)`
-    static var defaultValue: ConstantsController? = nil
+    static var defaultValue: ConstantsController?
 }
 
 public extension EnvironmentValues {
@@ -269,7 +284,7 @@ public extension EnvironmentValues {
         get { self[InProgressStateKey.self] }
         set { self[InProgressStateKey.self] = newValue }
     }
-    
+
     /// The ConstantsController reference of Player
     var constantsController: ConstantsController? {
         get { self[ConstantsControllerStateKey.self] }
@@ -277,16 +292,14 @@ public extension EnvironmentValues {
     }
 }
 
-internal extension SwiftUIPlayer {
+extension SwiftUIPlayer {
     /// For testing, uses a constant result of nil.
     init(flow: String, plugins: [NativePlugin], context: SwiftUIPlayer.Context = .init()) {
         self.init(flow: flow, plugins: plugins, result: .constant(nil), context: context)
     }
 }
 
-/**
- Lifecycle hooks for `SwiftUIPlayer`
- */
+/// Lifecycle hooks for `SwiftUIPlayer`
 public struct SwiftUIPlayerHooks: CoreHooks {
     /// Fired when the FlowController changes
     public var flowController: Hook<FlowController>
@@ -321,54 +334,52 @@ public struct SwiftUIPlayerHooks: CoreHooks {
     }
 }
 
-/**
- Holds information needed for transition animations when a new view in a flow is being shown
- */
+/// Holds information needed for transition animations when a new view in a flow is being shown
 public struct PlayerViewTransition: Equatable {
-    public static let identity = PlayerViewTransition(name: .identity, transition: .identity, animationCurve: .default)
+    public static let identity: PlayerViewTransition = .init(
+        name: .identity,
+        transition: .identity,
+        animationCurve: .default
+    )
 
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs._transition == rhs._transition && lhs.animationCurve == rhs.animationCurve
-    }
-
-    private var _transition: Transition
-    /// The transition to show the new view with
-    public var transition: AnyTransition { _transition.transition }
     /// The animation curve to use for the transition
     public var animationCurve: Animation
 
-    /**
-     Creates a new `PlayerViewTransition`
-     - parameters:
-        - transition: The transition to show the new view with
-        - animationCurve: The animation curve to use for the transition
-     */
+    private var _transition: Transition
+
+    /// The transition to show the new view with
+    public var transition: AnyTransition {
+        _transition.transition
+    }
+
+    /// Creates a new `PlayerViewTransition`
+    /// - parameters:
+    ///   - transition: The transition to show the new view with
+    ///   - animationCurve: The animation curve to use for the transition
     public init(
         transition: AnyTransition,
         animationCurve: Animation
     ) {
-        self._transition = .unnamed(transition)
+        _transition = .unnamed(transition)
         self.animationCurve = animationCurve
     }
 
-    /**
-     Creates a new `PlayerViewTransition`
-     - parameters:
-        - transition: The transition to show the new view with
-        - animationCurve: The animation curve to use for the transition
-     */
+    /// Creates a new `PlayerViewTransition`
+    /// - parameters:
+    ///   - transition: The transition to show the new view with
+    ///   - animationCurve: The animation curve to use for the transition
     public init(
         name: Name,
         transition: AnyTransition,
         animationCurve: Animation
     ) {
-        self._transition = .named(name, transition)
+        _transition = .named(name, transition)
         self.animationCurve = animationCurve
     }
 
     /// Name mostly exists as a way to allow testing of transition hooks.
     public struct Name: RawRepresentable {
-        public static let identity = Name(rawValue: "identity")
+        public static let identity: Name = .init(rawValue: "identity")
 
         public let rawValue: String
 
@@ -378,20 +389,20 @@ public struct PlayerViewTransition: Equatable {
     }
 
     private enum Transition: Equatable {
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            switch (lhs, rhs) {
-            case (.named(let lName, _), .named(let rName, _)): return lName == rName
-            default:                                           return false
-            }
-        }
-
         case named(Name, AnyTransition)
         case unnamed(AnyTransition)
 
         var transition: AnyTransition {
             switch self {
-            case .named(_, let transition): return transition
-            case .unnamed(let transition):  return transition
+            case let .named(_, transition): return transition
+            case let .unnamed(transition): return transition
+            }
+        }
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            switch (lhs, rhs) {
+            case let (.named(lName, _), .named(rName, _)): return lName == rName
+            default: return false
             }
         }
     }

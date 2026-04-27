@@ -1,15 +1,13 @@
-import Foundation
-import XCTest
-import JavaScriptCore
 import Combine
-
+import Foundation
+import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class ManagedPlayerJSContextLifecycleTests: XCTestCase {
-
     /// Verifies that the old JSContext is properly released when
     /// SwiftUIPlayer.Context loads a new flow after unloading the previous one.
     ///
@@ -54,7 +52,10 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
         autoreleasepool {
             let player2 = SwiftUIPlayer(
-                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                flow: FlowData.COUNTER.replacingOccurrences(
+                    of: "counter-flow",
+                    with: "counter-flow-2"
+                ),
                 plugins: [],
                 result: .constant(nil),
                 context: context
@@ -66,7 +67,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertNil(
             weakOldContext,
             "Old JSContext was not deallocated after unload + reload — " +
-            "cross-runtime retain cycle between Swift closures and JSContext"
+                "cross-runtime retain cycle between Swift closures and JSContext"
         )
     }
 
@@ -74,9 +75,9 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
     /// JSContexts across multiple flow loads, simulating the ManagedPlayer
     /// navigation pattern. Each flow load creates a new JSContext on the same VM.
     /// After unload, the previous context should be released.
-    func testSharedVMDoesNotAccumulateContexts() {
-        let vm = JSVirtualMachine()!
-        var createdContexts: [Weak<JSContext>] = []
+    func testSharedVMDoesNotAccumulateContexts() throws {
+        let vm = try XCTUnwrap(JSVirtualMachine())
+        var createdContexts = [Weak<JSContext>]()
 
         let context = SwiftUIPlayer.Context {
             let ctx = JSContext(virtualMachine: vm)!
@@ -84,7 +85,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
             return ctx
         }
 
-        for i in 0..<5 {
+        for i in 0 ..< 5 {
             autoreleasepool {
                 let flow = FlowData.COUNTER.replacingOccurrences(
                     of: "counter-flow",
@@ -112,7 +113,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertEqual(
             leakedCount, 0,
             "\(leakedCount) of 5 JSContexts still alive after unload — " +
-            "orphaned contexts accumulating on shared JSVirtualMachine"
+                "orphaned contexts accumulating on shared JSVirtualMachine"
         )
     }
 
@@ -121,7 +122,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
     /// the run loop must tick to let those blocks execute and release JSValues.
     private func waitForDeallocation(of object: @escaping () -> AnyObject?, timeout: TimeInterval) {
         let deadline = Date(timeIntervalSinceNow: timeout)
-        while object() != nil && Date() < deadline {
+        while object() != nil, Date() < deadline {
             RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.01))
         }
     }
@@ -129,5 +130,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
 private class Weak<T: AnyObject> {
     weak var value: T?
-    init(_ value: T) { self.value = value }
+
+    init(_ value: T) {
+        self.value = value
+    }
 }
