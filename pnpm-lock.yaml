@@ -252,6 +252,9 @@ importers:
       eslint-plugin-react:
         specifier: ^7.37.4
         version: 7.37.5(eslint@9.33.0(jiti@2.5.1))
+      fast-sort:
+        specifier: ^3.4.1
+        version: 3.4.1
       github-slugger:
         specifier: ^1.0.0
         version: 1.5.0
@@ -502,7 +505,11 @@ importers:
         specifier: workspace:^
         version: link:../types
 
-  core/partial-match-registry: {}
+  core/partial-match-registry:
+    dependencies:
+      fast-sort:
+        specifier: ^3.4.1
+        version: 3.4.1
 
   core/player:
     dependencies:
@@ -5129,6 +5136,9 @@ packages:
 
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==, tarball: https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz}
+
+  fast-sort@3.4.1:
+    resolution: {integrity: sha512-76uvGPsF6So53sZAqenP9UVT3p5l7cyTHkLWVCMinh41Y8NDrK1IYXJgaBMfc1gk7nJiSRZp676kddFG2Aa5+A==, tarball: https://registry.npmjs.org/fast-sort/-/fast-sort-3.4.1.tgz}
 
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==, tarball: https://registry.npmjs.org/fast-uri/-/fast-uri-3.0.6.tgz}
@@ -14545,6 +14555,8 @@ snapshots:
   fast-json-stable-stringify@2.1.0: {}
 
   fast-levenshtein@2.0.6: {}
+
+  fast-sort@3.4.1: {}
 
   fast-uri@3.0.6: {}
 

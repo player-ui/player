@@ -127,17 +127,9 @@ assemble_ios_release(
         "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPlugin_Sources": "plugins/check-path/swiftui/",
         "//plugins/check-path/core:core_native_bundle": "plugins/check-path/ios/Resources/",
 
-        # Common Expressions
-        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPlugin_Sources": "plugins/common-expressions/ios/",
-        "//plugins/common-expressions/core:core_native_bundle": "plugins/common-expressions/ios/Resources/",
-
         # Common Types
         "//plugins/common-types/ios:PlayerUICommonTypesPlugin_Sources": "plugins/common-types/ios/",
         "//plugins/common-types/core:core_native_bundle": "plugins/common-types/ios/Resources/",
-
-        # Computed Properties
-        "//plugins/computed-properties/ios:PlayerUIComputedPropertiesPlugin_Sources": "plugins/computed-properties/ios/",
-        "//plugins/computed-properties/core:core_native_bundle": "plugins/computed-properties/ios/Resources/",
 
         # Console Logger (PrintLoggerPlugin)
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPlugin_Sources": "plugins/console-logger/ios/",

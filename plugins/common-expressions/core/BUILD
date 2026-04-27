@@ -11,7 +11,6 @@ vitest_config(name = "vitest_config")
 js_xlr_pipeline(
     package_name = "@player-ui/common-expressions-plugin",
     build_deps = NATIVE_BUILD_DEPS,
-    native_bundle = "CommonExpressionsPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

@@ -2,18 +2,16 @@
 title: Common Expressions
 ---
 
-import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import { Aside } from "@astrojs/starlight/components";
 import { PackageManagers } from 'starlight-package-managers'
-import SPM from "../../../../components/SPM.astro";
+
+<Aside title="Core-only Plugin">This plugin should be added to the shared core and is not intended to be re-registered across platforms. There are no separate iOS or Android implementations — add it once in your core Player setup.</Aside>
 
 This plugin exposes some basic expressions into Player content.
 
 It also serves as a good reference to adding your own custom expressions into Player.
 
 ## Usage
-
-<PlatformTabs>
-  <Fragment slot='core'>
 
 Install the plugin:
 
@@ -32,33 +30,6 @@ player.start(myFlow);
 ```
 
 This will allow any included expressions or custom expressions to be used in the content
-
-  </Fragment>
-
-<Fragment slot='ios'>
-
-<SPM product="CommonExpressionsPlugin" />
-
-### Swift Usage
-
-This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
-
-```swift
-
-var body: some View {
-    SwiftUIPlayer(
-        flow: flow,
-        plugins: [
-          CommonExpressionsPlugin()
-        ],
-        result: $resultBinding
-    )
-}
-```
-
-</Fragment>
-
-</PlatformTabs>
 
 ---
 

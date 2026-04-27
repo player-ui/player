@@ -11,7 +11,6 @@ vitest_config(name = "vitest_config")
 js_pipeline(
     package_name = "@player-ui/computed-properties-plugin",
     build_deps = NATIVE_BUILD_DEPS,
-    native_bundle = "ComputedPropertiesPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],
