@@ -1,3 +1,25 @@
+# 0.15.3-next.3 (Tue Apr 28 2026)
+
+### Release Notes
+
+#### guard against async released exceptions when retrieving state ([#853](https://github.com/player-ui/player/pull/853))
+
+Guard against released exceptions when retrieving state since we can turn that into a `ReleasedState`.
+
+---
+
+#### 🐛 Bug Fix
+
+- guard against async released exceptions when retrieving state [#853](https://github.com/player-ui/player/pull/853) ([@sugarmanz](https://github.com/sugarmanz))
+- Manage memory leak [#855](https://github.com/player-ui/player/pull/855) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 2
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.15.3-next.2 (Wed Apr 22 2026)
 
 #### 🐛 Bug Fix
