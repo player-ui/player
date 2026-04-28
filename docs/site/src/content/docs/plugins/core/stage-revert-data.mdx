@@ -3,8 +3,9 @@ title: Stage Revert Data
 platform: core
 ---
 
-import PlatformTabs from "../../../../components/PlatformTabs.astro";
-import SPM from "../../../../components/SPM.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside title="Core-only Plugin">This plugin should be added to the shared core and is not intended to be re-registered across platforms. There are no separate iOS or Android implementations — add it once in your core Player setup.</Aside>
 
 This plugin enables users to temporarily stage data changes before committing to the actual data model
 
@@ -31,9 +32,6 @@ It also should include a list of acceptable `commitTransitions` valid `VIEW` nam
 
 ## Example
 
-<PlatformTabs>
-  <Fragment slot='core'>
-
 Simply add the plugin to the config when constructing a player instance.
 
 ```javascript
@@ -43,27 +41,3 @@ const player = new Player({
   plugins: [new StageRevertPlugin()],
 });
 ```
-
-  </Fragment>
-  <Fragment slot='ios'>
-
-<SPM product="StageRevertDataPlugin" />
-
-### Swift Usage
-
-This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
-
-```swift
-var body: some View {
-  SwiftUIPlayer(
-    flow: flow,
-    plugins: [
-      StageRevertDataPlugin()
-    ],
-    result: $resultBinding
-  )
-}
-```
-
-  </Fragment>
-</PlatformTabs>

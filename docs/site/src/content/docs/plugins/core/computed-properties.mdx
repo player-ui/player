@@ -2,16 +2,14 @@
 title: Computed Properties
 ---
 
-import PlatformTabs from "../../../../components/PlatformTabs.astro";
-import SPM from "../../../../components/SPM.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside title="Core-only Plugin">This plugin should be added to the shared core and is not intended to be re-registered across platforms. There are no separate iOS or Android implementations — add it once in your core Player setup.</Aside>
 
 This plugin allows users to specify a path in the data-model (binding) as a computed property in the schema.
 Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown.
 
 ## Usage
-
-<PlatformTabs>
-  <Fragment slot='core'>
 
 Add the plugin to Player:
 
@@ -23,31 +21,6 @@ const player = new Player({
   plugins: [new ComputedPropertiesPlugin()],
 });
 ```
-
-  </Fragment>
-
-  <Fragment slot='ios'>
-
-<SPM product="ComputedPropertiesPlugin" />
-
-### Swift Usage
-
-This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
-
-```swift
-var body: some View {
-    SwiftUIPlayer(
-        flow: flow,
-        plugins: [
-          ComputedPropertiesPlugin()
-        ],
-        result: $resultBinding
-    )
-}
-```
-
-  </Fragment>
-</PlatformTabs>
 
 ## Expression Data Type
 

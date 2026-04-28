@@ -15,7 +15,6 @@ swift_library(
 
         "//plugins/beacon/swiftui:PlayerUIBeaconPlugin",
         "//plugins/common-types/ios:PlayerUICommonTypesPlugin",
-        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPlugin",
         "//plugins/expression/ios:PlayerUIExpressionPlugin",
         "//plugins/external-state/ios:PlayerUIExternalStatePlugin",
         "//plugins/external-state/swiftui:PlayerUIExternalStateViewModifierPlugin",

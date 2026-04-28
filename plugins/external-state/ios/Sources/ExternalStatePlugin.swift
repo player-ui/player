@@ -88,7 +88,7 @@ public class ExternalStatePlugin: JSBasePlugin, NativePlugin {
 
             return JSValue(object: [
                 "ref": matchedHandler.ref,
-                "match": matchedHandler.match,
+                "match": matchedHandler.match as Any,
                 "handlerFunction": JSValue(object: callback, in: context) as Any
             ], in: context)
         }

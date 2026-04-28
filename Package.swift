@@ -11,13 +11,10 @@ let ios_plugins: [SwiftPlugin] = [
     (name: "AsyncNodePlugin", path: "async-node", resources: true),
     (name: "BaseBeaconPlugin", path: "beacon", resources: true),
     (name: "CheckPathPlugin", path: "check-path", resources: true),
-    (name: "CommonExpressionsPlugin", path: "common-expressions", resources: true),
     (name: "CommonTypesPlugin", path: "common-types", resources: true),
-    (name: "ComputedPropertiesPlugin", path: "computed-properties", resources: true),
     (name: "ExpressionPlugin", path: "expression", resources: true),
     (name: "ExternalStatePlugin", path: "external-state", resources: true),
     (name: "PubSubPlugin", path: "pubsub", resources: true),
-    (name: "StageRevertDataPlugin", path: "stage-revert-data", resources: true),
     (name: "TypesProviderPlugin", path: "types-provider", resources: true),
     (name: "PrintLoggerPlugin", path: "console-logger", resources: false)
 ]
