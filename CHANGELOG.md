@@ -1,3 +1,47 @@
+# 0.15.3 (Tue Apr 28 2026)
+
+### Release Notes
+
+#### guard against async released exceptions when retrieving state ([#853](https://github.com/player-ui/player/pull/853))
+
+Guard against released exceptions when retrieving state since we can turn that into a `ReleasedState`.
+
+#### Fix HermesNode property access on released JSI objects ([#825](https://github.com/player-ui/player/pull/825))
+
+Added a defensive guard in HermesNode so property reads on a released runtime/object fail safely by throwing a PlayerRuntimeException with context instead of a fatal native NPE.
+
+Added regression tests:
+- A deterministic unit test for “released JSI object property read”
+- A small concurrency test that reads player.state while player.release() is happening
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#858](https://github.com/player-ui/player/pull/858) ([@intuit-svc](https://github.com/intuit-svc))
+- guard against async released exceptions when retrieving state [#853](https://github.com/player-ui/player/pull/853) ([@sugarmanz](https://github.com/sugarmanz))
+- Manage memory leak [#855](https://github.com/player-ui/player/pull/855) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Refactor stateType from String to NavigationFlowStateType enum [#850](https://github.com/player-ui/player/pull/850) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Add ios-review skill with iOS code conventions [#848](https://github.com/player-ui/player/pull/848) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Restore Xcode local development [#847](https://github.com/player-ui/player/pull/847) ([@KVSRoyal](https://github.com/KVSRoyal) [@spentacular](https://github.com/spentacular))
+- fix: create ErrorState with error.message is undefined [#845](https://github.com/player-ui/player/pull/845) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Use Xcode 26.4.0 in CI/CD [#779](https://github.com/player-ui/player/pull/779) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Fix the memory leak for large payloads [#841](https://github.com/player-ui/player/pull/841) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Fix HermesNode property access on released JSI objects [#825](https://github.com/player-ui/player/pull/825) ([@kharrop](https://github.com/kharrop) [@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 8
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Chloe ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.15.3-next.3 (Tue Apr 28 2026)
 
 ### Release Notes
