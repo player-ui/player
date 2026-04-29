@@ -1,3 +1,15 @@
+# 0.15.4-next.0 (Wed Apr 29 2026)
+
+#### 🐛 Bug Fix
+
+- Propagate styles in composable asset [#835](https://github.com/player-ui/player/pull/835) ([@justin-medeiros](https://github.com/justin-medeiros))
+
+#### Authors: 1
+
+- Justin Medeiros ([@justin-medeiros](https://github.com/justin-medeiros))
+
+---
+
 # 0.15.3 (Tue Apr 28 2026)
 
 ### Release Notes
