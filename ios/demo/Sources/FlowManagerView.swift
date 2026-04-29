@@ -5,20 +5,19 @@
 //  Created by Zhao Xia Wu on 2023-11-01.
 //
 
-import SwiftUI
 import PlayerUI
-import PlayerUISwiftUI
-import PlayerUIReferenceAssets
-import PlayerUIMetricsPlugin
 import PlayerUIExternalActionViewModifierPlugin
+import PlayerUIMetricsPlugin
+import PlayerUIReferenceAssets
+import PlayerUISwiftUI
+import SwiftUI
 
-/**
- SwiftUI View to wrap the `ManagedPlayer` and handle the result
- for use in UI testing
- */
+/// SwiftUI View to wrap the `ManagedPlayer` and handle the result
+/// for use in UI testing
 public struct FlowManagerView: View {
     let flowSequence: [String]
     let navTitle: String
+
     @State private var complete = false
 
     public var body: some View {
@@ -26,36 +25,37 @@ public struct FlowManagerView: View {
             if complete {
                 VStack {
                     Text("Flow Completed").font(.title)
-                    Button(action: {complete = false}, label: { Text("Start Over " )})
+                    Button(action: { complete = false }, label: { Text("Start Over ") })
                 }
             } else {
                 VStack {
                     ManagedPlayer(
                         plugins: [
                             ReferenceAssetsPlugin(),
-                            MetricsPlugin { (render, _, flow) in
-                                print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
+                            MetricsPlugin { render, _, flow in
+                                print(
+                                    "Render: \(render?.duration ?? 0)ms | Request \(flow?.flow.requestTime ?? 0)ms"
+                                )
                             },
-                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
-
-                                return AnyView(
+                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { _, _, transition in
+                                AnyView(
                                     Text("External State")
                                         .onDisappear {
                                             transition("Next")
                                         }
                                 )
-                            }
+                            },
                         ],
                         flowManager: ConstantFlowManager(flowSequence),
                         onComplete: { _ in
                             complete = true
                         },
-                        fallback: { (context) in
+                        fallback: { context in
                             VStack {
                                 Text(context.error.localizedDescription)
 
                                 switch context.error as? PlayerError {
-                                case .promiseRejected(error: let errorState) :
+                                case let .promiseRejected(error: errorState):
                                     Text(errorState.error)
                                 default:
                                     EmptyView()
@@ -74,6 +74,7 @@ public struct FlowManagerView: View {
                         }
                     )
 
+                    // swiftlint:disable:next multiple_closures_with_trailing_closure
                     Button(action: { complete = true }) {
                         Text("Terminate Flow")
                     }

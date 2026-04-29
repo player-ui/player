@@ -7,11 +7,11 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class HeadlessPlayerTests: XCTestCase {
     func testViewId() {
@@ -22,7 +22,7 @@ class HeadlessPlayerTests: XCTestCase {
                 XCTAssertEqual(viewController.currentView?.id, "action")
             }
         }
-        player.start(flow: FlowData.COUNTER) { _ in}
+        player.start(flow: FlowData.COUNTER) { _ in }
     }
 
     // func testApplyTo() {
@@ -39,7 +39,8 @@ class HeadlessPlayerTests: XCTestCase {
 
     func testUpdateHook() {
         let player = HeadlessPlayerImpl(plugins: [])
-        // this func only exists because the compiler thinks XCTAssertThrowsError throws when it does not
+        /// this func only exists because the compiler thinks XCTAssertThrowsError throws
+        /// when it does not
         func checkUnregisteredAssetDecodeFails(_ assetJsValue: JSValue) {
             XCTAssertThrowsError(try player.assetRegistry.decode(assetJsValue))
         }
@@ -49,11 +50,11 @@ class HeadlessPlayerTests: XCTestCase {
             }
         }
 
-        player.start(flow: FlowData.COUNTER) { (result) in
+        player.start(flow: FlowData.COUNTER) { result in
             switch result {
-            case .success(let result):
+            case let .success(result):
                 print(result)
-            case .failure(let error):
+            case let .failure(error):
                 print(error.localizedDescription)
             }
         }
@@ -63,16 +64,16 @@ class HeadlessPlayerTests: XCTestCase {
         let player = HeadlessPlayerImpl(plugins: [])
         let inProgress = expectation(description: "inProgress state")
         let completed = expectation(description: "completed state")
-        player.hooks?.state.tap({ (newState) in
+        player.hooks?.state.tap { newState in
             if (newState as? InProgressState) != nil {
                 inProgress.fulfill()
             }
             if (newState as? CompletedState) != nil {
                 completed.fulfill()
             }
-        })
+        }
 
-        player.start(flow: FlowData.COUNTER, completion: {_ in})
+        player.start(flow: FlowData.COUNTER, completion: { _ in })
         do {
             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
         } catch {
@@ -86,17 +87,18 @@ class HeadlessPlayerTests: XCTestCase {
         let player = HeadlessPlayerImpl(plugins: [])
         let inProgress = expectation(description: "inProgress state")
         let completed = expectation(description: "completed state")
-        player.hooks?.state.tap({ (newState) in
+        player.hooks?.state.tap { newState in
             if (newState as? InProgressState) != nil {
                 inProgress.fulfill()
             }
             if (newState as? ErrorState) != nil {
                 completed.fulfill()
             }
-        })
+        }
 
-        player.start(flow: FlowData.COUNTER, completion: {_ in})
-        (player.state as? InProgressState)?.fail(PlayerError.unknownResponse(DecodingError.baseAssetNotDecodable))
+        player.start(flow: FlowData.COUNTER, completion: { _ in })
+        (player.state as? InProgressState)?
+            .fail(PlayerError.unknownResponse(DecodingError.baseAssetNotDecodable))
 
         wait(for: [inProgress, completed], timeout: 5)
     }
@@ -105,17 +107,18 @@ class HeadlessPlayerTests: XCTestCase {
         let player = HeadlessPlayerImpl(plugins: [])
         let inProgress = expectation(description: "inProgress state")
         let completed = expectation(description: "completed state")
-        player.hooks?.state.tap({ (newState) in
+        player.hooks?.state.tap { newState in
             if (newState as? InProgressState) != nil {
                 inProgress.fulfill()
             }
             if (newState as? ErrorState) != nil {
                 completed.fulfill()
             }
-        })
+        }
 
-        player.start(flow: FlowData.COUNTER, completion: {_ in})
-        (player.state as? InProgressState)?.fail(PlayerError.unknownResponse(PlayerError.jsConversionFailure))
+        player.start(flow: FlowData.COUNTER, completion: { _ in })
+        (player.state as? InProgressState)?
+            .fail(PlayerError.unknownResponse(PlayerError.jsConversionFailure))
 
         wait(for: [inProgress, completed], timeout: 5)
     }
@@ -123,13 +126,13 @@ class HeadlessPlayerTests: XCTestCase {
     func testTransition() {
         let player = HeadlessPlayerImpl(plugins: [])
         XCTAssertNotNil(player.state as? NotStartedState)
-        player.hooks?.dataController.tap({ dataController in
+        player.hooks?.dataController.tap { dataController in
             dataController.set(transaction: ["count": 5])
-        })
+        }
 
-        player.start(flow: FlowData.COUNTER) { (result) in
+        player.start(flow: FlowData.COUNTER) { result in
             switch result {
-            case .success(let result):
+            case let .success(result):
                 print(result)
                 XCTAssertNotNil(player.state as? CompletedState)
                 XCTAssertEqual(result.endState?.outcome, "done")
@@ -142,7 +145,7 @@ class HeadlessPlayerTests: XCTestCase {
                 XCTAssertEqual(result.flow.id, "counter-flow")
                 XCTAssertEqual(result.flow.data?["count"] as? Int, 0)
                 XCTAssertEqual(result.data["count"] as? Int, 5)
-            case .failure(let error):
+            case let .failure(error):
                 print(error.localizedDescription)
                 XCTFail("flow should have succeeded")
             }
@@ -159,9 +162,10 @@ class HeadlessPlayerTests: XCTestCase {
     func testPlayerControllers() {
         let player = HeadlessPlayerImpl(plugins: [])
 
-        player.start(flow: FlowData.COUNTER) { _ in  }
+        player.start(flow: FlowData.COUNTER) { _ in }
         XCTAssertNotNil(player.state as? InProgressState)
-        guard let state = player.state as? InProgressState else { return XCTFail("state was not InProgressState") }
+        guard let state = player.state as? InProgressState
+        else { return XCTFail("state was not InProgressState") }
         XCTAssertNotNil(state.controllers)
     }
 
@@ -171,11 +175,11 @@ class HeadlessPlayerTests: XCTestCase {
                 self.init(fileName: "", pluginName: "")
             }
 
-            override func setup(context: JSContext) {}
+            override func setup(context _: JSContext) {}
         }
         let player = HeadlessPlayerImpl(plugins: [])
 
-        player.start(flow: FlowData.COUNTER) { _ in  }
+        player.start(flow: FlowData.COUNTER) { _ in }
 
         let plugin = RegisterMePlugin()
 
@@ -186,15 +190,18 @@ class HeadlessPlayerTests: XCTestCase {
 
     func testEmptyFlowObject() {
         let player = HeadlessPlayerImpl(plugins: [])
-        player.start(flow: "{}") { (result) in
+        player.start(flow: "{}") { result in
             switch result {
-            case .success(let result):
+            case let .success(result):
                 print(result)
                 XCTFail("should have failed")
-            case .failure(let error):
+            case let .failure(error):
                 switch error {
-                case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating 'this.navigation.BEGIN')")
+                case let .promiseRejected(errorState):
+                    XCTAssertEqual(
+                        errorState.error,
+                        "undefined is not an object (evaluating 'this.navigation.BEGIN')"
+                    )
                 default: break
                 }
             }
@@ -203,15 +210,18 @@ class HeadlessPlayerTests: XCTestCase {
 
     func testEmptyStringFlow() {
         let player = HeadlessPlayerImpl(plugins: [])
-        player.start(flow: "") { (result) in
+        player.start(flow: "") { result in
             switch result {
-            case .success(let result):
+            case let .success(result):
                 print(result)
                 XCTFail("should have failed")
-            case .failure(let error):
+            case let .failure(error):
                 switch error {
-                case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating \'o.navigation\')")
+                case let .promiseRejected(errorState):
+                    XCTAssertEqual(
+                        errorState.error,
+                        "undefined is not an object (evaluating \'o.navigation\')"
+                    )
                 default: break
                 }
             }
@@ -220,12 +230,12 @@ class HeadlessPlayerTests: XCTestCase {
 
     func testBadStringFlow() {
         let player = HeadlessPlayerImpl(plugins: [])
-        player.start(flow: ")") { (result) in
+        player.start(flow: ")") { result in
             switch result {
-            case .success(let result):
+            case let .success(result):
                 print(result)
                 XCTFail("Should have failed")
-            case .failure(let error):
+            case let .failure(error):
                 switch error {
                 case .jsConversionFailure:
                     XCTAssertTrue(true)
@@ -238,12 +248,12 @@ class HeadlessPlayerTests: XCTestCase {
     func testStartNoContext() {
         let player = HeadlessPlayerImpl(plugins: [])
         player.jsPlayerReference = nil
-        player.start(flow: "{}") { (result) in
+        player.start(flow: "{}") { result in
             switch result {
-            case .success(let result):
+            case let .success(result):
                 print(result)
                 XCTFail("Should have failed")
-            case .failure(let error):
+            case let .failure(error):
                 switch error {
                 case .jsConversionFailure:
                     XCTAssertTrue(true)
@@ -259,7 +269,7 @@ class HeadlessPlayerTests: XCTestCase {
         let updateExp = expectation(description: "Data Updated")
 
         XCTAssertNotNil(player.state as? NotStartedState)
-        player.hooks?.dataController.tap({ dataController in
+        player.hooks?.dataController.tap { dataController in
             dataController.hooks.onUpdate.tap { updates in
                 XCTAssertEqual(updates.first?.binding.asString(), "count")
                 XCTAssertEqual(updates.first?.oldValue, AnyType.number(data: 0))
@@ -268,75 +278,98 @@ class HeadlessPlayerTests: XCTestCase {
             }
 
             dataController.set(transaction: ["count": 5])
-        })
+        }
 
-        player.start(flow: FlowData.COUNTER) { _ in}
+        player.start(flow: FlowData.COUNTER) { _ in }
         wait(for: [updateExp], timeout: 1)
     }
 
-    func testConstantsController() {
+    func testConstantsController() throws {
         let player = HeadlessPlayerImpl(plugins: [])
-        
-        guard let constantsController = player.constantsController else { return }
-        
+
+        let constantsController = try XCTUnwrap(player.constantsController)
+
         // Basic get/set tests
         let data: Any = [
             "firstname": "john",
             "lastname": "doe",
             "favorite": [
-                "color": "red"
+                "color": "red",
             ],
-            "age": 1
+            "age": 1,
         ]
-        
+
         constantsController.addConstants(data: data, namespace: "constants")
 
-        let firstname: String? = constantsController.getConstants(key: "firstname", namespace: "constants")
+        let firstname: String? = constantsController.getConstants(
+            key: "firstname",
+            namespace: "constants"
+        )
         XCTAssertEqual(firstname, "john")
 
-        let middleName: String? = constantsController.getConstants(key:"middlename", namespace: "constants")
+        let middleName: String? = constantsController.getConstants(
+            key: "middlename",
+            namespace: "constants"
+        )
         XCTAssertNil(middleName)
 
-        let middleNameSafe: String? = constantsController.getConstants(key:"middlename", namespace: "constants", fallback: "A")
+        let middleNameSafe: String? = constantsController.getConstants(
+            key: "middlename",
+            namespace: "constants",
+            fallback: "A"
+        )
         XCTAssertEqual(middleNameSafe, "A")
 
-        let favoriteColor: String? = constantsController.getConstants(key:"favorite.color", namespace: "constants")
+        let favoriteColor: String? = constantsController.getConstants(
+            key: "favorite.color",
+            namespace: "constants"
+        )
         XCTAssertEqual(favoriteColor, "red")
-        
-        let age: Int? = constantsController.getConstants(key:"age", namespace: "constants")
+
+        let age: Int? = constantsController.getConstants(key: "age", namespace: "constants")
         XCTAssertEqual(age, 1)
 
-        let nonExistantNamespace: String? = constantsController.getConstants(key:"test", namespace: "foo")
+        let nonExistantNamespace: String? = constantsController.getConstants(
+            key: "test",
+            namespace: "foo"
+        )
         XCTAssertNil(nonExistantNamespace)
 
-        let nonExistantNamespaceWithFallback: String? = constantsController.getConstants(key:"test", namespace: "foo", fallback: "B")
+        let nonExistantNamespaceWithFallback: String? = constantsController.getConstants(
+            key: "test",
+            namespace: "foo",
+            fallback: "B"
+        )
         XCTAssertEqual(nonExistantNamespaceWithFallback, "B")
-        
+
         // Test and make sure keys override properly
         let newData: Any = [
-           "favorite": [
-             "color": "blue",
-           ],
-        ];
+            "favorite": [
+                "color": "blue",
+            ],
+        ]
 
-        constantsController.addConstants(data: newData, namespace: "constants");
-        
-        let newFavoriteColor: String? = constantsController.getConstants(key: "favorite.color", namespace:"constants")
+        constantsController.addConstants(data: newData, namespace: "constants")
+
+        let newFavoriteColor: String? = constantsController.getConstants(
+            key: "favorite.color",
+            namespace: "constants"
+        )
         XCTAssertEqual(newFavoriteColor, "blue")
     }
-    
-    func testConstantsControllerTempValues() {
+
+    func testConstantsControllerTempValues() throws {
         let player = HeadlessPlayerImpl(plugins: [])
-        
-        guard let constantsController = player.constantsController else { return }
-        
+
+        let constantsController = try XCTUnwrap(player.constantsController)
+
         // Add initial constants
         let data: Any = [
             "firstname": "john",
             "lastname": "doe",
             "favorite": [
-                "color": "red"
-            ]
+                "color": "red",
+            ],
         ]
         constantsController.addConstants(data: data, namespace: "constants")
 
@@ -344,42 +377,58 @@ class HeadlessPlayerTests: XCTestCase {
         let tempData: Any = [
             "firstname": "jane",
             "favorite": [
-                "color": "blue"
-            ]
+                "color": "blue",
+            ],
         ]
-        constantsController.setTemporaryValues(data:tempData, namespace: "constants")
+        constantsController.setTemporaryValues(data: tempData, namespace: "constants")
 
         // Test temporary override
-        let firstnameTemp: String? = constantsController.getConstants(key:"firstname", namespace: "constants")
+        let firstnameTemp: String? = constantsController.getConstants(
+            key: "firstname",
+            namespace: "constants"
+        )
         XCTAssertEqual(firstnameTemp, "jane")
 
-        let favoriteColorTemp: String? = constantsController.getConstants(key: "favorite.color", namespace: "constants")
+        let favoriteColorTemp: String? = constantsController.getConstants(
+            key: "favorite.color",
+            namespace: "constants"
+        )
         XCTAssertEqual(favoriteColorTemp, "blue")
 
         // Test fallback to original values when temporary values are not present
-        let lastnameTemp: String? = constantsController.getConstants(key: "lastname", namespace: "constants")
+        let lastnameTemp: String? = constantsController.getConstants(
+            key: "lastname",
+            namespace: "constants"
+        )
         XCTAssertEqual(lastnameTemp, "doe")
-        
+
         // Reset temp and values should be the same as the original data
-        constantsController.clearTemporaryValues();
-        
-        let firstname: String? = constantsController.getConstants(key:"firstname", namespace: "constants")
+        constantsController.clearTemporaryValues()
+
+        let firstname: String? = constantsController.getConstants(
+            key: "firstname",
+            namespace: "constants"
+        )
         XCTAssertEqual(firstname, "john")
 
-        let favoriteColor: String? = constantsController.getConstants(key: "favorite.color", namespace: "constants")
+        let favoriteColor: String? = constantsController.getConstants(
+            key: "favorite.color",
+            namespace: "constants"
+        )
         XCTAssertEqual(favoriteColor, "red")
 
-        let lastname: String? = constantsController.getConstants(key: "lastname", namespace: "constants")
+        let lastname: String? = constantsController.getConstants(
+            key: "lastname",
+            namespace: "constants"
+        )
         XCTAssertEqual(lastname, "doe")
     }
 }
 
 class FakePlugin: JSBasePlugin, NativePlugin {
-    override func setup(context: JSContext) {
-
-    }
-
     convenience init() {
         self.init(fileName: "", pluginName: "")
     }
+
+    override func setup(context _: JSContext) {}
 }

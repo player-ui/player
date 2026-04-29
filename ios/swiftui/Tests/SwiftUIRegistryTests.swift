@@ -6,19 +6,19 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import Foundation
-import XCTest
-import JavaScriptCore
 import Combine
-import SwiftUI
+import Foundation
+import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUILogger
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+import SwiftUI
+import XCTest
 
 // swiftlint:disable type_body_length file_length
 class SwiftUIRegistryTests: XCTestCase {
-    let context: JSContext = JSContext()
+    private let context: JSContext = .init()
 
     func testDuplicateRegistration() {
         let operationSkipped = expectation(description: "Skipped duplicate registration")
@@ -26,17 +26,17 @@ class SwiftUIRegistryTests: XCTestCase {
         operationSkipped.expectedFulfillmentCount = 2
         let logger = TapableLogger()
         logger.logLevel = .trace
-        logger.hooks.trace.tap(name: "test", { messages in
+        logger.hooks.trace.tap(name: "test") { messages in
             let message: String = (messages as? [String] ?? []).first ?? ""
-            guard  message.contains("Duplicate Registration skipped for") else { return }
+            guard message.contains("Duplicate Registration skipped for") else { return }
             operationSkipped.fulfill()
-        })
+        }
 
-        logger.hooks.warn.tap(name: "test", { messages in
+        logger.hooks.warn.tap(name: "test") { messages in
             let message: String = (messages as? [String] ?? []).first ?? ""
             guard message.contains("Overriding registration for match") else { return }
             override.fulfill()
-        })
+        }
         let registry = SwiftUIRegistry(logger: logger)
         registry.register(["type": "action"], for: ActionAsset.self)
         XCTAssertEqual(1, registry.registeredAssets.count)
@@ -52,7 +52,8 @@ class SwiftUIRegistryTests: XCTestCase {
     }
 
     func testDecodeWrappedAsset() {
-        let val = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
+        let val = context
+            .evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
 
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
@@ -84,10 +85,14 @@ class SwiftUIRegistryTests: XCTestCase {
         }
 
         class TestNestedAsset: UncontrolledAsset<TestData> {
-            override var view: AnyView { AnyView(EmptyView()) }
+            override var view: AnyView {
+                AnyView(EmptyView())
+            }
         }
         let val = context
-            .evaluateScript("({asset: {id: 'someId', type: 'nested', nested: {asset: {id: 'someOtherId', type: 'text', value: ''}, extra: 'value'}}})")
+            .evaluateScript(
+                "({asset: {id: 'someId', type: 'nested', nested: {asset: {id: 'someOtherId', type: 'text', value: ''}, extra: 'value'}}})"
+            )
 
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
@@ -103,7 +108,8 @@ class SwiftUIRegistryTests: XCTestCase {
         do {
             let decoded = try registry.decodeWrapper(object)
             XCTAssertEqual(decoded.asset?.id, "someId")
-            guard let asset = decoded.asset as? TestNestedAsset else { return XCTFail("Decoded asset was not TestNestedAsset") }
+            guard let asset = decoded.asset as? TestNestedAsset
+            else { return XCTFail("Decoded asset was not TestNestedAsset") }
             XCTAssertEqual(asset.model.data.nested?.additionalData?.extra, "value")
         } catch {
             XCTFail("unable to decode wrapper")
@@ -111,8 +117,10 @@ class SwiftUIRegistryTests: XCTestCase {
     }
 
     func testWrappedAssetEquivalence() {
-        let asset1 = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
-        let asset2 = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someOtherValue'}})")
+        let asset1 = context
+            .evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
+        let asset2 = context
+            .evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someOtherValue'}})")
 
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
@@ -124,8 +132,8 @@ class SwiftUIRegistryTests: XCTestCase {
         guard
             let object = asset1,
             let object2 = asset2 else {
-                return XCTFail("object should not be nil")
-            }
+            return XCTFail("object should not be nil")
+        }
 
         do {
             let wrapped1 = try registry.decodeWrapper(object)
@@ -167,14 +175,16 @@ class SwiftUIRegistryTests: XCTestCase {
         var set = Set<AnyCancellable>()
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.sink { newVal in
-            if newVal != nil {
-                XCTAssertEqual(newVal?.id, "someId")
-                decodedExpectation.fulfill()
+        registry.$root
+            .sink { newVal in
+                if newVal != nil {
+                    XCTAssertEqual(newVal?.id, "someId")
+                    decodedExpectation.fulfill()
+                }
             }
-        }.store(in: &set)
+            .store(in: &set)
 
-        try registry.decode(value: val!)
+        try registry.decode(value: XCTUnwrap(val))
 
         wait(for: [decodedExpectation], timeout: 1)
     }
@@ -196,17 +206,19 @@ class SwiftUIRegistryTests: XCTestCase {
         var root: AnyObject?
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.sink { newVal in
-            if root == nil, newVal != nil {
-                root = newVal?.modelObject
-            } else if root != nil, newVal != nil {
-                XCTAssertFalse(root === newVal?.modelObject)
-                decodedExpectation.fulfill()
+        registry.$root
+            .sink { newVal in
+                if root == nil, newVal != nil {
+                    root = newVal?.modelObject
+                } else if root != nil, newVal != nil {
+                    XCTAssertFalse(root === newVal?.modelObject)
+                    decodedExpectation.fulfill()
+                }
             }
-        }.store(in: &set)
+            .store(in: &set)
 
-        try registry.decode(value: val!)
-        try registry.decode(value: val!)
+        try registry.decode(value: XCTUnwrap(val))
+        try registry.decode(value: XCTUnwrap(val))
 
         wait(for: [decodedExpectation], timeout: 1)
     }
@@ -218,7 +230,9 @@ class SwiftUIRegistryTests: XCTestCase {
 
         class SwiftUITestAsset: ControlledAsset<TextData, TestModel> {
             /// A type erased view object
-            public override var view: AnyView { AnyView(EmptyView()) }
+            override public var view: AnyView {
+                AnyView(EmptyView())
+            }
         }
 
         let partialMatch = PartialMatchFingerprintPlugin()
@@ -235,24 +249,27 @@ class SwiftUIRegistryTests: XCTestCase {
         var root: AnyObject?
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.sink { newVal in
-            if root == nil, newVal != nil {
-                root = newVal?.modelObject
-            } else if root != nil, newVal != nil {
-                XCTAssertTrue(root === newVal?.modelObject)
-                decodedExpectation.fulfill()
+        registry.$root
+            .sink { newVal in
+                if root == nil, newVal != nil {
+                    root = newVal?.modelObject
+                } else if root != nil, newVal != nil {
+                    XCTAssertTrue(root === newVal?.modelObject)
+                    decodedExpectation.fulfill()
+                }
             }
-        }.store(in: &set)
+            .store(in: &set)
 
-        try registry.decode(value: val!)
-        try registry.decode(value: val!)
+        try registry.decode(value: XCTUnwrap(val))
+        try registry.decode(value: XCTUnwrap(val))
 
         wait(for: [decodedExpectation], timeout: 1)
     }
 
     func testDecodeJSValueReturnsNewAsset() throws {
         let val = context.evaluateScript("({id: 'someId', type: 'text', value: 'someValue'})")
-        let val2 = context.evaluateScript("({id: 'someOtherId', type: 'action', value: 'someValue'})")
+        let val2 = context
+            .evaluateScript("({id: 'someOtherId', type: 'action', value: 'someValue'})")
 
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
@@ -270,17 +287,19 @@ class SwiftUIRegistryTests: XCTestCase {
         var root: SwiftUIAsset?
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.sink { newVal in
-            if root == nil, newVal != nil {
-                root = newVal
-            } else if root != nil, newVal != nil {
-                XCTAssertNotEqual(root?.uuid, newVal?.uuid)
-                decodedExpectation.fulfill()
+        registry.$root
+            .sink { newVal in
+                if root == nil, newVal != nil {
+                    root = newVal
+                } else if root != nil, newVal != nil {
+                    XCTAssertNotEqual(root?.uuid, newVal?.uuid)
+                    decodedExpectation.fulfill()
+                }
             }
-        }.store(in: &set)
+            .store(in: &set)
 
-        try registry.decode(value: val!)
-        try registry.decode(value: val2!)
+        try registry.decode(value: XCTUnwrap(val))
+        try registry.decode(value: XCTUnwrap(val2))
 
         wait(for: [decodedExpectation], timeout: 1)
     }
@@ -310,18 +329,20 @@ class SwiftUIRegistryTests: XCTestCase {
         var root: AnyObject?
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.sink { newVal in
-            if root == nil, newVal != nil {
-                root = newVal?.modelObject
-            } else if root != nil, newVal != nil {
-                XCTAssertFalse(root === newVal?.modelObject)
-                root = newVal?.modelObject
-                decodedExpectation.fulfill()
+        registry.$root
+            .sink { newVal in
+                if root == nil, newVal != nil {
+                    root = newVal?.modelObject
+                } else if root != nil, newVal != nil {
+                    XCTAssertFalse(root === newVal?.modelObject)
+                    root = newVal?.modelObject
+                    decodedExpectation.fulfill()
+                }
             }
-        }.store(in: &set)
+            .store(in: &set)
 
-        try registry.decode(value: val!)
-        try registry.decode(value: val2!)
+        try registry.decode(value: XCTUnwrap(val))
+        try registry.decode(value: XCTUnwrap(val2))
 
         wait(for: [decodedExpectation], timeout: 1)
 
@@ -331,7 +352,6 @@ class SwiftUIRegistryTests: XCTestCase {
         else { return XCTFail("unable to decode asset") }
 
         XCTAssertEqual(text.model.data.value.stringValue, "value2")
-
     }
 
     func testDecodeJSValueUpdatesNestedArrayData() throws {
@@ -359,18 +379,20 @@ class SwiftUIRegistryTests: XCTestCase {
         var root: AnyObject?
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.sink { newVal in
-            if root == nil, newVal != nil {
-                root = newVal?.modelObject
-            } else if root != nil, newVal != nil {
-                XCTAssertFalse(root === newVal?.modelObject)
-                root = newVal?.modelObject
-                decodedExpectation.fulfill()
+        registry.$root
+            .sink { newVal in
+                if root == nil, newVal != nil {
+                    root = newVal?.modelObject
+                } else if root != nil, newVal != nil {
+                    XCTAssertFalse(root === newVal?.modelObject)
+                    root = newVal?.modelObject
+                    decodedExpectation.fulfill()
+                }
             }
-        }.store(in: &set)
+            .store(in: &set)
 
-        try registry.decode(value: val!)
-        try registry.decode(value: val2!)
+        try registry.decode(value: XCTUnwrap(val))
+        try registry.decode(value: XCTUnwrap(val2))
 
         wait(for: [decodedExpectation], timeout: 1)
 
@@ -438,7 +460,7 @@ class SwiftUIRegistryTests: XCTestCase {
         guard let values = (root as? CollectionAsset)?.model.data.values else {
             return XCTFail("value should not be nil")
         }
-        guard 2 == values.count else {
+        guard values.count == 2 else {
             return XCTFail("incorrect number of values")
         }
         let text1 = values[0]?.asset as? TextAsset
@@ -452,7 +474,7 @@ class SwiftUIRegistryTests: XCTestCase {
         guard let updatedValues = (root as? CollectionAsset)?.model.data.values else {
             return XCTFail("unable to get updated values")
         }
-        guard 2 == updatedValues.count else {
+        guard updatedValues.count == 2 else {
             return XCTFail("incorrect number of updated values")
         }
         let updatedText1 = updatedValues[0]?.asset as? TextAsset
@@ -534,9 +556,7 @@ class SwiftUIRegistryTests: XCTestCase {
 
         let jsValue = context.evaluateScript(jsString)
         XCTAssertNotNil(jsValue)
-        guard let _ = jsValue else {
-            return
-        }
+        _ = try XCTUnwrap(jsValue)
 
         let registry = SwiftUIRegistry(logger: TapableLogger())
         registry.register("collection", asset: CollectionAsset.self)
@@ -561,13 +581,16 @@ class SwiftUIRegistryTests: XCTestCase {
         var root: SwiftUIAsset?
 
         let decodedExpectation = expectation(description: "Root Decoded")
-        registry.$root.dropFirst().sink { newVal in
-            guard newVal != nil else { return }
-            root = newVal
-            decodedExpectation.fulfill()
-        }.store(in: &set)
+        registry.$root
+            .dropFirst()
+            .sink { newVal in
+                guard newVal != nil else { return }
+                root = newVal
+                decodedExpectation.fulfill()
+            }
+            .store(in: &set)
 
-        try registry.decode(value: jsValue!)
+        try registry.decode(value: XCTUnwrap(jsValue))
 
         wait(for: [decodedExpectation], timeout: 1)
 
@@ -577,16 +600,25 @@ class SwiftUIRegistryTests: XCTestCase {
             return XCTFail("incorrect root asset")
         }
 
-        guard let choice = collectionAsset.model.data.values.first.flatMap({ $0?.asset as? SwiftUIChoiceAsset }) else {
+        guard let choice = collectionAsset.model
+            .data
+            .values
+            .first
+            .flatMap({ $0?.asset as? SwiftUIChoiceAsset }) else {
             return XCTFail("incorrect asset for first value")
         }
 
         for choice in choice.model.data.choices {
-            let hasSelectFunction = (choice.select?.rawValue != nil) || (choice.unSelect?.rawValue != nil)
+            let hasSelectFunction = (choice.select?.rawValue != nil) ||
+                (choice.unSelect?.rawValue != nil)
             XCTAssertTrue(hasSelectFunction)
         }
 
-        guard let action = collectionAsset.model.data.values.last.flatMap({ $0?.asset as? ActionAsset }) else {
+        guard let action = collectionAsset.model
+            .data
+            .values
+            .last
+            .flatMap({ $0?.asset as? ActionAsset }) else {
             return XCTFail("incorrect asset for last value")
         }
 

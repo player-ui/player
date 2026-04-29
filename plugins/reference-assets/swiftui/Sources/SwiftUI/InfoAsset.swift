@@ -1,13 +1,11 @@
 import SwiftUI
 
 #if SWIFT_PACKAGE
-import PlayerUI
-import PlayerUISwiftUI
+    import PlayerUI
+    import PlayerUISwiftUI
 #endif
 
-/**
- Data Decoded by Player for `InfoAsset`
- */
+/// Data Decoded by Player for `InfoAsset`
 struct InfoData: AssetData {
     /// The ID of the asset
     var id: String
@@ -25,28 +23,25 @@ struct InfoData: AssetData {
     var footer: WrappedAsset?
 }
 
-/**
- Wrapper class to tie `InfoData` to a SwiftUI `View`
- */
+/// Wrapper class to tie `InfoData` to a SwiftUI `View`
 class InfoAsset: UncontrolledAsset<InfoData> {
     /// A type erased view object
-    override var view: AnyView { AnyView(InfoAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(InfoAssetView(model: model))
+    }
 }
 
-/**
- View implementation for `InfoAsset`
- */
+/// View implementation for `InfoAsset`
 struct InfoAssetView: View {
     /// The viewModel with decoded data, supplied by `InfoAsset`
     @ObservedObject var model: AssetViewModel<InfoData>
 
-    @ViewBuilder
     var body: some View {
         VStack {
             model.data.title?.asset?.view.font(.title).padding(.bottom, 40)
             model.data.subTitle?.asset?.view.font(.subheadline).padding(.bottom, 40)
             model.data.primaryInfo?.asset?.view
-            if let actions = model.data.actions?.compactMap({ $0.asset }) {
+            if let actions = model.data.actions?.compactMap(\.asset) {
                 ForEach(actions) { action in
                     action.view
                 }

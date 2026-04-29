@@ -1,37 +1,36 @@
 //
-//  AsyncNodePluginTests.swift
+//  AsynNodePluginViewInspectorTests.swift
 //  PlayerUI
 //
 //  Created by Zhao Xia Wu on 2024-02-05.
 //
 
 import Foundation
-import XCTest
-import SwiftUI
 import JavaScriptCore
-import ViewInspector
-
 @testable import PlayerUI
-@testable import PlayerUIInternalTestUtilities
-@testable import PlayerUISwiftUI
-@testable import PlayerUIReferenceAssets
 @testable import PlayerUIAsyncNodePlugin
+@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+import SwiftUI
+import ViewInspector
+import XCTest
 
-extension Inspection: InspectionEmissary { }
+extension Inspection: InspectionEmissary {}
 
 class AsyncNodePluginViewInspectorTests: XCTestCase {
-    @MainActor func testAsyncNodeWithSwiftUIPlayerUsingJSValue() throws {
+    @MainActor func testAsyncNodeWithSwiftUIPlayerUsingJSValue() {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let jsContext = JSContext()
 
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
 
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin]) { _,_ in
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin]) { _, _ in
             handlerExpectation.fulfill()
 
             return .singleNode(.concrete(jsContext?.evaluateScript("""
-                ({"asset": {"id": "text", "type": "text", "value":"new node from the hook"}})
-                """) ?? JSValue()))
+            ({"asset": {"id": "text", "type": "text", "value":"new node from the hook"}})
+            """) ?? JSValue()))
         }
 
         plugin.context = jsContext
@@ -39,7 +38,8 @@ class AsyncNodePluginViewInspectorTests: XCTestCase {
         let context = SwiftUIPlayer.Context { jsContext ?? JSContext() }
 
         let player = SwiftUIPlayer(
-            flow: .asyncNodeJson, plugins: [ReferenceAssetsPlugin(), plugin], context: context)
+            flow: .asyncNodeJson, plugins: [ReferenceAssetsPlugin(), plugin], context: context
+        )
 
         ViewHosting.host(view: player)
 

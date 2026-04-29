@@ -1,18 +1,17 @@
 import JavaScriptCore
-
 import PlayerUI
 #if SWIFT_PACKAGE
-import PlayerUILogger
+    import PlayerUILogger
 #endif
 
 open class HeadlessPlayerImpl: HeadlessPlayer {
     public var assetRegistry: BaseAssetRegistry<TestWrapper>
     public var hooks: HeadlessHooks?
-    public var logger = TapableLogger()
+    public var logger: TapableLogger = .init()
 
     public var jsPlayerReference: JSValue?
 
-    let match = PartialMatchFingerprintPlugin()
+    let match: PartialMatchFingerprintPlugin = .init()
 
     public init(plugins: [NativePlugin], context: JSContext = JSContext()) {
         assetRegistry = BaseAssetRegistry<TestWrapper>(logger: logger)
@@ -20,7 +19,9 @@ open class HeadlessPlayerImpl: HeadlessPlayer {
         assetRegistry.partialMatchRegistry = match
         guard let player = jsPlayerReference else { return }
         hooks = HeadlessHooks(from: player)
-        for plugin in plugins { plugin.apply(player: self) }
+        for plugin in plugins {
+            plugin.apply(player: self)
+        }
     }
 }
 
@@ -35,7 +36,7 @@ public class HeadlessHooks: CoreHooks {
 
     public var onStart: Hook<FlowType>
 
-    required public init(from value: JSValue) {
+    public required init(from value: JSValue) {
         flowController = Hook(baseValue: value, name: "flowController")
         viewController = Hook(baseValue: value, name: "viewController")
         dataController = Hook(baseValue: value, name: "dataController")
@@ -45,30 +46,31 @@ public class HeadlessHooks: CoreHooks {
 }
 
 public class TestAssetType: PlayerAsset, Decodable {
-    var rawValue: JSValue?
     public var id: String
     public var type: String
+
+    var rawValue: JSValue?
     var value: String?
-    struct Data: Decodable {
-        var id: String
-        var type: String
-        var value: String?
-    }
-    required public init(from decoder: Decoder) throws {
+
+    public required init(from decoder: Decoder) throws {
         let data = try decoder.singleValueContainer().decode(Data.self)
         id = data.id
         type = data.type
         value = data.value
     }
+
+    struct Data: Decodable {
+        var id: String
+        var type: String
+        var value: String?
+    }
 }
 
 public class TestWrapper: AssetContainer, Decodable {
-    public enum CodingKeys: String, CodingKey {
-        case asset
-    }
     public var asset: TestAssetType?
-    required public init(forAsset: TestAssetType) {
-        self.asset = forAsset
+
+    public required init(forAsset: TestAssetType) {
+        asset = forAsset
     }
 
     public required init(from decoder: Decoder) throws {
@@ -82,18 +84,20 @@ public class TestWrapper: AssetContainer, Decodable {
             asset = try decodeAsset(singleContainer)
         }
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case asset
+    }
 }
 
 /// A function that decodes a `SwiftUIAsset`
-typealias DecodeTestFunction = ((Any) throws -> TestAssetType?)
+typealias DecodeTestFunction = (Any) throws -> TestAssetType?
 
 extension Decoder {
-    /**
-     Retrieves a `DecodeSwiftUIFunction` if the decoder has one
-     - returns: A `DecodeSwiftUIFunction`
-     */
+    /// Retrieves a `DecodeSwiftUIFunction` if the decoder has one
+    /// - returns: A `DecodeSwiftUIFunction`
     func getTestDecodeFunction() throws -> DecodeTestFunction {
-        guard let decodeFunction = self.userInfo[self.decodeFunctionKey] as? DecodeTestFunction else {
+        guard let decodeFunction = userInfo[decodeFunctionKey] as? DecodeTestFunction else {
             throw DecodingError.decoderNotAnAssetDecoder
         }
         return decodeFunction

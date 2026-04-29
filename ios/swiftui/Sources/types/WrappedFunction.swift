@@ -9,17 +9,11 @@ import Foundation
 import JavaScriptCore
 
 #if SWIFT_PACKAGE
-import PlayerUI
+    import PlayerUI
 #endif
 
-/**
- Represents a JS Function that was part of the asset in the JS runtime
- */
+/// Represents a JS Function that was part of the asset in the JS runtime
 public struct WrappedFunction<T>: JSValueBacked, Decodable, Hashable {
-    public static func == (lhs: WrappedFunction<T>, rhs: WrappedFunction<T>) -> Bool {
-        lhs.rawValue == rhs.rawValue
-    }
-
     public let rawValue: JSValue?
 
     public let userInfo: [CodingUserInfoKey: Any]?
@@ -29,48 +23,46 @@ public struct WrappedFunction<T>: JSValueBacked, Decodable, Hashable {
         self.userInfo = userInfo
     }
 
-    public func hash(into hasher: inout Hasher) {
-        return hasher.combine(rawValue)
-    }
-
-    /**
-     Constructs a WrappedFunction from a decoder
-     Since we can't decode JS functions using the JSONDecoder, this does nothing
-     and the JSValue is populated later with reflection
-     */
+    /// Constructs a WrappedFunction from a decoder
+    /// Since we can't decode JS functions using the JSONDecoder, this does nothing
+    /// and the JSValue is populated later with reflection
     public init(from decoder: Decoder) throws {
-        self.init(rawValue: try decoder.getJSValue(), userInfo: decoder.userInfo)
+        try self.init(rawValue: decoder.getJSValue(), userInfo: decoder.userInfo)
     }
 
-    // In Swift 5.2 we can just call the entire object
-    /**
-     Executes the function
-     */
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(rawValue)
+    }
+
+    /// In Swift 5.2 we can just call the entire object
+    /// Executes the function
     public func callAsFunction(_ args: Any...) -> T? {
         guard let jsValue = rawValue else { return nil }
         let val = jsValue.call(withArguments: args)
         return val?.toObject() as? T
     }
 
-    /**
-     Executes the function and returns the customType specified
-     */
-    public func callAsFunction<U>(customType: U.Type, args: Any...) throws -> U? where U: Decodable {
+    /// Executes the function and returns the customType specified
+    public func callAsFunction<U: Decodable>(customType: U.Type, args: Any...) throws -> U? {
         guard let jsValue = rawValue else { throw DecodingError.malformedData }
-        let decodedState = try JSONDecoder().decode(customType, from: jsValue.call(withArguments: args))
-        return decodedState
+        return try JSONDecoder().decode(customType, from: jsValue.call(withArguments: args))
+    }
+
+    public static func == (lhs: WrappedFunction<T>, rhs: WrappedFunction<T>) -> Bool {
+        lhs.rawValue == rhs.rawValue
     }
 }
 
-extension WrappedFunction where T: Decodable {
-    public enum Error: Swift.Error, Equatable {
+public extension WrappedFunction where T: Decodable {
+    enum Error: Swift.Error, Equatable {
         /// There was a failure in the promise from calling a JS function
         case promiseFailed(error: String)
     }
 
-    public func callAsFunctionAsync(args: Any...) async throws -> T {
+    func callAsFunctionAsync(args: Any...) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
-            guard let jsValue = rawValue else { return continuation.resume(throwing: DecodingError.malformedData) }
+            guard let jsValue = rawValue
+            else { return continuation.resume(throwing: DecodingError.malformedData) }
 
             let promiseHandler: @convention(block) (JSValue) -> Void = {
                 do {
@@ -82,7 +74,8 @@ extension WrappedFunction where T: Decodable {
             }
 
             let errorHandler: @convention(block) (JSValue) -> Void = { error in
-                return continuation.resume(throwing: WrappedFunction.Error.promiseFailed(error: error.toString()))
+                continuation
+                    .resume(throwing: WrappedFunction.Error.promiseFailed(error: error.toString()))
             }
 
             guard
@@ -100,22 +93,20 @@ extension WrappedFunction where T: Decodable {
     }
 }
 
-/**
- Wrapper class to decode model references into strings from the raw JSValue
- */
+/// Wrapper class to decode model references into strings from the raw JSValue
 public struct ModelReference: JSValueBacked, Decodable, Hashable {
     public let rawValue: JSValue?
+
+    /// The string value of this model reference
+    public var stringValue: String? {
+        rawValue?.toString()
+    }
 
     public init(rawValue: JSValue?) {
         self.rawValue = rawValue
     }
 
     public init(from decoder: Decoder) throws {
-        self.init(rawValue: try decoder.getJSValue())
-    }
-
-    /// The string value of this model reference
-    public var stringValue: String? {
-        rawValue?.toString()
+        try self.init(rawValue: decoder.getJSValue())
     }
 }

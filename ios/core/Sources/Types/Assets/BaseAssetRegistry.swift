@@ -1,5 +1,5 @@
 //
-//  AssetRegistry.swift
+//  BaseAssetRegistry.swift
 //
 //
 //  Created by Borawski, Harris on 2/13/20.
@@ -8,12 +8,10 @@
 import Foundation
 import JavaScriptCore
 #if SWIFT_PACKAGE
-import PlayerUILogger
+    import PlayerUILogger
 #endif
 
-/**
- Represents the different errors that occur when decoding
- */
+/// Represents the different errors that occur when decoding
 public enum DecodingError: Error {
     /// Unable to decode a base asset, does not contain keys: `id` and `type`
     case baseAssetNotDecodable
@@ -21,7 +19,8 @@ public enum DecodingError: Error {
     /// The provided type was not registered with the AssetRegistry
     case typeNotRegistered(type: String)
 
-    /// The type was registered with the AssetRegistry, but the provided value could not decode to it
+    /// The type was registered with the AssetRegistry, but the provided value could not decode to
+    /// it
     case typeNotDecodable(type: String)
 
     /// The decoder being used was not an AssetDecoder
@@ -34,21 +33,10 @@ public enum DecodingError: Error {
     case malformedData
 }
 
-/**
- A registry of assets used to decode the view tree returned by Player
- */
-open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
-    WrapperType: Decodable,
-    WrapperType: AssetContainer,
+/// A registry of assets used to decode the view tree returned by Player
+open class BaseAssetRegistry<WrapperType: Decodable & AssetContainer>: PlayerRegistry where
     WrapperType.AssetType: Decodable {
-
-    /// A type representing an entry in the registry
-    public typealias RegistryEntry = (assetType: AssetType.Type, match: [String: Any])
-
-    /// A read-only look at the types of assets that are registered
-    public var registeredAssets: [AssetType.Type] {
-        return registry.map({ $0.0 })
-    }
+    public let decoder: JSONDecoder = .init()
 
     /// The registry plugin that wraps the partial-match-registry
     public var partialMatchRegistry: PartialMatchFingerprintPlugin? {
@@ -69,51 +57,53 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
         }
     }
 
-    public let decoder = JSONDecoder()
+    /// A read-only look at the types of assets that are registered
+    public var registeredAssets: [AssetType.Type] {
+        registry.map(\.0)
+    }
 
-    /**
-     Initializes an empty registry
-     - parameters:
-        - logger: A `TapableLogger` instance to log with
-     */
+    /// Initializes an empty registry
+    /// - parameters:
+    ///   - logger: A `TapableLogger` instance to log with
     public init(logger: TapableLogger? = nil) {
         self.logger = logger
         decoder.setDecodeAssetFunction(decodeFunction(_:))
         decoder.setLogger(logger)
     }
 
-    /**
-     Register an asset to decode a type, this is converted to ["type": <type>]
-     - parameters:
-        - type: The string type the asset should decode
-        - asset: The swift type representing the asset
-     */
+    /// Register an asset to decode a type, this is converted to ["type": <type>]
+    /// - parameters:
+    ///   - type: The string type the asset should decode
+    ///   - asset: The swift type representing the asset
     public func register(_ type: String, asset: WrapperType.AssetType.Type) {
-        self.register(["type": type], for: asset)
+        register(["type": type], for: asset)
     }
 
-    /**
-     Register and asset to decode based on matching the specified object
-     This allows registration of multiple assets for the same type, but can match based on other parts of the object
-
-     Example:
-     ```swift
-     register(["type": "action", "metaData": ["role": "back"]], BackActionAsset.self)
-     ```
-     This asset will only be used when decoding a view in the JSON tree that is type action, and has the `back` role.
-     This means the custom asset gets the `run` function that regular actions get
-     - parameters:
-        - match: The object to match this asset to
-        - for: The Asset type to associate with the match
-     */
+    /// Register and asset to decode based on matching the specified object
+    /// This allows registration of multiple assets for the same type, but can match based on other
+    /// parts of the object
+    ///
+    /// Example:
+    /// ```swift
+    /// register(["type": "action", "metaData": ["role": "back"]], BackActionAsset.self)
+    /// ```
+    /// This asset will only be used when decoding a view in the JSON tree that is type action, and
+    /// has the `back` role.
+    /// This means the custom asset gets the `run` function that regular actions get
+    /// - parameters:
+    ///   - match: The object to match this asset to
+    ///   - for: The Asset type to associate with the match
     public func register(_ match: [String: Any], for asset: WrapperType.AssetType.Type) {
         if let index = registry.firstIndex(where: { matched in
-            return NSDictionary(dictionary: match).isEqual(to: matched.match)
+            NSDictionary(dictionary: match).isEqual(to: matched.match)
         }) {
             if asset == registry[index].assetType {
-                self.logger?.t("Duplicate Registration skipped for \(String(describing: match)) asset: \(String(describing: asset))")
+                logger?
+                    .t(
+                        "Duplicate Registration skipped for \(String(describing: match)) asset: \(String(describing: asset))" // swiftlint:disable:this line_length
+                    )
             } else {
-                self.logger?.w("Overriding registration for match: \(String(describing: match))")
+                logger?.w("Overriding registration for match: \(String(describing: match))")
                 registry[index] = (assetType: asset, match: match)
             }
         } else {
@@ -121,21 +111,38 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
         }
     }
 
-    /**
-     Helper function to register or reregister all assets with the partial match registry
-     */
+    /// Decodes a JSValue into an Asset
+    /// - parameters:
+    ///   - value: The JSValue representing an asset
+    /// - returns: A decoded Asset
+    public func decode(_ value: JSValue) throws -> WrapperType.AssetType {
+        assert(Thread.isMainThread, "decoder must be accessed from main")
+        typealias Shim = RegistryDecodeShim<WrapperType.AssetType>
+        let localDecoder = AnyTypeDecodingContext(value).map { $0.inject(to: decoder) } ?? decoder
+        return try localDecoder.decode(Shim.self, from: value).asset
+    }
+
+    /// Decodes a JSValue into an AssetWrapper
+    /// - parameters:
+    ///   - value: The JSValue representing an asset
+    /// - returns: A decoded Asset
+    public func decodeWrapper(_ value: JSValue) throws -> WrapperType {
+        assert(Thread.isMainThread, "decoder must be accessed from main")
+        let localDecoder = AnyTypeDecodingContext(value).map { $0.inject(to: decoder) } ?? decoder
+        return try localDecoder.decode(WrapperType.self, from: value)
+    }
+
+    /// Helper function to register or reregister all assets with the partial match registry
     private func registerWithPlugin() {
         for (index, entry) in registry.enumerated() {
             partialMatchRegistry?.register(match: entry.match, index: index)
         }
     }
 
-    /**
-     Retrieves an asset type from the partial match registry based on the ID
-     - parameters:
-        - id: The ID of the asset to get the type for
-     - returns: The type to decode as
-     */
+    /// Retrieves an asset type from the partial match registry based on the ID
+    /// - parameters:
+    ///   - id: The ID of the asset to get the type for
+    /// - returns: The type to decode as
     private func getAssetType(id: String) -> WrapperType.AssetType.Type? {
         guard let index = partialMatchRegistry?.get(assetId: id) else { return nil }
         return registry[index].assetType
@@ -151,35 +158,13 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
         return try decoder.singleValueContainer().decode(type)
     }
 
+    /// A type representing an entry in the registry
+    public typealias RegistryEntry = (assetType: AssetType.Type, match: [String: Any])
+
     /// This is used by `decodeFunction` to pickup an `id` to pass to the partial match registry.
     private struct TypeCheck: Decodable {
         let id: String
         let type: String?
-    }
-
-    /**
-     Decodes a JSValue into an Asset
-     - parameters:
-        - value: The JSValue representing an asset
-     - returns: A decoded Asset
-     */
-    public func decode(_ value: JSValue) throws -> WrapperType.AssetType {
-        assert(Thread.isMainThread, "decoder must be accessed from main")
-        typealias Shim = RegistryDecodeShim<WrapperType.AssetType>
-        let localDecoder = AnyTypeDecodingContext(value).map { $0.inject(to: decoder) } ?? decoder
-        return try localDecoder.decode(Shim.self, from: value).asset
-    }
-
-    /**
-     Decodes a JSValue into an AssetWrapper
-     - parameters:
-        - value: The JSValue representing an asset
-     - returns: A decoded Asset
-     */
-    public func decodeWrapper(_ value: JSValue) throws -> WrapperType {
-        assert(Thread.isMainThread, "decoder must be accessed from main")
-        let localDecoder = AnyTypeDecodingContext(value).map { $0.inject(to: decoder) } ?? decoder
-        return try localDecoder.decode(WrapperType.self, from: value)
     }
 }
 
@@ -203,7 +188,8 @@ extension AnyTypeDecodingContext {
 }
 
 extension JSValue {
-    /// Returns the contents of this value encoded into UTF-8 string data. Throws DecodingError.malformedData
+    /// Returns the contents of this value encoded into UTF-8 string data. Throws
+    /// DecodingError.malformedData
     /// if this value can't be transformed.
     func jsonData(pretty: Bool = false) throws -> Data {
         guard
@@ -212,7 +198,8 @@ extension JSValue {
             !json.isNull,
             // replace functions with placeholders, since we retrieve the value in WrappedFunction
             // with the coding path
-            let replacer = context?.evaluateScript("(key, value) => (typeof value === 'function' ? {} : value)"),
+            let replacer = context?
+            .evaluateScript("(key, value) => (typeof value === 'function' ? {} : value)"),
             let output = json.invokeMethod(
                 "stringify",
                 withArguments: [
@@ -220,7 +207,7 @@ extension JSValue {
                     replacer as Any,
                     (
                         pretty ? 2 : nil
-                    ) as Any
+                    ) as Any,
                 ]
             ),
             !output.isUndefined,
@@ -234,32 +221,37 @@ extension JSValue {
 }
 
 // MARK: Decoder Extension
+
 public extension Decoder {
     /// A `CodingUserInfoKey` to fetch the decoding function for this decoder
-    var decodeFunctionKey: CodingUserInfoKey { CodingUserInfoKey(rawValue: "decodeFunction")! }
+    var decodeFunctionKey: CodingUserInfoKey {
+        // swiftlint:disable:next force_unwrapping
+        CodingUserInfoKey(rawValue: "decodeFunction")!
+    }
 }
 
 /// A function that decodes an `Asset`
-typealias DecodeAssetFunction<Asset> = ((Decoder) throws -> Asset)
+typealias DecodeAssetFunction<Asset> = (Decoder) throws -> Asset
 
-extension Decoder {
+public extension Decoder {
     /// A logger that can be used to track useful decoding details
-    public var logger: TapableLogger? { userInfo[.logger] as? TapableLogger }
+    var logger: TapableLogger? {
+        userInfo[.logger] as? TapableLogger
+    }
 
-    /**
-     Retrieves a `DecodeAssetFunction<Asset>` if the decoder has one
-     - returns: A `DecodeSwiftUIFunction`
-     */
-    func getDecodeAssetFunction<Asset>() throws -> DecodeAssetFunction<Asset> {
+    /// Retrieves a `DecodeAssetFunction<Asset>` if the decoder has one
+    /// - returns: A `DecodeSwiftUIFunction`
+    internal func getDecodeAssetFunction<Asset>() throws -> DecodeAssetFunction<Asset> {
         guard let decodeFunction = userInfo[.decodeSUI] as? DecodeAssetFunction<Asset> else {
             throw DecodingError.decoderNotAnAssetDecoder
         }
         return decodeFunction
     }
 
-    /// Returns the JSValue found at the current coding path, or throws an error if decoding was not started
+    /// Returns the JSValue found at the current coding path, or throws an error if decoding was not
+    /// started
     /// with `JSONDecoder.decoder(_:from:)` provided a `JSValue` value.
-    public func getJSValue() throws -> JSValue {
+    func getJSValue() throws -> JSValue {
         guard let rootJS = userInfo[.rootJS] as? JSValue else {
             throw DecodingError.decoderNotAnAssetDecoder
         }
@@ -278,8 +270,9 @@ extension Decoder {
 extension JSONDecoder {
     /// Attempts to decode an object of type T from the JSON data found in value.
     /// During decoding calls to `decoder.getJSValue()` will return the object subscripted in value
-    /// at the current coding path. A decode function might use this to update RawValueBacked entities.
-    public func decode<T>(_ type: T.Type, from value: JSValue) throws -> T where T: Decodable {
+    /// at the current coding path. A decode function might use this to update RawValueBacked
+    /// entities.
+    public func decode<T: Decodable>(_: T.Type, from value: JSValue) throws -> T {
         setRootJS(value)
         defer { setRootJS(nil) }
 
@@ -301,7 +294,9 @@ extension JSONDecoder {
     }
 
     /// A logger that can be used to track useful decoding details
-    var logger: TapableLogger? { userInfo[.logger] as? TapableLogger }
+    var logger: TapableLogger? {
+        userInfo[.logger] as? TapableLogger
+    }
 
     func setLogger(_ logger: TapableLogger?) {
         userInfo[.logger] = logger

@@ -7,40 +7,44 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
-import SwiftHooks
 @testable import PlayerUILogger
+import SwiftHooks
+import XCTest
 
 class TapableLoggerTests: XCTestCase {
-    func testJSConversion() {
-        let context = JSContext()!
+    func testJSConversion() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let logger = TapableLogger()
 
-        let undef = context.evaluateScript("(undefined)")!
+        let undef = try XCTUnwrap(context.evaluateScript("(undefined)"))
 
-        let string = context.evaluateScript("('a')")!
+        let string = try XCTUnwrap(context.evaluateScript("('a')"))
 
-        let number = context.evaluateScript("(1)")!
+        let number = try XCTUnwrap(context.evaluateScript("(1)"))
 
-        let array = context.evaluateScript("(['a', 'b'])")!
+        let array = try XCTUnwrap(context.evaluateScript("(['a', 'b'])"))
 
-        let object = context.evaluateScript("({a: 1})")!
+        let object = try XCTUnwrap(context.evaluateScript("({a: 1})"))
 
-        let arrayOfObjectAndStrings = context.evaluateScript("(['message 1', {a: 1}, 'message 2'])")!
+        let arrayOfObjectAndStrings = try XCTUnwrap(context
+            .evaluateScript("(['message 1', {a: 1}, 'message 2'])"))
 
         XCTAssertNil(logger.convertJSValue(undef))
 
         XCTAssertEqual(logger.convertJSValue(string) as? [String], ["a"])
 
-        XCTAssertEqual(logger.convertJSValue(number) as? [Int] , [1])
+        XCTAssertEqual(logger.convertJSValue(number) as? [Int], [1])
 
-        XCTAssertEqual(logger.convertJSValue(array) as? [String] , ["a","b"])
+        XCTAssertEqual(logger.convertJSValue(array) as? [String], ["a", "b"])
 
-        XCTAssertEqual(logger.convertJSValue(object) as? [[String: Int]] , [["a":1]])
+        XCTAssertEqual(logger.convertJSValue(object) as? [[String: Int]], [["a": 1]])
 
-        XCTAssertEqual(logger.convertJSValue(arrayOfObjectAndStrings) as? [AnyHashable], ["message 1", ["a":1], "message 2"])
+        XCTAssertEqual(
+            logger.convertJSValue(arrayOfObjectAndStrings) as? [AnyHashable],
+            ["message 1", ["a": 1], "message 2"]
+        )
     }
 
     func testMessage() {
@@ -48,7 +52,7 @@ class TapableLoggerTests: XCTestCase {
         logger.logLevel = .info
 
         let logExpect = expectation(description: "Prefixed message logged")
-        logger.hooks.info.tap(name: "test") { (message) in
+        logger.hooks.info.tap(name: "test") { message in
             XCTAssertEqual("Message", (message as? [String])?.first)
             logExpect.fulfill()
         }
@@ -58,9 +62,6 @@ class TapableLoggerTests: XCTestCase {
         wait(for: [logExpect], timeout: 1)
     }
 
-    enum TestError: Error {
-        case errored
-    }
     func testLogHooks() {
         let logger = TapableLogger()
         logger.logLevel = .trace
@@ -98,6 +99,14 @@ class TapableLoggerTests: XCTestCase {
         logger.e(TestError.errored)
         logger.e("Message", er: TestError.errored)
 
-        wait(for: [traceExpect, debugExpect, infoExpect, warningExpect, errorExpect, errorMsgExpect, errorMsgAndErrorType], timeout: 1)
+        wait(
+            for: [traceExpect, debugExpect, infoExpect, warningExpect, errorExpect, errorMsgExpect,
+                  errorMsgAndErrorType],
+            timeout: 1
+        )
+    }
+
+    enum TestError: Error {
+        case errored
     }
 }

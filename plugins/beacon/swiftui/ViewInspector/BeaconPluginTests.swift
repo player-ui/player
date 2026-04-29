@@ -7,20 +7,17 @@
 //
 
 import Foundation
-import XCTest
-import SwiftUI
-import ViewInspector
 @testable import PlayerUI
-@testable import PlayerUIInternalTestUtilities
-@testable import PlayerUISwiftUI
-@testable import PlayerUIReferenceAssets
 @testable import PlayerUIBaseBeaconPlugin
 @testable import PlayerUIBeaconPlugin
+@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+import SwiftUI
+import ViewInspector
+import XCTest
 
 class BeaconPluginTests: XCTestCase {
-    override func setUp() {
-        XCUIApplication().terminate()
-    }
     //    func testContextAttachment() throws {
     //        let player = SwiftUIPlayer(flow: "", plugins: [BeaconPlugin<DefaultBeacon> { _ in}])
     //
@@ -79,38 +76,49 @@ class BeaconPluginTests: XCTestCase {
     //
     //        wait(for: [exp, expect], timeout: 10)
     //    }
-    
+
     func testSendsViewBeacon() {
         let beaconed = expectation(description: "View beacon called")
-        let plugin = BeaconPlugin<DefaultBeacon>(plugins: []) { (beacon) in
+        let plugin = BeaconPlugin<DefaultBeacon>(plugins: []) { beacon in
             guard beacon.action == "viewed" else { return }
             beaconed.fulfill()
         }
-        
+
         let player = SwiftUIPlayer(
             flow: FlowData.COUNTER,
             plugins: [ReferenceAssetsPlugin(), plugin]
         )
         ViewHosting.host(view: player)
-        
+
         wait(for: [beaconed], timeout: 10)
-        
+
         ViewHosting.expel()
+    }
+
+    override func setUp() {
+        XCUIApplication().terminate()
     }
 }
 
 struct TestButton: View {
     @Environment(\.beaconContext) var beaconContext
+
     var metaData: MetaData?
-    internal var didAppear: ((Self) -> Void)?
+    var didAppear: ((Self) -> Void)?
+
     var body: some View {
         Button(action: {
             if let data = metaData {
-                beaconContext?.beacon(action: "clicked", element: "button", id: "test", metaData: data)
+                beaconContext?.beacon(
+                    action: "clicked",
+                    element: "button",
+                    id: "test",
+                    metaData: data
+                )
             } else {
                 beaconContext?.beacon(action: "clicked", element: "button", id: "test")
             }
-        }, label: {Text("Beacon")})
-        .onAppear { self.didAppear?(self) }
+        }, label: { Text("Beacon") })
+            .onAppear { didAppear?(self) }
     }
 }

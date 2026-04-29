@@ -7,20 +7,17 @@
 //
 
 import Foundation
-import XCTest
-import SwiftUI
-import ViewInspector
-
 @testable import PlayerUI
-@testable import PlayerUITestUtilities
+@testable import PlayerUIBeaconPlugin
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
-@testable import PlayerUIBeaconPlugin
+@testable import PlayerUITestUtilities
+import SwiftUI
+import ViewInspector
+import XCTest
 
 @MainActor
 class ActionAssetTests: SwiftUIAssetUnitTestCase {
-    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
-
     func setup() {
         XCUIApplication().terminate()
     }
@@ -46,8 +43,8 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
         }
 
         _ = try action.view.inspect().find(ActionAssetView.self).button()
-
     }
+
     func testViewNoLabel() throws {
         let data = ActionData(id: "id", type: "action", label: nil, run: nil)
 
@@ -63,7 +60,12 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
         {"id": "text", "type": "text", "value":"hello world"}
         """)
         else { return XCTFail("unable to get asset") }
-        let data = ActionData(id: "id", type: "action", label: WrappedAsset(forAsset: text), run: nil)
+        let data = ActionData(
+            id: "id",
+            type: "action",
+            label: WrappedAsset(forAsset: text),
+            run: nil
+        )
 
         let model = AssetViewModel<ActionData>(data)
 
@@ -76,9 +78,10 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
         XCTAssertEqual("hello world", try label.string())
     }
 
-    func testRunsFunction() throws {
+    func testRunsFunction() {
         let runExpect = expectation(description: "Beacon Called")
-        guard let run: WrappedFunction<Void> = getWrappedFunction(completion: { runExpect.fulfill() }) else {
+        guard let run: WrappedFunction<Void> =
+            getWrappedFunction(completion: { runExpect.fulfill() }) else {
             return XCTFail("unable to get function")
         }
         let data = ActionData(id: "id", type: "action", label: nil, run: run)
@@ -96,7 +99,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
         wait(for: [appear, runExpect], timeout: 5)
     }
 
-    func testSendsBeacon() throws {
+    func testSendsBeacon() {
         let data = ActionData(id: "id", type: "action", label: nil, run: nil)
 
         let model = AssetViewModel<ActionData>(data)
@@ -109,10 +112,14 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
             try view.button().tap()
         }
 
-        ViewHosting.host(view: view.environment(\.beaconContext, BeaconContext({ _ in
+        ViewHosting.host(view: view.environment(\.beaconContext, BeaconContext { _ in
             expect.fulfill()
-        })))
+        }))
 
         wait(for: [appear, expect], timeout: 5)
+    }
+
+    override open func plugins() -> [NativePlugin] {
+        [ReferenceAssetsPlugin()]
     }
 }

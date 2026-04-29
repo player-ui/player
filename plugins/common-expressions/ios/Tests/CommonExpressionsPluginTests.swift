@@ -7,10 +7,10 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUICommonExpressionsPlugin
+import XCTest
 
 class CommonExpressionsPluginTests: XCTestCase {
     func testPluginConstructs() {

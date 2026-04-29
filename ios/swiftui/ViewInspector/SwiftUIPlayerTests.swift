@@ -6,29 +6,35 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import Foundation
-import XCTest
-import ViewInspector
-import SwiftUI
 import Combine
+import Foundation
 import JavaScriptCore
-
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+import SwiftUI
+import ViewInspector
+import XCTest
 
 class SwiftUIPlayerTests: XCTestCase {
     func testFlowLoads() throws {
         var bag = Set<AnyCancellable>()
         let context = SwiftUIPlayer.Context { JSContext() }
-        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin()], context: context)
+        let player = SwiftUIPlayer(
+            flow: FlowData.COUNTER,
+            plugins: [ReferenceAssetsPlugin()],
+            context: context
+        )
 
         let initialLoad = expectation(description: "Root loaded")
-        player.assetRegistry.$root.sink { (asset) in
-            guard asset != nil else { return }
-            initialLoad.fulfill()
-        }.store(in: &bag)
+        player.assetRegistry
+            .$root
+            .sink { asset in
+                guard asset != nil else { return }
+                initialLoad.fulfill()
+            }
+            .store(in: &bag)
 
         let view = try player.inspect().vStack().first?.anyView()
         XCTAssertNotNil(view)
@@ -38,12 +44,12 @@ class SwiftUIPlayerTests: XCTestCase {
         XCTAssertTrue(context.isLoaded)
     }
 
-    func testbadDecodeGoesToErrorState() throws {
+    func testbadDecodeGoesToErrorState() {
         var result: Result<CompletedState, PlayerError>?
 
         let failed = XCTestExpectation(description: "Error State reached")
 
-        let binding = Binding<Result<CompletedState, PlayerError>?>(get: {result}, set: {
+        let binding = Binding<Result<CompletedState, PlayerError>?>(get: { result }, set: {
             result = $0
             guard
                 case let .failure(error) = $0,
@@ -63,13 +69,19 @@ class SwiftUIPlayerTests: XCTestCase {
 
     func testViewHook() throws {
         var bag = Set<AnyCancellable>()
-        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin(), ViewHookPlugin()])
+        let player = SwiftUIPlayer(
+            flow: FlowData.COUNTER,
+            plugins: [ReferenceAssetsPlugin(), ViewHookPlugin()]
+        )
 
         let initialLoad = expectation(description: "Root loaded")
-        player.assetRegistry.$root.sink { (asset) in
-            guard asset != nil else { return }
-            initialLoad.fulfill()
-        }.store(in: &bag)
+        player.assetRegistry
+            .$root
+            .sink { asset in
+                guard asset != nil else { return }
+                initialLoad.fulfill()
+            }
+            .store(in: &bag)
         wait(for: [initialLoad], timeout: 3)
 
         let color = try player.body.inspect().vStack().first?.anyView().anyView().foregroundColor()
@@ -81,10 +93,10 @@ class SwiftUIPlayerTests: XCTestCase {
 class ViewHookPlugin: NativePlugin {
     var pluginName: String = "ViewHookPlugin"
 
-    func apply<P>(player: P) where P: HeadlessPlayer {
+    func apply<P: HeadlessPlayer>(player: P) {
         guard let swiftuiplayer = player as? SwiftUIPlayer else { return }
         swiftuiplayer.hooks?.view.tap(name: pluginName) { view in
-            return AnyView(view.foregroundColor(.black))
+            AnyView(view.foregroundColor(.black))
         }
     }
 }

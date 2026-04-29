@@ -164,9 +164,7 @@ jobs:
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
+              $(bazel query "kind(ios_ui_test, //plugins/...)")
       - run:
           name: Tests
           command: |
@@ -180,14 +178,6 @@ jobs:
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
               $(bazel query "kind(ios_ui_test, //plugins/...)")
-      - run:
-          name: Lint
-          command: |
-            bazel test \
-              --config=ci-mac \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
-
       - run:
           when: always
           command: |
@@ -212,6 +202,25 @@ jobs:
 
       - store_test_results:
           path: _test_results
+
+  # We run this stage in parallel with build-ios-trunk so it doesn't slow down the build
+  lint_ios:
+    executor: ios
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run:
+          name: Homebrew Dependencies
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install mint
+
+      - run:
+          name: Swift Lint and Format
+          command: |
+            mint bootstrap
+            mint run swiftlint lint --strict
+            mint run swiftformat ios plugins --lint
 
   test:
     executor: base
@@ -446,6 +455,26 @@ workflows:
             - build-fork
             - bazelrc_fork
 
+      - lint_ios:
+          name: lint-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - bazelrc
+            - build-trunk
+
+      - lint_ios:
+          name: lint-ios-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
+            - bazelrc_fork
+
       - maybe_release:
           filters:
             branches:
@@ -456,6 +485,7 @@ workflows:
           requires:
             - test-trunk
             - build-ios-trunk
+            - lint-ios-trunk
             - android-test-trunk
 
       - test:
@@ -580,6 +610,10 @@ workflows:
           requires:
             - build
 
+      - lint_ios:
+          requires:
+            - build
+
       - android_test:
           context:
             - Build
@@ -614,6 +648,7 @@ workflows:
             - test
             - bundle-analyze
             - build_and_test_ios
+            - lint_ios
             - build_docs
 
   full_release:
@@ -633,6 +668,10 @@ workflows:
             - setup
 
       - build_and_test_ios:
+          requires:
+            - bazelrc
+
+      - lint_ios:
           requires:
             - bazelrc
 
@@ -669,4 +708,5 @@ workflows:
             - test
             - bundle_analyze
             - build_and_test_ios
+            - lint_ios
             - build_docs

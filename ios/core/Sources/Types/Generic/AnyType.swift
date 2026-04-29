@@ -7,40 +7,8 @@
 
 import Foundation
 
-/**
- A union type to match the JS core players any type
- */
+/// A union type to match the JS core players any type
 public enum AnyType: Hashable {
-    // swiftlint:disable cyclomatic_complexity
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .string(let data):
-            hasher.combine(data)
-        case .bool(let data):
-            hasher.combine(data)
-        case .number(let data):
-            hasher.combine(data)
-        case .dictionary(let data):
-            hasher.combine(data)
-        case .numberDictionary(let data):
-            hasher.combine(data)
-        case .booleanDictionary(let data):
-            hasher.combine(data)
-        case .array(let data):
-            hasher.combine(data)
-        case .numberArray(let data):
-            hasher.combine(data)
-        case .booleanArray(let data):
-            hasher.combine(data)
-        case .anyDictionary(let data):
-            hasher.combine(data as NSDictionary)
-        case .anyArray(let data):
-            hasher.combine(data as NSArray)
-        case .unknownData:
-            return
-        }
-    }
-
     /// The underlying data was a string
     case string(data: String)
 
@@ -68,60 +36,84 @@ public enum AnyType: Hashable {
     /// The underlying data was an array of booleans
     case booleanArray(data: [Bool])
 
-    /**
-     The underlying data was a dictionary of varied value types
-
-     **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
-     */
+    /// The underlying data was a dictionary of varied value types
+    ///
+    /// **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
     case anyDictionary(data: [String: Any])
 
-    /**
-     The underlying data was an array of varied value types
-
-     **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
-     */
+    /// The underlying data was an array of varied value types
+    ///
+    /// **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
     case anyArray(data: [Any])
 
     /// The underlying data was not in a known format
     case unknownData
+
+    // swiftlint:disable:next cyclomatic_complexity
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .string(data):
+            hasher.combine(data)
+        case let .bool(data):
+            hasher.combine(data)
+        case let .number(data):
+            hasher.combine(data)
+        case let .dictionary(data):
+            hasher.combine(data)
+        case let .numberDictionary(data):
+            hasher.combine(data)
+        case let .booleanDictionary(data):
+            hasher.combine(data)
+        case let .array(data):
+            hasher.combine(data)
+        case let .numberArray(data):
+            hasher.combine(data)
+        case let .booleanArray(data):
+            hasher.combine(data)
+        case let .anyDictionary(data):
+            hasher.combine(data as NSDictionary)
+        case let .anyArray(data):
+            hasher.combine(data as NSArray)
+        case .unknownData:
+            return
+        }
+    }
 }
 
 extension AnyType: Equatable {
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     public static func == (lhs: AnyType, rhs: AnyType) -> Bool {
         switch (lhs, rhs) {
-        case (.string(let lhv), .string(let rhv)): return lhv == rhv
-        case (.bool(let lhv), .bool(let rhv)): return lhv == rhv
-        case (.number(let lhv), .number(let rhv)): return lhv == rhv
-        case (.dictionary(let lhv), .dictionary(let rhv)): return lhv == rhv
-        case (.numberDictionary(let lhv), .numberDictionary(let rhv)): return lhv == rhv
-        case (.booleanDictionary(let lhv), .booleanDictionary(let rhv)): return lhv == rhv
-        case (.array(let lhv), .array(let rhv)): return lhv == rhv
-        case (.numberArray(let lhv), .numberArray(let rhv)): return lhv == rhv
-        case (.booleanArray(let lhv), .booleanArray(let rhv)): return lhv == rhv
-        case (.anyDictionary(let lhv), .anyDictionary(let rhv)): return (lhv as NSDictionary).isEqual(to: rhv)
-        case (.anyArray(let lhv), .anyArray(let rhv)): return (lhv as NSArray).isEqual(to: rhv)
+        case let (.string(lhv), .string(rhv)): return lhv == rhv
+        case let (.bool(lhv), .bool(rhv)): return lhv == rhv
+        case let (.number(lhv), .number(rhv)): return lhv == rhv
+        case let (.dictionary(lhv), .dictionary(rhv)): return lhv == rhv
+        case let (.numberDictionary(lhv), .numberDictionary(rhv)): return lhv == rhv
+        case let (.booleanDictionary(lhv), .booleanDictionary(rhv)): return lhv == rhv
+        case let (.array(lhv), .array(rhv)): return lhv == rhv
+        case let (.numberArray(lhv), .numberArray(rhv)): return lhv == rhv
+        case let (.booleanArray(lhv), .booleanArray(rhv)): return lhv == rhv
+        case let (.anyDictionary(lhv), .anyDictionary(rhv)): return (lhv as NSDictionary)
+            .isEqual(to: rhv)
+        case let (.anyArray(lhv), .anyArray(rhv)): return (lhv as NSArray).isEqual(to: rhv)
         case (.unknownData, .unknownData): return true
         default: return false
         }
     }
 }
 
-/**
- Make AnyType Decodable
- */
+/// Make AnyType Decodable
 extension AnyType: Decodable {
-    /**
-     Construct AnyType by decoding
-     - parameters:
-        - decoder: A decoder to decode from
-     */
-    // swiftlint:disable cyclomatic_complexity
+    /// Construct AnyType by decoding
+    /// - parameters:
+    ///   - decoder: A decoder to decode from
+    // swiftlint:disable:next cyclomatic_complexity
     public init(from decoder: Decoder) throws {
         if let dictionary = try? decoder.singleValueContainer().decode([String: String].self) {
             self = .dictionary(data: dictionary)
             return
-        } else if let dictionary = try? decoder.singleValueContainer().decode([String: Double].self) {
+        } else if let dictionary = try? decoder.singleValueContainer()
+            .decode([String: Double].self) {
             self = .numberDictionary(data: dictionary)
             return
         } else if let dictionary = try? decoder.singleValueContainer().decode([String: Bool].self) {
@@ -145,7 +137,8 @@ extension AnyType: Decodable {
         } else if let number = try? decoder.singleValueContainer().decode(Double.self) {
             self = .number(data: number)
             return
-        } else if let context = decoder.userInfo[AnyTypeDecodingContext.key] as? AnyTypeDecodingContext {
+        } else if let context = decoder
+            .userInfo[AnyTypeDecodingContext.key] as? AnyTypeDecodingContext {
             let obj = try context.objectFor(path: decoder.singleValueContainer().codingPath)
             if let dictionary = obj as? [String: Any] {
                 self = .anyDictionary(data: dictionary)
@@ -156,71 +149,74 @@ extension AnyType: Decodable {
             }
         }
         self = .unknownData
-        return
     }
 }
 
-// Custom CodingKey for dynamic key name
-// and to try to coerce `Any` into `Encodable`
+/// Custom CodingKey for dynamic key name
+/// and to try to coerce `Any` into `Encodable`
 struct CustomEncodable: CodingKey {
     var data: Encodable?
-    init(_ encodable: Any?, key: String) {
-        self.stringValue = key
-        if let encodable = encodable as? Encodable {
-            self.data = encodable
-        } else if
-            let encodable,
-            let data = try? JSONSerialization.data(withJSONObject: encodable, options: .fragmentsAllowed),
-            let decoded = try? AnyTypeDecodingContext(rawData: data).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
-        {
-            self.data = decoded
-        }
-    }
     var stringValue: String
-
-    init?(stringValue: String) {
-        return nil
-    }
 
     var intValue: Int?
 
-    init?(intValue: Int) {
-        return nil
+    init(_ encodable: Any?, key: String) {
+        stringValue = key
+        if let encodable = encodable as? Encodable {
+            data = encodable
+        } else if
+            let encodable,
+            let data = try? JSONSerialization.data(
+                withJSONObject: encodable,
+                options: .fragmentsAllowed
+            ),
+            let decoded = try? AnyTypeDecodingContext(rawData: data)
+            .inject(to: JSONDecoder())
+            .decode(
+                AnyType.self,
+                from: data
+            ) {
+            self.data = decoded
+        }
     }
 
+    init?(stringValue _: String) {
+        nil
+    }
+
+    init?(intValue _: Int) {
+        nil
+    }
 }
 
-/**
- Make AnyType Encodable
- */
+/// Make AnyType Encodable
 extension AnyType: Encodable {
-    /**
-     Encode to an encoder
-     - parameters:
-        - encoder: The encoder to encode the value to
-     */
+    /// Encode to an encoder
+    /// - parameters:
+    ///   - encoder: The encoder to encode the value to
+    // swiftlint:disable:next cyclomatic_complexity
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
-        case .string(let string):
+        case let .string(string):
             try container.encode(string)
-        case .bool(let boolean):
+        case let .bool(boolean):
             try container.encode(boolean)
-        case .number(let number):
+        case let .number(number):
             try container.encode(number)
-        case .array(let stringArray):
+        case let .array(stringArray):
             try container.encode(stringArray)
-        case .numberArray(let numberArray):
+        case let .numberArray(numberArray):
             try container.encode(numberArray)
-        case .booleanArray(let booleanArray):
+        case let .booleanArray(booleanArray):
             try container.encode(booleanArray)
-        case .dictionary(let dictionary):
+        case let .dictionary(dictionary):
             try container.encode(dictionary)
-        case .numberDictionary(let dictionary):
+        case let .numberDictionary(dictionary):
             try container.encode(dictionary)
-        case .booleanDictionary(let dictionary):
+        case let .booleanDictionary(dictionary):
             try container.encode(dictionary)
-        case .anyDictionary(data: let dictionary):
+        case let .anyDictionary(data: dictionary):
             var keyed = encoder.container(keyedBy: CustomEncodable.self)
             for key in dictionary.keys {
                 let customEncodable = CustomEncodable(dictionary[key], key: key)
@@ -228,7 +224,7 @@ extension AnyType: Encodable {
                     try keyed.encode(value, forKey: customEncodable)
                 }
             }
-        case .anyArray(data: let array):
+        case let .anyArray(data: array):
             var indexed = encoder.unkeyedContainer()
             for value in array {
                 let encodable = CustomEncodable(value, key: "")
@@ -236,7 +232,6 @@ extension AnyType: Encodable {
                     try indexed.encode(data)
                 }
             }
-
         default:
             try container.encodeNil()
             return
@@ -245,7 +240,8 @@ extension AnyType: Encodable {
 }
 
 public struct AnyTypeDecodingContext {
-    static let key = CodingUserInfoKey(rawValue: "AnyTypeDecodingContext")!
+    // swiftlint:disable:next force_unwrapping
+    static let key: CodingUserInfoKey = .init(rawValue: "AnyTypeDecodingContext")!
 
     public var rawData: Data
 
@@ -258,6 +254,11 @@ public struct AnyTypeDecodingContext {
         return traverse(path: path, in: jsonData)
     }
 
+    public func inject(to decoder: JSONDecoder) -> JSONDecoder {
+        decoder.userInfo[AnyTypeDecodingContext.key] = self
+        return decoder
+    }
+
     private func traverse(path: [CodingKey], in obj: Any) -> Any {
         path.reduce(obj) { partialResult, key in
             if let index = key.intValue {
@@ -265,10 +266,5 @@ public struct AnyTypeDecodingContext {
             }
             return (partialResult as? [String: Any])?[key.stringValue] as Any
         }
-    }
-
-    public func inject(to decoder: JSONDecoder) -> JSONDecoder {
-        decoder.userInfo[AnyTypeDecodingContext.key] = self
-        return decoder
     }
 }

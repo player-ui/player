@@ -6,13 +6,13 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import XCTest
-import SwiftUI
 @testable import PlayerUI
 @testable import PlayerUILogger
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
 @testable import PlayerUITestUtilitiesCore
+import SwiftUI
+import XCTest
 
 struct ExampleAssetData: AssetData {
     var id: String
@@ -31,28 +31,32 @@ struct ExampleAssetView: View {
 }
 
 class ExampleAsset: UncontrolledAsset<ExampleAssetData> {
-    override var view: AnyView { AnyView(ExampleAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(ExampleAssetView(model: model))
+    }
 }
 
 class AssetUnitTestDefaultTests: SwiftUIAssetUnitTestCase {
     func testDefaultRegister() {
-        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: [self], registry: SwiftUIRegistry(logger: TapableLogger()))
+        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(
+            plugins: [self],
+            registry: SwiftUIRegistry(logger: TapableLogger())
+        )
         XCTAssertEqual(player.assetRegistry.registeredAssets.count, 0)
     }
 }
 
 class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("test", asset: ExampleAsset.self)
-    }
-
     func testRegistration() {
-        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: [self], registry: SwiftUIRegistry(logger: TapableLogger()))
+        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(
+            plugins: [self],
+            registry: SwiftUIRegistry(logger: TapableLogger())
+        )
         XCTAssertEqual(player.assetRegistry.registeredAssets.count, 1)
     }
 
     func testDefaultPlugins() {
-        XCTAssertEqual(0, self.plugins().count)
+        XCTAssertEqual(0, plugins().count)
     }
 
     func testShouldNotDecode() async {
@@ -167,7 +171,10 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
     func testDifferentEquatableTypesAreNotEqual() {
         struct OtherEquatableAssetData: AssetData, Equatable {
             let id: String
-            var type: String { "Equatable" }
+            var type: String {
+                "Equatable"
+            }
+
             var value: String = "value"
         }
 
@@ -175,15 +182,25 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
         let asset2 = EquatableAssetData(id: asset1.id)
         XCTAssertFalse(asset1.isEqual(asset2))
     }
+
+    override func register(registry: SwiftUIRegistry) {
+        registry.register("test", asset: ExampleAsset.self)
+    }
 }
 
 private struct EquatableAssetData: AssetData, Equatable {
     let id: String
-    var type: String { "Equatable" }
     var value: String = "value"
+
+    var type: String {
+        "Equatable"
+    }
 }
 
 private struct NotEquatableAssetData: AssetData {
     let id: String
-    var type: String { "NotEquatable" }
+
+    var type: String {
+        "NotEquatable"
+    }
 }

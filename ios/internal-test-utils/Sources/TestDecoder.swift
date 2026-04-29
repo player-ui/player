@@ -1,13 +1,14 @@
 class TestDecoder: Decoder {
-    init() {
-        self.codingPath = []
-        self.userInfo = [:]
-    }
     var codingPath: [CodingKey]
 
     var userInfo: [CodingUserInfoKey: Any]
 
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
+    init() {
+        codingPath = []
+        userInfo = [:]
+    }
+
+    func container<Key: CodingKey>(keyedBy _: Key.Type) throws -> KeyedDecodingContainer<Key> {
         fatalError("Not Implemented")
     }
 

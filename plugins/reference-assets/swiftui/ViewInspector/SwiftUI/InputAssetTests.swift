@@ -6,22 +6,19 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import Foundation
 import Combine
+import Foundation
+import JavaScriptCore
+@testable import PlayerUI
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
 import SwiftUI
 import ViewInspector
 import XCTest
-import JavaScriptCore
-
-@testable import PlayerUI
-@testable import PlayerUITestUtilities
-@testable import PlayerUIReferenceAssets
-@testable import PlayerUISwiftUI
 
 @MainActor
 class InputAssetTests: SwiftUIAssetUnitTestCase {
-    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
-
     func testDecoding() async throws {
         let json = """
         {
@@ -39,7 +36,8 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let input: InputAsset = await getAsset(json) else { return XCTFail("could not get asset") }
+        guard let input: InputAsset = await getAsset(json)
+        else { return XCTFail("could not get asset") }
 
         _ = try input.view.inspect().find(InputAssetView.self).vStack().textField(1)
     }
@@ -51,7 +49,8 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let setExpectation = expectation(description: "Model Set called")
         guard
-            let wrapper: WrappedFunction<Void> = getWrappedFunction(completion: { setExpectation.fulfill() })
+            let wrapper: WrappedFunction<Void> =
+            getWrappedFunction(completion: { setExpectation.fulfill() })
         else { return XCTFail("could not create function") }
 
         let data = InputData(
@@ -67,10 +66,12 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let model = InputAssetViewModel(data, userInfo: [:])
         let update1expect = expectation(description: "Initial value")
-        model.$data.sink { (data) in
-            guard data.value?.stringValue == "a" else { return }
-            update1expect.fulfill()
-        }.store(in: &bag)
+        model.$data
+            .sink { data in
+                guard data.value?.stringValue == "a" else { return }
+                update1expect.fulfill()
+            }
+            .store(in: &bag)
 
         wait(for: [update1expect], timeout: 3)
 
@@ -91,10 +92,12 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
         model.data = newData
 
         let update2expect = expectation(description: "Updated value")
-        model.$data.sink { (data) in
-            guard data.value?.stringValue == "b" else { return }
-            update2expect.fulfill()
-        }.store(in: &bag)
+        model.$data
+            .sink { data in
+                guard data.value?.stringValue == "b" else { return }
+                update2expect.fulfill()
+            }
+            .store(in: &bag)
 
         wait(for: [update2expect], timeout: 3)
 
@@ -106,7 +109,16 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
     func testViewNoLabel() throws {
         let val = context.evaluateScript("('a')")
         let modelRef = ModelReference(rawValue: val)
-        let data = InputData(id: "input", type: "input", placeholder: nil, value: modelRef, label: nil, set: nil, dataType: nil, validation: nil)
+        let data = InputData(
+            id: "input",
+            type: "input",
+            placeholder: nil,
+            value: modelRef,
+            label: nil,
+            set: nil,
+            dataType: nil,
+            validation: nil
+        )
 
         let model = InputAssetViewModel(data, userInfo: [:])
 
@@ -118,12 +130,16 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let background = try field.background()
 
-        XCTAssertEqual(Color(red: 0.729, green: 0.745, blue: 0.773), try background.foregroundColor())
+        XCTAssertEqual(
+            Color(red: 0.729, green: 0.745, blue: 0.773),
+            try background.foregroundColor()
+        )
     }
 
     func testViewWithLabel() async throws {
         guard
-            let label: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}")
+            let label: TextAsset =
+            await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}")
         else { return XCTFail("could not get asset") }
         let val = context.evaluateScript("('a')")
         let modelRef = ModelReference(rawValue: val)
@@ -156,7 +172,8 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
             let validationObject = context.evaluateScript("(\(validationDataString))")
         else { return XCTFail("could not get validation object") }
 
-        let validation = try JSONDecoder().decode(ValidationData.self, from: validationObject)
+        let validation = try JSONDecoder()
+            .decode(ValidationData.self, from: validationObject)
             .withDismiss(context: context, dismiss: {
                 dismissExpectation.fulfill()
             })
@@ -197,10 +214,20 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
     func testTextfieldEditingFalse() throws {
         let setExpectation = expectation(description: "Model Set called")
         guard
-            let wrapper: WrappedFunction<Void> = getWrappedFunction(completion: { setExpectation.fulfill() })
+            let wrapper: WrappedFunction<Void> =
+            getWrappedFunction(completion: { setExpectation.fulfill() })
         else { return XCTFail("could not create function") }
 
-        let data = InputData(id: "input", type: "input", placeholder: nil, value: nil, label: nil, set: wrapper, dataType: nil, validation: nil)
+        let data = InputData(
+            id: "input",
+            type: "input",
+            placeholder: nil,
+            value: nil,
+            label: nil,
+            set: wrapper,
+            dataType: nil,
+            validation: nil
+        )
 
         let model = InputAssetViewModel(data, userInfo: [:])
 
@@ -219,10 +246,20 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
     func testTextfieldCommit() throws {
         let setExpectation = expectation(description: "Model Set called")
         guard
-            let wrapper: WrappedFunction<Void> = getWrappedFunction(completion: { setExpectation.fulfill() })
+            let wrapper: WrappedFunction<Void> =
+            getWrappedFunction(completion: { setExpectation.fulfill() })
         else { return XCTFail("could not create function") }
 
-        let data = InputData(id: "input", type: "input", placeholder: nil, value: nil, label: nil, set: wrapper, dataType: nil, validation: nil)
+        let data = InputData(
+            id: "input",
+            type: "input",
+            placeholder: nil,
+            value: nil,
+            label: nil,
+            set: wrapper,
+            dataType: nil,
+            validation: nil
+        )
 
         let model = InputAssetViewModel(data, userInfo: [:])
 
@@ -239,6 +276,10 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         wait(for: [setExpectation], timeout: 1)
     }
+
+    override open func plugins() -> [NativePlugin] {
+        [ReferenceAssetsPlugin()]
+    }
 }
 
 extension ValidationData {
@@ -248,6 +289,10 @@ extension ValidationData {
             return value
         }
         let jsDismiss = JSValue(object: dismissCallback, in: context)
-        return ValidationData(severity: severity, message: message, dismiss: WrappedFunction(rawValue: jsDismiss))
+        return ValidationData(
+            severity: severity,
+            message: message,
+            dismiss: WrappedFunction(rawValue: jsDismiss)
+        )
     }
 }

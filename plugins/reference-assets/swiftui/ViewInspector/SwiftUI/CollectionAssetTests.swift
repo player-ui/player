@@ -7,19 +7,16 @@
 //
 
 import Foundation
-import XCTest
-import ViewInspector
-import SwiftUI
-
 @testable import PlayerUI
-@testable import PlayerUITestUtilities
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
+import SwiftUI
+import ViewInspector
+import XCTest
 
 @MainActor
 class CollectionAssetTests: SwiftUIAssetUnitTestCase {
-    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
-
     func testDecoding() async throws {
         let json = """
         {
@@ -44,7 +41,8 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let collection: CollectionAsset = await getAsset(json) else { return XCTFail("could not get asset") }
+        guard let collection: CollectionAsset = await getAsset(json)
+        else { return XCTFail("could not get asset") }
 
         _ = try collection.view.inspect().find(CollectionAssetView.self).vStack()
     }
@@ -82,7 +80,8 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let collection: CollectionAsset = await getAsset(json) else { return XCTFail("could not get asset") }
+        guard let collection: CollectionAsset = await getAsset(json)
+        else { return XCTFail("could not get asset") }
 
         let stack = try collection.view.inspect().find(CollectionAssetView.self).vStack()
         // Verify the label is present in the view hierarchy
@@ -94,8 +93,10 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
 
     func testView() async throws {
         guard
-            let text1: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
-            let text2: TextAsset = await getAsset("{\"id\": \"text2\", \"type\": \"text\", \"value\":\"goodbye world\"}")
+            let text1: TextAsset =
+            await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
+            let text2: TextAsset =
+            await getAsset("{\"id\": \"text2\", \"type\": \"text\", \"value\":\"goodbye world\"}")
         else { return XCTFail("could not get assets") }
         let model = AssetViewModel<CollectionData>(
             CollectionData(
@@ -103,7 +104,7 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
                 type: "collection",
                 values: [
                     WrappedAsset(forAsset: text1),
-                    WrappedAsset(forAsset: text2)
+                    WrappedAsset(forAsset: text2),
                 ]
             )
         )
@@ -122,9 +123,14 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
     /// when a label is provided in the model data.
     func testViewWithLabel() async throws {
         guard
-            let label: TextAsset = await getAsset("{\"id\": \"label\", \"type\": \"text\", \"value\":\"My Collection\"}"),
-            let text1: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
-            let text2: TextAsset = await getAsset("{\"id\": \"text2\", \"type\": \"text\", \"value\":\"goodbye world\"}")
+            let label: TextAsset =
+            await getAsset(
+                "{\"id\": \"label\", \"type\": \"text\", \"value\":\"My Collection\"}"
+            ),
+            let text1: TextAsset =
+            await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
+            let text2: TextAsset =
+            await getAsset("{\"id\": \"text2\", \"type\": \"text\", \"value\":\"goodbye world\"}")
         else { return XCTFail("could not get assets") }
         let model = AssetViewModel<CollectionData>(
             CollectionData(
@@ -133,7 +139,7 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
                 label: WrappedAsset(forAsset: label),
                 values: [
                     WrappedAsset(forAsset: text1),
-                    WrappedAsset(forAsset: text2)
+                    WrappedAsset(forAsset: text2),
                 ]
             )
         )
@@ -150,5 +156,9 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
         // Verify each value's text content
         _ = try stack.find(text: "hello world")
         _ = try stack.find(text: "goodbye world")
+    }
+
+    override open func plugins() -> [NativePlugin] {
+        [ReferenceAssetsPlugin()]
     }
 }

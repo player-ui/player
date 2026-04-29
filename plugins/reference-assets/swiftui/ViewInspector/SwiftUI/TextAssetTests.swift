@@ -7,18 +7,16 @@
 //
 
 import Foundation
-import XCTest
-import ViewInspector
-import SwiftUI
 @testable import PlayerUI
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
+import SwiftUI
+import ViewInspector
+import XCTest
 
 @MainActor
 class TextAssetTests: SwiftUIAssetUnitTestCase {
-    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
-
     func testAssetDecoding() async throws {
         let json = """
         {
@@ -28,10 +26,10 @@ class TextAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let text: TextAsset = await getAsset(json) else { return XCTFail("could not get asset") }
+        guard let text: TextAsset = await getAsset(json)
+        else { return XCTFail("could not get asset") }
 
         _ = try text.view.inspect().find(TextAssetView.self).text()
-
     }
 
     func testView() throws {
@@ -60,7 +58,7 @@ class TextAssetTests: SwiftUIAssetUnitTestCase {
                         value: nil,
                         name: nil,
                         metaData: ModifierMetaData(ref: "https://intuit.com")
-                    )
+                    ),
                 ]
             )
         )
@@ -74,5 +72,9 @@ class TextAssetTests: SwiftUIAssetUnitTestCase {
         let modifier = try text.modifier(LinkModifier.self)
         XCTAssertEqual(Color(red: 0.000, green: 0.467, blue: 0.773), try modifier.foregroundColor())
         try text.callOnTapGesture()
+    }
+
+    override open func plugins() -> [NativePlugin] {
+        [ReferenceAssetsPlugin()]
     }
 }

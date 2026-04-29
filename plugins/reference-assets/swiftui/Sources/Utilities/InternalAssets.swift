@@ -8,25 +8,30 @@
 import Foundation
 import UIKit
 
-/**
- Assets that are used internally for rendering ReferenceAssets
- */
+/// Assets that are used internally for rendering ReferenceAssets
 class InternalAssets {
-
-    /**
-     An image used for the dismiss button
-     */
+    /// An image used for the dismiss button
     static var dismissIcon: UIImage? {
-        return InternalAssets.getSVGOfSize(name: "dismiss")
+        InternalAssets.getSVGOfSize(name: "dismiss")
     }
 
-    /**
-     Helper method to get and resize bundled SVGs
-     - parameters:
-        - name: The name of the svg icon
-        - size: The size to resize the SVG to if desired
-     - returns: A resized UIImage from the SVG
-     */
+    #if SWIFT_PACKAGE
+        static var bundleURL: URL? {
+            Bundle.module.resourceURL
+        }
+    #else
+        static var bundleURL: URL? {
+            Bundle(for: InternalAssets.self)
+                .resourceURL?
+                .appendingPathComponent("ReferenceAssets.bundle")
+        }
+    #endif
+
+    /// Helper method to get and resize bundled SVGs
+    /// - parameters:
+    ///   - name: The name of the svg icon
+    ///   - size: The size to resize the SVG to if desired
+    /// - returns: A resized UIImage from the SVG
     static func getSVGOfSize(name: String, size: CGSize? = nil) -> UIImage? {
         guard
             let url = InternalAssets.bundleURL,
@@ -34,25 +39,19 @@ class InternalAssets {
 
         let image = UIImage(named: name, in: bundle, with: .none)
 
-        if let size = size {
+        if let size {
             return image?.resize(to: size).withRenderingMode(.alwaysTemplate)
         }
 
         return image?.withRenderingMode(.alwaysTemplate)
     }
-
-    #if SWIFT_PACKAGE
-    static var bundleURL: URL? { Bundle.module.resourceURL }
-    #else
-    static var bundleURL: URL? { Bundle(for: InternalAssets.self).resourceURL?.appendingPathComponent("ReferenceAssets.bundle") }
-    #endif
 }
 
 extension UIImage {
     func resize(to newSize: CGSize) -> UIImage {
         let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: newSize)
         UIGraphicsBeginImageContext(newSize)
-        self.draw(in: rect)
+        draw(in: rect)
         guard let newImage = UIGraphicsGetImageFromCurrentImageContext() else { return self }
         UIGraphicsEndImageContext()
         return newImage

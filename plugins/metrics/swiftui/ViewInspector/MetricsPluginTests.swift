@@ -7,27 +7,29 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
-import ViewInspector
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
-@testable import PlayerUITestUtilitiesCore
-@testable import PlayerUISwiftUI
 @testable import PlayerUIMetricsPlugin
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilitiesCore
+import ViewInspector
+import XCTest
 
 class TapCounterPlugin: NativePlugin {
     var pluginName: String = "TapCounter"
     var count = 0
-    func apply<P>(player: P) where P: HeadlessPlayer {
+
+    func apply<P: HeadlessPlayer>(player: P) {
         guard let player = player as? SwiftUIPlayer else { return }
-        player.hooks?.view.interceptRegister({ info in
+        player.hooks?.view.interceptRegister { info in
             self.count += 1
             return info
-        })
+        }
     }
 }
+
 class MetricsPluginTests: XCTestCase {
     func testConstruction() {
         let context = JSContext()
@@ -37,7 +39,7 @@ class MetricsPluginTests: XCTestCase {
         XCTAssertNotNil(plugin.pluginRef)
     }
 
-    func testRenderTimeTracking() {
+    func testRenderTimeTracking() throws {
         let renderEndCalled = XCTestExpectation(description: "renderEnd called")
         let callback: @convention(block) () -> Void = {
             renderEndCalled.fulfill()
@@ -45,9 +47,12 @@ class MetricsPluginTests: XCTestCase {
         let plugin = MetricsPlugin()
         let counter = TapCounterPlugin()
 
-        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [counter, plugin, ReferenceAssetsPlugin()])
+        let player = SwiftUIPlayer(
+            flow: FlowData.COUNTER,
+            plugins: [counter, plugin, ReferenceAssetsPlugin()]
+        )
 
-        let jscallback = JSValue(object: callback, in: plugin.pluginRef!.context)
+        let jscallback = try JSValue(object: callback, in: XCTUnwrap(plugin.pluginRef?.context))
         plugin.pluginRef?.setValue(jscallback, forProperty: "renderEnd")
 
         XCTAssertEqual(counter.count, 1)
@@ -59,12 +64,15 @@ class MetricsPluginTests: XCTestCase {
 
     func testNoRenderTimeTracking() {
         let counter = TapCounterPlugin()
-        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [counter, MetricsPlugin(trackRenderTime: false)])
+        let player = SwiftUIPlayer(
+            flow: FlowData.COUNTER,
+            plugins: [counter, MetricsPlugin(trackRenderTime: false)]
+        )
 
         XCTAssertEqual(counter.count, 0)
     }
 
-    func testHandler() throws {
+    func testHandler() {
         let calledBack = expectation(description: "RenderEnd handler called")
         let player = SwiftUIPlayer(
             flow: FlowData.COUNTER,
@@ -75,7 +83,7 @@ class MetricsPluginTests: XCTestCase {
                     XCTAssertNotNil(nodeMetrics)
                     XCTAssertNotNil(flowMetrics)
                     calledBack.fulfill()
-                }
+                },
             ]
         )
 
@@ -84,7 +92,7 @@ class MetricsPluginTests: XCTestCase {
         wait(for: [calledBack], timeout: 2)
     }
 
-    func testOnRenderEndHook() throws {
+    func testOnRenderEndHook() {
         let calledBackExpectation = expectation(description: "RenderEnd handler called")
         let hookExpectation = XCTestExpectation(description: "onRenderEnd hook called")
         let jsContext = JSContext()
@@ -109,7 +117,8 @@ class MetricsPluginTests: XCTestCase {
         }
 
         let player = SwiftUIPlayer(
-            flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin(), plugin], context: context)
+            flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin(), plugin], context: context
+        )
 
         ViewHosting.host(view: player)
 
@@ -126,7 +135,10 @@ class MetricsPluginTests: XCTestCase {
 
         XCTAssertNotNil(plugin.context)
 
-        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
+        let player = HeadlessPlayerImpl(
+            plugins: [ReferenceAssetsPlugin(), plugin],
+            context: context ?? JSContext()
+        )
 
         plugin.hooks?.onFlowBegin.tap { flow in
             XCTAssertEqual(flow.flow.completed, false)
@@ -140,7 +152,7 @@ class MetricsPluginTests: XCTestCase {
             handlerExpectationFlowEnd.fulfill()
         }
 
-        player.start(flow: FlowData.COUNTER, completion: {_ in})
+        player.start(flow: FlowData.COUNTER, completion: { _ in })
 
         wait(for: [handlerExpectationFlowBegin], timeout: 5)
 
@@ -157,7 +169,7 @@ class MetricsPluginTests: XCTestCase {
 class RequestTimePluginTests: XCTestCase {
     func testRequestTimeTracking() {
         let renderEndCalled = XCTestExpectation(description: "renderEnd handler called")
-        let plugin = MetricsPlugin { (_, _, flow) in
+        let plugin = MetricsPlugin { _, _, flow in
             guard let req = flow?.flow.requestTime else { return }
             XCTAssertEqual(req, 5)
             renderEndCalled.fulfill()
@@ -171,7 +183,7 @@ class RequestTimePluginTests: XCTestCase {
                 counter,
                 plugin,
                 RequestTimePlugin { 5 },
-                ReferenceAssetsPlugin()
+                ReferenceAssetsPlugin(),
             ]
         )
 

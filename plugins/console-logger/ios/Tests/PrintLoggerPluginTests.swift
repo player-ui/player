@@ -8,11 +8,11 @@
 
 import Foundation
 import JavaScriptCore
-import XCTest
 @testable import PlayerUI
-@testable import PlayerUIPrintLoggerPlugin
 @testable import PlayerUILogger
+@testable import PlayerUIPrintLoggerPlugin
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class PrintLoggerPluginTests: XCTestCase {
     func testPrintLogger() {
@@ -21,13 +21,13 @@ class PrintLoggerPluginTests: XCTestCase {
         let player = HeadlessPlayerImpl(plugins: [PrintLoggerPlugin(level: .trace)])
         XCTAssertEqual(LogLevel.trace, player.logger.logLevel)
 
-        player.logger.hooks.trace.tap(name: "test") { (message) in
+        player.logger.hooks.trace.tap(name: "test") { message in
             XCTAssertEqual("Message 1", (message as? [String])?.first)
             XCTAssertEqual("Message 2", (message as? [String])?[1])
             XCTAssertEqual("Message 3", (message as? [String])?[2])
             logExpect.fulfill()
         }
-        
+
         player.logger.t("Message 1", "Message 2", "Message 3")
         player.logger.d("Message")
         player.logger.i("Message")

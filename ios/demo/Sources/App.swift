@@ -1,21 +1,20 @@
-import SwiftUI
 import PlayerUI
-import PlayerUILogger
-import PlayerUISwiftUI
-import PlayerUIReferenceAssets
-
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
 import PlayerUICommonExpressionsPlugin
 import PlayerUICommonTypesPlugin
 import PlayerUIExpressionPlugin
 import PlayerUIExternalActionPlugin
+import PlayerUILogger
 import PlayerUIMetricsPlugin
 import PlayerUIPrintLoggerPlugin
 import PlayerUIPubSubPlugin
+import PlayerUIReferenceAssets
+import PlayerUISwiftUI
 import PlayerUISwiftUIPendingTransactionPlugin
 import PlayerUITransitionPlugin
 import PlayerUITypesProviderPlugin
+import SwiftUI
 
 @main
 struct BazelApp: App {
@@ -29,15 +28,6 @@ struct BazelApp: App {
 }
 
 struct MainView: View {
-    @State var result: Result<CompletedState, PlayerError>? = nil
-
-    var showAlert: Binding<Bool> {
-        Binding(get: { result != nil }) { newValue in
-            guard !newValue else { return }
-            result = nil
-        }
-    }
-
     let plugins: [NativePlugin] = [
         PrintLoggerPlugin(level: .trace),
         ReferenceAssetsPlugin(),
@@ -57,8 +47,11 @@ struct MainView: View {
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
         BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
     ]
+
+    @State var result: Result<CompletedState, PlayerError>?
+
     var body: some View {
         SegmentControlView(
             plugins: plugins,
@@ -68,21 +61,29 @@ struct MainView: View {
         )
         .navigationBarTitleDisplayMode(.inline)
         .alert(isPresented: showAlert, content: {
-            return Alert(
+            Alert(
                 title: Text("Flow Finished"),
                 message: Text(result?.message ?? "No Result"),
                 dismissButton: .default(Text("Done"))
             )
         })
     }
+
+    var showAlert: Binding<Bool> {
+        // swiftlint:disable:next multiple_closures_with_trailing_closure
+        Binding(get: { result != nil }) { newValue in
+            guard !newValue else { return }
+            result = nil
+        }
+    }
 }
 
 extension Result where Success == CompletedState, Failure == PlayerError {
     var message: String {
         switch self {
-        case .success(let success):
+        case let .success(success):
             return success.endState?.outcome ?? "No Outcome"
-        case .failure(let failure):
+        case let .failure(failure):
             guard case let .promiseRejected(error) = failure else {
                 return failure.playerDescription
             }

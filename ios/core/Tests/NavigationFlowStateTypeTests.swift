@@ -1,9 +1,8 @@
 import Foundation
-import XCTest
 @testable import PlayerUI
+import XCTest
 
 class NavigationFlowStateTypeTests: XCTestCase {
-
     func testKnownStateTypes() {
         let cases: [(String, NavigationFlowStateType)] = [
             ("VIEW", .view),

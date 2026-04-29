@@ -7,10 +7,9 @@
 
 import Foundation
 
-extension Error {
-
+public extension Error {
     /// Creates error descriptions logged by Player.
-    public var playerDescription: String {
+    var playerDescription: String {
         if let decodingError = self as? Swift.DecodingError {
             return decodingError.prettyDescription
         }
@@ -19,15 +18,12 @@ extension Error {
 }
 
 extension Swift.DecodingError {
-
-    /// Constructs a more human readable message to make it easier to identify and debug decoding errors
+    /// Constructs a more human readable message to make it easier to identify and debug decoding
+    /// errors
     var prettyDescription: String {
-
         let codingPathForDecodingErrorContext = { (context: Context) -> String in
             return context.codingPath
-                .map {
-                    $0.stringValue
-                }
+                .map(\.stringValue)
                 .map {
                     let prefix = "Index "
                     if $0.hasPrefix(prefix) {
@@ -42,25 +38,25 @@ extension Swift.DecodingError {
         let messageForDecodingErrorContext = { (context: Context) -> String in
             let message = context.debugDescription
             let codingPath = codingPathForDecodingErrorContext(context)
-            if 0 < codingPath.count {
+            if !codingPath.isEmpty {
                 return message + " (coding path \(codingPath))"
             }
             return message
         }
 
         switch self {
-        case .typeMismatch(_, let context):
+        case let .typeMismatch(_, context):
             return messageForDecodingErrorContext(context)
-        case .valueNotFound(_, let context):
+        case let .valueNotFound(_, context):
             return "Value not found at coding path \(codingPathForDecodingErrorContext(context))."
-        case .keyNotFound(let key, let context):
+        case let .keyNotFound(key, context):
             var keyPath = codingPathForDecodingErrorContext(context)
-            if 0 < keyPath.count {
+            if !keyPath.isEmpty {
                 keyPath.append(".")
             }
             keyPath.append(key.stringValue)
             return "Key not found at coding path \(keyPath)."
-        case .dataCorrupted(let context):
+        case let .dataCorrupted(context):
             return messageForDecodingErrorContext(context)
         @unknown default:
             return "\(self)"

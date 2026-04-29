@@ -6,29 +6,33 @@
 //  Copyright © 2021 CocoaPods. All rights reserved.
 //
 
-import Foundation
 import Combine
-import XCTest
+import Foundation
 import JavaScriptCore
-
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class ManagedPlayerViewModelTests: XCTestCase {
-    let flow1 = FlowData.COUNTER
-    let flow2 = FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2")
+    private let flow1 = FlowData.COUNTER
+    private let flow2 = FlowData.COUNTER.replacingOccurrences(
+        of: "counter-flow",
+        with: "counter-flow-2"
+    )
 
     func testViewModelSuccessFlow() async throws {
         let flowManager = ConstantFlowManager([flow1], delay: 0)
 
         let completed = expectation(description: "Flows Completed")
-        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: { _ in
             completed.fulfill()
         })
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: { await viewModel.next() }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: {
+            await viewModel.next()
+        }
 
         let result = """
         {
@@ -42,7 +46,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         let stateObj = JSContext()?.evaluateScript("(\(result))")
 
-        let state = CompletedState.createInstance(from: stateObj)!
+        let state = try XCTUnwrap(CompletedState.createInstance(from: stateObj))
 
         viewModel.result = .success(state)
         await fulfillment(of: [completed], timeout: 2)
@@ -51,10 +55,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
     func testViewModelSuccessMultiFlow() async throws {
         let flowManager = ConstantFlowManager([flow1, flow2], delay: 0)
 
-        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in})
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: { _ in })
 
-
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: { await viewModel.next() }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: {
+            await viewModel.next()
+        }
 
         let result = """
         {
@@ -68,9 +73,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         let stateObj = JSContext()?.evaluateScript("(\(result))")
 
-        let state = CompletedState.createInstance(from: stateObj)!
+        let state = try XCTUnwrap(CompletedState.createInstance(from: stateObj))
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: { viewModel.result = .success(state) }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: {
+            viewModel.result = .success(state)
+        }
     }
 
     func testViewModelManagerError() async {
@@ -81,11 +88,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
         }
         let flowManager = ErrorFlowManager()
 
-        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in })
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: { _ in })
 
         await assertPublished(AnyPublisher(viewModel.$loadingState), condition: { state in
             guard
-                case .failed(let error) = state,
+                case let .failed(error) = state,
                 let _ = error as? PlayerError
             else { return false }
 
@@ -100,10 +107,10 @@ class ManagedPlayerViewModelTests: XCTestCase {
     func testViewModelRetry() async throws {
         let flowManager = ConstantFlowManager([flow1, flow2], delay: 0)
 
-        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in})
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: { _ in })
 
         await assertPublished(AnyPublisher(viewModel.$loadingState)) { value in
-            if case .loaded(let flow) = value, flow == self.flow1 {
+            if case let .loaded(flow) = value, flow == self.flow1 {
                 return true
             }
             return false
@@ -123,9 +130,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         let stateObj = JSContext()?.evaluateScript("(\(result))")
 
-        let state = CompletedState.createInstance(from: stateObj)!
+        let state = try XCTUnwrap(CompletedState.createInstance(from: stateObj))
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: { viewModel.result = .success(state) }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: {
+            viewModel.result = .success(state)
+        }
 
         await assertPublished(AnyPublisher(viewModel.$loadingState)) { value in
             if case .failed = value {
@@ -145,15 +154,19 @@ class ManagedPlayerViewModelTests: XCTestCase {
             viewModel.retry()
         }
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: { await viewModel.next(state) }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: {
+            await viewModel.next(state)
+        }
     }
 
     func testViewModelReset() async throws {
         let flowManager = ConstantFlowManager([flow1, flow2], delay: 0)
 
-        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in})
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: { _ in })
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: { await viewModel.next() }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: {
+            await viewModel.next()
+        }
 
         let result = """
         {
@@ -167,9 +180,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         let stateObj = JSContext()?.evaluateScript("(\(result))")
 
-        let state = CompletedState.createInstance(from: stateObj)!
+        let state = try XCTUnwrap(CompletedState.createInstance(from: stateObj))
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: { viewModel.result = .success(state) }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: {
+            viewModel.result = .success(state)
+        }
 
         await assertPublished(AnyPublisher(viewModel.$loadingState)) { value in
             if case .failed = value {
@@ -189,18 +204,22 @@ class ManagedPlayerViewModelTests: XCTestCase {
             viewModel.reset()
         }
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: { await viewModel.next() }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: {
+            await viewModel.next()
+        }
     }
 
     func testViewModelErrorFlow() async {
         let flowManager = ConstantFlowManager(["flow1"], delay: 0)
 
         let completed = expectation(description: "Flows Completed")
-        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in})
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: { _ in })
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 != nil } action: { await viewModel.next() }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 != nil } action: {
+            await viewModel.next()
+        }
 
-        let cancellable = viewModel.$loadingState.sink { (loadingState) in
+        let cancellable = viewModel.$loadingState.sink { loadingState in
             guard case .failed = loadingState else { return }
             completed.fulfill()
         }
@@ -224,7 +243,10 @@ class ManagedPlayerViewModelTests: XCTestCase {
             terminated.fulfill()
         }
 
-        var model: ManagedPlayerViewModel? = ManagedPlayerViewModel(manager: manager, onComplete: {_ in})
+        var model: ManagedPlayerViewModel? = ManagedPlayerViewModel(
+            manager: manager,
+            onComplete: { _ in }
+        )
 
         XCTAssertNotNil(model)
         model = nil
@@ -232,7 +254,10 @@ class ManagedPlayerViewModelTests: XCTestCase {
     }
 
     func testStateHook() {
-        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([FlowData.COUNTER]), onComplete: {_ in})
+        let model = ManagedPlayerViewModel(
+            manager: ConstantFlowManager([FlowData.COUNTER]),
+            onComplete: { _ in }
+        )
 
         let player = HeadlessPlayerImpl(plugins: [model])
 
@@ -250,12 +275,15 @@ class ManagedPlayerViewModelTests: XCTestCase {
     }
 
     func testLoadingStateFailureEmptyFlow() {
-        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([FlowData.COUNTER]), onComplete: {_ in})
+        let model = ManagedPlayerViewModel(
+            manager: ConstantFlowManager([FlowData.COUNTER]),
+            onComplete: { _ in }
+        )
 
         model.handleNextState(.flow(""))
 
         switch model.loadingState {
-        case .failed(let error):
+        case let .failed(error):
             XCTAssertEqual(error as? ManagedPlayerError, ManagedPlayerError.emptyFlow)
         default:
             XCTFail("Should Have entered failed state")
@@ -263,11 +291,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
     }
 
     func testRetryIdleState() {
-        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([]), onComplete: {_ in})
+        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([]), onComplete: { _ in })
         model.handleNextState(.flow(FlowData.COUNTER))
 
         switch model.loadingState {
-        case .loaded(let flow):
+        case let .loaded(flow):
             XCTAssertEqual(flow, FlowData.COUNTER)
         default:
             XCTFail("Should have entered loaded state")
@@ -283,33 +311,54 @@ class ManagedPlayerViewModelTests: XCTestCase {
     }
 
     func testNextUpdatesLoadingStateOnMainNoFlows() async throws {
-        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([], delay: 1/60), onComplete: {_ in})
+        let model = ManagedPlayerViewModel(
+            manager: ConstantFlowManager([], delay: 1 / 60),
+            onComplete: { _ in }
+        )
         try await checkNextUpdatesLoadingStateOnMain(model: model, expectedStateChangeCount: 1)
     }
 
     func testNextUpdatesLoadingStateOnMainOneFlow() async throws {
-        let model = ManagedPlayerViewModel(manager: ConstantFlowManager(["abc"], delay: 1/60), onComplete: {_ in})
-        try await checkNextUpdatesLoadingStateOnMain(model: model, nextCallCount: 2, expectedStateChangeCount: 4)
+        let model = ManagedPlayerViewModel(
+            manager: ConstantFlowManager(["abc"], delay: 1 / 60),
+            onComplete: { _ in }
+        )
+        try await checkNextUpdatesLoadingStateOnMain(
+            model: model,
+            nextCallCount: 2,
+            expectedStateChangeCount: 4
+        )
     }
 
     func testNextUpdatesLoadingStateOnMainMultipleFlows() async throws {
-        let model = ManagedPlayerViewModel(manager: ConstantFlowManager(["abc", "def", "ghi"], delay: 1/60), onComplete: {_ in})
-        try await checkNextUpdatesLoadingStateOnMain(model: model, nextCallCount: 3, expectedStateChangeCount: 6)
+        let model = ManagedPlayerViewModel(
+            manager: ConstantFlowManager(["abc", "def", "ghi"], delay: 1 / 60),
+            onComplete: { _ in }
+        )
+        try await checkNextUpdatesLoadingStateOnMain(
+            model: model,
+            nextCallCount: 3,
+            expectedStateChangeCount: 6
+        )
     }
 
     func testThrowingNextUpdatesLoadingStateOnMain() async throws {
-        let model = ManagedPlayerViewModel(manager: ThrowingFlowManager(), onComplete: {_ in})
+        let model = ManagedPlayerViewModel(manager: ThrowingFlowManager(), onComplete: { _ in })
         try await checkNextUpdatesLoadingStateOnMain(model: model, expectedStateChangeCount: 2)
     }
 
-    private func checkNextUpdatesLoadingStateOnMain(model: ManagedPlayerViewModel, nextCallCount: Int = 1, expectedStateChangeCount: Int) async throws {
-        let expect = (0..<expectedStateChangeCount).map {
+    private func checkNextUpdatesLoadingStateOnMain(
+        model: ManagedPlayerViewModel,
+        nextCallCount: Int = 1,
+        expectedStateChangeCount: Int
+    ) async throws {
+        let expect = (0 ..< expectedStateChangeCount).map {
             expectation(description: "\($0)")
         }
         var stateChangeCount = 0
         // the publisher emits immediately, we only care about changes
         // from the `next` call(s) below, drop the first state received
-        let cancellable = model.$loadingState.dropFirst().sink { state in
+        let cancellable = model.$loadingState.dropFirst().sink { _ in
             XCTAssertTrue(Thread.isMainThread)
             XCTAssertTrue(stateChangeCount < expect.count)
             stateChangeCount += 1
@@ -317,7 +366,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         }
         await withTaskGroup(of: Void.self) { group in
             group.addTask {
-                for _ in (0..<nextCallCount) {
+                for _ in 0 ..< nextCallCount {
                     await model.next()
                 }
             }
@@ -340,22 +389,29 @@ class ManagedPlayerViewModelTests: XCTestCase {
 }
 
 class TerminatingManager: FlowManager {
-    func next(_ result: CompletedState?) async throws -> NextState {
-        return .flow(FlowData.COUNTER)
-    }
     private var terminateFn: (InProgressState?) -> Void
-    init(_ terminate: @escaping (InProgressState?) -> Void ) {
-        self.terminateFn = terminate
+
+    init(_ terminate: @escaping (InProgressState?) -> Void) {
+        terminateFn = terminate
     }
-    public func terminate(state: InProgressState?) {
-        self.terminateFn(state)
+
+    func next(_: CompletedState?) async throws -> NextState {
+        .flow(FlowData.COUNTER)
+    }
+
+    func terminate(state: InProgressState?) {
+        terminateFn(state)
     }
 }
 
-internal extension XCTestCase {
-    func assertPublished<T>(_ publisher: AnyPublisher<T, Never>, condition: @escaping (T) -> Bool, action: () async -> Void) async {
+extension XCTestCase {
+    func assertPublished<T>(
+        _ publisher: AnyPublisher<T, Never>,
+        condition: @escaping (T) -> Bool,
+        action: () async -> Void
+    ) async {
         let expectation = XCTestExpectation(description: "Waiting for publisher to emit value")
-        let cancel = publisher.sink { (value) in
+        let cancel = publisher.sink { value in
             guard condition(value) else { return }
             expectation.fulfill()
         }

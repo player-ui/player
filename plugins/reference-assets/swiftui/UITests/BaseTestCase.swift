@@ -6,15 +6,15 @@
 //  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
+import Combine
 import Foundation
-import XCTest
 import PlayerUI
 import PlayerUITestUtilities
 import PlayerUITestUtilitiesCore
-import Combine
+import XCTest
 
 class BaseTestCase: AssetUITestCase {
-    // AssetCollectionView uses a List which wont register elements if they aren't on screen
+    /// AssetCollectionView uses a List which wont register elements if they aren't on screen
     override func openFlow(_ mockName: String) {
         guard !app.buttons[mockName].exists else { return super.openFlow(mockName) }
         var attempts = 0

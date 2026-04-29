@@ -7,13 +7,11 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+import XCTest
 
 class StateTests: XCTestCase {
-    let context = JSContext()!
-
     func testCompletedStateCreation() {
         let value = JSValue()
         XCTAssertNil(CompletedState.createInstance(from: value))

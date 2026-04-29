@@ -1,11 +1,11 @@
 import Foundation
-import XCTest
 @testable import PlayerUI
-@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIStageRevertDataPlugin
+@testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class StageRevertDataPluginTests: XCTestCase {
-    let json = """
+    private let json = """
     {
       "id": "minimal",
       "views": [
@@ -63,7 +63,7 @@ class StageRevertDataPluginTests: XCTestCase {
       }
     }
     """
-    
+
     func testStageRevertDataPluginStagesData() {
         let expected = XCTestExpectation(description: "data did not change")
         let player = HeadlessPlayerImpl(plugins: [StageRevertDataPlugin()])
@@ -83,11 +83,13 @@ class StageRevertDataPluginTests: XCTestCase {
             }
         }
 
-        player.hooks?.flowController.tap({ flowController in
+        player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.afterTransition.tap { flowInstance in
                     guard flowInstance.currentState?.name == "VIEW_3" else {
-                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        (player.state as? InProgressState)?.controllers?
+                            .data
+                            .set(transaction: ["name": "Test"])
                         do {
                             try flowController.transition(with: "clear")
                         } catch {
@@ -97,9 +99,9 @@ class StageRevertDataPluginTests: XCTestCase {
                     }
                 }
             }
-        })
+        }
 
-        player.start(flow: json, completion: {_ in})
+        player.start(flow: json, completion: { _ in })
         wait(for: [expected], timeout: 1)
     }
 
@@ -122,11 +124,13 @@ class StageRevertDataPluginTests: XCTestCase {
             }
         }
 
-        player.hooks?.flowController.tap({ flowController in
+        player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.afterTransition.tap { flowInstance in
                     guard flowInstance.currentState?.name == "VIEW_2" else {
-                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        (player.state as? InProgressState)?.controllers?
+                            .data
+                            .set(transaction: ["name": "Test"])
                         do {
                             try flowController.transition(with: "commit")
                         } catch {
@@ -136,9 +140,9 @@ class StageRevertDataPluginTests: XCTestCase {
                     }
                 }
             }
-        })
+        }
 
-        player.start(flow: json, completion: {_ in})
+        player.start(flow: json, completion: { _ in })
         wait(for: [expected], timeout: 1)
     }
 }

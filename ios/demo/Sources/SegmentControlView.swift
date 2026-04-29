@@ -5,48 +5,20 @@
 //  Created by Zhao Xia Wu on 2023-11-08.
 //
 
-import Foundation
-import SwiftUI
 import Combine
+import Foundation
 import PlayerUI
 import PlayerUITestUtilitiesCore
+import SwiftUI
 
-/**
- A SwiftUI View that contains two tabs AssetCollection and PluginsAndPlayer tab for ease of UITesting
- */
+/// A SwiftUI View that contains two tabs AssetCollection and PluginsAndPlayer tab for ease of
+/// UITesting
 public struct SegmentControlView: View {
     let plugins: [NativePlugin]
     let assetSections: [FlowLoader.FlowSection]
     let pluginSections: [FlowLoader.FlowSection]
     let padding: CGFloat
     let result: Binding<Result<CompletedState, PlayerError>?>
-    /**
-     Initializes and loads flows
-     - parameters:
-        - plugins: Plugins to add to Player instance that is created
-        - assetSections: The `[FlowSection]` to display asset flows
-        - pluginSections: The `[FlowSection]` to display plugin flows
-        - padding: Padding around the AssetFlowView ``
-        - completion: A handler for when a flow reaches an end state
-     */
-    public init(
-        plugins: [NativePlugin],
-        assetSections: [FlowLoader.FlowSection],
-        pluginSections: [FlowLoader.FlowSection],
-        padding: CGFloat = 16,
-        result: Binding<Result<CompletedState, PlayerError>?>
-    ) {
-        self.plugins = plugins
-        self.assetSections = assetSections
-        self.pluginSections = pluginSections
-        self.padding = padding
-        self.result = result
-    }
-
-    enum HeaderSelection: String, CaseIterable {
-        case flows = "Asset Flows"
-        case pluginsAndPlayer = "Plugins + Managed Player"
-    }
 
     @State var segmentationSelection: HeaderSelection = .flows
 
@@ -79,7 +51,7 @@ public struct SegmentControlView: View {
     }
 
     var flowsListSection: some View {
-        return AssetCollection(
+        AssetCollection(
             plugins: plugins,
             sections: assetSections,
             padding: padding,
@@ -89,12 +61,38 @@ public struct SegmentControlView: View {
         .navigationBarTitle(Text("Flows"))
         .alert(isPresented: $doneFlow, content: {
             Alert(title: Text("FlowFinished"),
-                    message: Text("Outcome: \(outcome)"),
-                    dismissButton: .default(Text("OK")))
+                  message: Text("Outcome: \(outcome)"),
+                  dismissButton: .default(Text("OK")))
         })
     }
 
     var playerListSection: some View {
-        return PluginsAndPlayerCollection(plugins: plugins, sections: pluginSections)
+        PluginsAndPlayerCollection(plugins: plugins, sections: pluginSections)
+    }
+
+    /// Initializes and loads flows
+    /// - parameters:
+    ///   - plugins: Plugins to add to Player instance that is created
+    ///   - assetSections: The `[FlowSection]` to display asset flows
+    ///   - pluginSections: The `[FlowSection]` to display plugin flows
+    ///   - padding: Padding around the AssetFlowView ``
+    ///   - completion: A handler for when a flow reaches an end state
+    public init(
+        plugins: [NativePlugin],
+        assetSections: [FlowLoader.FlowSection],
+        pluginSections: [FlowLoader.FlowSection],
+        padding: CGFloat = 16,
+        result: Binding<Result<CompletedState, PlayerError>?>
+    ) {
+        self.plugins = plugins
+        self.assetSections = assetSections
+        self.pluginSections = pluginSections
+        self.padding = padding
+        self.result = result
+    }
+
+    enum HeaderSelection: String, CaseIterable {
+        case flows = "Asset Flows"
+        case pluginsAndPlayer = "Plugins + Managed Player"
     }
 }

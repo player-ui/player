@@ -1,0 +1,28 @@
+--swiftversion 5.5
+--exclude .build,.swiftpm,xcode/.build,bazel-*
+--indent 4
+--allman false
+--max-width 100
+
+# Opt-in rules
+--enable blockComments
+--enable isEmpty
+--enable noGuardInTests
+--enable organizeDeclarations
+--enable preferSwiftStringAPI
+--enable propertyTypes
+--enable singlePropertyPerLine
+--enable sortSwitchCases
+--enable testSuiteAccessControl
+--enable unusedPrivateDeclarations
+--enable validateTestCases
+--enable wrapMultilineConditionalAssignment
+--enable wrapMultilineFunctionChains
+
+--disable wrapMultilineStatementBraces
+
+# Order for organizeDeclarations
+--organizationmode type
+--mark-categories false
+--type-order beforeMarks, staticProperty, instanceProperty, instancePropertyWithBody, swiftUIPropertyWrapper, swiftUIProperty, overriddenProperty, staticPropertyWithBody, classPropertyWithBody, computedProperty, instanceLifecycle, instanceMethod, overriddenMethod, swiftUIMethod, classMethod, staticMethod, nestedType
+

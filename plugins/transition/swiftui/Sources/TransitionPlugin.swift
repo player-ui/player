@@ -1,15 +1,13 @@
 import Combine
-import SwiftUI
 import SwiftHooks
+import SwiftUI
 
 #if SWIFT_PACKAGE
-import PlayerUI
-import PlayerUISwiftUI
+    import PlayerUI
+    import PlayerUISwiftUI
 #endif
 
-/**
- A plugin to supply transition animations for initial flow load and between views in a flow
- */
+/// A plugin to supply transition animations for initial flow load and between views in a flow
 public class TransitionPlugin: NativePlugin, ManagedPlayerPlugin {
     public var pluginName: String = "TransitionPlugin"
 
@@ -19,14 +17,12 @@ public class TransitionPlugin: NativePlugin, ManagedPlayerPlugin {
     private let pushTransition: PlayerViewTransition
     private let popTransition: PlayerViewTransition
 
-    /**
-     Initializes a `TransitionPlugin` with transition information.
-    
-     - parameters:
-        - stateTransition: The transition to use when the loaded state of managed player changes
-        - pushTransition:  The transition to use when views are pushed in the same flow
-        - popTransition:   The transition to use when views are popped in the same flow
-     */
+    /// Initializes a `TransitionPlugin` with transition information.
+    ///
+    /// - parameters:
+    ///   - stateTransition: The transition to use when the loaded state of managed player changes
+    ///   - pushTransition:  The transition to use when views are pushed in the same flow
+    ///   - popTransition:   The transition to use when views are popped in the same flow
     public init(
         stateTransition: PlayerViewTransition = .fadeInSlideOut,
         pushTransition: PlayerViewTransition = .push,
@@ -37,10 +33,10 @@ public class TransitionPlugin: NativePlugin, ManagedPlayerPlugin {
         self.popTransition = popTransition
     }
 
-    public func apply<P>(player: P) where P: HeadlessPlayer {
+    public func apply<P: HeadlessPlayer>(player: P) {
         guard let player = player as? SwiftUIPlayer else { return }
-        let pushTransition = self.pushTransition
-        let popTransition = self.popTransition
+        let pushTransition = pushTransition
+        let popTransition = popTransition
         player.hooks?.transition.tapNavigationStack(
             name: pluginName,
             player: player,
@@ -50,20 +46,26 @@ public class TransitionPlugin: NativePlugin, ManagedPlayerPlugin {
     }
 
     public func apply(_ model: ManagedPlayerViewModel) {
-        let stateTransition = self.stateTransition
+        let stateTransition = stateTransition
         model.stateTransition.tap(name: pluginName, id: tapId) { .bail(stateTransition) }
     }
 }
 
 private extension SyncBailHook where Parameters == Void, ReturnType == PlayerViewTransition {
-    /// Taps a standard navigation stack transition onto the supplied player. This will maintain a list of view
+    /// Taps a standard navigation stack transition onto the supplied player. This will maintain a
+    /// list of view
     /// identifiers and apply push/pop transitions based on the navigation stack.
-    func tapNavigationStack(name: String, player: SwiftUIPlayer, push: PlayerViewTransition = .push, pop: PlayerViewTransition = .pop) {
+    func tapNavigationStack(
+        name: String,
+        player: SwiftUIPlayer,
+        push: PlayerViewTransition = .push,
+        pop: PlayerViewTransition = .pop
+    ) {
         // keep track of the root view ids we navigate through
         var navStack: [String] = (player.assetRegistry.root?.id).map { [$0] } ?? []
 
-        // updates the navigation stack and returns a transtion appropriate for
-        // the push/pop/none operation that is occurring
+        /// updates the navigation stack and returns a transtion appropriate for
+        /// the push/pop/none operation that is occurring
         func updateNavStack(_ currentId: String?) -> PlayerViewTransition {
             // if there's no id currently clear the stack and return a pop
             guard let id = currentId else {
@@ -91,7 +93,8 @@ private extension SyncBailHook where Parameters == Void, ReturnType == PlayerVie
 }
 
 public extension PlayerViewTransition {
-    /// Transition that slides views in from the trailing edge and out from to the leading edge of the screen
+    /// Transition that slides views in from the trailing edge and out from to the leading edge of
+    /// the screen
     static let slideInSlideOut: PlayerViewTransition = push
 
     /// Transition that slides views in from the trailing edge and fades out views on removal
@@ -102,36 +105,44 @@ public extension PlayerViewTransition {
     )
 
     /// Transition that fades views in and slides out to the leading edge of the screen on removal
-    static let fadeInSlideOut = PlayerViewTransition(
+    static let fadeInSlideOut: PlayerViewTransition = .init(
         name: .fadeInSlideOut,
         transition: .asymmetric(insertion: .opacity, removal: .move(edge: .leading)),
         animationCurve: .inoutDefault
     )
 
     /// A standard navigation push transition
-    static let push = PlayerViewTransition(name: .push, transition: .push, animationCurve: .inoutDefault)
+    static let push: PlayerViewTransition = .init(
+        name: .push,
+        transition: .push,
+        animationCurve: .inoutDefault
+    )
 
     /// A standard navigation pop transition
-    static let pop = PlayerViewTransition(name: .pop, transition: .pop, animationCurve: .inoutDefault)
+    static let pop: PlayerViewTransition = .init(
+        name: .pop,
+        transition: .pop,
+        animationCurve: .inoutDefault
+    )
 }
 
 public extension PlayerViewTransition.Name {
-    static let slideInFadeOut = Self(rawValue: "slideInFadeOut")
-    static let fadeInSlideOut = Self(rawValue: "fadeInSlideOut")
-    static let push = Self(rawValue: "push")
-    static let pop = Self(rawValue: "pop")
+    static let slideInFadeOut: Self = .init(rawValue: "slideInFadeOut")
+    static let fadeInSlideOut: Self = .init(rawValue: "fadeInSlideOut")
+    static let push: Self = .init(rawValue: "push")
+    static let pop: Self = .init(rawValue: "pop")
 }
 
 private extension Animation {
-    static let inoutDefault = Animation.easeInOut(duration: 0.3)
+    static let inoutDefault: Animation = .easeInOut(duration: 0.3)
 }
 
 extension AnyTransition {
-    static let push = AnyTransition.asymmetric(
+    static let push: AnyTransition = .asymmetric(
         insertion: .move(edge: .trailing),
         removal: .move(edge: .leading)
     )
-    static let pop  = AnyTransition.asymmetric(
+    static let pop: AnyTransition = .asymmetric(
         insertion: .move(edge: .leading),
         removal: .move(edge: .trailing)
     )

@@ -8,15 +8,14 @@
 
 import Foundation
 import JavaScriptCore
-import SwiftUI
-import ViewInspector
-import XCTest
-
 @testable import PlayerUI
 @testable import PlayerUILogger
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
 @testable import PlayerUITestUtilitiesCore
+import SwiftUI
+import ViewInspector
+import XCTest
 
 struct ExampleData: AssetData {
     var id: String
@@ -28,37 +27,42 @@ struct ExampleData: AssetData {
 
 struct ExampleView: View {
     @ObservedObject var model: AssetViewModel<ExampleData>
+
     var body: some View {
         Button(
-            action: {self.model.data.function?()},
+            action: { model.data.function?() },
             label: { EmptyView() }
         )
     }
 }
 
 class ExampleSwiftUIAsset: UncontrolledAsset<ExampleData> {
-    override var view: AnyView { AnyView(ExampleView(model: model)) }
+    override var view: AnyView {
+        AnyView(ExampleView(model: model))
+    }
 }
 
 class SwiftUIAssetUnitTestDefaultTests: SwiftUIAssetUnitTestCase {
     func testDefaultRegister() {
-        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: [self], registry: SwiftUIRegistry(logger: TapableLogger()))
+        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(
+            plugins: [self],
+            registry: SwiftUIRegistry(logger: TapableLogger())
+        )
         XCTAssertEqual(player.assetRegistry.registeredAssets.count, 0)
     }
 }
 
 class SwiftUIAssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("test", asset: ExampleSwiftUIAsset.self)
-    }
-
     func testRegistration() {
-        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: [self], registry: SwiftUIRegistry(logger: TapableLogger()))
+        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(
+            plugins: [self],
+            registry: SwiftUIRegistry(logger: TapableLogger())
+        )
         XCTAssertEqual(player.assetRegistry.registeredAssets.count, 1)
     }
 
     func testDefaultPlugins() {
-        XCTAssertEqual(0, self.plugins().count)
+        XCTAssertEqual(0, plugins().count)
     }
 
     func testShouldNotDecode() async {
@@ -132,7 +136,13 @@ class SwiftUIAssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
             })
         else { return XCTFail("could not create function") }
 
-        let model = AssetViewModel<ExampleData>(ExampleData(id: "id", type: "test", value: "hello", nested: nil, function: function))
+        let model = AssetViewModel<ExampleData>(ExampleData(
+            id: "id",
+            type: "test",
+            value: "hello",
+            nested: nil,
+            function: function
+        ))
 
         let view = ExampleView(model: model)
         let button = try view.inspect().button()
@@ -140,5 +150,9 @@ class SwiftUIAssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
         try button.tap()
 
         wait(for: [functionExpecation], timeout: 1)
+    }
+
+    override func register(registry: SwiftUIRegistry) {
+        registry.register("test", asset: ExampleSwiftUIAsset.self)
     }
 }
