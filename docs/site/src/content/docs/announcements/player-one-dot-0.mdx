@@ -8,7 +8,7 @@ import PlatformTabs from "../../../components/PlatformTabs.astro";
 
 TBA
 
-## Breaking Changes
+## Breaking Changes (Player)
 
 Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release. If a change pertains to only one platform, that section will be prefaced with "(Core)", "(iOS)", or "(Android)". E.g. (iOS) `.anyArray` and `.anyDictionary` use `AnyType`.
 
@@ -405,7 +405,49 @@ transition occurs. Ensure every `EXTERNAL` state in your flow has a registered h
 In a future release, unhandled external states will automatically report an error via the Error Controller.
 :::
 
-## Behavioural Changes & Bug Fixes
+## Breaking Changes (Tooling)
+
+### New Package Scopes/Names
+The tooling ecosystem (previously all under the `@player-tools` scope) has been split up into separate scopes to better reflect the underlying capability groupings. 
+The table below maps each old `@player-tools` package to its new home:
+
+| Old Package | New Package | Repo |
+|---|---|---|
+| `@player-tools/cli` | `@player-cli/cli` | [cli](https://github.com/player-ui/cli) |
+| `@player-tools/dsl` | `@player-lang/react-dsl` | [language](https://github.com/player-ui/language) |
+| `@player-tools/fluent` | `@player-lang/functional-dsl` | [language](https://github.com/player-ui/language) |
+| `player_tools_dsl` | `player_lang_dsl` | [language](https://github.com/player-ui/language) |
+| `@player-tools/fluent-generator` | `@player-lang/functional-dsl-generator` | [language](https://github.com/player-ui/language) |
+| `player_tools_dsl_generator` | `player_lang_dsl_generator` | [language](https://github.com/player-ui/language) |
+| `@player-tools/json-language-server` | `@player-lang/json-language-server` | [language](https://github.com/player-ui/language) |
+| `@player-tools/json-language-service` | `@player-lang/json-language-service` | [language](https://github.com/player-ui/language) |
+| `@player-tools/typescript-expression-plugin` | `@player-lang/typescript-expression-plugin` | [language](https://github.com/player-ui/language) |
+| `@player-tools/complexity-check-plugin` | `@player-lang/complexity-check-plugin` | [language](https://github.com/player-ui/language) |
+| `@player-tools/metrics-output-plugin` | `@player-lang/metrics-output-plugin` | [language](https://github.com/player-ui/language) |
+| `@player-tools/xlr` | `@xlr-lib/xlr` | [xlr](https://github.com/player-ui/xlr) |
+| `@player-tools/xlr-sdk` | `@xlr-lib/xlr-sdk` | [xlr](https://github.com/player-ui/xlr) |
+| `@player-tools/xlr-utils` | `@xlr-lib/xlr-utils` | [xlr](https://github.com/player-ui/xlr) |
+| `@player-tools/xlr-converters` | `@xlr-lib/xlr-converters` | [xlr](https://github.com/player-ui/xlr) |
+
+### XLR Changes
+
+#### `@xlr-lib/xlr-utils`
+The following TypeScript-compiler-API-specific exports have been moved to the `@xlr-lib/xlr-converters` package and made private:
+
+`decorateNode`, `createDocString`, `createTSDocString`, `symbolDisplayToString`, `tsStripOptionalType`, `isExportedDeclaration`,` isNodeExported`, `getReferencedType`, `isTypeScriptLibType`, `getStringLiteralsFromUnion`, `buildTemplateRegex`, `isOptionalProperty`,` isGenericInterfaceDeclaration`, `isGenericTypeDeclaration`, `isTypeReferenceGeneric`, `TopLevelDeclaration`, `isTopLevelDeclaration`, `TopLevelNode`, `isTopLevelNode`
+
+This was done to make the utils package more portable and not pull in `typescript` as a dependency when used in web invocations of the SDK. 
+
+### Language Changes
+No from last release in old report
+
+### CLI
+- Updated to use Oclif 1.9
+
+### Devtools
+TBA
+
+## Behavioral Changes & Bug Fixes
 
 ### (Core) Partial Match Registry replaces exact matches, with log
 
@@ -458,6 +500,8 @@ registry.get(query); // Returns "less-specific"
 // After: Always returns the most specific match
 registry.get(query); // Always returns "more-specific"
 ```
+
+
 
 ## New Features
 
