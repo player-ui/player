@@ -1,5 +1,5 @@
-import type { PlayerConfigFileShape } from "@player-tools/cli";
-import { LSPAssetsPlugin } from "@player-tools/cli";
+import type { PlayerConfigFileShape } from "@player-cli/cli";
+import { LSPAssetsPlugin } from "@player-cli/cli";
 import path from "path";
 
 const config: PlayerConfigFileShape = {

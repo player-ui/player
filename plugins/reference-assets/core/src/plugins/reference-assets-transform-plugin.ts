@@ -19,18 +19,21 @@ import type {
   TextAsset,
 } from "../assets";
 
-export class ReferenceAssetsTransformPlugin implements ExtendedPlayerPlugin<
-  [
-    ActionAsset,
-    InputAsset,
-    ImageAsset,
-    TextAsset,
-    CollectionAsset,
-    ChoiceAsset,
-    ChatMessageAsset,
-  ],
-  [InfoAsset]
-> {
+export class ReferenceAssetsTransformPlugin
+  implements
+    ExtendedPlayerPlugin<
+      [
+        ActionAsset,
+        InputAsset,
+        ImageAsset,
+        TextAsset,
+        CollectionAsset,
+        ChoiceAsset,
+        ChatMessageAsset,
+      ],
+      [InfoAsset]
+    >
+{
   name = "reference-assets-transforms";
 
   apply(player: Player): void {

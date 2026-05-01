@@ -23,7 +23,7 @@ Nested assets are represented as objects containing an `asset` property. For exa
 <ContentTabs>
   <Fragment slot='tsx'>
 ```tsx
-import { Asset } from '@player-tools/dsl';
+import { Asset } from '@player-lang/react-dsl';
 
 <Asset id="parent" type="parent">
   <Asset.Label>
@@ -66,7 +66,7 @@ Example:
 <ContentTabs>
   <Fragment slot='tsx'>
 ```tsx
-import { View, expression as e, binding as b } from '@player-tools/dsl';
+import { View, expression as e, binding as b } from '@player-lang/react-dsl';
 
 <View 
   type="view"
@@ -138,7 +138,7 @@ Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can 
 <ContentTabs>
   <Fragment slot='tsx'>
 ```tsx
-import { Switch, Asset, expression as e, binding as b } from '@player-tools/dsl';
+import { Switch, Asset, expression as e, binding as b } from '@player-lang/react-dsl';
 
 <Switch>
   <Switch.Case exp={e`${b`name.first`} == 'John'`}>

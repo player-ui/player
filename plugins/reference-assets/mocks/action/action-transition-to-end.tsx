@@ -1,4 +1,4 @@
-import type { DSLFlow } from "@player-tools/dsl";
+import type { DSLFlow } from "@player-lang/react-dsl";
 
 // This is not a proper DSL flow. However, proper DSL will catch the invalid expression
 // before the test does.

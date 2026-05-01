@@ -24,4 +24,5 @@ js_xlr_pipeline(
     deps = [
         ":node_modules/@player-ui/types-provider-plugin",
     ],
+    cli = "@player-cli/cli"
 )

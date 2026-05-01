@@ -13,7 +13,7 @@ Much like the rest of Player, Player's CLI supports plugins that alter its behav
 To create a CLI Plugin, create a class that implements `PlayerCLIPlugin`. Example:
 
 ```typescript
-import { PlayerCLIPlugin } from '@player-tools/cli';
+import { PlayerCLIPlugin } from '@player-cli/cli';
 export class ExampleCLIPlugin implements PlayerCLIPlugin {}
 ```
 
@@ -49,7 +49,7 @@ onCreateLanguageService?: (
 #### Example
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   onCreateLanguageService(
@@ -80,7 +80,7 @@ onCreateDSLCompiler?: (compiler: DSLCompiler) => void | Promise<void>;
 #### Example
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   onCreateDSLCompiler(compiler: DSLCompiler): void {
@@ -115,9 +115,9 @@ onConvertXLR?: (
 #### Example
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
-import type { ExportTypes } from "@player-tools/xlr-sdk";
-import type { TransformFunction } from "@player-tools/xlr";
+import { PlayerCLIPlugin } from "@player-cli/cli";
+import type { ExportTypes } from "@xlr-lib/xlr-sdk";
+import type { TransformFunction } from "@xlr-lib/xlr";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   onConvertXLR(
@@ -148,8 +148,8 @@ createCompilerContext?: (context: CompilationContext) => void | Promise<void>;
 #### Example
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
-import type { CompilationContext } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
+import type { CompilationContext } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   createCompilerContext(context: CompilationContext): void {
@@ -211,8 +211,8 @@ Or `undefined` to continue to the next tap
 **Example:**
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
-import type { CompilationContext } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
+import type { CompilationContext } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   createCompilerContext(context: CompilationContext): void {
@@ -260,8 +260,8 @@ Or `undefined` to continue to the next tap
 **Example:**
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
-import type { CompilationContext } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
+import type { CompilationContext } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   createCompilerContext(context: CompilationContext): void {
@@ -319,7 +319,7 @@ Called synchronously before DSL content is compiled. Allows transformations on t
 **Example:**
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   onCreateDSLCompiler(compiler: DSLCompiler): void {
@@ -361,7 +361,7 @@ Called synchronously after DSL content is compiled to JSON. Allows modifications
 **Example:**
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   onCreateDSLCompiler(compiler: DSLCompiler): void {
@@ -405,7 +405,7 @@ Provides access to the internal `SchemaGenerator` object which is responsible fo
 **Example:**
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
 
 export class ExampleCLIPlugin implements PlayerCLIPlugin {
   onCreateDSLCompiler(compiler: DSLCompiler): void {
@@ -453,7 +453,7 @@ Called after the compilation of all files has been completed. Allows post-proces
 **Example:**
 
 ```typescript
-import { PlayerCLIPlugin } from "@player-tools/cli";
+import { PlayerCLIPlugin } from "@player-cli/cli";
 import fs from "fs";
 import path from "path";
 

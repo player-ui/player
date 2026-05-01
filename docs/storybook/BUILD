@@ -33,7 +33,7 @@ deps = [
     "//:node_modules/dequal",
     "//:node_modules/uuid",
     "//:node_modules/clsx",
-    "//:node_modules/@player-tools/dsl",
+    "//:node_modules/@player-lang/react-dsl",
     "//:node_modules/@reduxjs/toolkit",
     "//:node_modules/@monaco-editor/react",
     "//:node_modules/esbuild-wasm",

@@ -11,4 +11,5 @@ vitest_config(name = "vitest_config")
 js_xlr_pipeline(
     package_name = "@player-ui/types",
     xlr_mode = "types",
+    cli = "@player-cli/cli"
 )
