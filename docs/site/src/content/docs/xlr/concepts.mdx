@@ -14,7 +14,7 @@ XLRs contain all of the information about a TypeScript type or interface. For an
 
 ### XLR Nodes
 
-XLR nodes are similar to TypeScripts internal AST nodes but a bit simpler. Almost every type/language feature you would use in TypeScript has an equivalent XLR node type. The definitions for these types are available in the `@player-tools/xlr` [package](https://github.com/player-ui/tools/tree/main/xlr/types).
+XLR nodes are similar to TypeScripts internal AST nodes but a bit simpler. Almost every type/language feature you would use in TypeScript has an equivalent XLR node type. The definitions for these types are available in the `@xlr-lib/xlr` [package](https://github.com/player-ui/tools/tree/main/xlr/types).
 
 ### Named Types
 
@@ -42,7 +42,7 @@ export type TransformFunction = (
 Here is an example of a transform function that adds a new `transformed` property to all objects that are part of the `Assets` capability:
 
 ```typescript
-import type { TransformFunction } from "@player-tools/xlr";
+import type { TransformFunction } from "@xlr-lib/xlr";
 
 const transformFunction: TransformFunction = (input, capability) => {
   if (capability === "Assets" && input.type === "object") {

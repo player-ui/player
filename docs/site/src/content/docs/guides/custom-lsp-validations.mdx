@@ -53,8 +53,8 @@ import type {
   ASTNode,
   ASTVisitor,
   ValidationContext
-} from '@player-tools/json-language-service';
-import { getNodeValue } from '@player-tools/json-language-service';
+} from '@player-lang/json-language-service';
+import { getNodeValue } from '@player-lang/json-language-service';
 
 export class LegacyActionPlugin implements PlayerLanguageServicePlugin {
   name = 'legacy-action';
@@ -209,8 +209,8 @@ Once you've created your validation plugin, one usage option is to integrate it 
 Create a new [CLI config](../../capabilities/cli#config) or update your existing CLI config to include your validation plugin:
 
 ```typescript
-import type { PlayerConfigFileShape } from "@player-tools/cli";
-import { LSPPluginPlugin, LSPAssetsPlugin } from "@player-tools/cli";
+import type { PlayerConfigFileShape } from "@player-cli/cli";
+import { LSPPluginPlugin, LSPAssetsPlugin } from "@player-cli/cli";
 import { LegacyActionPlugin } from "./plugins/validation/legacy-action-plugins";
 import path from 'path';
 

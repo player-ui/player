@@ -9,7 +9,7 @@ import type {
   DataTypeRefs,
   ValidatorFunctionRefs,
   WithPlayerTypes,
-} from "@player-tools/dsl";
+} from "@player-lang/react-dsl";
 import {
   createSlot,
   Asset,
@@ -19,7 +19,7 @@ import {
   ObjectWithIndexTracking,
   GeneratedIDProperty,
   toJsonElement,
-} from "@player-tools/dsl";
+} from "@player-lang/react-dsl";
 import type { Asset as AssetType } from "@player-ui/player";
 import type {
   ActionAsset,
