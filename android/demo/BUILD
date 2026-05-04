@@ -7,7 +7,6 @@ main_deps = [
     "//jvm/hermes:hermes-android",
     "//jvm/utils",
     "//plugins/reference-assets/android",
-    "//plugins/common-types/jvm",
     "//tools/mocks:jar",
 
     artifact("androidx.navigation:navigation-ui-ktx"),

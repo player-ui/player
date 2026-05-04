@@ -15,7 +15,6 @@ import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.mocks.ClassLoaderMock
 import com.intuit.playerui.utils.mocks.ClassLoaderMocksReader
@@ -50,7 +49,7 @@ public abstract class AssetTest(
     @get:Rule
     public val name: TestName = TestName()
 
-    protected open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
+    protected open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), PendingTransactionPlugin()) }
 
     protected val context: Context get() = ApplicationProvider.getApplicationContext()
 
