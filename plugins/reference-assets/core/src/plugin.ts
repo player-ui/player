@@ -8,7 +8,6 @@ import {
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { CommonExpressionsPlugin } from "@player-ui/common-expressions-plugin";
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
-import { StageRevertDataPlugin } from "@player-ui/stage-revert-data-plugin";
 
 /**
  * A plugin to add transforms for the reference assets
@@ -20,7 +19,6 @@ export class ReferenceAssetsPlugin implements PlayerPlugin {
     new CommonTypesPlugin(),
     new CommonExpressionsPlugin(),
     new ComputedPropertiesPlugin(),
-    new StageRevertDataPlugin(),
     new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
     }),
