@@ -6,7 +6,6 @@ import PlayerUIReferenceAssets
 
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
-import PlayerUICommonTypesPlugin
 import PlayerUIExpressionPlugin
 import PlayerUIExternalStatePlugin
 import PlayerUIMetricsPlugin
@@ -41,7 +40,6 @@ struct MainView: View {
         [
             PrintLoggerPlugin(level: .trace),
             ReferenceAssetsPlugin(),
-            CommonTypesPlugin(),
             ExpressionPlugin(),
             MetricsPlugin { timing, render, flow in
                 print(timing as Any)

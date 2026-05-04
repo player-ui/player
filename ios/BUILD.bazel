@@ -28,8 +28,7 @@ xcodeproj(
         "//plugins/check-path/ios:PlayerUICheckPathPluginTests",
         "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPluginViewInspectorTests",
 
-        "//plugins/common-types/ios:PlayerUICommonTypesPluginTests",
-        
+
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPluginTests",
 
         "//plugins/expression/ios:PlayerUIExpressionPluginTests",

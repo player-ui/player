@@ -3,8 +3,9 @@ title: Computed Properties
 ---
 
 import { Aside } from "@astrojs/starlight/components";
+import CoreOnly from "../../../../components/CoreOnly.astro";
 
-<Aside title="Core-only Plugin">This plugin should be added to the shared core and is not intended to be re-registered across platforms. There are no separate iOS or Android implementations — add it once in your core Player setup.</Aside>
+<CoreOnly/>
 
 This plugin allows users to specify a path in the data-model (binding) as a computed property in the schema.
 Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown.

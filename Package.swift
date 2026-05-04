@@ -11,7 +11,6 @@ let ios_plugins: [SwiftPlugin] = [
     (name: "AsyncNodePlugin", path: "async-node", resources: true),
     (name: "BaseBeaconPlugin", path: "beacon", resources: true),
     (name: "CheckPathPlugin", path: "check-path", resources: true),
-    (name: "CommonTypesPlugin", path: "common-types", resources: true),
     (name: "ExpressionPlugin", path: "expression", resources: true),
     (name: "ExternalStatePlugin", path: "external-state", resources: true),
     (name: "PubSubPlugin", path: "pubsub", resources: true),

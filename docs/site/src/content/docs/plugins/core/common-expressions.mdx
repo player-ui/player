@@ -3,9 +3,10 @@ title: Common Expressions
 ---
 
 import { Aside } from "@astrojs/starlight/components";
-import { PackageManagers } from 'starlight-package-managers'
+import { PackageManagers } from 'starlight-package-managers';
+import CoreOnly from "../../../../components/CoreOnly.astro";
 
-<Aside title="Core-only Plugin">This plugin should be added to the shared core and is not intended to be re-registered across platforms. There are no separate iOS or Android implementations — add it once in your core Player setup.</Aside>
+<CoreOnly/>
 
 This plugin exposes some basic expressions into Player content.
 
