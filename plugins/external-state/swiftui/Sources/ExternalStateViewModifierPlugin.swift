@@ -10,14 +10,12 @@ public struct ExternalStateViewModifierHandler {
     /// Must include "ref" key.
     public typealias Match = [String: Any]
 
-    /**
-     The handler function to run when an external state is transitioned to
-     - parameters:
-        - state: The state object that represents the external state
-        - options: An object containing the dataModel instance and evaluate function
-        - transition: A completion handler that takes a string to transition with
-     - returns: A view to show as content by the ViewModifier
-     */
+    /// The handler function to run when an external state is transitioned to
+    /// - parameters:
+    ///    - state: The state object that represents the external state
+    ///    - options: An object containing the dataModel instance and evaluate function
+    ///    - transition: A completion handler that takes a string to transition with
+    /// - returns: A view to show as content by the ViewModifier
     public typealias Function = (
         NavigationFlowExternalState,
         PlayerControllers,
@@ -35,10 +33,8 @@ public struct ExternalStateViewModifierHandler {
     }
 }
 
-/**
- A variation on `ExternalStatePlugin` for `SwiftUIPlayer` that applies a ViewModifier to
- SwiftUIPlayer content when in an external state
- */
+/// A variation on `ExternalStatePlugin` for `SwiftUIPlayer` that applies a ViewModifier to
+/// SwiftUIPlayer content when in an external state
 open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifier>:
     JSBasePlugin, NativePlugin, ObservableObject {
 
@@ -51,11 +47,9 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
 
     private var handlers: [ExternalStateViewModifierHandler]
 
-    /**
-     Construct a plugin to handle external states
-     - parameters:
-        - handlers: array of handlers with matchers and handler functions
-     */
+    /// Construct a plugin to handle external states
+    /// - parameters:
+    ///    - handlers: array of handlers with matchers and handler functions
     public init(handlers: [ExternalStateViewModifierHandler]) {
         self.handlers = handlers
         super.init(
@@ -76,8 +70,8 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap {[weak self] old, newState in
                     guard
-                        old?.value?.stateType == "EXTERNAL",
-                        newState.value?.stateType != "EXTERNAL"
+                        old?.value?.stateType == .external,
+                        newState.value?.stateType != .external
                     else { return }
                     self?.isExternalState = false
                     self?.state = nil
@@ -86,12 +80,10 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
         })
     }
 
-    /**
-     Retrieves the arguments for constructing this plugin.
-     This is necessary because the arguments need to be supplied after construction of the swift object,
-     once the context has been provided.
-     - returns: An array of arguments to construct the plugin
-     */
+    /// Retrieves the arguments for constructing this plugin.
+    /// This is necessary because the arguments need to be supplied after construction of the swift object,
+    /// once the context has been provided.
+    /// - returns: An array of arguments to construct the plugin
     override open func getArguments() -> [Any] {
         guard let context = context else { return [] }
 
@@ -138,7 +130,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
 
             return JSValue(object: [
                 "ref": handler.ref,
-                "match": handler.match,
+                "match": handler.match as Any,
                 "handlerFunction": JSValue(object: callback, in: context) as Any
             ], in: context)
         }
@@ -160,32 +152,24 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
     }
 }
 
-/**
- ViewModifier type specifically for the `ExternalStateViewModifierPlugin` to provide observable properties
- to present content in an external action
- */
+/// ViewModifier type specifically for the `ExternalStateViewModifierPlugin` to provide observable properties
+/// to present content in an external action
 public protocol ExternalStateViewModifier: ViewModifier {
     /// An observable reference to the presenting plugin, to know when we are in an external state
     var plugin: ExternalStateViewModifierPlugin<Self> { get }
 
-    /**
-     Creates a new `ExternalStateViewModifier` with the plugin that is presenting it
-     - parameters:
-        - plugin: The plugin presenting this view modifier
-     */
+    /// Creates a new `ExternalStateViewModifier` with the plugin that is presenting it
+    /// - parameters:
+    ///    - plugin: The plugin presenting this view modifier
     init(plugin: ExternalStateViewModifierPlugin<Self>)
 }
 
-/**
- A ViewModifier for the `ExternalStateViewModifierPlugin` that presents the external state with the `.sheet` modifier
- */
+/// A ViewModifier for the `ExternalStateViewModifierPlugin` that presents the external state with the `.sheet` modifier
 public struct ExternalStateSheetModifier: ExternalStateViewModifier {
     @ObservedObject public var plugin: ExternalStateViewModifierPlugin<Self>
-    /**
-     Constructs this ViewModifier
-     - parameters:
-        - plugin: The plugin presenting the external state
-     */
+    /// Constructs this ViewModifier
+    /// - parameters:
+    ///    - plugin: The plugin presenting the external state
     public init(plugin: ExternalStateViewModifierPlugin<Self>) {
         self.plugin = plugin
     }
