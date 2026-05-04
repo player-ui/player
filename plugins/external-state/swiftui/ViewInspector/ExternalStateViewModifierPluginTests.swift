@@ -194,7 +194,7 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
                 player.hooks?.flowController.tap({ flowController in
                     flowController.hooks.flow.tap { flow in
                         flow.hooks.afterTransition.tap { [weak self] newFlow in
-                            if newFlow.currentState?.value?.stateType == self?.expected {
+                            if newFlow.currentState?.value?.stateType.rawValue == self?.expected {
                                 self?.expectation.fulfill()
                             }
                         }
@@ -237,7 +237,7 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
         wait(for: [viewTransition], timeout: 10)
         let state = player.state as? InProgressState
         XCTAssertNotNil(state)
-        XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, "VIEW")
+        XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, .view)
         XCTAssertNil(plugin.state)
         XCTAssertFalse(plugin.isExternalState)
         do {

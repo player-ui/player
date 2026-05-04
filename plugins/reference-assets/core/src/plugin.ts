@@ -5,6 +5,9 @@ import {
   AsyncNodePlugin,
   AsyncNodePluginPlugin,
 } from "@player-ui/async-node-plugin";
+import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
+import { CommonExpressionsPlugin } from "@player-ui/common-expressions-plugin";
+import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
 
 /**
  * A plugin to add transforms for the reference assets
@@ -13,6 +16,9 @@ export class ReferenceAssetsPlugin implements PlayerPlugin {
   name = "reference-assets-plugin";
 
   private readonly metaPlugin = new MetaPlugin([
+    new CommonTypesPlugin(),
+    new CommonExpressionsPlugin(),
+    new ComputedPropertiesPlugin(),
     new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
     }),

@@ -35,7 +35,6 @@ import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.beacon.BeaconPlugin
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.beacon.beaconPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.filterKeys
 import com.intuit.playerui.utils.normalizeStackTraceElements
 import com.intuit.playerui.utils.test.PlayerTest
@@ -73,7 +72,7 @@ internal class HeadlessPlayerTest :
     override val exceptions = mutableListOf<Throwable>()
 
     val beaconPlugin = BeaconPlugin()
-    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), beaconPlugin)
+    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), beaconPlugin)
 
     @TestTemplate
     fun `test player not started state`() {

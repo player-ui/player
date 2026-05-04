@@ -10,7 +10,6 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    "//plugins/common-types/jvm",
     "//plugins/pending-transaction/jvm",
     "//plugins/reference-assets/android",
 
