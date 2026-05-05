@@ -4,7 +4,6 @@ import com.intuit.playerui.core.player.PlayerExceptionMetadata
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,7 +22,7 @@ private class ExceptionWithAnyMetadata(
     PlayerExceptionMetadata
 
 internal class ErrorControllerTest : PlayerTest() {
-    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), CommonTypesPlugin())
+    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin())
 
     private lateinit var errorController: ErrorController
 

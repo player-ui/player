@@ -169,7 +169,7 @@ describe("ErrorController", () => {
       );
 
       // Reset mock to track only clearErrors call
-      vitest.clearAllMocks();
+      vitest.mocked(mockDataController.set).mockClear();
 
       errorController.clearErrors();
 
@@ -213,7 +213,7 @@ describe("ErrorController", () => {
       );
 
       // Reset mock to track only clearCurrentError call
-      vitest.clearAllMocks();
+      vitest.mocked(mockDataController.set).mockClear();
 
       errorController.clearCurrentError();
 
@@ -315,7 +315,7 @@ describe("ErrorController", () => {
       expect(mockDataController.set).toHaveBeenCalled();
 
       // Clear error should delete via middleware with writeSymbol
-      vitest.clearAllMocks();
+      vitest.mocked(mockDataController.set).mockClear();
       errorController.clearCurrentError();
       expect(mockDataController.delete).toHaveBeenCalledWith(
         "errorState",
@@ -338,7 +338,7 @@ describe("ErrorController", () => {
       expect(mockDataController.set).not.toHaveBeenCalled();
 
       // Clear error shouldn't about current state. Should always try to clear.
-      vitest.clearAllMocks();
+      vitest.mocked(mockDataController.set).mockClear();
       errorController.clearCurrentError();
       expect(mockDataController.delete).toHaveBeenCalledWith(
         "errorState",
