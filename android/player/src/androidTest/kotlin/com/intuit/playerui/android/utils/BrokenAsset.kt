@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.utils
 
 import android.view.View
+import kotlinx.coroutines.CoroutineScope
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
@@ -34,10 +35,10 @@ internal class BrokenAsset(
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override suspend fun View.hydrate(data: Data) {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
         if (data.shouldFail ||
-            (data.layout == Layout.Frame && this is LinearLayout) ||
-            (data.layout == Layout.Linear && this is FrameLayout)
+            (data.layout == Layout.Frame && view is LinearLayout) ||
+            (data.layout == Layout.Linear && view is FrameLayout)
         ) {
             invalidateView()
         }

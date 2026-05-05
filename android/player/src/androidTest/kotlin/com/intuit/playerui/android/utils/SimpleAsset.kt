@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.utils
 
 import android.view.View
+import kotlinx.coroutines.CoroutineScope
 import android.widget.TextView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.DecodableAsset
@@ -18,7 +19,7 @@ internal class SimpleAsset(
 ) : DecodableAsset<Node>(assetContext, Node.serializer()) {
     override suspend fun initView(data: Node) = TextView(context)
 
-    override suspend fun View.hydrate(data: Node) = Unit
+    override suspend fun CoroutineScope.hydrate(view: View, data: Node) = Unit
 
     companion object {
         val sampleMap = mapOf(

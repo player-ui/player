@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -16,11 +17,10 @@ import com.intuit.playerui.plugins.coroutines.flowScope
 import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.start
 import com.intuit.playerui.utils.test.runBlockingTest
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json.Default.encodeToString
@@ -30,7 +30,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.assertFailsWith
 
 @RunWith(AndroidJUnit4::class)
 internal class HydrationScopeTest : BaseRenderableAssetTest() {
@@ -41,8 +40,8 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     ) : RenderableAsset<Node>(assetContext, NodeSerializer()) {
         override suspend fun initView(data: Node): View = TextView(context)
 
-        override suspend fun View.hydrate(data: Node) {
-            hydrationScope.launch {
+        override suspend fun CoroutineScope.hydrate(view: View, data: Node) {
+            launch {
                 delay(500)
                 completed = true
             }
@@ -74,57 +73,46 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         player.start(makeFlow(encodeToString(NodeSerializer(), asset)))
     }
 
-    // TODO: revisit this test — uses render() which returns View, revisit once renderInto replacement is settled
     @Test
-    fun `test cancelling caller job during render propagates CancellationException`() = runBlocking {
+    fun `test cancelling hydration scope does not cancel flow scope`() = runBlocking {
         val test = TestAsset(assetContext)
-        // First render to establish hydrationScope
-        test.render(appContext)
+        test.awaitRender(appContext)
         val hydrationScope = test.currentHydrationScope
         assertTrue(hydrationScope.isActive)
+        assertTrue(player.flowScope!!.isActive)
 
-        // Cancel caller job before render — CancellationException propagates to the caller
-        var didThrow = false
-        val renderJob = launch {
-            coroutineContext.job.cancel("cancelled by test")
-            try {
-                test.render(appContext)
-            } catch (_: CancellationException) {
-                didThrow = true
-            }
-        }
-        renderJob.join()
-        assertTrue(didThrow)
-        // hydrationScope is a child of flowScope, not the caller — cancelling the caller must not cancel it
-        assertTrue(hydrationScope.isActive)
+        // hydrationScope is a SupervisorJob child of flowScope — cancelling it must not propagate up
+        hydrationScope.cancel("cancelled by test")
+        assertFalse(hydrationScope.isActive)
+        assertTrue(player.flowScope!!.isActive)
     }
 
     @Test
     fun `test hydration scope can launch coroutines`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(appContext)
+        test.awaitRender(appContext)
         waitForCompleted()
     }
 
     @Test
     fun `test existing hydration scope is cancelled on re-render`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(appContext)
+        test.awaitRender(appContext)
         val currentHydrationScope = test.currentHydrationScope
         assertTrue(currentHydrationScope.isActive)
         player.recycle()
-        test.render(appContext)
+        test.awaitRender(appContext)
         assertFalse(currentHydrationScope.isActive)
     }
 
     @Test
     fun `test hydration scope is refreshed on re-render`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(appContext)
+        test.awaitRender(appContext)
         val firstHydrationScope = test.currentHydrationScope
         assertTrue(firstHydrationScope.isActive)
         player.recycle()
-        test.render(appContext)
+        test.awaitRender(appContext)
         val secondHydrationScope = test.currentHydrationScope
         assertTrue(secondHydrationScope.isActive)
         assertFalse(firstHydrationScope.isActive)
@@ -134,7 +122,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test hydration scope is cancelled on flow end`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(appContext)
+        test.awaitRender(appContext)
         player.inProgressState?.forceTransition("")
         waitForCondition { !player.flowScope!!.isActive }
         assertFalse(player.flowScope!!.isActive)
@@ -145,7 +133,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test hydration scope is cancelled on player release`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(appContext)
+        test.awaitRender(appContext)
         player.release()
         waitForCondition { !player.flowScope!!.isActive }
         assertFalse(player.flowScope!!.isActive)

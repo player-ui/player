@@ -3,6 +3,8 @@ package com.intuit.playerui.android
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.renderer.awaitRender
+import com.intuit.playerui.android.utils.CoroutineTestDispatcherRule
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.android.utils.awaitFirstView
@@ -21,11 +23,14 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class AndroidPlayerTest {
+    @get:Rule
+    val coroutineRule = CoroutineTestDispatcherRule()
     @Test
     fun `test list constructor`() {
         val player = AndroidPlayer(listOf())
@@ -111,8 +116,7 @@ internal class AndroidPlayerTest {
         player.registerAsset("simple", ::SimpleAsset)
         val asset = player.awaitFirstView(SimpleAsset.sampleFlow)!!
         assertNull(player.getCachedAssetView(asset.assetContext))
-        // TODO: uses render() which returns View — revisit once renderInto replacement is settled
-        assertNotNull(asset.render(ApplicationProvider.getApplicationContext()))
+        assertNotNull(asset.awaitRender(ApplicationProvider.getApplicationContext()))
         assertNotNull(player.getCachedAssetView(asset.assetContext))
         player.recycle()
         assertNull(player.getCachedAssetView(asset.assetContext))

@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.utils
 
 import android.view.View
+import kotlinx.coroutines.CoroutineScope
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
@@ -34,7 +35,7 @@ internal class ThrowingAsset(
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override suspend fun View.hydrate(data: Data) = throw Exception("Throwing during render")
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) = throw Exception("Throwing during render")
 
     companion object {
         val sampleMap = mapOf(

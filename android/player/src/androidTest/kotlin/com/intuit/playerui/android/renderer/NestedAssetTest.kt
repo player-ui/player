@@ -36,11 +36,10 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
         AssetContext(appContext, asset, player, ::NestedAsset)
     }
 
-    // TODO: uses render() which returns View — revisit once renderInto replacement is settled
     @Test
     fun `tested nested asset constructs`() = runBlockingTest {
         val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
-        val nested = asset.render(appContext)
+        val nested = asset.awaitRender(appContext)
         assertTrue(nested is LinearLayout)
         assertNotNull(NestedAsset.dummy)
         assertNotNull(NestedAsset.dummy2?.firstOrNull())
@@ -64,7 +63,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
         assertFalse(onHydrationStarted)
         assertFalse(onHydrationCompleted)
-        asset.render(appContext)
+        asset.awaitRender(appContext)
         assertTrue(onHydrationStarted)
         assertTrue(onHydrationCompleted)
     }

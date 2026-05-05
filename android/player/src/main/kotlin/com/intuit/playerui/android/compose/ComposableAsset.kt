@@ -21,11 +21,10 @@ import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
@@ -44,9 +43,9 @@ public abstract class ComposableAsset<Data>(
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
-    override suspend fun View.hydrate(data: Data) {
-        require(this is ComposeView)
-        setContent {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+        require(view is ComposeView)
+        view.setContent {
             compose(data = data)
         }
     }
@@ -104,9 +103,7 @@ public abstract class ComposableAsset<Data>(
     private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         val childAsset = this
         AndroidView(factory = ::FrameLayout, modifier) { container ->
-            this@ComposableAsset.hydrationScope.launch {
-                this@ComposableAsset.run { childAsset.renderInto(container, styles) }
-            }
+            this@ComposableAsset.hydrationScope.inflate(childAsset, container, styles)
         }
     }
 }

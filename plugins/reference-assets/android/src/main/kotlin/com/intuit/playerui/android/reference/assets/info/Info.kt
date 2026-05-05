@@ -7,6 +7,7 @@ import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 
 class Info(
@@ -22,10 +23,10 @@ class Info(
 
     override suspend fun initView(data: Data) = LayoutInflater.from(context).inflate(R.layout.info, null).rootView
 
-    override suspend fun View.hydrate(data: Data) {
-        data.title?.renderInto(findViewById(R.id.info_title), Text.Styles.Title)
-        data.primaryInfo?.renderInto(findViewById(R.id.info_primary_info))
-        data.actions.filterNotNull().forEach { it.renderInto(findViewById(R.id.info_actions)) }
-        data.footer?.renderInto(findViewById(R.id.info_footer))
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+        inflate(data.title, view.findViewById(R.id.info_title), Text.Styles.Title)
+        inflate(data.primaryInfo, view.findViewById(R.id.info_primary_info))
+        data.actions.filterNotNull().forEach { inflate(it, view.findViewById(R.id.info_actions)) }
+        inflate(data.footer, view.findViewById(R.id.info_footer))
     }
 }

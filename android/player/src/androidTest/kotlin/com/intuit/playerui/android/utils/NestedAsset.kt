@@ -10,6 +10,7 @@ import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.utils.makeFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -24,11 +25,11 @@ internal class NestedAsset(
 
     override suspend fun initView(data: Data) = LinearLayout(context)
 
-    override suspend fun View.hydrate(data: Data) {
-        require(this is LinearLayout)
-        data.nested?.renderInto(this)
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+        require(view is LinearLayout)
+        inflate(data.nested, view)
         dummy = data.nested as? RenderableAsset<*>
-        data.nestedAssets.forEach { it.renderInto(this) }
+        data.nestedAssets.forEach { inflate(it, view) }
         dummy2 = data.nestedAssets.map { it as? RenderableAsset<*> }
     }
 

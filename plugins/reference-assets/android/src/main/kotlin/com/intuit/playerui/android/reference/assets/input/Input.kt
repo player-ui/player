@@ -10,6 +10,7 @@ import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.plugins.transactions.commitPendingTransaction
 import com.intuit.playerui.plugins.transactions.registerPendingTransaction
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -58,11 +59,11 @@ class Input(
             }
         }.rootView
 
-    override suspend fun View.hydrate(data: Data) {
-        data.label?.renderInto(findViewById(R.id.input_label_container), Text.Styles.Label)
-        data.note?.renderInto(findViewById(R.id.input_note_container), Text.Styles.Note)
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+        inflate(data.label, view.findViewById(R.id.input_label_container), Text.Styles.Label)
+        inflate(data.note, view.findViewById(R.id.input_note_container), Text.Styles.Note)
 
-        findViewById<FormattedEditText>(R.id.input_field).run {
+        view.findViewById<FormattedEditText>(R.id.input_field).run {
             error = data.validation?.message
             if (data.value != text.toString()) {
                 setText(data.value ?: "")
@@ -90,7 +91,7 @@ class Input(
                     player.commitPendingTransaction()
                 } else {
                     player.registerPendingTransaction {
-                        hydrationScope.launch {
+                        launch {
                             data.set(text.toString())
                         }
                     }

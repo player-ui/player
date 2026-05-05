@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.testutils.asset
 
 import android.view.View
+import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import kotlinx.coroutines.delay

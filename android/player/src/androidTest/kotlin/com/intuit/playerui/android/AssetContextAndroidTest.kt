@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.serializer
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.MapBackedNode
@@ -29,7 +30,7 @@ class AssetContextAndroidTest {
     private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset<Unit>(assetContext, serializer()) {
         override suspend fun initView(data: Unit) = TextView(context)
 
-        override suspend fun View.hydrate(data: Unit) = Unit
+        override suspend fun CoroutineScope.hydrate(view: View, data: Unit) = Unit
     }
 
     private val assetContext by lazy {

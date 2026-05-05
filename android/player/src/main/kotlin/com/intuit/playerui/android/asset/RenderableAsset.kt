@@ -36,6 +36,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -95,55 +96,60 @@ public abstract class RenderableAsset<Data>(
     /** Build a [View] for the asset, to be launched in [Dispatchers.Default] */
     public abstract suspend fun initView(data: Data): View
 
-    /** Hydrate [View] with data from [asset], to be launched in [Dispatchers.Main] */
-    public abstract suspend fun View.hydrate(data: Data)
+    /** Hydrate [View] with data from [asset]. Runs on [Dispatchers.Main]; [this] scope is the [hydrationScope] for launching child renders. */
+    public abstract suspend fun CoroutineScope.hydrate(view: View, data: Data)
 
     // ── Concrete render implementation ────────────────────────────────────────
 
-    private suspend fun doRender(): View {
-        player.asyncHydrationTrackerPlugin?.trackHydration(this)
+    private suspend fun doRender(isRoot: Boolean = false): View {
+        player.asyncHydrationTrackerPlugin?.trackHydration(this, isRoot)
         return try {
-            val data = getData()
-            val view = withContext(Dispatchers.Default) {
-                initView(data)
+            val (data, view) = withContext(Dispatchers.Default) {
+                val data = getData()
+                data to initView(data)
             }
             withContext(Dispatchers.Main) {
-                view.hydrate(data)
+                hydrationScope.hydrate(view, data)
             }
             view
         } catch (exception: Throwable) {
             if (exception is CancellationException) throw exception
+            if (exception is StaleViewException) throw exception
             if (exception is AssetRenderException) {
                 exception.assetParentPath += assetContext
                 throw exception
             }
             throw AssetRenderException(assetContext, "Failed to render asset", exception)
         } finally {
-            player.asyncHydrationTrackerPlugin?.hydrationDone(this)
+            player.asyncHydrationTrackerPlugin?.renderingComplete(this)
         }
     }
 
-    private suspend fun render(): View = try {
+    internal suspend fun render(isRoot: Boolean = false): View = try {
         cachedAssetView.let { (cachedAssetContext, cachedView) ->
             requireContext()
             when {
                 cachedView == null -> {
                     renewHydrationScope("recreating view")
-                    doRender()
+                    doRender(isRoot)
                 }
                 cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
                     renewHydrationScope("recreating view")
                     cachedView.removeSelf()
-                    doRender()
+                    doRender(isRoot)
                 }
-                !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
-                    try {
-                        cachedView.also { rehydrate(it) }
-                    } catch (exception: StaleViewException) {
-                        player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
-                        render()
+                !cachedAssetContext.asset.nativeReferenceEquals(asset) -> {
+                    // TODO: ideally rehydrate the existing view rather than recreating it
+                    renewHydrationScope("rehydrating ${asset.id}")
+                    doRender(isRoot)
+                }
+
+                else -> cachedView.also {
+                    player.asyncHydrationTrackerPlugin?.let { tracker ->
+                        if (isRoot) tracker.trackHydration(this@RenderableAsset, isRoot = true)
+                        tracker.renderingComplete(this@RenderableAsset)
                     }
-                else -> cachedView
+                }
             }
         }.also { player.cacheAssetView(assetContext, it) }
     } catch (exception: Throwable) {
@@ -179,11 +185,12 @@ public abstract class RenderableAsset<Data>(
 
     private fun rehydrate(view: View) {
         renewHydrationScope("rehydrating ${asset.id}")
+        player.asyncHydrationTrackerPlugin?.trackHydration(this, isRoot = true)
         hydrationScope.launch {
             try {
                 val data = getData()
                 withContext(Dispatchers.Main) {
-                    view.hydrate(data)
+                    hydrationScope.hydrate(view, data)
                 }
             } catch (exception: StaleViewException) {
                 player.inProgressState?.fail(
@@ -197,7 +204,7 @@ public abstract class RenderableAsset<Data>(
             } catch (exception: Throwable) {
                 throw AssetRenderException(assetContext, "Failed to rehydrate asset", exception)
             } finally {
-                player.asyncHydrationTrackerPlugin?.hydrationDone(this@RenderableAsset)
+                player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
             }
         }
     }
@@ -217,115 +224,57 @@ public abstract class RenderableAsset<Data>(
 
     // ── Public render entry points ────────────────────────────────────────────
 
-    /** Render this asset into [container], inheriting context from the calling asset. Launches into [hydrationScope] — returns after scheduling, not after completion. */
-    public suspend fun GenericAsset.renderInto(container: ViewGroup) {
-        val asset = assetContext
-            .withContext(this@RenderableAsset.requireContext())
-            .build()
-        hydrationScope.launch {
+    private fun CoroutineScope.inflateChild(child: RenderableAsset<*>, container: ViewGroup) {
+        player.asyncHydrationTrackerPlugin?.preTrackChild(child)
+        launch {
             try {
-                val view = asset.render()
+                val view = child.render()
                 withContext(Dispatchers.Main) { view into container }
             } catch (_: CancellationException) {}
         }
     }
 
-    /** Render this asset into [container] with [styles]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
-    public suspend fun GenericAsset.renderInto(
-        container: ViewGroup,
-        @StyleRes vararg styles: Style?,
-    ) {
-        val asset = assetContext
-            .withContext(this@RenderableAsset.requireContext())
-            .withStyles(*styles)
-            .build()
-        hydrationScope.launch {
-            try {
-                val view = asset.render()
-                withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
-        }
+    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).build() } ?: return
+        inflateChild(asset, container)
     }
 
-    /** Render this asset into [container] with [styles]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
-    public suspend fun GenericAsset.renderInto(
-        container: ViewGroup,
-        @StyleRes styles: Styles?,
-    ) {
-        val asset = assetContext
-            .withContext(this@RenderableAsset.requireContext())
-            .withStyles(styles)
-            .build()
-        hydrationScope.launch {
-            try {
-                val view = asset.render()
-                withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
-        }
+    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes vararg styles: Style?) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() } ?: return
+        inflateChild(asset, container)
     }
 
-    /** Render this asset into [container] with a [tag]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
-    public suspend fun GenericAsset.renderInto(
-        container: ViewGroup,
-        tag: String,
-    ) {
-        val asset = assetContext
-            .withContext(this@RenderableAsset.requireContext())
-            .withTag(tag)
-            .build()
-        hydrationScope.launch {
-            try {
-                val view = asset.render()
-                withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
-        }
+    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes styles: Styles?) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(styles).build() } ?: return
+        inflateChild(asset, container)
     }
 
-    /** Render this asset into [container] with [styles] and a [tag]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
-    public suspend fun GenericAsset.renderInto(
-        container: ViewGroup,
-        @StyleRes vararg styles: Style?,
-        tag: String,
-    ) {
-        val asset = assetContext
-            .withContext(this@RenderableAsset.requireContext())
-            .withTag(tag)
-            .withStyles(*styles)
-            .build()
-        hydrationScope.launch {
-            try {
-                val view = asset.render()
-                withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
-        }
+    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, tag: String) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).build() } ?: return
+        inflateChild(asset, container)
     }
 
-    /** Render this asset into [container] with [styles] and a [tag]. Launches into [hydrationScope] — returns after scheduling, not after completion. */
-    public suspend fun GenericAsset.renderInto(
-        container: ViewGroup,
-        @StyleRes styles: Styles?,
-        tag: String,
-    ) {
-        val asset = assetContext
-            .withContext(this@RenderableAsset.requireContext())
-            .withTag(tag)
-            .withStyles(styles)
-            .build()
-        hydrationScope.launch {
-            try {
-                val view = asset.render()
-                withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
-        }
+    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes vararg styles: Style?, tag: String) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() } ?: return
+        inflateChild(asset, container)
+    }
+
+    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes styles: Styles?, tag: String) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() } ?: return
+        inflateChild(asset, container)
     }
 
     /** Root entry point — render this asset into [container] using [context] to bootstrap the context chain. */
-    public suspend fun renderInto(container: FrameLayout, context: Context) {
+    public fun CoroutineScope.renderInto(container: FrameLayout, context: Context) {
         val asset = assetContext
             .withContext(player.hooks.context.call(context))
             .build()
-        val view = asset.render()
-        withContext(Dispatchers.Main) { view into container }
+        launch {
+            try {
+                val view = asset.render(isRoot = true)
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {}
+        }
     }
 
     // ── Expansion helpers ─────────────────────────────────────────────────────
@@ -387,34 +336,53 @@ public abstract class RenderableAsset<Data>(
 
     @ExperimentalPlayerApi
     public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
-        private var trackedHydrations = mutableSetOf<String>()
+        private var counter = 0
 
         public val hooks: Hooks = Hooks()
 
-        public fun trackHydration(asset: RenderableAsset<*>) {
-            synchronized(trackedHydrations) {
-                if (trackedHydrations.isEmpty()) hooks.onHydrationStarted.call()
-                trackedHydrations.add(asset.assetContext.id)
+        /**
+         * Called by [renderChildInto] synchronously before launching the child coroutine,
+         * while still inside the parent's hydrate(). Increments the counter so it can't
+         * drop to zero before the child's own [trackHydration] fires.
+         */
+        public fun preTrackChild(child: RenderableAsset<*>) {
+            synchronized(this) {
+                counter++
             }
         }
 
-        public fun hydrationDone(asset: RenderableAsset<*>) {
-            val doneHydrating = synchronized(trackedHydrations) {
-                trackedHydrations.remove(asset.assetContext.id)
-                trackedHydrations.isEmpty()
+        /**
+         * Called at the start of [doRender]. For root assets (no parent), increments and
+         * fires [Hooks.onHydrationStarted]. For children, decrements the pre-track increment
+         * and re-increments — net zero change, but fires started if this is truly the first asset.
+         */
+        public fun trackHydration(asset: RenderableAsset<*>, isRoot: Boolean) {
+            val fireStarted: Boolean
+            synchronized(this) {
+                fireStarted = counter == 0
+                if (isRoot) {
+                    // nested assets are pre-tracked; no change needed here
+                    counter++
+                }
             }
+            if (fireStarted) hooks.onHydrationStarted.call()
+        }
 
-            if (doneHydrating) {
-                hooks.onHydrationComplete.call()
+        /** Called in [doRender]'s finally block. Decrements counter; fires [Hooks.onHydrationComplete] when it reaches zero. */
+        public fun renderingComplete(asset: RenderableAsset<*>) {
+            val fireComplete: Boolean
+            synchronized(this) {
+                fireComplete = --counter == 0
             }
+            if (fireComplete) hooks.onHydrationComplete.call()
         }
 
         override fun apply(androidPlayer: AndroidPlayer) {
             androidPlayer.hooks.viewController.tap { viewController ->
                 viewController?.hooks?.view?.tap { view ->
                     view?.hooks?.onUpdate?.tap { _ ->
-                        synchronized(trackedHydrations) {
-                            trackedHydrations.clear()
+                        synchronized(this@AsyncHydrationTrackerPlugin) {
+                            counter = 0
                         }
                     }
                 }

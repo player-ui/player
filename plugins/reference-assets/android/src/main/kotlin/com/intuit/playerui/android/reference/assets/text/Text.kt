@@ -12,6 +12,7 @@ import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin.Companion.referenceAssetsPlugin
 import com.intuit.playerui.core.player.Player
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 
 class Text(
@@ -59,9 +60,9 @@ class Text(
         }
     }
 
-    override suspend fun View.hydrate(data: Data) {
-        when (this) {
-            is TextView -> text = buildSpannedString {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+        when (view) {
+            is TextView -> view.text = buildSpannedString {
                 data.ref?.let {
                     inSpans(refSpan(it)) { append(data.value) }
                 } ?: append(data.value)

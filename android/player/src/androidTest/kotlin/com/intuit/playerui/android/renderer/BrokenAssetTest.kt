@@ -14,18 +14,23 @@ import com.intuit.playerui.android.utils.BrokenAsset.Companion.asset
 import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
+import com.intuit.playerui.android.utils.CoroutineTestDispatcherRule
 import com.intuit.playerui.utils.start
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.assertFailsWith
 
 @RunWith(AndroidJUnit4::class)
 internal class BrokenAssetTest {
+    @get:Rule
+    val coroutineRule = CoroutineTestDispatcherRule()
     private val runtime = BrokenAsset.runtime
 
     val appContext: Context = ApplicationProvider.getApplicationContext()
@@ -43,32 +48,39 @@ internal class BrokenAssetTest {
         player.start(BrokenAsset.sampleFlow)
     }
 
-    // TODO: these tests use render() which returns View — revisit once renderInto replacement is settled
     @Test
-    fun `invalidate view should fail on first render`() = runTest {
-        val exception = assertFailsWith<AssetRenderException> {
-            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(appContext)
+    fun `invalidate view should fail on first render`() = runBlocking {
+        var caught: AssetRenderException? = null
+        try {
+            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).awaitRender(appContext)
+        } catch (e: AssetRenderException) {
+            caught = e
         }
-        assertNotNull(exception)
-        assertTrue(exception.cause is StaleViewException)
+        assertNotNull(caught)
+        assertTrue(caught!!.cause is StaleViewException)
     }
 
     @Test
-    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() = runTest {
+    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() = runBlocking {
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(appContext) is FrameLayout,
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).awaitRender(appContext) is FrameLayout,
         )
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(appContext) is LinearLayout,
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).awaitRender(appContext) is LinearLayout,
         )
     }
 
     @Test
-    fun `manual rehydration should fail the player on invalidate view`() = runTest {
+    fun `manual rehydration should fail the player on invalidate view`() = runBlocking {
         BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).apply {
-            assertTrue(render(appContext) is FrameLayout)
+            assertTrue(awaitRender(appContext) is FrameLayout)
+            val rehydrationComplete = CompletableDeferred<Unit>()
+            player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("manual-rehydrate") {
+                rehydrationComplete.complete(Unit)
+            }
             data.layout = BrokenAsset.Layout.Linear
             rehydrate()
+            rehydrationComplete.await()
         }
         assertTrue(player.state is ErrorState)
     }

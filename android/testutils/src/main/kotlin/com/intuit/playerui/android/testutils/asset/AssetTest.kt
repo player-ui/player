@@ -2,12 +2,12 @@ package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
@@ -22,11 +22,11 @@ import com.intuit.playerui.utils.mocks.getFlow
 import com.intuit.playerui.utils.start
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -80,11 +80,15 @@ public abstract class AssetTest(
             field = value
 
             field?.let { asset ->
-                // TODO: renderInto is fire-and-forget (Unit), need a way to get the rendered View for test assertion
-                CoroutineScope(Dispatchers.Main).launch {
-                    try {
-                        viewChannel.emit(asset.render(context))
-                    } catch (_: CancellationException) {}
+                val container = FrameLayout(context)
+                asset.player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("AssetTest-render") {
+                    // Post to Main after hook fires to ensure renderInto's `view into container` has run
+                    CoroutineScope(Dispatchers.Main).launch {
+                        viewChannel.emit(container.getChildAt(0) ?: emptyView)
+                    }
+                }
+                CoroutineScope(Dispatchers.Main).run {
+                    with(asset) { renderInto(container, context!!) }
                 }
             }
         }
@@ -149,14 +153,4 @@ public abstract class AssetTest(
     protected fun blockUntilRendered(timeout: Long = 5_000): View = runBlocking {
         awaitRendered(timeout)
     }
-
-    // TODO: revisit whether awaitCompleteHydration is still needed now that render() is suspend
-    // private suspend fun View.awaitCompleteHydration() {
-    //     if (this is RenderableAsset.AsyncViewStub) {
-    //         awaitView()?.awaitCompleteHydration()
-    //         return
-    //     }
-    //     while (getTag(R.bool.view_hydrated) == false) delay(25)
-    //     if (this is ViewGroup) children.forEach { it.awaitCompleteHydration() }
-    // }
 }

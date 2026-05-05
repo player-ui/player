@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.State
@@ -39,7 +40,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.withContext
 
 /**
  * [Fragment] wrapper integration with the [AndroidPlayer]. Delegates
@@ -155,7 +155,7 @@ public abstract class PlayerFragment :
 
     /** Default implementation of [handleAssetUpdate] */
     @ExperimentalPlayerApi
-    protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset<*>?, animateTransition: Boolean) {
+    protected open fun CoroutineScope.renderIntoPlayerCanvas(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         val startTime = System.currentTimeMillis()
         val tracker = asset?.player?.asyncHydrationTrackerPlugin
 
@@ -165,20 +165,20 @@ public abstract class PlayerFragment :
 
         if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
 
-        val transition = if (animateTransition) {
-            binding.scrollContainer.scrollTo(0, 0)
-            buildTransitionAnimation()
-        } else null
-
-        // TODO: with transition, renderInto inserts the view immediately then transitionInto re-inserts it — view is populated twice, causing a visual flash. Need to skip renderInto and only insert via transitionInto once hydration is complete, but that requires render() to return a View.
+        val context = requireContext()
+        val transition = if (animateTransition) buildTransitionAnimation() else null
         if (transition != null) {
+            binding.scrollContainer.scrollTo(0, 0)
+            val offscreen = FrameLayout(context)
             tracker?.hooks?.onHydrationComplete?.tap("renderIntoPlayerCanvas-transition") {
-                binding.playerCanvas.getChildAt(0).transitionInto(binding.playerCanvas, transition)
+                val child = offscreen.getChildAt(0)
+                child.transitionInto(binding.playerCanvas, transition)
             }
+            asset?.run { renderInto(offscreen, context) }
+        } else {
+            asset?.run { renderInto(binding.playerCanvas, context) }
+                ?: run { null into binding.playerCanvas }
         }
-
-        asset?.renderInto(binding.playerCanvas, requireContext())
-            ?: withContext(Dispatchers.Main) { null into binding.playerCanvas }
     }
 
     /**
