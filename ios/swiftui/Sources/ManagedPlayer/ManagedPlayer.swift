@@ -188,7 +188,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                             context.logger.d("loadingState changed to .loading - calling context.unload()")
                             // only call unload if were in loading state
                             context.unload()
-                        } else if case .loaded(let flow) = newState {
+                        } else if case .loaded(_) = newState {
                             context.logger.d("loadingState changed to .loaded")
                         }
                     }

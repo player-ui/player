@@ -896,6 +896,15 @@ importers:
       '@player-ui/beacon-plugin':
         specifier: workspace:^
         version: link:../../beacon/core
+      '@player-ui/common-expressions-plugin':
+        specifier: workspace:^
+        version: link:../../common-expressions/core
+      '@player-ui/common-types-plugin':
+        specifier: workspace:^
+        version: link:../../common-types/core
+      '@player-ui/computed-properties-plugin':
+        specifier: workspace:^
+        version: link:../../computed-properties/core
       '@player-ui/expression-plugin':
         specifier: workspace:^
         version: link:../../expression/core
@@ -905,13 +914,13 @@ importers:
       '@player-ui/player':
         specifier: workspace:^
         version: link:../../../core/player
+      '@player-ui/stage-revert-data-plugin':
+        specifier: workspace:^
+        version: link:../../stage-revert-data/core
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:^
         version: link:../../../tools/asset-testing-library/core
-      '@player-ui/common-types-plugin':
-        specifier: workspace:^
-        version: link:../../common-types/core
 
   plugins/reference-assets/mocks:
     dependencies:

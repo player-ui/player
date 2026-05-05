@@ -1,0 +1,10 @@
+---
+// Custom component that makes it easier to change the usage docs for all the plugins.
+// This component adds a note explaining that a plugin is only meant to be used with the core.
+
+import {Aside} from "@astrojs/starlight/components";
+---
+
+<Aside title="Core-only Plugin">This plugin should be added to the shared core and is not intended 
+to be re-registered across platforms. There are no separate iOS, JVM, or Android implementations — add 
+it once in your core Player setup.</Aside>

@@ -2,7 +2,6 @@ package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.test.RuntimeTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import com.intuit.playerui.utils.test.simpleFlowString
@@ -18,7 +17,6 @@ internal class RuntimePropertyAccessRaceConditionTest : RuntimeTest() {
         val player = HeadlessPlayer(
             runtime,
             ReferenceAssetsPlugin(),
-            CommonTypesPlugin(),
         )
 
         // Use a real reference-assets flow to exercise deserialization.
