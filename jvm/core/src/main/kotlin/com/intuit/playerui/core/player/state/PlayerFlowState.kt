@@ -14,7 +14,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializabl
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataController
-import com.intuit.playerui.core.data.DataModelWithParser
+import com.intuit.playerui.core.data.ReadOnlyDataController
 import com.intuit.playerui.core.experimental.RuntimeClassDiscriminator
 import com.intuit.playerui.core.expressions.ExpressionController
 import com.intuit.playerui.core.expressions.ExpressionEvaluator
@@ -62,10 +62,7 @@ public class CompletedState(
 
     internal val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
 
-    // TODO: Completed state dataModel change needs rectification here
-    public val dataModel: DataModelWithParser by lazy {
-        DataModelWithParser(controllers.data.node)
-    }
+    public val dataModel: ReadOnlyDataController get() = controllers.data
 
     internal object Serializer : NodeWrapperSerializer<CompletedState>(::CompletedState, COMPLETED.value)
 }
@@ -154,14 +151,18 @@ public val InProgressState.lastViewUpdate: Asset? get() = controllers.view.curre
 /** A function to get the current state of the flow state-machine */
 public val InProgressState.currentFlowState: NamedState? get() = controllers.flow.current?.currentState
 
-public val InProgressState.dataModel: DataController get() = controllers.data
+public val InProgressState.dataModel: DataController get() = controllers.data as DataController
 
 @Serializable(ControllerState.Serializer::class)
 public class ControllerState internal constructor(
     override val node: Node,
 ) : NodeWrapper {
-    /** The manager for data for a flow */
-    public val data: DataController by NodeSerializableField(DataController.serializer())
+    /**
+     * The manager for data for a flow. Uses [ReadOnlyDataController.serializer] so the concrete
+     * type ([DataController] vs [ReadOnlyDataController]) is determined by whether the underlying
+     * JS object exposes a [set] function.
+     */
+    public val data: ReadOnlyDataController by NodeSerializableField(ReadOnlyDataController.serializer())
 
     /** The view manager for a flow */
     public val view: ViewController by NodeSerializableField(ViewController.serializer())

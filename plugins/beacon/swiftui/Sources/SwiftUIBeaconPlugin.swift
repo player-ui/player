@@ -9,11 +9,9 @@ import Foundation
 import JavaScriptCore
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIBaseBeaconPlugin
-#endif
 
 /**
  Plugin used by `SwiftUIPlayer` for beaconing in a uniform format between platforms

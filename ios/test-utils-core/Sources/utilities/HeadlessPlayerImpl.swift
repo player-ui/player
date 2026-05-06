@@ -1,9 +1,7 @@
 import JavaScriptCore
 
 import PlayerUI
-#if SWIFT_PACKAGE
 import PlayerUILogger
-#endif
 
 open class HeadlessPlayerImpl: HeadlessPlayer {
     public var assetRegistry: BaseAssetRegistry<TestWrapper>

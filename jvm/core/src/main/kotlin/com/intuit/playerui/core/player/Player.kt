@@ -18,6 +18,7 @@ import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.player.state.ReleasedState
 import com.intuit.playerui.core.plugins.Pluggable
+import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.core.validation.ValidationController
 import com.intuit.playerui.core.view.View
 import com.intuit.playerui.core.view.ViewController
@@ -122,6 +123,11 @@ public abstract class Player : Pluggable {
      * method has no effect.
      */
     public abstract fun release()
+
+    /**
+     * Registers a Plugin on a running Player instance
+     */
+    public abstract fun registerPlugin(plugin: Plugin)
 
     /**
      * Utility method to allow consumers to start a flow from a
