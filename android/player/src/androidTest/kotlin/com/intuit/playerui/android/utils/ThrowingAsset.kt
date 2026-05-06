@@ -6,6 +6,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.DecodableAsset
+import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -17,7 +18,7 @@ import kotlinx.serialization.json.Json
 
 internal class ThrowingAsset(
     assetContext: AssetContext,
-) : DecodableAsset<ThrowingAsset.Data>(assetContext, Data.serializer()) {
+) : RenderableAsset<ThrowingAsset.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         var layout: Layout,

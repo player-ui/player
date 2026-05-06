@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import android.widget.TextView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.DecodableAsset
+import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -16,7 +17,7 @@ import kotlinx.serialization.json.Json
 @Suppress("DEPRECATION_ERROR")
 internal class SimpleAsset(
     assetContext: AssetContext,
-) : DecodableAsset<Node>(assetContext, Node.serializer()) {
+) : RenderableAsset<Node>(assetContext, Node.serializer()) {
     override suspend fun initView(data: Node) = TextView(context)
 
     override suspend fun CoroutineScope.hydrate(view: View, data: Node) = Unit
