@@ -6,7 +6,7 @@ import { PackageManagers } from 'starlight-package-managers'
 
 XLR creation is done through the Player CLI which can be added to your project like so:
 
-<PackageManagers pkg="@player-tools/cli" />
+<PackageManagers pkg="@player-cli/cli" />
 
 
 ## Exporting Base Type Definitions
@@ -17,6 +17,7 @@ If you want to compile all exported interfaces/types and are using our Bazel rul
 js_xlr_pipeline(
     package_name = "<package name>",
     xlr_mode = "types",
+    cli = "@player-cli/cli"
 )
 ```
 
@@ -57,7 +58,8 @@ js_xlr_pipeline(
     peer_deps = [...],
     test_deps = [...],
     deps = [...],
-    xlr_mode = "plugin"
+    xlr_mode = "plugin",
+    cli = "@player-cli/cli"
 )
 ```
 

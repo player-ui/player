@@ -6,9 +6,9 @@ import {
   Collection,
   Action,
 } from "@player-ui/reference-assets-plugin-components";
-import type { DSLFlow } from "@player-tools/dsl";
-import { binding as b } from "@player-tools/dsl";
-import { expression as e } from "@player-tools/dsl";
+import type { DSLFlow } from "@player-lang/react-dsl";
+import { binding as b } from "@player-lang/react-dsl";
+import { expression as e } from "@player-lang/react-dsl";
 
 const view1 = (
   <Collection>

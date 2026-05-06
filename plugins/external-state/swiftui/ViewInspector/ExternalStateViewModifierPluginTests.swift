@@ -181,11 +181,11 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
         class HasTransitionedPlugin: NativePlugin {
             var pluginName: String = "HasTransitioned"
 
-            var expected: String
+            var expected: NavigationFlowStateType
 
             var expectation: XCTestExpectation
 
-            init(expected: String, expectation: XCTestExpectation) {
+            init(expected: NavigationFlowStateType, expectation: XCTestExpectation) {
                 self.expected = expected
                 self.expectation = expectation
             }
@@ -194,7 +194,7 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
                 player.hooks?.flowController.tap({ flowController in
                     flowController.hooks.flow.tap { flow in
                         flow.hooks.afterTransition.tap { [weak self] newFlow in
-                            if newFlow.currentState?.value?.stateType.rawValue == self?.expected {
+                            if newFlow.currentState?.value?.stateType == self?.expected {
                                 self?.expectation.fulfill()
                             }
                         }
@@ -212,7 +212,7 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
             plugins: [
                 ReferenceAssetsPlugin(),
                 plugin,
-                HasTransitionedPlugin(expected: "VIEW", expectation: viewTransition)
+                HasTransitionedPlugin(expected: .view, expectation: viewTransition)
             ],
             result: Binding(get: {nil}, set: { (result) in
             switch result {
@@ -424,5 +424,5 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
     }
 }
 
-extension InspectableSheet: PopupPresenter {}
+extension InspectableSheet: @retroactive PopupPresenter {}
 extension Inspection: InspectionEmissary { }

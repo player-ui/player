@@ -199,7 +199,7 @@ class AnyTypeTests: XCTestCase {
 
         // Should throw AnyTypeDecodingError.missingDecodingContext
         XCTAssertThrowsError(try JSONDecoder().decode(AnyType.self, from: data)) { error in
-            guard let decodingError = error as? AnyTypeDecodingError else {
+            guard error is AnyTypeDecodingError else {
                 return XCTFail("Expected AnyTypeDecodingError but got \(type(of: error))")
             }
         }
@@ -242,7 +242,7 @@ class AnyTypeTests: XCTestCase {
 
         // Should throw AnyTypeDecodingError.missingDecodingContext
         XCTAssertThrowsError(try JSONDecoder().decode(AnyType.self, from: data)) { error in
-            guard let decodingError = error as? AnyTypeDecodingError else {
+            guard error is AnyTypeDecodingError else {
                 return XCTFail("Expected AnyTypeDecodingError but got \(type(of: error))")
             }
         }

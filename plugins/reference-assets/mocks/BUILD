@@ -26,7 +26,9 @@ compile_mocks(
     data = [
         ":node_modules/@player-ui/reference-assets-cli-preset",
         ":node_modules/@player-ui/reference-assets-plugin-components",
-    ]
+    ],
+    cli = "@player-cli/cli",
+    dsl_package = "@player-lang/react-dsl"
 )
 
 filegroup(
