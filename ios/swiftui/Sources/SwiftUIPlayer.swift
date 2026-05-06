@@ -158,7 +158,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             do {
                 try registry.decode(value: value)
             } catch {
-                (state as? InProgressState)?.fail(PlayerError.unknownResponse(error))
+                (state as? InProgressState)?.controllers?.error.captureError(error: error)
             }
         }
     }
@@ -279,6 +279,9 @@ public struct SwiftUIPlayerHooks: CoreHooks {
     /// Fired when the DataController changes
     public var dataController: Hook<DataController>
 
+    /// Fired when the ErrorController changes
+    public var errorController: Hook<ErrorController>
+
     /// Fired when the state changes
     public var state: Hook<BaseFlowState>
 
@@ -296,6 +299,7 @@ public struct SwiftUIPlayerHooks: CoreHooks {
         flowController = Hook<FlowController>(baseValue: player, name: "flowController")
         viewController = Hook<ViewController>(baseValue: player, name: "viewController")
         dataController = Hook<DataController>(baseValue: player, name: "dataController")
+        errorController = Hook<ErrorController>(baseValue: player, name: "errorController")
         state = Hook<BaseFlowState>(baseValue: player, name: "state")
         view = SyncWaterfallHook<AnyView>()
         transition = SyncBailHook<Void, PlayerViewTransition>()

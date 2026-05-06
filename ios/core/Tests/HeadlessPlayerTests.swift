@@ -209,8 +209,9 @@ class HeadlessPlayerTests: XCTestCase {
             case .failure(let error):
                 switch error {
                 case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating 'this.navigation.BEGIN')")
-                default: break
+                    XCTAssertEqual(errorState.error.message, "undefined is not an object (evaluating 'this.navigation.BEGIN')")
+                default:
+                    XCTFail("Should throw PlayerError.promiseRejected")
                 }
             }
         }
@@ -225,9 +226,9 @@ class HeadlessPlayerTests: XCTestCase {
                 XCTFail("should have failed")
             case .failure(let error):
                 switch error {
-                case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating \'o.navigation\')")
-                default: break
+                case .jsConversionFailure: break
+                default:
+                    XCTFail("Should throw PlayerError.jsConversionFailure")
                 }
             }
         }

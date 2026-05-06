@@ -3,7 +3,7 @@ import { BindingParser } from "../../../binding";
 import { ExpressionEvaluator } from "../../../expressions";
 import { LocalModel, withParser } from "../../../data";
 import { SchemaController } from "../../../schema";
-import { Resolve, Resolver } from "..";
+import { Resolve, Resolver, ResolverError } from "..";
 import type { Node } from "../../parser";
 import { NodeType, Parser } from "../../parser";
 
@@ -136,4 +136,56 @@ describe("Node cache updates", () => {
       expect.anything(),
     );
   });
+});
+
+describe("error handling", () => {
+  let resolverOptions: Resolve.ResolverOptions;
+
+  beforeEach(() => {
+    const model = new LocalModel({});
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+
+    resolverOptions = {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    };
+  });
+
+  const computeTreeHooks: Array<keyof Resolver["hooks"]> = [
+    "afterNodeUpdate",
+    "afterResolve",
+    "beforeResolve",
+    "resolve",
+    "resolveOptions",
+    "skipResolve",
+  ];
+  it.each(computeTreeHooks)(
+    "should wrap errors in hooks in a ResolverError",
+    (hook) => {
+      const resolver = new Resolver(simpleViewWithAsync, resolverOptions);
+
+      resolver.hooks[hook].tap("test", () => {
+        throw new Error("ERROR!");
+      });
+
+      let error: unknown;
+      try {
+        resolver.update();
+      } catch (err: unknown) {
+        error = err;
+      }
+
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(ResolverError);
+      const resolverError = error as ResolverError;
+      expect(resolverError.cause).toStrictEqual(new Error("ERROR!"));
+      expect(resolverError.stage).toStrictEqual(hook);
+    },
+  );
 });

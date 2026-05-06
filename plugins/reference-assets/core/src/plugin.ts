@@ -5,6 +5,7 @@ import {
   AsyncNodePlugin,
   AsyncNodePluginPlugin,
 } from "@player-ui/async-node-plugin";
+import { ErrorRecoveryPlugin } from "./plugins/error-recovery-plugin";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { CommonExpressionsPlugin } from "@player-ui/common-expressions-plugin";
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
@@ -24,6 +25,7 @@ export class ReferenceAssetsPlugin implements PlayerPlugin {
     }),
     new ReferenceAssetsTransformPlugin(),
     new ChatUiDemoPlugin(),
+    new ErrorRecoveryPlugin(),
   ]);
 
   apply(player: Player): void {
