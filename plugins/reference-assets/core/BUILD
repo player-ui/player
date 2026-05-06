@@ -29,4 +29,5 @@ js_xlr_pipeline(
         ":node_modules/@player-ui/expression-plugin",
         ":node_modules/@player-ui/meta-plugin",
     ],
+    cli = "@player-cli/cli"
 )

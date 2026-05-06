@@ -20,4 +20,5 @@ js_xlr_pipeline(
     deps = [
         ":node_modules/@player-ui/expression-plugin",
     ],
+    cli = "@player-cli/cli"
 )

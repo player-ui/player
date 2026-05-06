@@ -6,7 +6,7 @@ In order to take advantage of the auto-completion and validation of TypeScript t
 
 ## Creating a Basic Component
 
-The `Asset` component from the `@player-tools/dsl` package is the quickest way to create a new component. The `Asset` component will take all the Asset's properties and convert them to their equivalent JSON representation when serialized.
+The `Asset` component from the `@player-lang/react-dsl` package is the quickest way to create a new component. The `Asset` component will take all the Asset's properties and convert them to their equivalent JSON representation when serialized.
 
 In the examples below, we'll be creating a TSX component for the `action` asset in our reference set.
 
@@ -29,12 +29,12 @@ export interface ActionAsset<AnyTextAsset extends Asset = Asset>
 }
 ```
 
-_Note: The `Asset` type we're importing here from the `@player-ui/player` package is different than the `Asset` component from the `@player-tools/dsl` package. The former is the basic TypeScript definition for what an Asset in Player is while the latter is a helper function for allowing DSL components to be created. Fundamentally they share a name to reinforce the abstraction of foundational capabilities to core libraries_
+_Note: The `Asset` type we're importing here from the `@player-ui/player` package is different than the `Asset` component from the `@player-lang/react-dsl` package. The former is the basic TypeScript definition for what an Asset in Player is while the latter is a helper function for allowing DSL components to be created. Fundamentally they share a name to reinforce the abstraction of foundational capabilities to core libraries_
 
 To turn this interface into a usable component, create a new React component that _renders_ an Asset:
 
 ```tsx
-import { Asset, AssetPropsWithChildren } from "@player-tools/dsl";
+import { Asset, AssetPropsWithChildren } from "@player-lang/react-dsl";
 
 export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
   return <Asset type="action" {...props} />;
@@ -65,7 +65,7 @@ Continuing the example fo the `ActionAsset`, we need a way for users to users to
 
 ```tsx
 import React from 'react';
-import { Asset, AssetPropsWithChildren, createSlot } from '@player-tools/dsl';
+import { Asset, AssetPropsWithChildren, createSlot } from '@player-lang/react-dsl';
 
 export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
   return <Asset type="action" {...props} />;
@@ -167,7 +167,7 @@ which when compiled would look like the following (note the automatic insertion 
 
 ## Creating a Complex Component
 
-While a majority of Assets can be described simply via the base `Action` Component, there are certain cases where DSL components need to contain a bit more logic. This section aims to describe further tools that are offered in the `@player-tools/dsl` package.
+While a majority of Assets can be described simply via the base `Action` Component, there are certain cases where DSL components need to contain a bit more logic. This section aims to describe further tools that are offered in the `@player-lang/react-dsl` package.
 
 ### Components with Specially Handled Properties
 
@@ -197,8 +197,8 @@ Crucially, the difference is in how the `exp` property is handled. As the `exp` 
 
 The first is to modify the type for the commponent. In the above code snippit we are using the `Omit` type to remove the base `exp` property from the source type and replacing it with an `exp` property that expects a `ExpressionTemplateInstance` which allows an DSL expression to be passed in.
 
-The second is to extract out the `exp` property from the props and use a `property` component to manually control how that property will get serialized. This component is exposed by the underlying `react-json-reconciler` library which also supplies an `array`, `obj` and `value` component to allow full control over more complicated data structures. The `@player-tools/dsl` package also exposes the `toJsonProperties` function to process whole non-Asset objects.
+The second is to extract out the `exp` property from the props and use a `property` component to manually control how that property will get serialized. This component is exposed by the underlying `react-json-reconciler` library which also supplies an `array`, `obj` and `value` component to allow full control over more complicated data structures. The `@player-lang/react-dsl` package also exposes the `toJsonProperties` function to process whole non-Asset objects.
 
 ### View Components
 
-For Assets that are intended to be Views, a `View` component is exported from the `@player-tools/dsl` package. Its usage is exactly the same as the `Asset` component, however it correctly handles the serialization of any Crossfield Validations that exist on the View.
+For Assets that are intended to be Views, a `View` component is exported from the `@player-lang/react-dsl` package. Its usage is exactly the same as the `Asset` component, however it correctly handles the serialization of any Crossfield Validations that exist on the View.

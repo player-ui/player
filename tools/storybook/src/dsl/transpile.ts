@@ -1,6 +1,6 @@
 import { initialize, transform } from "esbuild-wasm/lib/browser";
 import * as React from "react";
-import * as PlayerDSL from "@player-tools/dsl";
+import * as PlayerDSL from "@player-lang/react-dsl";
 
 let initializedPromise: undefined | Promise<void>;
 async function setup() {
@@ -42,7 +42,7 @@ export const execute = async (
 
   const mods = {
     react: React,
-    "@player-tools/dsl": PlayerDSL,
+    "@player-lang/react-dsl": PlayerDSL,
     ...additionalModules,
   };
 

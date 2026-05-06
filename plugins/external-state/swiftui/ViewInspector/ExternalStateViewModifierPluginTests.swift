@@ -194,7 +194,7 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
                 player.hooks?.flowController.tap({ flowController in
                     flowController.hooks.flow.tap { flow in
                         flow.hooks.afterTransition.tap { [weak self] newFlow in
-                            if newFlow.currentState?.value?.stateType.rawValue == self?.expected {
+                            if newFlow.currentState?.value?.stateType == self?.expected {
                                 self?.expectation.fulfill()
                             }
                         }
@@ -424,5 +424,5 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
     }
 }
 
-extension InspectableSheet: PopupPresenter {}
+extension InspectableSheet: @retroactive PopupPresenter {}
 extension Inspection: InspectionEmissary { }

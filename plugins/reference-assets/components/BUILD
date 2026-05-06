@@ -13,7 +13,7 @@ js_pipeline(
     peer_deps = [
         "//:node_modules/react",
         "//:node_modules/@types/react",
-        "//:node_modules/@player-tools/dsl",
+        "//:node_modules/@player-lang/react-dsl",
         ":node_modules/@player-ui/player",
     ],
     deps = [

@@ -383,4 +383,4 @@ public struct PlayerViewTransition: Equatable {
     }
 }
 
-extension InProgressState: ObservableObject {}
+extension InProgressState: @retroactive ObservableObject {}

@@ -142,7 +142,6 @@
     "https://bcr.bazel.build/modules/rules_android/0.6.5/MODULE.bazel": "6a44151a40914578679754a4f4b1fdc80d3e1cc674626524f0e6037a9d6c775f",
     "https://bcr.bazel.build/modules/rules_android/0.6.5/source.json": "c45d1b4a54d165c16089b1fd90aecadd21a2400f0eca149359a41919da6830ed",
     "https://bcr.bazel.build/modules/rules_apple/3.16.1/MODULE.bazel": "8294474defa70af2534a558ab905c083d69203344145e6f7d544d5098611ec7d",
-    "https://bcr.bazel.build/modules/rules_apple/3.22.0/MODULE.bazel": "0fd8c630d6cecc18abe84114ee21c1a0fb759b45063d3d2600ec22669e93ea43",
     "https://bcr.bazel.build/modules/rules_apple/3.3.0/MODULE.bazel": "7497a6e08c439493b863de42653868f78207bd26d32a0267423260ae2a1d861a",
     "https://bcr.bazel.build/modules/rules_apple/3.8.0/MODULE.bazel": "b0ecef90c460f956e67d36ae42d1879e46ec8f182fa87683b0e53a8f3982dd37",
     "https://bcr.bazel.build/modules/rules_apple/4.0.1/MODULE.bazel": "dec3ca18ca4680c66a33341918ef5160ba37b51b282435e2ec01490b2f873475",
@@ -224,7 +223,8 @@
     "https://bcr.bazel.build/modules/rules_python/1.0.0/MODULE.bazel": "898a3d999c22caa585eb062b600f88654bf92efb204fa346fb55f6f8edffca43",
     "https://bcr.bazel.build/modules/rules_python/1.2.0/MODULE.bazel": "5aeeb48b2a6c19d668b48adf2b8a2b209a6310c230db0ce77450f148a89846e4",
     "https://bcr.bazel.build/modules/rules_python/1.3.0/MODULE.bazel": "8361d57eafb67c09b75bf4bbe6be360e1b8f4f18118ab48037f2bd50aa2ccb13",
-    "https://bcr.bazel.build/modules/rules_python/1.3.0/source.json": "25932f917cd279c7baefa6cb1d3fa8750a7a29de522024449b19af6eab51f4a0",
+    "https://bcr.bazel.build/modules/rules_python/1.6.1/MODULE.bazel": "0dd0dd858e4480a7dc0cecb21d2131a476cdd520bdb42d9fae64a50965a50082",
+    "https://bcr.bazel.build/modules/rules_python/1.6.1/source.json": "ef9a16eb730d643123689686b00bc5fd65d33f17061e7e9ac313a946acb33dea",
     "https://bcr.bazel.build/modules/rules_robolectric/4.14.1.2/MODULE.bazel": "d44fec647d0aeb67b9f3b980cf68ba634976f3ae7ccd6c07d790b59b87a4f251",
     "https://bcr.bazel.build/modules/rules_robolectric/4.15.1/MODULE.bazel": "79e54e3feb48be316b6963fe8d2a36c1026c1e424e074538b75ed9f3d2a57150",
     "https://bcr.bazel.build/modules/rules_robolectric/4.15.1/source.json": "341a22bb8a2f8daaacb90514a815d77f3e65f927f5e193ff83ee4be828d0a4b8",
@@ -3957,8 +3957,8 @@
     },
     "@@rules_python+//python/uv:uv.bzl%uv": {
       "general": {
-        "bzlTransitiveDigest": "Xpqjnjzy6zZ90Es9Wa888ZLHhn7IsNGbph/e6qoxzw8=",
-        "usagesDigest": "vJ5RHUxAnV24M5swNGiAnkdxMx3Hp/iOLmNANTC5Xc8=",
+        "bzlTransitiveDigest": "bGHlxez0Lkvq2VwrlfCLraKHiJIRHSIJb432X2+pky8=",
+        "usagesDigest": "NLVT/j5MDeByMeAteJXuCT7XkRj5dlKKVJm5XGD/Ol8=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -3983,6 +3983,11 @@
           }
         },
         "recordedRepoMappingEntries": [
+          [
+            "rules_python+",
+            "bazel_tools",
+            "bazel_tools"
+          ],
           [
             "rules_python+",
             "platforms",
