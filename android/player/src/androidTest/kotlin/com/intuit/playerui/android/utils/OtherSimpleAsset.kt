@@ -1,7 +1,6 @@
 package com.intuit.playerui.android.utils
 
 import android.view.View
-import kotlinx.coroutines.CoroutineScope
 import android.widget.ImageView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
@@ -12,6 +11,7 @@ import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.utils.makeFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 
 internal class OtherSimpleAsset(

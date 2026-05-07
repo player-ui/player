@@ -9,13 +9,13 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.StaleViewException
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.BrokenAsset
 import com.intuit.playerui.android.utils.BrokenAsset.Companion.asset
+import com.intuit.playerui.android.utils.CoroutineTestDispatcherRule
 import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
-import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
-import com.intuit.playerui.android.utils.CoroutineTestDispatcherRule
 import com.intuit.playerui.utils.start
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
@@ -66,7 +66,9 @@ internal class BrokenAssetTest {
             BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).awaitRender(appContext) is FrameLayout,
         )
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).awaitRender(appContext) is LinearLayout,
+            BrokenAsset(
+                baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear)),
+            ).awaitRender(appContext) is LinearLayout,
         )
     }
 
@@ -87,11 +89,12 @@ internal class BrokenAssetTest {
 
     @Test
     fun `cannot render without a context`() {
+        val exception = org.junit.Assert.assertThrows(PlayerException::class.java) {
+            BrokenAsset(baseContext).requireContext()
+        }
         assertEquals(
             "Android context not found! Ensure the asset is rendered with a valid Android context.",
-            org.junit.Assert.assertThrows(PlayerException::class.java) {
-                BrokenAsset(baseContext).requireContext()
-            }.message,
+            exception.message,
         )
         assertTrue(player.state is ErrorState)
     }

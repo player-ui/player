@@ -52,7 +52,12 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
 
     @Test
     fun `test rendering with some styles and a tag using another render method`() = runBlocking {
-        val simple = assetContext.withContext(appContext).withStyles(listOf(R.style.Theme_AppCompat)).withTag("tag").build().awaitRender(appContext)
+        val simple = assetContext
+            .withContext(appContext)
+            .withStyles(listOf(R.style.Theme_AppCompat))
+            .withTag("tag")
+            .build()
+            .awaitRender(appContext)
         assertTrue(simple is TextView)
     }
 

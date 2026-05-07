@@ -31,6 +31,7 @@ import org.junit.runner.RunWith
 internal class AndroidPlayerTest {
     @get:Rule
     val coroutineRule = CoroutineTestDispatcherRule()
+
     @Test
     fun `test list constructor`() {
         val player = AndroidPlayer(listOf())

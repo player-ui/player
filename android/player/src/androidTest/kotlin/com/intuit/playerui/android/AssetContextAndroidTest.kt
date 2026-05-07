@@ -6,10 +6,10 @@ import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.serializer
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.MapBackedNode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.serialization.serializer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

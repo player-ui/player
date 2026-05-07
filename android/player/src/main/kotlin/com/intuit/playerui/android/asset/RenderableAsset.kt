@@ -36,7 +36,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -60,8 +59,8 @@ internal typealias CachedAssetView = Pair<AssetContext?, View?>
 public abstract class RenderableAsset<Data>(
     override val assetContext: AssetContext,
     private val serializer: KSerializer<Data>,
-) : GenericAsset, NodeWrapper {
-
+) : GenericAsset,
+    NodeWrapper {
     internal val cachedAssetView: CachedAssetView get() =
         player.getCachedAssetView(assetContext) ?: cachedAssetViewNotFound
 
@@ -126,32 +125,32 @@ public abstract class RenderableAsset<Data>(
     }
 
     internal suspend fun render(isRoot: Boolean = false): View = try {
-        cachedAssetView.let { (cachedAssetContext, cachedView) ->
-            requireContext()
-            when {
-                cachedView == null -> {
-                    renewHydrationScope("recreating view")
-                    doRender(isRoot)
-                }
-                cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
-                    renewHydrationScope("recreating view")
-                    cachedView.removeSelf()
-                    doRender(isRoot)
-                }
-                !cachedAssetContext.asset.nativeReferenceEquals(asset) -> {
-                    // TODO: ideally rehydrate the existing view rather than recreating it
-                    renewHydrationScope("rehydrating ${asset.id}")
-                    doRender(isRoot)
-                }
-
-                else -> cachedView.also {
-                    player.asyncHydrationTrackerPlugin?.let { tracker ->
-                        if (isRoot) tracker.trackHydration(this@RenderableAsset, isRoot = true)
-                        tracker.renderingComplete(this@RenderableAsset)
+        cachedAssetView
+            .let { (cachedAssetContext, cachedView) ->
+                requireContext()
+                when {
+                    cachedView == null -> {
+                        renewHydrationScope("recreating view")
+                        doRender(isRoot)
+                    }
+                    cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
+                        renewHydrationScope("recreating view")
+                        cachedView.removeSelf()
+                        doRender(isRoot)
+                    }
+                    !cachedAssetContext.asset.nativeReferenceEquals(asset) -> {
+                        // TODO: ideally rehydrate the existing view rather than recreating it
+                        renewHydrationScope("rehydrating ${asset.id}")
+                        doRender(isRoot)
+                    }
+                    else -> cachedView.also {
+                        player.asyncHydrationTrackerPlugin?.let { tracker ->
+                            if (isRoot) tracker.trackHydration(this@RenderableAsset, isRoot = true)
+                            tracker.renderingComplete(this@RenderableAsset)
+                        }
                     }
                 }
-            }
-        }.also { player.cacheAssetView(assetContext, it) }
+            }.also { player.cacheAssetView(assetContext, it) }
     } catch (exception: Throwable) {
         if (exception is AssetRenderException) {
             exception.assetParentPath += assetContext
@@ -230,7 +229,8 @@ public abstract class RenderableAsset<Data>(
             try {
                 val view = child.render()
                 withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
+            } catch (_: CancellationException) {
+            }
         }
     }
 
@@ -239,27 +239,49 @@ public abstract class RenderableAsset<Data>(
         inflateChild(asset, container)
     }
 
-    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes vararg styles: Style?) {
+    public fun CoroutineScope.inflate(
+        child: GenericAsset?,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+    ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() } ?: return
         inflateChild(asset, container)
     }
 
-    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes styles: Styles?) {
+    public fun CoroutineScope.inflate(
+        child: GenericAsset?,
+        container: ViewGroup,
+        @StyleRes styles: Styles?,
+    ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(styles).build() } ?: return
         inflateChild(asset, container)
     }
 
-    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, tag: String) {
+    public fun CoroutineScope.inflate(
+        child: GenericAsset?,
+        container: ViewGroup,
+        tag: String,
+    ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).build() } ?: return
         inflateChild(asset, container)
     }
 
-    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes vararg styles: Style?, tag: String) {
+    public fun CoroutineScope.inflate(
+        child: GenericAsset?,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        tag: String,
+    ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() } ?: return
         inflateChild(asset, container)
     }
 
-    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup, @StyleRes styles: Styles?, tag: String) {
+    public fun CoroutineScope.inflate(
+        child: GenericAsset?,
+        container: ViewGroup,
+        @StyleRes styles: Styles?,
+        tag: String,
+    ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() } ?: return
         inflateChild(asset, container)
     }
@@ -273,7 +295,8 @@ public abstract class RenderableAsset<Data>(
             try {
                 val view = asset.render(isRoot = true)
                 withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {}
+            } catch (_: CancellationException) {
+            }
         }
     }
 
@@ -323,13 +346,14 @@ public abstract class RenderableAsset<Data>(
             override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as? T
         } as KSerializer<T>
 
-        public fun <T : RenderableAsset<*>> conform(klass: KClass<T>): KSerializer<T> = object : KSerializer<T?> by this as KSerializer<T?> {
-            override fun deserialize(decoder: Decoder) = try {
-                klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
-            } catch (e: ClassCastException) {
-                null
-            }
-        } as KSerializer<T>
+        public fun <T : RenderableAsset<*>> conform(klass: KClass<T>): KSerializer<T> =
+            object : KSerializer<T?> by this as KSerializer<T?> {
+                override fun deserialize(decoder: Decoder) = try {
+                    klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
+                } catch (e: ClassCastException) {
+                    null
+                }
+            } as KSerializer<T>
     }
 
     // ── Async hydration tracking ──────────────────────────────────────────────

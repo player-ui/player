@@ -12,6 +12,8 @@ public sealed interface GenericAsset {
     public val assetContext: AssetContext
 
     public object ContextualSerializer : KSerializer<GenericAsset> by kotlinx.serialization.ContextualSerializer(GenericAsset::class)
+
     public object AssetListSerializer : KSerializer<List<GenericAsset>> by ListSerializer(ContextualSerializer)
+
     public object NullableAssetListSerializer : KSerializer<List<GenericAsset?>> by ListSerializer(ContextualSerializer.nullable)
 }
