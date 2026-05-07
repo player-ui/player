@@ -31,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.collections.emptyList
 
 /**
  * Base class for assets that render using Jetpack Compose.
