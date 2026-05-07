@@ -2,18 +2,16 @@
 title: Common Types
 ---
 
-import PlatformTabs from "../../../../components/PlatformTabs.astro";
-import SPM from "../../../../components/SPM.astro";
+import CoreOnly from "../../../../components/CoreOnly.astro";
 import { PackageManagers } from 'starlight-package-managers'
+
+<CoreOnly/>
 
 This plugin exposes some basic `DataTypes`, `validations`, and `formats` into Player content.
 
 It also serves as a good reference to adding your own custom types into Player.
 
 ## Usage
-
-<PlatformTabs>
-  <Fragment slot='core'>
 
 Install the plugin:
 
@@ -32,33 +30,6 @@ player.start(myFlow);
 ```
 
 This will allow any `DataTypes`, `formats`, `validations` and custom data types to be used in the content
-
-  </Fragment>
-
-<Fragment slot='ios'>
-
-<SPM product="CommonTypesPlugin" />
-
-### Swift Usage
-
-This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
-
-```swift
-
-var body: some View {
-    SwiftUIPlayer(
-        flow: flow,
-        plugins: [
-          CommonTypesPlugin()
-        ],
-        result: $resultBinding
-    )
-}
-```
-
-</Fragment>
-
-</PlatformTabs>
 
 ## Formats
 

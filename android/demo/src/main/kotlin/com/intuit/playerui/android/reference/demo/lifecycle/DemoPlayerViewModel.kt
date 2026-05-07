@@ -10,7 +10,6 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +18,6 @@ class DemoPlayerViewModel(
     manager: FlowManager,
 ) : PlayerViewModel(manager) {
     override val plugins = listOf(
-        CommonTypesPlugin(),
         ReferenceAssetsPlugin(),
         PendingTransactionPlugin(),
         AsyncHydrationTrackerPlugin(),

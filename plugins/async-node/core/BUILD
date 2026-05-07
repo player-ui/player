@@ -23,6 +23,7 @@ js_pipeline(
     test_deps = [
         ":node_modules/@player-ui/check-path-plugin",
         ":node_modules/@player-ui/partial-match-registry",
+        ":node_modules/@player-ui/expression-plugin",
         "//:vitest_config",
     ]
 )

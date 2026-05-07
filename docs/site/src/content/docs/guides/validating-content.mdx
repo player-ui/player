@@ -17,8 +17,8 @@ To provide a singular package used to wrap up validation, DSL content transforma
 For validation, a `LSPAssetsPlugin` should be used to point to where the exported XLRs are for both the Assets, and the `@player-ui/types` package to ensure that the base Player constructs used for validation match the same version that will be used at runtime. A very basic example of this would look like.
 
 ```typescript
-import type { PlayerConfigFileShape } from "@player-tools/cli";
-import { LSPAssetsPlugin } from "@player-tools/cli";
+import type { PlayerConfigFileShape } from "@player-cli/cli";
+import { LSPAssetsPlugin } from "@player-cli/cli";
 
 const config: PlayerConfigFileShape = {
   plugins: [
@@ -62,7 +62,7 @@ With this, you'll now have a package that can be integrated into content builds.
 
 ## Step 3: Integrate into Content Build
 
-The first step in validating content is to add your CLI preset as a dependency to the repository/project where the content lives. You'll also want to add the `@player-tools/cli`, `react`, and `@types/react` packages as a dependencies which will also pull in the underlying dependencies and make the tooling available to run. 
+The first step in validating content is to add your CLI preset as a dependency to the repository/project where the content lives. You'll also want to add the `@player-cli/cli`, `react`, and `@types/react` packages as a dependencies which will also pull in the underlying dependencies and make the tooling available to run. 
 
 ### Bazel
 
@@ -137,7 +137,7 @@ compile_dsl(
     output_dir = "<content outout directory>",
     config = ":dsl_config",
     data = [
-        "//:node_modules/@player-tools/dsl",
+        "//:node_modules/@player-lang/react-dsl",
         "//:node_modules/@types/react",
         "//:node_modules/react",
         ...

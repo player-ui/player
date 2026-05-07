@@ -1,6 +1,6 @@
 import { initialize, transform } from "esbuild-wasm/lib/browser";
 import * as React from "react";
-import * as PlayerDSL from "@player-tools/dsl";
+import * as PlayerDSL from "@player-lang/react-dsl";
 import * as ReferenceAssets from "@player-ui/reference-assets-plugin-components";
 import { loader, Editor } from "@monaco-editor/react";
 import stringify from "stringify-object";
@@ -75,7 +75,7 @@ export const compileDSLCode = async (code: string) => {
 
   const mods = {
     react: React,
-    "@player-tools/dsl": PlayerDSL,
+    "@player-lang/react-dsl": PlayerDSL,
     "@player-ui/reference-assets-plugin-components": ReferenceAssets,
   };
 

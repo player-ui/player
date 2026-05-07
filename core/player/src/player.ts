@@ -19,6 +19,7 @@ import {
   DataController,
   ValidationController,
   FlowController,
+  ErrorController,
 } from "./controllers";
 import { FlowExpPlugin } from "./plugins/flow-exp-plugin";
 import { DefaultExpPlugin } from "./plugins/default-exp-plugin";
@@ -119,6 +120,7 @@ export class Player {
     schema: new SyncHook<[SchemaController]>(),
     validationController: new SyncHook<[ValidationController]>(),
     bindingParser: new SyncHook<[BindingParser]>(),
+    errorController: new SyncHook<[ErrorController]>(),
     state: new SyncHook<[PlayerFlowState]>(),
     onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
@@ -245,9 +247,20 @@ export class Player {
 
     this.hooks.validationController.call(validationController);
 
+    const errorController = new ErrorController({
+      logger: this.logger,
+      flow: flowController,
+      fail: flowResultDeferred.reject,
+    });
+
+    this.hooks.errorController.call(errorController);
+
     dataController = new DataController(userFlow.data, {
       pathResolver,
-      middleware: validationController.getDataMiddleware(),
+      middleware: [
+        ...validationController.getDataMiddleware(),
+        errorController.getDataMiddleware(),
+      ],
       logger: this.logger,
     });
 
@@ -267,6 +280,10 @@ export class Player {
       "player",
       (binding) => schema.getApparentType(binding)?.default,
     );
+
+    errorController.setOptions({
+      model: dataController,
+    });
 
     // eslint-disable-next-line prefer-const
     let viewController: ViewController;
@@ -447,6 +464,7 @@ export class Player {
         type: (b) => schema.getType(parseBinding(b)),
       },
       constants: this.constantsController,
+      errorController,
     });
 
     viewController.hooks.view.tap("player", (view) => {
@@ -486,6 +504,7 @@ export class Player {
           expression: expressionEvaluator,
           binding: pathResolver,
           validation: validationController,
+          error: errorController,
         },
         fail: flowResultDeferred.reject,
         flow: userFlow,

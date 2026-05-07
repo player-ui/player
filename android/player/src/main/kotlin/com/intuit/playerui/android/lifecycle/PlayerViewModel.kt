@@ -206,7 +206,9 @@ public open class PlayerViewModel(
     }
 
     public fun fail(cause: Throwable) {
-        player.inProgressState?.fail(cause)
+        player.inProgressState?.controllers?.error?.captureError(
+            cause,
+        )
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */
@@ -224,5 +226,6 @@ public open class PlayerViewModel(
 }
 
 public inline fun PlayerViewModel.fail(message: String, cause: Throwable? = null) {
-    fail(PlayerException(message, cause))
+    val playerException = cause as? PlayerException ?: PlayerException(message, cause)
+    fail(playerException)
 }

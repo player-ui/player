@@ -9,6 +9,7 @@ import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
+import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.j2v8.V8Primitive
@@ -17,22 +18,24 @@ import com.intuit.playerui.j2v8.v8Array
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.ArraySerializer
 
-internal fun Any?.handleValue(format: RuntimeFormat<V8Value>): Any? = when (this) {
-    is V8Primitive -> value
-    is V8Value -> transform(format)
-    else -> this
-}
-
-private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
+internal fun Any?.handleValue(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? =
     when (this) {
-        V8.getUndefined() -> null
         is V8Primitive -> value
-        is V8Function -> toInvokable<Any?>(format, this, format.serializer())
-        is V8Array -> toList(format)
-        is V8Object -> toNode(format)
-        else -> null
+        is V8Value -> transform(format, deserializationStrategy)
+        else -> this
     }
-}
+
+private fun V8Value.transform(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>?): Any? =
+    evaluateInJSThreadIfDefinedBlocking(format.runtime) {
+        when (this) {
+            V8.getUndefined() -> null
+            is V8Primitive -> value
+            is V8Function -> toInvokable<Any?>(format, this, format.serializer())
+            is V8Array -> deserializationStrategy?.let { format.decodeFromRuntimeValue(deserializationStrategy, this) } ?: toList(format)
+            is V8Object -> deserializationStrategy?.let { format.decodeFromRuntimeValue(deserializationStrategy, this) } ?: toNode(format)
+            else -> null
+        }
+    }
 
 internal fun V8Array.toList(format: RuntimeFormat<V8Value>): List<Any?>? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     keys.map(::get).map { it.handleValue(format) }
@@ -54,25 +57,16 @@ internal fun <R> V8Function.toInvokable(
     Invokable { args ->
         evaluateInJSThreadBlocking(format.runtime) {
             try {
-                when (
-                    val result =
-                        call(
-                            receiver,
-                            format
-                                .encodeToRuntimeValue(
-                                    ArraySerializer(GenericSerializer()),
-                                    args as Array<Any?>,
-                                ).v8Array,
-                        ).handleValue(format)
-                ) {
-                    is Node -> deserializationStrategy?.let {
-                        result.deserialize(deserializationStrategy)
-                    } ?: run {
-                        result as R
-                    }
+                val result = call(
+                    receiver,
+                    format
+                        .encodeToRuntimeValue(
+                            ArraySerializer(GenericSerializer()),
+                            args as Array<Any?>,
+                        ).v8Array,
+                )
 
-                    else -> result as R
-                }
+                result.handleValue(format, deserializationStrategy) as R
             } catch (e: Throwable) {
                 e.printStackTrace()
                 throw e

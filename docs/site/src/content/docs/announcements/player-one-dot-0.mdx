@@ -8,7 +8,7 @@ import PlatformTabs from "../../../components/PlatformTabs.astro";
 
 TBA
 
-## Breaking Changes
+## Breaking Changes (Player)
 
 Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release. If a change pertains to only one platform, that section will be prefaced with "(Core)", "(iOS)", or "(Android)". E.g. (iOS) `.anyArray` and `.anyDictionary` use `AnyType`.
 
@@ -254,6 +254,40 @@ public suspend fun terminate(data: Data? = null) {}
 
 **Migration**: Provide the `Data` type appropriate for your use case. If `terminate` will always be called with `nill`, use `Nothing`.
 
+### (iOS/Android) `CommonTypesPlugin`, `CommonExpressionsPlugin`, `ComputedPropertiesPlugin`, and `StageRevertDataPlugin` removed
+
+These plugins are now **core-only**. They operate at the shared JS core layer and should not be registered per-platform.
+
+#### Migration
+
+Remove any direct registration of these plugins in your iOS or Android code:
+
+```swift
+// Before — no longer needed
+plugins: [
+  CommonTypesPlugin(),
+  CommonExpressionsPlugin(),
+  ComputedPropertiesPlugin(),
+  StageRevertDataPlugin(),
+]
+```
+
+```kotlin
+// Before — no longer needed
+override val plugins = listOf(
+  CommonTypesPlugin(),
+  ReferenceAssetsPlugin(),
+)
+```
+
+Instead, register these plugins once in the shared core layer of your Player plugin, following the process described in the
+corresponding docs:
+
+- [Common Types Plugin](../../plugins/core/common-types)
+- [Common Expressions Plugin](../../plugins/core/common-expressions)
+- [Computed Properties Plugin](../../plugins/core/computed-properties)
+- [Stage Revert Data Plugin](../../plugins/core/stage-revert-data)
+
 ### (iOS) Dropped CocoaPods Support
 
 Since CocoaPods is in maintenance mode, we are dropping support in favour of using Swift Package Manager (SPM) only. Please leverage the Swift Package, e.g.
@@ -272,6 +306,23 @@ targets: [
     ),
 ]
 ```
+
+### (iOS) `ErrorState.error` is now `JSValueError` instead of `String`
+
+`ErrorState.error` previously held the raw error message as a `String`. It is now a `JSValueError` struct that exposes the full error metadata from the JS layer:
+
+```swift
+// Before
+let message: String = errorState.error
+
+// After
+let message: String = errorState.error.message
+let type: String = errorState.error.type
+let severity: ErrorSeverity? = errorState.error.severity
+let metadata: [String: Any]? = errorState.error.metadata
+```
+
+**Migration:** Replace direct string usage of `errorState.error` with `errorState.error.message`.
 
 ### `ExternalActionPlugin` renamed to `ExternalStatePlugin` with new handler API
 
@@ -405,7 +456,49 @@ transition occurs. Ensure every `EXTERNAL` state in your flow has a registered h
 In a future release, unhandled external states will automatically report an error via the Error Controller.
 :::
 
-## Behavioural Changes & Bug Fixes
+## Breaking Changes (Tooling)
+
+### New Package Scopes/Names
+The tooling ecosystem (previously all under the `@player-tools` scope) has been split up into separate scopes to better reflect the underlying capability groupings. 
+The table below maps each old `@player-tools` package to its new home:
+
+| Old Package | New Package | Repo |
+|---|---|---|
+| `@player-tools/cli` | `@player-cli/cli` | [cli](https://github.com/player-ui/cli) |
+| `@player-tools/dsl` | `@player-lang/react-dsl` | [language](https://github.com/player-ui/language) |
+| `@player-tools/fluent` | `@player-lang/functional-dsl` | [language](https://github.com/player-ui/language) |
+| `player_tools_dsl` | `player_lang_dsl` | [language](https://github.com/player-ui/language) |
+| `@player-tools/fluent-generator` | `@player-lang/functional-dsl-generator` | [language](https://github.com/player-ui/language) |
+| `player_tools_dsl_generator` | `player_lang_dsl_generator` | [language](https://github.com/player-ui/language) |
+| `@player-tools/json-language-server` | `@player-lang/json-language-server` | [language](https://github.com/player-ui/language) |
+| `@player-tools/json-language-service` | `@player-lang/json-language-service` | [language](https://github.com/player-ui/language) |
+| `@player-tools/typescript-expression-plugin` | `@player-lang/typescript-expression-plugin` | [language](https://github.com/player-ui/language) |
+| `@player-tools/complexity-check-plugin` | `@player-lang/complexity-check-plugin` | [language](https://github.com/player-ui/language) |
+| `@player-tools/metrics-output-plugin` | `@player-lang/metrics-output-plugin` | [language](https://github.com/player-ui/language) |
+| `@player-tools/xlr` | `@xlr-lib/xlr` | [xlr](https://github.com/player-ui/xlr) |
+| `@player-tools/xlr-sdk` | `@xlr-lib/xlr-sdk` | [xlr](https://github.com/player-ui/xlr) |
+| `@player-tools/xlr-utils` | `@xlr-lib/xlr-utils` | [xlr](https://github.com/player-ui/xlr) |
+| `@player-tools/xlr-converters` | `@xlr-lib/xlr-converters` | [xlr](https://github.com/player-ui/xlr) |
+
+### XLR Changes
+
+#### `@xlr-lib/xlr-utils`
+The following TypeScript-compiler-API-specific exports have been moved to the `@xlr-lib/xlr-converters` package and made private:
+
+`decorateNode`, `createDocString`, `createTSDocString`, `symbolDisplayToString`, `tsStripOptionalType`, `isExportedDeclaration`,` isNodeExported`, `getReferencedType`, `isTypeScriptLibType`, `getStringLiteralsFromUnion`, `buildTemplateRegex`, `isOptionalProperty`,` isGenericInterfaceDeclaration`, `isGenericTypeDeclaration`, `isTypeReferenceGeneric`, `TopLevelDeclaration`, `isTopLevelDeclaration`, `TopLevelNode`, `isTopLevelNode`
+
+This was done to make the utils package more portable and not pull in `typescript` as a dependency when used in web invocations of the SDK. 
+
+### Language Changes
+No from last release in old report
+
+### CLI
+- Updated to use Oclif 1.9
+
+### Devtools
+TBA
+
+## Behavioral Changes & Bug Fixes
 
 ### (Core) Partial Match Registry replaces exact matches, with log
 
@@ -459,6 +552,8 @@ registry.get(query); // Returns "less-specific"
 registry.get(query); // Always returns "more-specific"
 ```
 
+
+
 ## New Features
 
 ### (iOS) Convenience Methods for `AnyType`
@@ -475,3 +570,18 @@ if case let .anyDictionary(myDict) = anyType,
 // After
 let title: String? = anyType["title"]?.as(String.self)
 ```
+
+### ErrorController
+
+Player now includes a built-in `ErrorController` for structured error handling across the flow lifecycle. It is automatically instantiated when a flow starts and accessible via `controllers.error` in the `InProgressState`.
+
+Key capabilities:
+
+- **`captureError(error)`** — captures any `Error` implementing `PlayerErrorMetadata` (`type`, optional `severity`, optional `metadata`). Returns `true` if recovery succeeded via `errorTransitions`, `false` if the flow was failed.
+- **`onError` hook** — plugins can tap to observe errors; return `true` to take ownership and skip `errorState` navigation.
+- **`errorState` binding** — errors are automatically written to `errorState` in the data model, readable in views via `{{errorState.message}}`, `{{errorState.errorType}}`, etc.
+- **`errorTransitions` map** — flows can define per-state or flow-level error routing to navigate to dedicated error views instead of failing.
+
+**Render-time error recovery** — All platforms provide the ability to recover from render-time errors by calling `captureError(error)`
+
+See the [Error Handling docs](/content/error-handling) for the full API reference.
