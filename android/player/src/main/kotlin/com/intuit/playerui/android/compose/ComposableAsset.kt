@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -19,9 +20,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.withContext
+import com.intuit.playerui.android.withStyles
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +47,12 @@ public abstract class ComposableAsset<Data>(
 
     override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
         require(view is ComposeView)
+        // Bridge the gap between setContent returning (synchronous) and the composition
+        // actually executing (apply phase). Without this extra bump, doRender's finally would
+        // decrement the tracker to 0 and fire onHydrationComplete before any nested compose
+        // child has had a chance to pre-track itself. The matching decrement fires from a
+        // LaunchedEffect inside compose() once first composition completes.
+        player.asyncHydrationTrackerPlugin?.preTrackChild(this@ComposableAsset)
         view.setContent {
             compose(data = data)
         }
@@ -53,6 +62,10 @@ public abstract class ComposableAsset<Data>(
     public fun compose(data: Data? = null) {
         val data: Data? by produceState(initialValue = data, key1 = this) {
             value = getData()
+        }
+
+        LaunchedEffect(this) {
+            player.asyncHydrationTrackerPlugin?.renderingComplete(this@ComposableAsset)
         }
 
         data?.let {
@@ -85,6 +98,11 @@ public abstract class ComposableAsset<Data>(
         val containerModifier = Modifier.testTag(assetTag) then modifier
         assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
+            // Pre-track synchronously during the parent's composition pass. For ComposableAsset
+            // children the matching decrement fires from the child's own LaunchedEffect inside
+            // compose(); for Android-view children it fires from doRender's finally once the
+            // launched render completes.
+            player.asyncHydrationTrackerPlugin?.preTrackChild(this)
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
@@ -102,7 +120,12 @@ public abstract class ComposableAsset<Data>(
     private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         val childAsset = this
         AndroidView(factory = ::FrameLayout, modifier) { container ->
-            this@ComposableAsset.hydrationScope.inflate(childAsset, container, styles)
+            // childAsset was already pre-tracked during composition by the GenericAsset.compose
+            // caller; use the already-tracked variant to avoid a double bump.
+            this@ComposableAsset.hydrationScope.inflateChildAlreadyTracked(
+                childAsset.assetContext.withStyles(styles).build(),
+                container,
+            )
         }
     }
 }

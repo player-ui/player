@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.asset
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -101,6 +102,7 @@ public abstract class RenderableAsset<Data>(
     // ── Concrete render implementation ────────────────────────────────────────
 
     private suspend fun doRender(isRoot: Boolean = false): View {
+        println("doRender ENTER id=${assetContext.id} isRoot=$isRoot thread=${Thread.currentThread().name}")
         player.asyncHydrationTrackerPlugin?.trackHydration(this, isRoot)
         return try {
             val (data, view) = withContext(Dispatchers.Default) {
@@ -120,11 +122,13 @@ public abstract class RenderableAsset<Data>(
             }
             throw AssetRenderException(assetContext, "Failed to render asset", exception)
         } finally {
+            println("render complete on ${this.assetContext.id}")
             player.asyncHydrationTrackerPlugin?.renderingComplete(this)
         }
     }
 
     internal suspend fun render(isRoot: Boolean = false): View = try {
+        println("render ENTER id=${assetContext.id} isRoot=$isRoot thread=${Thread.currentThread().name}")
         cachedAssetView
             .let { (cachedAssetContext, cachedView) ->
                 requireContext()
@@ -146,6 +150,7 @@ public abstract class RenderableAsset<Data>(
                     else -> cachedView.also {
                         player.asyncHydrationTrackerPlugin?.let { tracker ->
                             if (isRoot) tracker.trackHydration(this@RenderableAsset, isRoot = true)
+                            Log.d("+++", "render complete on ${this.assetContext.id}")
                             tracker.renderingComplete(this@RenderableAsset)
                         }
                     }
@@ -203,6 +208,7 @@ public abstract class RenderableAsset<Data>(
             } catch (exception: Throwable) {
                 throw AssetRenderException(assetContext, "Failed to rehydrate asset", exception)
             } finally {
+                Log.d("+++", "render complete on ${this@RenderableAsset.assetContext.id}")
                 player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
             }
         }
@@ -225,6 +231,15 @@ public abstract class RenderableAsset<Data>(
 
     private fun CoroutineScope.inflateChild(child: RenderableAsset<*>, container: ViewGroup) {
         player.asyncHydrationTrackerPlugin?.preTrackChild(child)
+        inflateChildAlreadyTracked(child, container)
+    }
+
+    /**
+     * Variant of [inflateChild] for callers that have already invoked [AsyncHydrationTrackerPlugin.preTrackChild]
+     * synchronously. Used by the Compose interop path, which must bump the tracker during composition
+     * (before the parent's render finally runs) rather than from inside an apply-phase update lambda.
+     */
+    internal fun CoroutineScope.inflateChildAlreadyTracked(child: RenderableAsset<*>, container: ViewGroup) {
         launch {
             try {
                 val view = child.render()
@@ -288,14 +303,21 @@ public abstract class RenderableAsset<Data>(
 
     /** Root entry point — render this asset into [container] using [context] to bootstrap the context chain. */
     public fun CoroutineScope.renderInto(container: FrameLayout, context: Context) {
+        println("+++DBG renderInto SYNC START id=${assetContext.id} thread=${Thread.currentThread().name}")
         val asset = assetContext
             .withContext(player.hooks.context.call(context))
             .build()
+        println("+++DBG renderInto built, about to launch")
         launch {
+            println("+++DBG renderInto LAUNCH BODY entered thread=${Thread.currentThread().name}")
             try {
                 val view = asset.render(isRoot = true)
                 withContext(Dispatchers.Main) { view into container }
             } catch (_: CancellationException) {
+            } catch (exception: AssetRenderException) {
+                player.inProgressState?.fail(exception)
+            } catch (exception: Throwable) {
+                player.inProgressState?.fail(AssetRenderException(assetContext, "Failed to render asset", exception))
             }
         }
     }
@@ -370,6 +392,7 @@ public abstract class RenderableAsset<Data>(
          * drop to zero before the child's own [trackHydration] fires.
          */
         public fun preTrackChild(child: RenderableAsset<*>) {
+            Log.d("+++", "render tracking on ${child.assetContext.id}")
             synchronized(this) {
                 counter++
             }
@@ -385,6 +408,7 @@ public abstract class RenderableAsset<Data>(
             synchronized(this) {
                 fireStarted = counter == 0
                 if (isRoot) {
+                    Log.d("+++", "render tracking on ${asset.assetContext.id}")
                     // nested assets are pre-tracked; no change needed here
                     counter++
                 }
@@ -398,7 +422,11 @@ public abstract class RenderableAsset<Data>(
             synchronized(this) {
                 fireComplete = --counter == 0
             }
-            if (fireComplete) hooks.onHydrationComplete.call()
+            println("renderingComplete id=${asset.assetContext.id} fireComplete=$fireComplete counter=$counter")
+            if (fireComplete) {
+                println("FIRING onHydrationComplete from asset ${asset.assetContext.id}")
+                hooks.onHydrationComplete.call()
+            }
         }
 
         override fun apply(androidPlayer: AndroidPlayer) {

@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
@@ -72,23 +73,17 @@ public abstract class AssetTest(
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
+    private var renderContainer: FrameLayout = FrameLayout(context)
+
     protected var currentAssetTree: RenderableAsset<*>? = null
         private set(value) {
-            // reset view on new asset
+            println("+++DBG setCurrentAssetTree value=$value thread=${Thread.currentThread().name}")
             currentView = null
-
             field = value
-
             field?.let { asset ->
-                val container = FrameLayout(context)
-                asset.player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("AssetTest-render") {
-                    // Post to Main after hook fires to ensure renderInto's `view into container` has run
-                    CoroutineScope(Dispatchers.Main).launch {
-                        viewChannel.emit(container.getChildAt(0) ?: emptyView)
-                    }
-                }
+                renderContainer = FrameLayout(context)
                 CoroutineScope(Dispatchers.Main).run {
-                    with(asset) { renderInto(container, context!!) }
+                    with(asset) { renderInto(renderContainer, this@AssetTest.context) }
                 }
             }
         }
@@ -112,7 +107,12 @@ public abstract class AssetTest(
 
     @Before
     public fun beforeEach() {
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        println("+++DBG SANITY beforeEach running")
+        player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("AssetTest-render") {
+            CoroutineScope(Dispatchers.Main).launch {
+                viewChannel.emit(renderContainer.getChildAt(0) ?: emptyView)
+            }
+        }
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
             if (state !is InProgressState) {
@@ -124,7 +124,6 @@ public abstract class AssetTest(
 
     @After
     public fun afterEach() {
-        Dispatchers.resetMain()
     }
 
     protected fun launchMock(): Unit = launchMock(name.methodName)
