@@ -288,6 +288,21 @@ corresponding docs:
 - [Computed Properties Plugin](../../plugins/core/computed-properties)
 - [Stage Revert Data Plugin](../../plugins/core/stage-revert-data)
 
+### (iOS) `SwiftUIPlayer.clearExceptionHandler()` removed
+
+As part of the JSContext memory leak fix ([#855](https://github.com/player-ui/player/pull/855)), `unload()` was enhanced to fully break all retain cycles — including clearing the `exceptionHandler`. This made the standalone `clearExceptionHandler()` method redundant, so it has been removed.
+
+#### Migration
+
+Remove any calls to `clearExceptionHandler()`. No replacement is needed; `unload()` handles this cleanup automatically when `ManagedPlayer` tears down.
+
+```swift
+// Before
+player.clearExceptionHandler()
+
+// After — remove the call; unload() clears it automatically
+```
+
 ### (iOS) Dropped CocoaPods Support
 
 Since CocoaPods is in maintenance mode, we are dropping support in favour of using Swift Package Manager (SPM) only. Please leverage the Swift Package, e.g.
