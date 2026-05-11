@@ -1,15 +1,12 @@
 package com.intuit.playerui.android.testutils.asset
 
-import androidx.activity.ComponentActivity
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
+import androidx.activity.ComponentActivity
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import org.robolectric.Robolectric
-import org.robolectric.android.controller.ActivityController
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
@@ -33,9 +30,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -45,6 +39,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
+import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.LooperMode
 
 @RunWith(AndroidJUnit4::class)

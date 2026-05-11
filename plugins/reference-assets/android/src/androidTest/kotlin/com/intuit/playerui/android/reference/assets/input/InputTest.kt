@@ -15,8 +15,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class InputTest : AssetTest("input") {
-    private fun runOnMain(block: () -> Unit) =
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
+    private fun runOnMain(block: () -> Unit) = InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
 
     @Test
     fun basic() {
