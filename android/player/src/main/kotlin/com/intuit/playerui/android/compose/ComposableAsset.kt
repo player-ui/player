@@ -9,6 +9,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -52,7 +53,6 @@ public abstract class ComposableAsset<Data>(
         // decrement the tracker to 0 and fire onHydrationComplete before any nested compose
         // child has had a chance to pre-track itself. The matching decrement fires from a
         // LaunchedEffect inside compose() once first composition completes.
-        player.asyncHydrationTrackerPlugin?.preTrackChild(this@ComposableAsset)
         view.setContent {
             compose(data = data)
         }
@@ -64,8 +64,8 @@ public abstract class ComposableAsset<Data>(
             value = getData()
         }
 
-        LaunchedEffect(this) {
-            player.asyncHydrationTrackerPlugin?.renderingComplete(this@ComposableAsset)
+        SideEffect {
+            player.asyncHydrationTrackerPlugin?.renderingComplete(this@ComposableAsset, completedComposable = true)
         }
 
         data?.let {
@@ -98,10 +98,6 @@ public abstract class ComposableAsset<Data>(
         val containerModifier = Modifier.testTag(assetTag) then modifier
         assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
-            // Pre-track synchronously during the parent's composition pass. For ComposableAsset
-            // children the matching decrement fires from the child's own LaunchedEffect inside
-            // compose(); for Android-view children it fires from doRender's finally once the
-            // launched render completes.
             player.asyncHydrationTrackerPlugin?.preTrackChild(this)
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(

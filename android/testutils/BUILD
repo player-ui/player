@@ -14,9 +14,12 @@ main_deps = main_exports + [
     "//plugins/pending-transaction/jvm",
     "//plugins/reference-assets/android",
 
+    artifact("androidx.activity:activity"),
     artifact("androidx.test:core"),
     artifact("androidx.test:runner"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("org.robolectric:robolectric"),
+    artifact("org.robolectric:annotations"),
 ]
 
 kt_android(

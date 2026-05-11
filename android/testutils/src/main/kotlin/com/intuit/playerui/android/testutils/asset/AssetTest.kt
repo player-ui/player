@@ -1,11 +1,15 @@
 package com.intuit.playerui.android.testutils.asset
 
+import androidx.activity.ComponentActivity
 import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
+import org.robolectric.Robolectric
+import org.robolectric.android.controller.ActivityController
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
@@ -41,8 +45,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
+import org.robolectric.annotation.LooperMode
 
 @RunWith(AndroidJUnit4::class)
+@LooperMode(LooperMode.Mode.INSTRUMENTATION_TEST)
 @OptIn(ExperimentalCoroutinesApi::class)
 public abstract class AssetTest(
     private val group: String? = null,
@@ -73,17 +79,23 @@ public abstract class AssetTest(
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    private var renderContainer: FrameLayout = FrameLayout(context)
+    private lateinit var activityController: ActivityController<ComponentActivity>
+
+    private val hostActivity: ComponentActivity get() = activityController.get()
+
+    private fun newRenderContainer(): FrameLayout = FrameLayout(hostActivity).also { container ->
+        hostActivity.setContentView(container)
+    }
+
+    private lateinit var renderContainer: FrameLayout
 
     protected var currentAssetTree: RenderableAsset<*>? = null
         private set(value) {
-            println("+++DBG setCurrentAssetTree value=$value thread=${Thread.currentThread().name}")
             currentView = null
             field = value
             field?.let { asset ->
-                renderContainer = FrameLayout(context)
                 CoroutineScope(Dispatchers.Main).run {
-                    with(asset) { renderInto(renderContainer, this@AssetTest.context) }
+                    with(asset) { renderInto(renderContainer, hostActivity) }
                 }
             }
         }
@@ -107,7 +119,10 @@ public abstract class AssetTest(
 
     @Before
     public fun beforeEach() {
-        println("+++DBG SANITY beforeEach running")
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            activityController = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+            renderContainer = newRenderContainer()
+        }
         player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("AssetTest-render") {
             CoroutineScope(Dispatchers.Main).launch {
                 viewChannel.emit(renderContainer.getChildAt(0) ?: emptyView)
