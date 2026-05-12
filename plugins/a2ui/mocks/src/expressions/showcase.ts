@@ -1,0 +1,77 @@
+import type { A2UISnapshot } from "@player-ui/player";
+
+/**
+ * Exercises several A2UI standard expression functions end-to-end:
+ *   • formatString — adapter pre-resolves into `{{binding}}` template
+ *   • formatNumber + formatCurrency — Intl-backed handlers
+ *   • required / email validations on a TextField
+ *   • openUrl wired to a Button action
+ */
+const snapshot: A2UISnapshot = {
+  surfaceId: "expressions-showcase",
+  dataModel: {
+    user: { name: "Ada", email: "" },
+    order: { subtotal: 1299.5 },
+  },
+  components: [
+    {
+      id: "root",
+      component: "Column",
+      children: ["greeting", "subtotal", "total", "emailField", "linkBtn"],
+    },
+    {
+      id: "greeting",
+      component: "Text",
+      variant: "h3",
+      text: {
+        call: "formatString",
+        args: { value: "Hello, ${/user/name}!" },
+      },
+    },
+    {
+      id: "subtotal",
+      component: "Text",
+      text: {
+        call: "formatString",
+        args: {
+          value: "Subtotal: ${/order/subtotal}",
+        },
+      },
+    },
+    {
+      id: "total",
+      component: "Text",
+      text: {
+        call: "formatCurrency",
+        args: {
+          value: { path: "/order/subtotal" },
+          currency: "USD",
+          locale: "en-US",
+        },
+      },
+    },
+    {
+      id: "emailField",
+      component: "TextField",
+      label: "Email",
+      value: { path: "/user/email" },
+      textFieldType: "shortText",
+      validationRegexp: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+    },
+    {
+      id: "linkBtn",
+      component: "Button",
+      variant: "outline",
+      child: "linkLbl",
+      action: {
+        functionCall: {
+          call: "openUrl",
+          args: { url: "https://a2ui.org", target: "_blank" },
+        },
+      },
+    },
+    { id: "linkLbl", component: "Text", text: "Open A2UI Spec" },
+  ],
+};
+
+export default snapshot;

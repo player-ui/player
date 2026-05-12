@@ -19,8 +19,7 @@ export function createA2UIStory(loader: A2UIStoryLoader, options?: any) {
       flow={async () => {
         const mod = await loader();
         const snap =
-          (mod as { default?: A2UISnapshot }).default ??
-          (mod as A2UISnapshot);
+          (mod as { default?: A2UISnapshot }).default ?? (mod as A2UISnapshot);
         return { default: snap as unknown as Record<string, unknown> };
       }}
       format="a2ui"

@@ -276,8 +276,7 @@ export const PlayerStory = (props: PlayerStoryProps) => {
   useContentKind("json");
 
   const MockComp = React.useMemo(
-    () =>
-      wrapInLazy(LocalPlayerStory, flow, other, format === "a2ui"),
+    () => wrapInLazy(LocalPlayerStory, flow, other, format === "a2ui"),
     [],
   );
 

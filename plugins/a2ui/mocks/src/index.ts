@@ -18,3 +18,4 @@ export { default as sliderBasic } from "./slider/basic";
 export { default as dateTimeInputBasic } from "./date-time-input/basic";
 export { default as choicePickerSingle } from "./choice-picker/single-select";
 export { default as choicePickerMulti } from "./choice-picker/multi-select";
+export { default as expressionsShowcase } from "./expressions/showcase";
