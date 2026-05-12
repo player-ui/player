@@ -17,8 +17,12 @@ main_deps = main_exports + [
     artifact("androidx.activity:activity"),
     artifact("androidx.test:core"),
     artifact("androidx.test:runner"),
-    artifact("com.google.guava:guava"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+]
+
+instrumented_unit_test_deps = main_deps + [
+    ":testutils",
+    artifact("com.google.guava:guava"),
     artifact("org.robolectric:robolectric"),
     artifact("org.robolectric:annotations"),
 ]
@@ -28,12 +32,18 @@ kt_android(
     main_deps = main_deps,
 )
 
+kt_android(
+    name = "instrumented_unit_testutils",
+    main_srcs = glob(["src/instrumented_unit_test_main/kotlin/**/*.kt"]),
+    main_deps = instrumented_unit_test_deps,
+)
+
 # For use locally, to automatically pull in the *singular* configured runtime that should be tested against
 kt_jvm_library(
     name = "with-runtime",
     visibility = ["//visibility:public"],
     exports = [
-        ":testutils",
+        ":instrumented_unit_testutils",
         "//jvm/hermes:hermes-host",
     ],
 )
