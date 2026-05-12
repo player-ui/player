@@ -7,10 +7,14 @@ export const textTransform: TransformFunction<TextAsset, TextAsset> = (
   asset,
   options,
 ) => {
-  const text =
-    asset.text && asset.text?.match(SIMPLE_BINDING_REGEX)
-      ? options.data.model.get(asset.text)
-      : asset.text;
+  let text = asset.text;
+  if (asset.text && SIMPLE_BINDING_REGEX.test(asset.text)) {
+    try {
+      text = options.data.model.get(asset.text) ?? asset.text;
+    } catch (e) {
+      text = asset.text;
+    }
+  }
   return {
     ...asset,
     text,
