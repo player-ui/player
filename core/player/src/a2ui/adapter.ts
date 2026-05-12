@@ -354,10 +354,9 @@ export function adaptA2UIToFlow(snapshot: A2UISnapshot, logger?: Logger): Flow {
   const flow: Flow = {
     id: snapshot.surfaceId,
     views: [rootAsset],
-    data: (snapshot.dataModel as Record<string, unknown>) ?? {},
+    data: (snapshot.data as Record<string, unknown>) ?? {},
     navigation: buildNavigation(snapshot.surfaceId, ctx.eventNames),
   };
   if (schema) flow.schema = schema;
-
   return flow;
 }

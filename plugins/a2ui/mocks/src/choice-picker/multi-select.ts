@@ -2,7 +2,7 @@ import type { A2UISnapshot } from "@player-ui/player";
 
 const snapshot: A2UISnapshot = {
   surfaceId: "choice-picker-multi",
-  dataModel: { survey: { toppings: [] } },
+  data: { survey: { toppings: [] } },
   components: [
     {
       id: "root",

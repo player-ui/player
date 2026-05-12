@@ -7,7 +7,7 @@ describe("Player.start with format: 'a2ui'", () => {
   test("renders a flat A2UI snapshot as a nested resolved view", async () => {
     const snapshot: A2UISnapshot = {
       surfaceId: "greeting",
-      dataModel: { message: "Hello from A2UI" },
+      data: { message: "Hello from A2UI" },
       components: [
         { id: "root", component: "Column", children: ["header", "body"] },
         { id: "header", component: "Text", text: "Welcome" },
@@ -54,7 +54,7 @@ describe("Player.start with format: 'a2ui'", () => {
   test("event action transitions to a named END state with that outcome", async () => {
     const snapshot: A2UISnapshot = {
       surfaceId: "form",
-      dataModel: {},
+      data: {},
       components: [
         {
           id: "root",
@@ -82,7 +82,7 @@ describe("Player.start with format: 'a2ui'", () => {
   test("event context is written into the data model before transition", async () => {
     const snapshot: A2UISnapshot = {
       surfaceId: "form",
-      dataModel: { user: { id: "u-42" } },
+      data: { user: { id: "u-42" } },
       components: [
         {
           id: "root",

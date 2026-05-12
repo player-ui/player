@@ -112,7 +112,7 @@ function renderArg(value: A2UIDynamicValue): string {
   if (isPathRef(value)) {
     // Bare binding ref inside an expression — Player resolves it from the data
     // model when the expression evaluates.
-    return pointerToBinding(value.path);
+    return `{{${pointerToBinding(value.path)}}}`;
   }
   if (isFunctionCall(value)) {
     // Nested call: drop the outer @[...]@ wrap so it composes inside the parent.

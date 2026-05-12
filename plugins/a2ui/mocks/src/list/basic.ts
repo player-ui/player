@@ -7,7 +7,7 @@ import type { A2UISnapshot } from "@player-ui/player";
  */
 const snapshot: A2UISnapshot = {
   surfaceId: "list-basic",
-  dataModel: {
+  data: {
     items: ["Apples", "Oranges", "Pears", "Bananas"],
   },
   components: [

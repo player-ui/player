@@ -9,7 +9,7 @@ import type { A2UISnapshot } from "@player-ui/player";
  */
 const snapshot: A2UISnapshot = {
   surfaceId: "expressions-showcase",
-  dataModel: {
+  data: {
     user: { name: "Ada", email: "" },
     order: { subtotal: 1299.5 },
   },

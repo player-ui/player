@@ -39,7 +39,7 @@ describe("adaptA2UIToFlow — minimal cases", () => {
   test("uses dataModel as initial data when present", () => {
     const flow = adaptA2UIToFlow(
       snapshot([{ id: "root", component: "Text", text: "x" }], {
-        dataModel: { message: "Hello" },
+        data: { message: "Hello" },
       }),
     );
     expect(flow.data).toEqual({ message: "Hello" });
@@ -192,7 +192,7 @@ describe("adaptA2UIToFlow — dynamic values", () => {
       ]),
     );
     expect(flow.views?.[0]).toMatchObject({
-      text: "@[formatNumber(price)]@",
+      text: "@[formatNumber({{price}})]@",
     });
   });
 });
@@ -216,7 +216,7 @@ describe("adaptA2UIToFlow — actions", () => {
     );
     const view = flow.views?.[0] as Record<string, unknown>;
     expect(view.value).toBeUndefined();
-    expect(view.exp).toBe("@[openUrl(url)]@");
+    expect(view.exp).toBe("@[openUrl({{url}})]@");
     expect(flow.navigation.FLOW_1).toMatchObject({
       VIEW_1: { transitions: { "*": "END_Done" } },
     });

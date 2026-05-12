@@ -2,7 +2,7 @@ import type { A2UISnapshot } from "@player-ui/player";
 
 const snapshot: A2UISnapshot = {
   surfaceId: "slider-basic",
-  dataModel: { settings: { volume: 50 } },
+  data: { settings: { volume: 50 } },
   components: [
     {
       id: "root",

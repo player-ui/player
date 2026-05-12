@@ -2,7 +2,7 @@ import type { A2UISnapshot } from "@player-ui/player";
 
 const snapshot: A2UISnapshot = {
   surfaceId: "text-field-validation",
-  dataModel: { user: { email: "" } },
+  data: { user: { email: "" } },
   components: [
     {
       id: "root",

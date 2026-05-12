@@ -64,7 +64,7 @@ export interface A2UISnapshot {
   catalogId?: string;
   theme?: Record<string, unknown>;
   components: A2UIComponent[];
-  dataModel?: unknown;
+  data?: unknown;
 }
 
 export type StartOptions = {

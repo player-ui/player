@@ -7,6 +7,7 @@ import {
   dateTimeInputTransform,
   sliderTransform,
   textFieldTransform,
+  textTransform,
 } from "../assets";
 import type {
   ButtonAsset,
@@ -63,6 +64,7 @@ export class A2UITransformPlugin implements ExtendedPlayerPlugin<
         [{ type: "Slider" }, sliderTransform],
         [{ type: "DateTimeInput" }, dateTimeInputTransform],
         [{ type: "ChoicePicker" }, choicePickerTransform],
+        [{ type: "Text" }, textTransform],
       ]),
     );
   }

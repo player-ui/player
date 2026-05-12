@@ -2,7 +2,7 @@ import type { A2UISnapshot } from "@player-ui/player";
 
 const snapshot: A2UISnapshot = {
   surfaceId: "check-box-basic",
-  dataModel: { prefs: { newsletter: false } },
+  data: { prefs: { newsletter: false } },
   components: [
     {
       id: "root",
