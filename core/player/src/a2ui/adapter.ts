@@ -65,13 +65,16 @@ function inlineComponent(
     type: component.component,
   };
 
-  // Non-structural props get Dynamic* translation.
+  // Non-structural props get Dynamic* translation. Properties whose name ends
+  // in `Child`/`Children` (e.g. Modal.entryPointChild, Modal.contentChild) are
+  // treated as asset-ID references and inlined into `{asset: ...}` wrappers.
   for (const [key, value] of Object.entries(component)) {
     if (STRUCTURAL_KEYS.has(key)) continue;
     asset[key] = translatePropValue(
       value as A2UIDynamicValue,
       templateScope,
-      ctx.logger,
+      ctx,
+      key,
     );
   }
 
@@ -140,38 +143,73 @@ function wrapInlined(asset: Asset): { asset: Asset } {
   return { asset };
 }
 
+const CHILD_KEY_RE = /(?:^|[a-z])Child$|^child$/;
+const CHILDREN_KEY_RE = /(?:^|[a-z])Children$|^children$/;
+
 /**
- * Translate a non-structural prop value. Identical to translateDynamicValue
- * but threads a template scope through so relative `{path}` refs become
- * `<scope>._index_.<...>`.
+ * Translate a non-structural prop value. Threads template scope so relative
+ * `{path}` refs become `<scope>._index_.<...>`. Also resolves nested
+ * `child`/`*Child` and `children`/`*Children` keys (e.g. `Modal.entryPointChild`,
+ * `Tabs.tabItems[].child`) as asset-ID references, inlining them into
+ * Player's `{asset: ...}` wrapper shape.
+ *
+ * `parentKey` is the property name of the currently-translated value within
+ * its enclosing object (when known) — used to detect child-slot semantics.
  */
 function translatePropValue(
   value: A2UIDynamicValue,
-  templateScope?: string,
-  logger?: Logger,
+  templateScope: string | undefined,
+  ctx: WalkContext,
+  parentKey?: string,
 ): unknown {
   if (value === null || value === undefined) return value;
+
+  // Resolve `child` / `*Child` ID references.
+  if (parentKey && CHILD_KEY_RE.test(parentKey) && typeof value === "string") {
+    return wrapInlined(resolveAndInline(value, ctx, templateScope));
+  }
+  // Resolve `children` / `*Children` ID-array references. Templated form
+  // ({path, componentId}) is only supported at top level — punt with a warn.
+  if (parentKey && CHILDREN_KEY_RE.test(parentKey)) {
+    if (Array.isArray(value) && value.every((v) => typeof v === "string")) {
+      return (value as string[]).map((id) =>
+        wrapInlined(resolveAndInline(id, ctx, templateScope)),
+      );
+    }
+    if (
+      typeof value === "object" &&
+      value !== null &&
+      !Array.isArray(value) &&
+      "componentId" in (value as Record<string, unknown>)
+    ) {
+      ctx.logger?.warn(
+        `[a2ui] Templated children are only supported at top-level 'children'; '${parentKey}' will be left unresolved.`,
+      );
+    }
+  }
+
   if (typeof value !== "object") return value;
+
   if (Array.isArray(value)) {
-    return value.map((v) => translatePropValue(v, templateScope, logger));
+    return value.map((v) =>
+      translatePropValue(v, templateScope, ctx, undefined),
+    );
   }
   if (isPathRef(value)) {
     return scopedBinding(value.path, templateScope);
   }
   if (isFunctionCall(value)) {
     if (templateScope) {
-      // Rewrite path refs inside the call's args to be scope-aware before
-      // translation runs.
       return translateFunctionCall(
         rewritePathsInCall(value, templateScope) as never,
-        logger,
+        ctx.logger,
       );
     }
-    return translateFunctionCall(value as never, logger);
+    return translateFunctionCall(value as never, ctx.logger);
   }
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value)) {
-    out[k] = translatePropValue(v as A2UIDynamicValue, templateScope, logger);
+    out[k] = translatePropValue(v as A2UIDynamicValue, templateScope, ctx, k);
   }
   return out;
 }

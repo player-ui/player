@@ -2,27 +2,25 @@ import React from "react";
 import { ReactAsset } from "@player-ui/react";
 import type { ModalAsset } from "@player-ui/a2ui-plugin";
 import { cn, commonProps } from "../utils";
+import { useModalTrigger } from "../components/modalBus";
 
 /**
  * Lightweight modal — no Radix dialog dep. The entry-point asset is rendered
- * inline and wrapped in a click target; clicking it toggles a controlled
- * overlay containing the content asset.
+ * directly (e.g. as a `Button`) and signals open via the module-level modal
+ * bus; this Modal subscribes by the trigger's component id. That avoids the
+ * `<button>`-inside-`<button>` HTML nesting issue from wrapping the trigger.
  */
 export const Modal = (props: ModalAsset) => {
   const { id, entryPointChild, contentChild } = props;
   const [open, setOpen] = React.useState(false);
 
+  const triggerId = entryPointChild?.asset?.id;
+  const onOpen = React.useCallback(() => setOpen(true), []);
+  useModalTrigger(triggerId, onOpen);
+
   return (
     <div id={id} {...commonProps(props)}>
-      {entryPointChild && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="player-bg-transparent player-p-0 player-border-0"
-        >
-          <ReactAsset {...entryPointChild} />
-        </button>
-      )}
+      {entryPointChild && <ReactAsset {...entryPointChild} />}
       {open && (
         <div
           role="dialog"
