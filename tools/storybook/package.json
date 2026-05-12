@@ -25,6 +25,7 @@
   "dependencies": {
     "@player-ui/beacon-plugin-react": "workspace:^",
     "@player-ui/make-flow": "workspace:^",
+    "@player-ui/player": "workspace:^",
     "@player-ui/react": "workspace:^",
     "@player-ui/metrics-plugin-react": "workspace:^"
   }

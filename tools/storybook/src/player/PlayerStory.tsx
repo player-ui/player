@@ -8,6 +8,7 @@ import type {
 import { ReactPlayer } from "@player-ui/react";
 import { BeaconPlugin } from "@player-ui/beacon-plugin-react";
 import { makeFlow } from "@player-ui/make-flow";
+import type { StartOptions } from "@player-ui/player";
 import { Placeholder } from "storybook/internal/components";
 import { useDispatch, useSelector } from "react-redux";
 import { addons } from "storybook/preview-api";
@@ -61,6 +62,15 @@ export const PlayerOptionsContext = React.createContext<{
   options?: ReactPlayerOptions;
 }>({ options: {} });
 
+/**
+ * Content format passed to `ReactPlayer.start`. When `"a2ui"`, the editor
+ * value is treated as an A2UI snapshot and Player will adapt it on every
+ * start — so users can edit the snapshot live in the JSON editor.
+ */
+export const StartFormatContext = React.createContext<{
+  format?: StartOptions["format"];
+}>({});
+
 export const SuspenseSpinner = (props: PropsWithChildren) => {
   return (
     <React.Suspense fallback={<div className="sb-loader" />}>
@@ -74,6 +84,7 @@ const PlayerJsonEditorStory = () => {
   useFlowSetListener(addons.getChannel());
 
   const { plugins } = React.useContext(ReactPlayerPluginContext);
+  const { format } = React.useContext(StartFormatContext);
 
   const dispatch = useDispatch();
 
@@ -103,9 +114,12 @@ const PlayerJsonEditorStory = () => {
     setPlayerState("in-progress");
     setTrackedBeacons([]);
 
-    setKey(jsonEditorValue.value.id);
+    setKey(
+      (jsonEditorValue.value as { id?: string; surfaceId?: string }).id ??
+        (jsonEditorValue.value as { surfaceId?: string }).surfaceId,
+    );
 
-    wp.start(jsonEditorValue.value)
+    wp.start(jsonEditorValue.value as never, format ? { format } : undefined)
       .then(() => {
         setPlayerState("completed");
       })
@@ -207,6 +221,8 @@ function wrapInLazy(
 
   /** Any other props to pass */
   other?: any,
+  /** Skip makeFlow wrapping — used for raw content like A2UI snapshots. */
+  skipMakeFlow?: boolean,
 ) {
   /** an async loader to wrap the mock as a player component */
   const asPlayer = async () => {
@@ -215,10 +231,13 @@ function wrapInLazy(
 
     /** The component to load */
     const Comp = () => {
-      const flow = {
-        ...makeFlow("default" in mock ? mock.default : mock),
-        ...(other ?? {}),
-      };
+      const raw = ("default" in mock ? mock.default : mock) as Record<
+        string,
+        unknown
+      >;
+      const flow = skipMakeFlow
+        ? ({ ...raw, ...(other ?? {}) } as Flow)
+        : ({ ...makeFlow(raw), ...(other ?? {}) } as Flow);
 
       return <Component mock={flow} />;
     };
@@ -240,6 +259,12 @@ export interface PlayerStoryProps {
   storybookControls?: Flow["data"];
   /**  options, like suspend and plugins */
   options?: ReactPlayerOptions;
+  /**
+   * Content format passed to Player.start. Default `"player"` (Flow JSON).
+   * Use `"a2ui"` to feed an A2UI snapshot — Player adapts on every start so
+   * users can edit the snapshot live.
+   */
+  format?: StartOptions["format"];
 }
 
 /**
@@ -247,11 +272,12 @@ export interface PlayerStoryProps {
  * This handles all of the wiring of the mock into the flow editor, events, etc
  */
 export const PlayerStory = (props: PlayerStoryProps) => {
-  const { flow, storybookControls, options, ...other } = props;
+  const { flow, storybookControls, options, format, ...other } = props;
   useContentKind("json");
 
   const MockComp = React.useMemo(
-    () => wrapInLazy(LocalPlayerStory, flow, other),
+    () =>
+      wrapInLazy(LocalPlayerStory, flow, other, format === "a2ui"),
     [],
   );
 
@@ -268,7 +294,9 @@ export const PlayerStory = (props: PlayerStoryProps) => {
               options,
             }}
           >
-            <MockComp />
+            <StartFormatContext.Provider value={{ format }}>
+              <MockComp />
+            </StartFormatContext.Provider>
           </PlayerOptionsContext.Provider>
         </StorybookControlsContext.Provider>
       </SuspenseSpinner>
