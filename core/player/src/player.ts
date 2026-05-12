@@ -30,6 +30,8 @@ import type {
   PlayerHooks,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
+import { adaptA2UIToFlow } from "./a2ui";
+import type { A2UISnapshot, StartOptions } from "./a2ui";
 
 /**
 Variables injected at build time
@@ -494,8 +496,15 @@ export class Player {
     };
   }
 
-  public async start(payload: Flow): Promise<CompletedState> {
-    const ref = Symbol(payload?.id ?? "payload");
+  public async start(
+    payload: Flow | A2UISnapshot,
+    options?: StartOptions,
+  ): Promise<CompletedState> {
+    const flow: Flow =
+      options?.format === "a2ui"
+        ? adaptA2UIToFlow(payload as A2UISnapshot, this.logger)
+        : (payload as Flow);
+    const ref = Symbol(flow?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
     const maybeUpdateState = <T extends PlayerFlowState>(newState: T) => {
@@ -518,7 +527,7 @@ export class Player {
     });
 
     try {
-      const { state, start } = this.setupFlow(payload);
+      const { state, start } = this.setupFlow(flow);
       this.setState({
         ref,
         ...state,
@@ -545,7 +554,7 @@ export class Player {
       const errorState: ErrorState = {
         status: "error",
         ref,
-        flow: payload,
+        flow,
         error,
       };
 

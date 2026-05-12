@@ -17,7 +17,7 @@ export class ReadOnlyDataController implements DataModelWithParser<DataModelOpti
     this.logger = logger;
   }
 
-  get(binding: BindingLike, options?: DataModelOptions | undefined) {
+  get(binding: BindingLike, options?: DataModelOptions | undefined): any {
     return this.controller.get(binding, options);
   }
 

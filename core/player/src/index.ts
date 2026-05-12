@@ -13,3 +13,4 @@ export * from "./player";
 export * from "./controllers/index";
 export * from "./types";
 export * from "./plugins/flow-exp-plugin";
+export * from "./a2ui/index";
