@@ -17,7 +17,10 @@ main_deps = main_exports + [
     artifact("androidx.activity:activity"),
     artifact("androidx.test:core"),
     artifact("androidx.test:runner"),
+    artifact("com.google.guava:guava"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("org.robolectric:robolectric"),
+    artifact("org.robolectric:annotations"),
 ]
 
 kt_android(

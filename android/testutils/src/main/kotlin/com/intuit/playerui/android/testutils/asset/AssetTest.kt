@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
@@ -39,8 +39,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
+import org.robolectric.android.controller.ActivityController
+import org.robolectric.annotation.LooperMode
 
 @RunWith(AndroidJUnit4::class)
+@LooperMode(LooperMode.Mode.INSTRUMENTATION_TEST)
 @OptIn(ExperimentalCoroutinesApi::class)
 public abstract class AssetTest(
     private val group: String? = null,
@@ -71,9 +75,13 @@ public abstract class AssetTest(
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    private lateinit var scenario: ActivityScenario<ComponentActivity>
+    private lateinit var activityController: ActivityController<ComponentActivity>
 
-    private lateinit var hostActivity: ComponentActivity
+    private val hostActivity: ComponentActivity get() = activityController.get()
+
+    private fun newRenderContainer(): FrameLayout = FrameLayout(hostActivity).also { container ->
+        hostActivity.setContentView(container)
+    }
 
     private lateinit var renderContainer: FrameLayout
 
@@ -107,10 +115,9 @@ public abstract class AssetTest(
 
     @Before
     public fun beforeEach() {
-        scenario = ActivityScenario.launch(ComponentActivity::class.java)
-        scenario.onActivity { activity ->
-            hostActivity = activity
-            renderContainer = FrameLayout(activity).also(activity::setContentView)
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            activityController = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+            renderContainer = newRenderContainer()
         }
         player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("AssetTest-render") {
             CoroutineScope(Dispatchers.Main).launch {
@@ -128,7 +135,6 @@ public abstract class AssetTest(
 
     @After
     public fun afterEach() {
-        if (::scenario.isInitialized) scenario.close()
     }
 
     protected fun launchMock(): Unit = launchMock(name.methodName)

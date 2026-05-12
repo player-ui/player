@@ -166,6 +166,10 @@ maven.install(
     ],
     version_conflict_policy = "pinned",
 )
+maven.amend_artifact(
+    coordinates = "org.robolectric:robolectric",
+    exclusions = ["com.google.testparameterinjector:test-parameter-injector"],
+)
 use_repo(maven, "maven")
 
 bazel_dep(name = "rules_robolectric", version = "4.15.1")
