@@ -133,10 +133,6 @@ public abstract class AssetTest(
         }
     }
 
-    @After
-    public fun afterEach() {
-    }
-
     protected fun launchMock(): Unit = launchMock(name.methodName)
 
     protected fun launchMock(name: String): Unit = launchMock(

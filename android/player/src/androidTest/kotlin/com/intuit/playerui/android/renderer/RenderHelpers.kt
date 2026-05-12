@@ -21,7 +21,7 @@ internal suspend fun RenderableAsset<*>.awaitRender(context: Context): View {
     player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("awaitRender-${System.nanoTime()}") {
         hydrationComplete.complete(Unit)
     }
-    val view = builtAsset.render(isRoot = true)
+    val view = builtAsset.render()
     hydrationComplete.await()
     return view
 }

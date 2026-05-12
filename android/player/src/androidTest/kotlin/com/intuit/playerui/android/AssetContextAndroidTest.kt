@@ -30,7 +30,7 @@ class AssetContextAndroidTest {
     private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset<Unit>(assetContext, serializer()) {
         override suspend fun initView(data: Unit) = TextView(context)
 
-        override suspend fun CoroutineScope.hydrate(view: View, data: Unit) = Unit
+        override fun CoroutineScope.hydrate(view: View, data: Unit) = Unit
     }
 
     private val assetContext by lazy {

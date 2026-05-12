@@ -25,7 +25,7 @@ internal class NestedAsset(
 
     override suspend fun initView(data: Data) = LinearLayout(context)
 
-    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
         require(view is LinearLayout)
         inflate(data.nested, view)
         dummy = data.nested as? RenderableAsset<*>

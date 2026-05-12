@@ -59,7 +59,7 @@ class Input(
             }
         }.rootView
 
-    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
         inflate(data.label, view.findViewById(R.id.input_label_container), Text.Styles.Label)
         inflate(data.note, view.findViewById(R.id.input_note_container), Text.Styles.Note)
 

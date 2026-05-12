@@ -35,7 +35,7 @@ internal class BrokenAsset(
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
         if (data.shouldFail ||
             (data.layout == Layout.Frame && view is LinearLayout) ||
             (data.layout == Layout.Linear && view is FrameLayout)

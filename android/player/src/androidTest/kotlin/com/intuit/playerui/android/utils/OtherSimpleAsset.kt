@@ -19,7 +19,7 @@ internal class OtherSimpleAsset(
 ) : RenderableAsset<Node>(assetContext, NodeSerializer()) {
     override suspend fun initView(data: Node) = ImageView(context)
 
-    override suspend fun CoroutineScope.hydrate(view: View, data: Node) = Unit
+    override fun CoroutineScope.hydrate(view: View, data: Node) = Unit
 
     companion object {
         val sampleMap = mapOf(

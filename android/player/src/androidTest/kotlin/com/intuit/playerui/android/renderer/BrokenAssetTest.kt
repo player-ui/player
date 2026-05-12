@@ -80,7 +80,7 @@ internal class BrokenAssetTest {
             player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("manual-rehydrate") {
                 rehydrationComplete.complete(Unit)
             }
-            data.layout = BrokenAsset.Layout.Linear
+            getData().layout = BrokenAsset.Layout.Linear
             rehydrate()
             rehydrationComplete.await()
         }

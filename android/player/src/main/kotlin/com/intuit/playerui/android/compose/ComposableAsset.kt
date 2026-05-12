@@ -45,13 +45,8 @@ public abstract class ComposableAsset<Data>(
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
-    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
         require(view is ComposeView)
-        // Bridge the gap between setContent returning (synchronous) and the composition
-        // actually executing (apply phase). Without this extra bump, doRender's finally would
-        // decrement the tracker to 0 and fire onHydrationComplete before any nested compose
-        // child has had a chance to pre-track itself. The matching decrement fires from a
-        // LaunchedEffect inside compose() once first composition completes.
         view.setContent {
             compose(data = data)
         }
@@ -115,9 +110,7 @@ public abstract class ComposableAsset<Data>(
     private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         val childAsset = this
         AndroidView(factory = ::FrameLayout, modifier) { container ->
-            // childAsset was already pre-tracked during composition by the GenericAsset.compose
-            // caller; use the already-tracked variant to avoid a double bump.
-            this@ComposableAsset.hydrationScope.inflateChildAlreadyTracked(
+            this@ComposableAsset.hydrationScope.inflate(
                 childAsset.assetContext.withStyles(styles).build(),
                 container,
             )

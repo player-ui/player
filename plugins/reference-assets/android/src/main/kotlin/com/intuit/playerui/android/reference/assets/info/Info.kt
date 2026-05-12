@@ -23,7 +23,7 @@ class Info(
 
     override suspend fun initView(data: Data) = LayoutInflater.from(context).inflate(R.layout.info, null).rootView
 
-    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
         inflate(data.title, view.findViewById(R.id.info_title), Text.Styles.Title)
         inflate(data.primaryInfo, view.findViewById(R.id.info_primary_info))
         data.actions.filterNotNull().forEach { inflate(it, view.findViewById(R.id.info_actions)) }

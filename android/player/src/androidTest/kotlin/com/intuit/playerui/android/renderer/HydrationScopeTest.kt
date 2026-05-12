@@ -40,7 +40,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     ) : RenderableAsset<Node>(assetContext, NodeSerializer()) {
         override suspend fun initView(data: Node): View = TextView(context)
 
-        override suspend fun CoroutineScope.hydrate(view: View, data: Node) {
+        override fun CoroutineScope.hydrate(view: View, data: Node) {
             launch {
                 delay(500)
                 completed = true
