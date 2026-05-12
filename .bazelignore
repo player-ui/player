@@ -67,6 +67,9 @@ plugins/stage-revert-data/core/node_modules
 tools/asset-testing-library/core/node_modules
 docs/storybook/node_modules
 plugins/reference-assets/mocks/node_modules
+plugins/a2ui/core/node_modules
+plugins/a2ui/react/node_modules
+plugins/a2ui/mocks/node_modules
 tools/storybook/node_modules
 tools/components/node_modules
 tools/mocks/node_modules
