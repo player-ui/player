@@ -8,7 +8,6 @@ import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
-import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.RenderableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.Styles
@@ -181,7 +180,7 @@ public class AndroidPlayer private constructor(
 
     /** Apply [AndroidPlayerPlugin]s last */
     init {
-        player.format.registerContextualSerializer(assetSerializer.conform<GenericAsset>())
+        player.format.registerContextualSerializer(assetSerializer.conform<RenderableAsset<*>>())
 
         plugins
             .filterIsInstance<AndroidPlayerPlugin>()
