@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.GenericAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.build
@@ -88,7 +87,7 @@ public abstract class ComposableAsset<Data>(
      * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
      */
     @Composable
-    public fun GenericAsset.compose(
+    public fun RenderableAsset<*>.compose(
         modifier: Modifier = Modifier,
         styles: AssetStyle? = null,
         tag: String? = null,
@@ -115,7 +114,7 @@ public abstract class ComposableAsset<Data>(
     private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         val childAsset = this
         AndroidView(factory = ::FrameLayout, modifier) { container ->
-            // childAsset was already pre-tracked during composition by the GenericAsset.compose
+            // childAsset was already pre-tracked during composition by the RenderableAsset.compose
             // caller; use the already-tracked variant to avoid a double bump.
             this@ComposableAsset.hydrationScope.inflateChildAlreadyTracked(
                 childAsset.assetContext.withStyles(styles).build(),

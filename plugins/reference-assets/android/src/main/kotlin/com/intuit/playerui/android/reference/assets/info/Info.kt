@@ -3,7 +3,7 @@ package com.intuit.playerui.android.reference.assets.info
 import android.view.LayoutInflater
 import android.view.View
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.GenericAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
@@ -15,10 +15,10 @@ class Info(
 ) : RenderableAsset<Info.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
-        val title: GenericAsset? = null,
-        val primaryInfo: GenericAsset? = null,
-        val actions: List<GenericAsset?> = emptyList(),
-        val footer: GenericAsset? = null,
+        val title: AnyAsset? = null,
+        val primaryInfo: AnyAsset? = null,
+        val actions: List<AnyAsset?> = emptyList(),
+        val footer: AnyAsset? = null,
     )
 
     override suspend fun initView(data: Data) = LayoutInflater.from(context).inflate(R.layout.info, null).rootView

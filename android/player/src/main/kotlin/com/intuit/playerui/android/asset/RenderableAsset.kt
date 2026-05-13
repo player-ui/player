@@ -36,7 +36,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.ContextualSerializer
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -46,6 +49,9 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 
 internal typealias CachedAssetView = Pair<AssetContext?, View?>
+
+/** Convenience type represents slot for any arbitrary asset instance */
+public typealias AnyAsset = RenderableAsset<out @Contextual Any>
 
 /**
  * [RenderableAsset] is the base class for each asset in an asset tree.
@@ -57,11 +63,11 @@ internal typealias CachedAssetView = Pair<AssetContext?, View?>
  * Beaconing and expansion hooks can be accessed through the [AssetContext]
  * as well.
  */
+@Serializable(ContextualSerializer::class)
 public abstract class RenderableAsset<Data>(
-    override val assetContext: AssetContext,
+    public val assetContext: AssetContext,
     private val serializer: KSerializer<Data>,
-) : GenericAsset,
-    NodeWrapper {
+) : NodeWrapper {
     internal val cachedAssetView: CachedAssetView get() =
         player.getCachedAssetView(assetContext) ?: cachedAssetViewNotFound
 
@@ -242,13 +248,13 @@ public abstract class RenderableAsset<Data>(
         }
     }
 
-    public fun CoroutineScope.inflate(child: GenericAsset?, container: ViewGroup) {
+    public fun CoroutineScope.inflate(child: RenderableAsset<*>?, container: ViewGroup) {
         val asset = child?.assetContext?.run { withContext(requireContext()).build() } ?: return
         inflateChild(asset, container)
     }
 
     public fun CoroutineScope.inflate(
-        child: GenericAsset?,
+        child: RenderableAsset<*>?,
         container: ViewGroup,
         @StyleRes vararg styles: Style?,
     ) {
@@ -257,7 +263,7 @@ public abstract class RenderableAsset<Data>(
     }
 
     public fun CoroutineScope.inflate(
-        child: GenericAsset?,
+        child: RenderableAsset<*>?,
         container: ViewGroup,
         @StyleRes styles: Styles?,
     ) {
@@ -266,7 +272,7 @@ public abstract class RenderableAsset<Data>(
     }
 
     public fun CoroutineScope.inflate(
-        child: GenericAsset?,
+        child: RenderableAsset<*>?,
         container: ViewGroup,
         tag: String,
     ) {
@@ -275,7 +281,7 @@ public abstract class RenderableAsset<Data>(
     }
 
     public fun CoroutineScope.inflate(
-        child: GenericAsset?,
+        child: RenderableAsset<*>?,
         container: ViewGroup,
         @StyleRes vararg styles: Style?,
         tag: String,
@@ -285,7 +291,7 @@ public abstract class RenderableAsset<Data>(
     }
 
     public fun CoroutineScope.inflate(
-        child: GenericAsset?,
+        child: RenderableAsset<*>?,
         container: ViewGroup,
         @StyleRes styles: Styles?,
         tag: String,
@@ -341,22 +347,23 @@ public abstract class RenderableAsset<Data>(
 
     public class Serializer(
         private val player: AndroidPlayer,
-    ) : KSerializer<GenericAsset?> {
+    ) : KSerializer<RenderableAsset<*>?> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.playerui.android.asset.RenderableAsset")
 
-        override fun deserialize(decoder: Decoder): GenericAsset? = decoder
+        override fun deserialize(decoder: Decoder): RenderableAsset<*>? = decoder
             .requireNodeDecoder()
             .decodeNode()
             .let(::AssetWrapper)
             .asset
             .let(player::expandAsset)
 
-        override fun serialize(encoder: Encoder, value: GenericAsset?): Nothing =
+        override fun serialize(encoder: Encoder, value: RenderableAsset<*>?): Nothing =
             throw SerializationException("RenderableAsset.Serializer.serialize is not supported")
 
-        public inline fun <reified T : GenericAsset?> conform(): KSerializer<T> = object : KSerializer<T?> by this as KSerializer<T?> {
-            override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as? T
-        } as KSerializer<T>
+        public inline fun <reified T : RenderableAsset<*>?> conform(): KSerializer<T> =
+            object : KSerializer<T?> by this as KSerializer<T?> {
+                override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as? T
+            } as KSerializer<T>
 
         public fun <T : RenderableAsset<*>> conform(klass: KClass<T>): KSerializer<T> =
             object : KSerializer<T?> by this as KSerializer<T?> {

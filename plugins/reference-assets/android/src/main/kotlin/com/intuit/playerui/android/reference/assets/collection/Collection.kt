@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.GenericAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
@@ -21,9 +21,9 @@ class Collection(
     @Serializable
     data class Data(
         /** Required [values] is the collection of asset */
-        val values: List<GenericAsset>,
+        val values: List<AnyAsset>,
         /** An optional label to title the collection */
-        val label: GenericAsset? = null,
+        val label: AnyAsset? = null,
     )
 
     @Composable
