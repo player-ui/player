@@ -13,7 +13,6 @@ import kotlinx.coroutines.CompletableDeferred
  * async children have completed hydration.
  */
 internal suspend fun RenderableAsset<*>.awaitRender(context: Context): View {
-    val id = "${asset.id}:${asset.type}"
     val builtAsset = assetContext
         .withContext(player.hooks.context.call(context))
         .build()

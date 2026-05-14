@@ -1,17 +1,12 @@
 package com.intuit.playerui.android.compose
 
-import android.view.View
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.SuspendableAsset.AsyncViewStub
 import com.intuit.playerui.android.renderer.BaseRenderableAssetTest
 import com.intuit.playerui.android.utils.ContextCapturingAsset
 import com.intuit.playerui.android.utils.NestedComposableAsset
@@ -24,7 +19,6 @@ import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.core.player.state.InProgressState
-import com.intuit.playerui.core.utils.InternalPlayerApi
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -67,44 +61,36 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
         TextStyleCapturingAsset.reset()
     }
 
-    @OptIn(InternalPlayerApi::class)
-    private fun resolveView(stub: View?) = if (stub is AsyncViewStub) runBlocking { stub.awaitView() } else stub
-
     @Test
-    fun `initView creates ComposeView with WRAP_CONTENT`() = runBlocking {
-        val asset = SimpleComposableAsset(assetContext)
-        val view = resolveView(asset.render(appContext))
-        assertTrue(view is ComposeView)
-        assertEquals(WRAP_CONTENT, view!!.layoutParams.width)
-        assertEquals(WRAP_CONTENT, view.layoutParams.height)
-    }
-
-    @Test
-    fun `compose renders content when data available`() = runBlocking {
-        val asset = player.awaitFirstView(SimpleComposableAsset.sampleFlow)
-        val view = resolveView(asset?.render(appContext))
-        assertTrue("Expected ComposeView", view is ComposeView)
-    }
-
-    @Test
-    fun `nested ComposableAsset renders via compose dispatch`(): Unit = runBlocking {
-        val asset = player.awaitFirstView(NestedComposableAsset.sampleFlow)
+    fun `compose renders content when data available`() {
+        val asset = runBlocking { player.awaitFirstView(SimpleComposableAsset.sampleFlow) } as? SimpleComposableAsset
         assertNotNull("Expected asset from flow", asset)
-        val view = resolveView(asset?.render(appContext)) as ComposeView
+        val data = runBlocking { asset!!.getData() }
 
-        composeRule.setContent { AndroidView(factory = { view }) }
+        composeRule.setContent { asset!!.compose(data) }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("simple-compose").assertExists()
+    }
+
+    @Test
+    fun `nested ComposableAsset renders via compose dispatch`() {
+        val asset = runBlocking { player.awaitFirstView(NestedComposableAsset.sampleFlow) } as? NestedComposableAsset
+        assertNotNull("Expected asset from flow", asset)
+        val data = runBlocking { asset!!.getData() }
+
+        composeRule.setContent { asset!!.compose(data) }
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("nested-compose").assertExists()
         composeRule.onNodeWithTag("child-tag").assertExists()
     }
 
     @Test
-    fun `Compose to Compose propagates textStyle via LocalTextStyle`() = runBlocking {
-        val asset = player.awaitFirstView(StyledNestedComposableAsset.styledComposeChildFlow)
+    fun `Compose to Compose propagates textStyle via LocalTextStyle`() {
+        val asset = runBlocking { player.awaitFirstView(StyledNestedComposableAsset.styledComposeChildFlow) } as? StyledNestedComposableAsset
         assertNotNull("Expected asset from flow", asset)
-        val view = resolveView(asset?.render(appContext)) as ComposeView
+        val data = runBlocking { asset!!.getData() }
 
-        composeRule.setContent { AndroidView(factory = { view }) }
+        composeRule.setContent { asset!!.compose(data) }
         composeRule.waitForIdle()
         waitForCondition { TextStyleCapturingAsset.lastCapturedTextStyle != null }
 
@@ -118,12 +104,12 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `Compose to Compose to XML view propagates xmlStyles through LocalContext`() = runBlocking {
-        val asset = player.awaitFirstView(StyledNestedComposableAsset.styledComposeToViewFlow)
+    fun `Compose to Compose to XML view propagates xmlStyles through LocalContext`() {
+        val asset = runBlocking { player.awaitFirstView(StyledNestedComposableAsset.styledComposeToViewFlow) } as? StyledNestedComposableAsset
         assertNotNull("Expected asset from flow", asset)
-        val view = resolveView(asset?.render(appContext)) as ComposeView
+        val data = runBlocking { asset!!.getData() }
 
-        composeRule.setContent { AndroidView(factory = { view }) }
+        composeRule.setContent { asset!!.compose(data) }
         composeRule.waitForIdle()
         waitForCondition { ContextCapturingAsset.lastCapturedContext != null }
 
