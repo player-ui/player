@@ -116,12 +116,25 @@ export interface NavigationFlow {
   /** An optional expression to run when this Flow ends */
   onEnd?: Expression | ExpressionObject;
 
+  /**
+   * An optional flow-level transitions map (fallback when node-level is not defined).
+   * Used as a fallback when the current state doesn't have a transition defined.
+   */
+  transitions?: NavigationFlowTransition;
+
+  /**
+   * Optional flow-level error transitions map.
+   * Maps error types directly to state names (no indirection through transitions map).
+   */
+  errorTransitions?: Record<string, string>;
+
   [key: string]:
     | undefined
     | string
     | Expression
     | ExpressionObject
-    | NavigationFlowState;
+    | NavigationFlowState
+    | NavigationFlowTransition;
 }
 
 export type NavigationFlowTransition = Record<string, string>;
@@ -154,6 +167,12 @@ export interface NavigationFlowTransitionableState<T extends string>
   extends NavigationBaseState<T> {
   /** A mapping of transition-name to FlowState name */
   transitions: NavigationFlowTransition;
+
+  /**
+   * Optional error transitions map.
+   * Maps error types directly to state names (no indirection through transitions map).
+   */
+  errorTransitions?: Record<string, string>;
 }
 
 /** A state representing a view  */

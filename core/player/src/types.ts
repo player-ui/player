@@ -8,6 +8,7 @@ import type {
   DataController,
   ValidationController,
   FlowController,
+  ErrorController,
 } from "./controllers";
 import type { ReadOnlyDataController } from "./controllers/data/utils";
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
@@ -33,6 +34,8 @@ export interface PlayerHooks {
   validationController: SyncHook<[ValidationController], Record<string, any>>;
   /** Manages parsing binding */
   bindingParser: SyncHook<[BindingParser], Record<string, any>>;
+  /** Manages error handling and captures errors from all subsystems */
+  errorController: SyncHook<[ErrorController], Record<string, any>>;
   /** A that's called for state changes in the flow execution */
   state: SyncHook<[PlayerFlowState], Record<string, any>>;
   /** A hook to access the current flow */
@@ -97,6 +100,9 @@ export interface ControllerState {
 
   /** the manager for the flow state machine */
   flow: FlowController;
+
+  /** The manager for error handling */
+  error: ErrorController;
 }
 
 /** A flow is currently executing */

@@ -1,4 +1,4 @@
-declare module 'package-size' {
+declare module "package-size" {
   export interface Options {
     /**
      * Sort packages in size (from small to large)
@@ -12,7 +12,7 @@ declare module 'package-size' {
 
     cache?: boolean;
 
-    target?: 'browser' | 'node';
+    target?: "browser" | "node";
 
     registry?: string;
 
@@ -29,6 +29,6 @@ declare module 'package-size' {
 
   export default function getSizes(
     packages: string | string[],
-    options?: Options
+    options?: Options,
   ): SizeData;
 }

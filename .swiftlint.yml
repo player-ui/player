@@ -1,13 +1,20 @@
 disabled_rules:
     - unused_optional_binding
     - unused_setter_value
+
 type_name:
     excluded:
+        # T is a universally understood generic placeholder
         - T
+
 line_length:
+    # TODO: Change this to the Google Swift Style Guide 100-char limit when we update our swiftlint config
     warning: 160
     ignores_comments: true
+
+# Longer functions should be split into named helpers. Long functions are harder to read, test, and maintain.
 function_body_length: 50
+
 identifier_name:
     excluded:
         - id
@@ -17,6 +24,27 @@ identifier_name:
         - drop_down
         - radio_button
         - search_input
+
 included:
     - ios
     - plugins
+
+opt_in_rules:
+    # Enforces Swift 5.7+ shorthand `guard let foo` over verbose `guard let foo = foo` to reduce visual clutter
+    - shorthand_optional_binding
+    # We should never force unwrap in production code because it will crash the app
+    - force_unwrapping
+    # We should avoid more than 2 levels of nested conditionals because it makes the code harder to read and understand
+    - nesting
+
+# TODO: Add severity overrides for "error" when we update our swiftlint config
+# Severity overrides — all set to error so lint fails on violations
+# shorthand_optional_binding:
+#     severity: error
+# force_unwrapping:
+#     severity: error
+# nesting:
+#     severity: error
+# # Don't add unnecessary parentheses to control statements
+# control_statement:
+#     severity: error

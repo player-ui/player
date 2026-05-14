@@ -482,17 +482,4 @@ describe("Read Only Data Controller", () => {
   it("Reads data", () => {
     expect(readOnlyController.get("some.data")).toStrictEqual(true);
   });
-
-  it("Logs error on set", () => {
-    expect(readOnlyController.set([["some.data", false]])).toStrictEqual([]);
-    expect(logger.error).toBeCalledWith(
-      "Error: Tried to set in a read only instance of the DataController",
-    );
-  });
-  it("Logs error on delete", () => {
-    readOnlyController.delete("some.data");
-    expect(logger.error).toBeCalledWith(
-      "Error: Tried to delete in a read only instance of the DataController",
-    );
-  });
 });

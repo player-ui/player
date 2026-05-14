@@ -1,4 +1,4 @@
-declare module '*.d.ts' {
+declare module "*.d.ts" {
   const type: string;
   export default type;
 }

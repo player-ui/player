@@ -1,4 +1,4 @@
-import type { DSLFlow } from "@player-tools/dsl";
+import type { DSLFlow } from "@player-lang/react-dsl";
 
 // This is not a proper DSL flow. However, proper DSL will catch the invalid expression
 // before the test does.
@@ -18,10 +18,10 @@ const flow: DSLFlow = {
               asset: {
                 id: "action-good-label",
                 type: "text",
-                value: "End the flow (success)"
-              }
-            }
-          }
+                value: "End the flow (success)",
+              },
+            },
+          },
         },
         {
           asset: {
@@ -32,13 +32,13 @@ const flow: DSLFlow = {
               asset: {
                 id: "action-bad-label",
                 type: "text",
-                value: "End the flow (error)"
-              }
-            }
-          }
-        }
-      ]
-    }
+                value: "End the flow (error)",
+              },
+            },
+          },
+        },
+      ],
+    },
   ],
   data: {},
   navigation: {

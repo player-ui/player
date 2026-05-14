@@ -3,7 +3,7 @@
 //  PlayerUI_Tests
 //
 //  Created by Harris Borawski on 4/5/21.
-//  Copyright © 2021 CocoaPods. All rights reserved.
+//  Copyright © 2021 Intuit. All rights reserved.
 //
 import Foundation
 import XCTest
@@ -178,15 +178,15 @@ class ManagedPlayer14Tests: XCTestCase {
 }
 
 class NeverLoad: FlowManager {
-    func next(_ result: CompletedState?) async throws -> NextState {
+    func next(result: CompletedState?) async throws -> String? {
         try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
-        return .flow("")
+        return ""
     }
 }
 
 class ErrorLoaded: FlowManager {
     init() {}
-    func next(_ result: CompletedState?) async throws -> NextState {
+    func next(result: CompletedState?) async throws -> String? {
         try await Task.sleep(nanoseconds: 500_000_000)
         throw PlayerError.jsConversionFailure
     }
@@ -194,17 +194,17 @@ class ErrorLoaded: FlowManager {
 
 class AlwaysLoaded: FlowManager {
     init() {}
-    func next(_ result: CompletedState?) async throws -> NextState {
-        return .flow(FlowData.COUNTER)
+    func next(result: CompletedState?) async throws -> String? {
+        return FlowData.COUNTER
     }
 }
 
 class ActionLoaded: FlowManager {
     init() {}
 
-    func next(_ result: CompletedState?) async throws -> NextState {
+    func next(result: CompletedState?) async throws -> String? {
         try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
-        return .flow(FlowData.flowAction)
+        return FlowData.flowAction
     }
 }
 

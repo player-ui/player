@@ -80,7 +80,7 @@ The end state represents a completion of a flow. It contains an optional `outcom
 
 ### `EXTERNAL`
 
-The external state represents a state that can't be resolved by Player itself -- it defers resolution of the transition value to the application. This is typically used in conjunction with the `ExternalActionPlugin` in order to wire up the proper handler that can process these values.
+The external state represents a state that can't be resolved by Player itself -- it defers resolution of the transition value to the application. This is typically used in conjunction with the `ExternalStatePlugin` in order to wire up the proper handler that can process these values.
 
 Similar to the view node, external states contain a `ref` to describe the external state type:
 

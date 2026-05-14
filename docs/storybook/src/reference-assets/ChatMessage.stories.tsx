@@ -9,7 +9,5 @@ export default meta;
 
 export const Basic = createDSLStory(
   () =>
-    import(
-      "!!raw-loader!@player-ui/mocks/chat-message/chat-message-basic.tsx"
-    ),
+    import("!!raw-loader!@player-ui/mocks/chat-message/chat-message-basic.tsx"),
 );

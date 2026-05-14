@@ -29,7 +29,7 @@ import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.lifecycle.fail
 import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import com.intuit.playerui.core.managed.AsyncFlowIterator
+import com.intuit.playerui.core.managed.FlowManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +47,8 @@ import kotlinx.coroutines.plus
  * including hooking the player up to the fragment lifecycle.
  *
  * Subclasses will need to provide a [PlayerViewModel] implementation,
- * which requires an [AsyncFlowIterator]. For pre-defined flow use case,
- * the subclass can use the [AsyncFlowIterator] pseudo constructor
+ * which requires a [FlowManager]. For pre-defined flow use case,
+ * the subclass can use the [FlowManager] pseudo constructor
  * for convenience.
  *
  * // TODO: Check this

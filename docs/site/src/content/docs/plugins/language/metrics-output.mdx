@@ -4,13 +4,13 @@ title: Metrics Output Plugin
 
 import { PackageManagers } from "starlight-package-managers";
 
-Generate a JSON file of metrics using `@player-tools/metrics-output-plugin`. The plugin consumes diagnostics from LSP plugins and produces a single JSON file with per-file metrics and optional project-level metadata.
+Generate a JSON file of metrics using `@player-lang/metrics-output-plugin`. The plugin consumes diagnostics from LSP plugins and produces a single JSON file with per-file metrics and optional project-level metadata.
 
 ## Usage
 
 Install the plugin:
 
-<PackageManagers pkg="@player-tools/metrics-output-plugin" />
+<PackageManagers pkg="@player-lang/metrics-output-plugin" />
 
 ### Basic Configuration
 
@@ -18,7 +18,7 @@ Use `fileName` and `outputDir` to configure where the JSON file is written, and 
 
 ```js
 [
-  "@player-tools/metrics-output-plugin",
+  "@player-lang/metrics-output-plugin",
   {
     outputDir: "dist", // default: current dir
     fileName: "metrics", // default: metrics
@@ -49,7 +49,7 @@ features: (diagnostics) => extractByData(SOURCE_TYPE_SYMBOL, diagnostics)
 import {
   extractFromDiagnostics,
   extractByData,
-} from "@player-tools/metrics-output-plugin";
+} from "@player-lang/metrics-output-plugin";
 
 export default {
   plugins: [
@@ -58,7 +58,7 @@ export default {
 
     // Metrics output consumes diagnostics and writes a single JSON file
     [
-      "@player-tools/metrics-output-plugin",
+      "@player-lang/metrics-output-plugin",
       {
         outputDir: "dist",
         fileName: "metrics",

@@ -1,16 +1,16 @@
-import { Flow } from '@player-ui/react';
-import { makeFlow } from '@player-ui/make-flow';
+import { Flow } from "@player-ui/react";
+import { makeFlow } from "@player-ui/make-flow";
 
 export const actionCountFlow = makeFlow({
   asset: {
-    id: 'add-action',
-    type: 'action',
-    exp: '{{count}} = {{count}} + 1',
+    id: "add-action",
+    type: "action",
+    exp: "{{count}} = {{count}} + 1",
     label: {
       asset: {
-        id: 'foo',
-        type: 'text',
-        value: 'Clicked {{count}} times',
+        id: "foo",
+        type: "text",
+        value: "Clicked {{count}} times",
       },
     },
   },
@@ -21,43 +21,43 @@ actionCountFlow.data = {
 };
 
 export const actionNavigationFlow: Flow = {
-  id: 'action-navigation-flow',
+  id: "action-navigation-flow",
   views: [
     {
-      id: 'view-1',
-      type: 'collection',
+      id: "view-1",
+      type: "collection",
       label: {
         asset: {
-          id: 'title',
-          type: 'text',
-          value: 'View 1',
+          id: "title",
+          type: "text",
+          value: "View 1",
         },
       },
       values: [
         {
           asset: {
-            id: 'action-prev',
-            type: 'action',
-            value: 'Prev',
+            id: "action-prev",
+            type: "action",
+            value: "Prev",
             label: {
               asset: {
-                id: 'action-prev-id',
-                type: 'text',
-                value: 'Go Back',
+                id: "action-prev-id",
+                type: "text",
+                value: "Go Back",
               },
             },
           },
         },
         {
           asset: {
-            id: 'action-next',
-            type: 'action',
-            value: 'Next',
+            id: "action-next",
+            type: "action",
+            value: "Next",
             label: {
               asset: {
-                id: 'action-next-id',
-                type: 'text',
-                value: 'Next',
+                id: "action-next-id",
+                type: "text",
+                value: "Next",
               },
             },
           },
@@ -65,40 +65,40 @@ export const actionNavigationFlow: Flow = {
       ],
     },
     {
-      id: 'view-2',
-      type: 'collection',
+      id: "view-2",
+      type: "collection",
       label: {
         asset: {
-          id: 'title',
-          type: 'text',
-          value: 'View 2',
+          id: "title",
+          type: "text",
+          value: "View 2",
         },
       },
       values: [
         {
           asset: {
-            id: 'action-prev',
-            type: 'action',
-            value: 'Prev',
+            id: "action-prev",
+            type: "action",
+            value: "Prev",
             label: {
               asset: {
-                id: 'action-prev-id',
-                type: 'text',
-                value: 'Go Back',
+                id: "action-prev-id",
+                type: "text",
+                value: "Go Back",
               },
             },
           },
         },
         {
           asset: {
-            id: 'action-next',
-            type: 'action',
-            value: 'Next',
+            id: "action-next",
+            type: "action",
+            value: "Next",
             label: {
               asset: {
-                id: 'action-next-id',
-                type: 'text',
-                value: 'End',
+                id: "action-next-id",
+                type: "text",
+                value: "End",
               },
             },
           },
@@ -107,54 +107,54 @@ export const actionNavigationFlow: Flow = {
     },
   ],
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
-        ref: 'view-1',
+        state_type: "VIEW",
+        ref: "view-1",
         transitions: {
-          Next: 'VIEW_2',
-          Prev: 'END',
+          Next: "VIEW_2",
+          Prev: "END",
         },
       },
       VIEW_2: {
-        state_type: 'VIEW',
-        ref: 'view-2',
+        state_type: "VIEW",
+        ref: "view-2",
         transitions: {
-          Next: 'END',
-          Prev: 'VIEW_1',
+          Next: "END",
+          Prev: "VIEW_1",
         },
       },
       END: {
-        state_type: 'END',
-        outcome: 'done',
+        state_type: "END",
+        outcome: "done",
       },
     },
   },
 };
 
 export const textFlow = makeFlow({
-  id: 'view-1',
-  type: 'collection',
+  id: "view-1",
+  type: "collection",
   values: [
     {
       asset: {
-        id: 'text-1',
-        type: 'text',
-        value: 'This is some text.',
+        id: "text-1",
+        type: "text",
+        value: "This is some text.",
       },
     },
     {
       asset: {
-        id: 'text-2',
-        type: 'text',
-        value: 'This is some text that is a link',
+        id: "text-2",
+        type: "text",
+        value: "This is some text that is a link",
         modifiers: [
           {
-            type: 'link',
+            type: "link",
             metaData: {
-              ref: 'https://intuit.com',
+              ref: "https://intuit.com",
             },
           },
         ],
@@ -164,65 +164,65 @@ export const textFlow = makeFlow({
 });
 
 export const collectionFlow = makeFlow({
-  id: 'view-1',
-  type: 'collection',
+  id: "view-1",
+  type: "collection",
   label: {
     asset: {
-      id: 'title',
-      type: 'text',
-      value: 'Collections are used to group assets.',
+      id: "title",
+      type: "text",
+      value: "Collections are used to group assets.",
     },
   },
   values: [
     {
       asset: {
-        id: 'text-1',
-        type: 'text',
-        value: 'This is the first item in the collection',
+        id: "text-1",
+        type: "text",
+        value: "This is the first item in the collection",
       },
     },
     {
       asset: {
-        id: 'text-2',
-        type: 'text',
-        value: 'This is the second item in the collection',
+        id: "text-2",
+        type: "text",
+        value: "This is the second item in the collection",
       },
     },
   ],
 });
 
 export const inputValidationFlow = makeFlow({
-  id: 'input-1',
-  type: 'input',
+  id: "input-1",
+  type: "input",
   label: {
     asset: {
-      id: 'input-1-label',
-      type: 'text',
-      value: 'Input with validation and formatting',
+      id: "input-1-label",
+      type: "text",
+      value: "Input with validation and formatting",
     },
   },
   note: {
     asset: {
-      id: 'input-1-note',
-      type: 'text',
-      value: 'It expects a positive integer',
+      id: "input-1-note",
+      type: "text",
+      value: "It expects a positive integer",
     },
   },
-  binding: 'foo.bar',
+  binding: "foo.bar",
 });
 
 inputValidationFlow.schema = {
   ROOT: {
     foo: {
-      type: 'FooType',
+      type: "FooType",
     },
   },
   FooType: {
     bar: {
-      type: 'IntegerPosType',
+      type: "IntegerPosType",
       validation: [
         {
-          type: 'required',
+          type: "required",
         },
       ],
     },
@@ -230,39 +230,39 @@ inputValidationFlow.schema = {
 };
 
 export const inputTransitionFlow = makeFlow({
-  id: 'input-validation',
-  type: 'info',
+  id: "input-validation",
+  type: "info",
   title: {
     asset: {
-      id: 'title',
-      type: 'text',
-      value: 'Some validations can prevent users from advancing',
+      id: "title",
+      type: "text",
+      value: "Some validations can prevent users from advancing",
     },
   },
   primaryInfo: {
     asset: {
-      id: 'primaryInfo',
-      type: 'collection',
+      id: "primaryInfo",
+      type: "collection",
       values: [
         {
           asset: {
-            id: 'input-1',
-            type: 'input',
+            id: "input-1",
+            type: "input",
             label: {
               asset: {
-                id: 'input-1-label',
-                type: 'text',
-                value: 'Input with validation and formatting',
+                id: "input-1-label",
+                type: "text",
+                value: "Input with validation and formatting",
               },
             },
             note: {
               asset: {
-                id: 'input-1-note',
-                type: 'text',
-                value: 'It expects a positive integer',
+                id: "input-1-note",
+                type: "text",
+                value: "It expects a positive integer",
               },
             },
-            binding: 'foo.bar',
+            binding: "foo.bar",
           },
         },
       ],
@@ -271,13 +271,13 @@ export const inputTransitionFlow = makeFlow({
   actions: [
     {
       asset: {
-        id: 'next-action',
-        value: 'Next',
-        type: 'action',
+        id: "next-action",
+        value: "Next",
+        type: "action",
         label: {
-          id: 'next-action-label',
-          type: 'text',
-          value: 'Continue',
+          id: "next-action-label",
+          type: "text",
+          value: "Continue",
         },
       },
     },
@@ -287,25 +287,25 @@ export const inputTransitionFlow = makeFlow({
 inputTransitionFlow.schema = inputValidationFlow.schema;
 
 export const infoFlow = makeFlow({
-  id: 'info-view',
-  type: 'info',
+  id: "info-view",
+  type: "info",
   title: {
     asset: {
-      id: 'info-title',
-      type: 'text',
-      value: 'View Title',
+      id: "info-title",
+      type: "text",
+      value: "View Title",
     },
   },
   actions: [
     {
       asset: {
-        id: 'next-action',
-        value: 'Next',
-        type: 'action',
+        id: "next-action",
+        value: "Next",
+        type: "action",
         label: {
-          id: 'next-action-label',
-          type: 'text',
-          value: 'Continue',
+          id: "next-action-label",
+          type: "text",
+          value: "Continue",
         },
       },
     },
@@ -313,43 +313,43 @@ export const infoFlow = makeFlow({
 });
 
 export const imageFlow = makeFlow({
-  id: 'image-basic',
-  type: 'image',
+  id: "image-basic",
+  type: "image",
   metaData: {
-    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
+    ref: "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png",
   },
 });
 
 export const imageCaptionFlow = makeFlow({
-  id: 'image-caption',
-  type: 'image',
+  id: "image-caption",
+  type: "image",
   metaData: {
-    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
+    ref: "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png",
   },
   caption: {
     asset: {
-      id: 'image-caption',
-      type: 'text',
-      value: 'Image caption',
+      id: "image-caption",
+      type: "text",
+      value: "Image caption",
     },
   },
 });
 
 export const imageAccessibilityFlow = makeFlow({
-  id: 'image-accessibility',
-  type: 'image',
+  id: "image-accessibility",
+  type: "image",
   metaData: {
-    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
-    accessibility: 'This is accessibility text for an image',
+    ref: "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png",
+    accessibility: "This is accessibility text for an image",
   },
-  placeholder: 'This is placeholder text for an image',
+  placeholder: "This is placeholder text for an image",
 });
 
 export const imagePlaceholderFlow = makeFlow({
-  id: 'image-placeholder',
-  type: 'image',
+  id: "image-placeholder",
+  type: "image",
   metaData: {
-    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
+    ref: "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png",
   },
-  placeholder: 'This is placeholder text for an image',
+  placeholder: "This is placeholder text for an image",
 });

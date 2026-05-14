@@ -7,7 +7,6 @@ main_deps = [
     "//jvm/hermes:hermes-android",
     "//jvm/utils",
     "//plugins/reference-assets/android",
-    "//plugins/common-types/jvm",
     "//tools/mocks:jar",
 
     artifact("androidx.navigation:navigation-ui-ktx"),
@@ -24,6 +23,7 @@ test_deps = [
     artifact("androidx.test.espresso:espresso-intents"),
     artifact("androidx.test.ext:junit-ktx"),
     artifact("androidx.compose.ui:ui-test-junit4"),
+    artifact("com.google.guava:guava"),
 ]
 
 kt_android(

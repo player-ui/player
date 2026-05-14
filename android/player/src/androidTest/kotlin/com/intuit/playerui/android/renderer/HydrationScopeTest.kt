@@ -6,6 +6,7 @@ import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.utils.waitForCondition
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
@@ -143,15 +144,5 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
 
     private fun waitForCompleted(count: Int = 5, delay: Long = 500) {
         waitForCondition(count, delay) { completed }
-    }
-
-    private fun waitForCondition(
-        count: Int = 5,
-        delay: Long = 500,
-        conditions: () -> Boolean = { true },
-    ) {
-        var counter = 0
-        while (!conditions() && counter++ < count) runBlockingTest { delay(delay) }
-        assertTrue(conditions())
     }
 }

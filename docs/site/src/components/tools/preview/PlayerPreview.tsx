@@ -56,40 +56,39 @@ export default function PlayerPreview() {
   return (
     <div className="grid grid-cols-2 gap-8 py-4">
       <div>
-        <h3 className="mb-2" style={{marginTop: "1rem"}}>Content</h3>
+        <h3 className="mb-2" style={{ marginTop: "1rem" }}>
+          Content
+        </h3>
       </div>
       <div>
         <h3 className="mb-2">Player View</h3>
       </div>
       <div>
         <Editor
-            height="90vh"
-            width="100%"
-            language="typescript"
-            theme={`vs-${theme}`}
-            value={JSON.stringify(currentFlow, null, 2)}
-            path="flow.tsx"
-            keepCurrentModel={true}
-            options={{
-              quickSuggestions: true,
-              suggestOnTriggerCharacters: true,
-              parameterHints: {
-                enabled: true,
-              },
-              readOnly: true
-            }}
-          />
+          height="90vh"
+          width="100%"
+          language="typescript"
+          theme={`vs-${theme}`}
+          value={JSON.stringify(currentFlow, null, 2)}
+          path="flow.tsx"
+          keepCurrentModel={true}
+          options={{
+            quickSuggestions: true,
+            suggestOnTriggerCharacters: true,
+            parameterHints: {
+              enabled: true,
+            },
+            readOnly: true,
+          }}
+        />
       </div>
       <div>
         {completed && <div> Done with demo </div>}
-          {!completed && (
-            <React.Suspense fallback={<div> Loading... </div>}>
-              <ManagedPlayer
-                manager={flowManager}
-                {...config}
-              />
-            </React.Suspense>
-          )}
+        {!completed && (
+          <React.Suspense fallback={<div> Loading... </div>}>
+            <ManagedPlayer manager={flowManager} {...config} />
+          </React.Suspense>
+        )}
       </div>
     </div>
   );

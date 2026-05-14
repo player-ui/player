@@ -20,13 +20,15 @@ compile_mocks(
         "info",
         "input",
         "text",
-        "chat-message",
+        "chat-message"
     ],
     dsl_config = ":dsl_config",
     data = [
         ":node_modules/@player-ui/reference-assets-cli-preset",
         ":node_modules/@player-ui/reference-assets-plugin-components",
-    ]
+    ],
+    cli = "@player-cli/cli",
+    dsl_package = "@player-lang/react-dsl"
 )
 
 filegroup(

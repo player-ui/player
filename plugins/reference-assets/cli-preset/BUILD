@@ -11,7 +11,7 @@ vitest_config(name = "vitest_config")
 js_pipeline(
     package_name = "@player-ui/reference-assets-cli-preset",
     peer_deps = [
-        "//:node_modules/@player-tools/cli",
+        "//:node_modules/@player-cli/cli",
     ],
     deps = [
         ":node_modules/@player-ui/reference-assets-plugin",

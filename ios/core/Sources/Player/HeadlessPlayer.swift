@@ -7,9 +7,7 @@
 
 import Foundation
 import JavaScriptCore
-#if SWIFT_PACKAGE
 import PlayerUILogger
-#endif
 
 // MARK: PlayerError
 
@@ -55,6 +53,9 @@ public protocol CoreHooks {
 
     /// Fired when the DataController changes
     var dataController: Hook<DataControllerType> { get }
+
+    /// Fired when the ErrorController changes
+    var errorController: Hook<ErrorController> { get }
 
     /// Fired when the state changes
     var state: Hook<BaseFlowState> { get }
@@ -227,6 +228,17 @@ public extension HeadlessPlayer {
         jsPlayerReference?.invokeMethod("registerPlugin", withArguments: [plugin.pluginRef as Any])
     }
 
+    /// Registers a NativePlugin with player after instantiation
+    /// For JSBasePlugin instances, delegates to the typed overload; for other NativePlugins, calls apply directly
+    /// - Parameter plugin: The plugin to register
+    func registerPlugin(_ plugin: NativePlugin) {
+        if let jsPlugin = plugin as? JSBasePlugin {
+            registerPlugin(jsPlugin)
+        } else {
+            plugin.apply(player: self)
+        }
+    }
+
     /**
      Starts Player for the given flow
      - parameters:
@@ -235,7 +247,6 @@ public extension HeadlessPlayer {
      */
     func start(flow: String, completion: @escaping (Result<CompletedState, PlayerError>) -> Void) {
         // declare these variables outside and reference them inside the errorHandler to prevent retain cycle
-        let playerRef = jsPlayerReference
         let loggerRef = logger
 
         let promiseHandler: @convention(block) (JSValue?) -> Void = { completedState in
@@ -246,9 +257,10 @@ public extension HeadlessPlayer {
             }
             completion(.success(result))
         }
-        let errorHandler: @convention(block) (JSValue?) -> Void = { _ in
+        let errorHandler: @convention(block) (JSValue?) -> Void = { [weak jsPlayerReference] _ in
             guard
-                let result = playerRef?.getState() as? ErrorState else {
+                let playerRef = jsPlayerReference,
+                let result = playerRef.getState() as? ErrorState else {
                 return completion(.failure(PlayerError.jsConversionFailure))
             }
 
@@ -258,7 +270,7 @@ public extension HeadlessPlayer {
 
         // Ensure these get created because otherwise we will never know when the flow ends/errors
         guard
-            let context = playerRef?.context,
+            let context = jsPlayerReference?.context,
             let flowObject = context.evaluateScript("(\(flow))"),
             !flowObject.isUndefined,
             let callback = JSValue(object: promiseHandler, in: context),
@@ -268,7 +280,7 @@ public extension HeadlessPlayer {
         }
 
         // Should not be possible due to fatalError in constructor, but just for handling optionals safely
-        guard let player = playerRef else { return completion(.failure(PlayerError.playerNotInstantiated)) }
+        guard let player = jsPlayerReference else { return completion(.failure(PlayerError.playerNotInstantiated)) }
         player
             .invokeMethod("start", withArguments: [flowObject])
             .invokeMethod("then", withArguments: [callback])
@@ -290,10 +302,11 @@ public extension HeadlessPlayer {
         - context: The context to attach the exception handler to
      */
     private func attachExceptionHandler(to context: JSContext) {
+        let loggerRef = logger
         context.exceptionHandler = { (_: JSContext!, value: JSValue!) in
             let stacktrace = value.objectForKeyedSubscript("stack").toString()
             let moreInfo = "in method \(String(describing: stacktrace))"
-            logger.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
+            loggerRef.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
         }
     }
 
@@ -314,16 +327,9 @@ public protocol WithSymbol {
     static var symbol: String { get }
 }
 
-// Needed to reference the resource bundle, can't use a protocol for referencing
-internal class ResourceBundleShim {}
-
 internal extension JSContext {
     var coreBundle: URL? {
-        #if SWIFT_PACKAGE
         return ResourceUtilities.urlForFile(name: "Player.native", ext: "js", bundle: Bundle.module)
-        #else
-        return ResourceUtilities.urlForFile(name: "Player.native", ext: "js", bundle: Bundle(for: ResourceBundleShim.self), pathComponent: "PlayerUI.bundle")
-        #endif
     }
     /// Loads the core player bundle into the give JSContext
     func loadCore() {

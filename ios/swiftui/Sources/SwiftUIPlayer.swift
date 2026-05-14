@@ -9,11 +9,8 @@ import SwiftUI
 import JavaScriptCore
 import Combine
 import SwiftHooks
-
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUILogger
-#endif
 
 /**
  A `HeadlessPlayer` implementation that renders itself as a SwiftUI View
@@ -74,13 +71,15 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             self.player = playerValue
             self.flow = flow
             self.hooks = hooks
-            DispatchQueue.main.async { self.result = nil }
+            DispatchQueue.main.async { [weak self] in
+                self?.result = nil 
+            }
 
             for plugin in allPlugins { plugin.apply(player: player) }
             registry.partialMatchRegistry = partialMatchPlugin
 
-            hooks.viewController.tap { [weak self] controller in
-                guard let self = self, self.player == playerValue else { return }
+            hooks.viewController.tap { [weak self, weak playerValue] controller in
+                guard let self, let playerValue, self.player == playerValue else { return }
                 self.onViewController(controller)
             }
 
@@ -93,26 +92,41 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 return
             }
 
-            player.start(flow: flow) { [weak self] (result) in
-                guard let self = self, self.player == playerValue else { return }
-                DispatchQueue.main.async { self.result = result }
+            player.start(flow: flow) { [weak self, weak playerValue] (result) in
+                guard let self, let playerValue, self.player == playerValue else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.result = result 
+                }
             }
         }
 
         /// Unload the context. This will release the current javascript player/context and clear the current
-        /// result.
+        /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
+        /// by clearing the exceptionHandler and any exported objects on the context.
         public func unload() {
-            player = nil
-            hooks = nil
-            flow = nil
-            DispatchQueue.main.async { self.result = nil }
+            // ObjC property accessors (e.g. JSValue.context) return autoreleased
+            // objects. Without an explicit pool, those temporaries prevent the
+            // JSContext from deallocating until the next run-loop drain.
+            autoreleasepool {
+                if let ctx = player?.context {
+                    ctx.exceptionHandler = nil
+                    ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
+                    JSGarbageCollect(ctx.jsGlobalContextRef)
+                }
+                // Break plugin → JSContext/JSValue references
+                partialMatchPlugin.pluginRef = nil
+                partialMatchPlugin.context = nil
+                // Release the JS player instance and all hook JSValues
+                player = nil
+                hooks = nil
+                flow = nil
+                // Release InProgressState which holds PlayerControllers (JSValues)
+                state = nil
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.result = nil 
+             }
             registry.resetView()
-        }
-
-        /// Clear the exceptionHandler of the context to remove reference to the logger
-        /// should be called when ManagedPlayer gets tore down
-        public func clearExceptionHandler() {
-            player?.context.exceptionHandler = nil
         }
 
         /// Returns `player` but asserts that it is not nil. Used from methods that should not be called
@@ -128,9 +142,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             - viewController: The new ViewController instance
          */
         private func onViewController(_ viewController: ViewController) {
-            let playerValue = expectedPlayer
-            viewController.hooks.view.tap { [weak self] view in
-                guard let self = self, self.player == playerValue else { return }
+            viewController.hooks.view.tap { [weak self, weak expectedPlayer] view in
+                guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
                 self.onView(view)
             }
         }
@@ -141,10 +154,9 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             - view: The new View in the ViewController
          */
         private func onView(_ view: PlayerView) {
-            let playerValue = expectedPlayer
-            view.hooks.onUpdate.tap { [weak self] value in
+            view.hooks.onUpdate.tap { [weak self, weak expectedPlayer] value in
                 Task { @MainActor [weak self] in
-                    guard let self = self, self.player == playerValue else { return }
+                    guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
                     self.onUpdate(value)
                 }
             }
@@ -160,7 +172,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             do {
                 try registry.decode(value: value)
             } catch {
-                (state as? InProgressState)?.fail(PlayerError.unknownResponse(error))
+                (state as? InProgressState)?.controllers?.error.captureError(error: error)
             }
         }
     }
@@ -281,6 +293,9 @@ public struct SwiftUIPlayerHooks: CoreHooks {
     /// Fired when the DataController changes
     public var dataController: Hook<DataController>
 
+    /// Fired when the ErrorController changes
+    public var errorController: Hook<ErrorController>
+
     /// Fired when the state changes
     public var state: Hook<BaseFlowState>
 
@@ -298,6 +313,7 @@ public struct SwiftUIPlayerHooks: CoreHooks {
         flowController = Hook<FlowController>(baseValue: player, name: "flowController")
         viewController = Hook<ViewController>(baseValue: player, name: "viewController")
         dataController = Hook<DataController>(baseValue: player, name: "dataController")
+        errorController = Hook<ErrorController>(baseValue: player, name: "errorController")
         state = Hook<BaseFlowState>(baseValue: player, name: "state")
         view = SyncWaterfallHook<AnyView>()
         transition = SyncBailHook<Void, PlayerViewTransition>()
@@ -381,4 +397,4 @@ public struct PlayerViewTransition: Equatable {
     }
 }
 
-extension InProgressState: ObservableObject {}
+extension InProgressState: @retroactive ObservableObject {}
