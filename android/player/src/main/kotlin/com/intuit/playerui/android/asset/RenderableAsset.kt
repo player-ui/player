@@ -274,11 +274,8 @@ public abstract class RenderableAsset<Data>(
     private fun CoroutineScope.inflateChild(child: RenderableAsset<*>, container: ViewGroup) {
         player.asyncHydrationTrackerPlugin?.preTrackChild(child)
         launch {
-            try {
-                val view = child.render()
-                withContext(Dispatchers.Main) { view into container }
-            } catch (_: CancellationException) {
-            }
+            val view = child.render()
+            withContext(Dispatchers.Main) { view into container }
         }
     }
 
