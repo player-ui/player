@@ -33,7 +33,6 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName

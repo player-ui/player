@@ -86,7 +86,9 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
 
     @Test
     fun `Compose to Compose propagates textStyle via LocalTextStyle`() {
-        val asset = runBlocking { player.awaitFirstView(StyledNestedComposableAsset.styledComposeChildFlow) } as? StyledNestedComposableAsset
+        val asset = runBlocking {
+            player.awaitFirstView(StyledNestedComposableAsset.styledComposeChildFlow)
+        } as? StyledNestedComposableAsset
         assertNotNull("Expected asset from flow", asset)
         val data = runBlocking { asset!!.getData() }
 
@@ -105,7 +107,9 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
 
     @Test
     fun `Compose to Compose to XML view propagates xmlStyles through LocalContext`() {
-        val asset = runBlocking { player.awaitFirstView(StyledNestedComposableAsset.styledComposeToViewFlow) } as? StyledNestedComposableAsset
+        val asset = runBlocking {
+            player.awaitFirstView(StyledNestedComposableAsset.styledComposeToViewFlow)
+        } as? StyledNestedComposableAsset
         assertNotNull("Expected asset from flow", asset)
         val data = runBlocking { asset!!.getData() }
 

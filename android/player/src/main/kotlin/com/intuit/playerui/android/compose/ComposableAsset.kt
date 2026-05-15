@@ -23,7 +23,6 @@ import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withStyles
@@ -31,8 +30,6 @@ import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.state.inProgressState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlin.collections.emptyList
 import kotlin.coroutines.cancellation.CancellationException
