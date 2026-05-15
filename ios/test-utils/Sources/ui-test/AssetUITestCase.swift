@@ -89,16 +89,14 @@ open class AssetUITestCase: XCTestCase {
         wait(for: [expectation], timeout: timeout)
     }
 
-    /**
-     Taps an element and verifies the expected outcome appears. Retries the tap if the
-     outcome doesn't show up (e.g. the JS action handler isn't wired yet due to async
-     SwiftUI binding).
-     - parameters:
-        - element: The XCUIElement to tap
-        - expectedOutcome: The XCUIElement expected to appear after a successful tap
-        - timeout: How long to wait for the outcome after each tap
-        - retries: Maximum number of tap attempts
-     */
+    /// Taps an element and verifies the expected outcome appears. Retries the tap if the
+    /// outcome doesn't show up (e.g. the JS action handler isn't wired yet due to async
+    /// SwiftUI binding).
+    /// - parameters:
+    ///    - element: The XCUIElement to tap
+    ///    - expectedOutcome: The XCUIElement expected to appear after a successful tap
+    ///    - timeout: How long to wait for the outcome after each tap
+    ///    - retries: Maximum number of tap attempts
     public func tapAndAssertElementAppears(
         _ element: XCUIElement,
         expectedOutcome: XCUIElement,
