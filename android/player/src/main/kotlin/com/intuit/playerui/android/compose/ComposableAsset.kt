@@ -25,7 +25,6 @@ import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
-import com.intuit.playerui.android.withStyles
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.state.inProgressState
@@ -131,8 +130,9 @@ public abstract class ComposableAsset<Data>(
         val childAsset = this
         AndroidView(factory = ::FrameLayout, modifier) { container ->
             this@ComposableAsset.hydrationScope.inflate(
-                childAsset.assetContext.withStyles(styles).build(),
+                childAsset,
                 container,
+                styles,
             )
         }
     }
