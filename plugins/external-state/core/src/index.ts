@@ -5,9 +5,14 @@ import type {
   PlayerFlowState,
   NavigationFlowState,
   NavigationFlowExternalState,
+  ErrorController,
 } from "@player-ui/player";
 import { Registry } from "@player-ui/partial-match-registry";
 import { ExternalStatePluginSymbol } from "./symbols.js";
+import { ExternalStateError } from "./ExternalStateError.js";
+
+export { ExternalStateError } from "./ExternalStateError.js";
+export type { ExternalStateErrorMetadata } from "./ExternalStateError.js";
 
 export type ExternalStateHandlerMatch = Record<string, unknown>;
 
@@ -60,6 +65,11 @@ export class ExternalStatePlugin implements PlayerPlugin {
    */
   private readonly handlers: ExternalStateHandler[];
 
+  /** The error controller to use for thhis plugin.
+   * Only the first instance of the plugin should tap the error controller hook.
+   */
+  private errorController?: ErrorController;
+
   /** Creates a new ExternalStatePlugin */
   constructor(handlers: ExternalStateHandler[]) {
     this.handlers = handlers;
@@ -73,6 +83,10 @@ export class ExternalStatePlugin implements PlayerPlugin {
     if (!isFirstInstance) {
       return;
     }
+
+    player.hooks.errorController.tap(this.name, (errorController) => {
+      this.errorController = errorController;
+    });
 
     player.hooks.flowController.tap(this.name, (flowController) => {
       flowController.hooks.flow.tap(this.name, (flow) => {
@@ -88,26 +102,39 @@ export class ExternalStatePlugin implements PlayerPlugin {
           ) {
             try {
               const handler = this.registry?.get(toState.value);
-              const transitionValue = await handler?.(
+
+              if (!handler) {
+                this.errorController?.captureError(
+                  ExternalStateError.missingHandler(toState.value.ref),
+                );
+                return;
+              }
+
+              const transitionValue = await handler(
                 toState.value,
                 currentState.controllers,
               );
 
-              if (transitionValue !== undefined) {
-                const latestState = player.getState();
+              if (!transitionValue) {
+                this.errorController?.captureError(
+                  ExternalStateError.missingTransitionValue(toState.value.ref),
+                );
+                return;
+              }
 
-                // Ensure the Player is still in the same state after waiting for transitionValue
-                if (
-                  isInProgress(latestState) &&
-                  latestState.controllers.flow.current?.currentState?.name ===
-                    toState.name
-                ) {
-                  latestState.controllers.flow.transition(transitionValue);
-                } else {
-                  player.logger.warn(
-                    `External state resolved with [${transitionValue}], but Player already navigated away from [${toState.name}]`,
-                  );
-                }
+              const latestState = player.getState();
+
+              // Ensure the Player is still in the same state after waiting for transitionValue
+              if (
+                isInProgress(latestState) &&
+                latestState.controllers.flow.current?.currentState?.name ===
+                  toState.name
+              ) {
+                latestState.controllers.flow.transition(transitionValue);
+              } else {
+                player.logger.warn(
+                  `External state resolved with [${transitionValue}], but Player already navigated away from [${toState.name}]`,
+                );
               }
             } catch (error) {
               if (error instanceof Error) {

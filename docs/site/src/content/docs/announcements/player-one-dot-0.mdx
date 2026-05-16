@@ -449,12 +449,11 @@ support that.
 
 #### Missing handlers
 
-For now, If no handler matches an external state, the Player remains on that state and no
-transition occurs. Ensure every `EXTERNAL` state in your flow has a registered handler.
+The plugin leverages the new `ErrorController` to throw an `ExternalStateError` (`type: "EXTERNAL-STATE"`) instead of silently stalling the flow. Flows can recover via `errorTransitions`. These are the cases that will trigger an error:
+1. When no handler matches (`metadata.reason: "missing-handler"`)
+2. When a handler returns no transition value (`metadata.reason: "missing-transition-value"`).
 
-:::note
-In a future release, unhandled external states will automatically report an error via the Error Controller.
-:::
+See the [Error Handling docs](/content/error-handling) for more on recovering from errors.
 
 ## Breaking Changes (Tooling)
 
