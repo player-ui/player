@@ -12,7 +12,9 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Test
 
 class InfoUITest : ComposeUITest("info") {
-    enum class Action(val label: String) {
+    enum class Action(
+        val label: String,
+    ) {
         Next("Next"),
         Dismiss("Dismiss"),
         Continue("Continue"),
@@ -23,10 +25,7 @@ class InfoUITest : ComposeUITest("info") {
             .check(matches(isDisplayed()))
     }
 
-    fun verifyAndProceed(
-        view: Int,
-        action: Action? = null,
-    ) {
+    fun verifyAndProceed(view: Int, action: Action? = null) {
         verifyView(view)
 
         action?.let {
