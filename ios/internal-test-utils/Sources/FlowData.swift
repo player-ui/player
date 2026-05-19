@@ -233,4 +233,120 @@ public struct FlowData {
     }
 
     """
+
+    public static let LONG_ACTION_CHAIN: String = """
+{
+  "id": "long-action-chain",
+  "views": [],
+  "data": {
+    "counter": 0,
+    "ready": false
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "ACTION_1",
+      "ACTION_1": {
+        "state_type": "ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ACTION_2"
+        }
+      },
+      "ACTION_2": {
+        "state_type": "ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ACTION_3"
+        }
+      },
+      "ACTION_3": {
+        "state_type": "ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ASYNC_1"
+        }
+      },
+      "ASYNC_1": {
+        "state_type": "ASYNC_ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ACTION_4"
+        },
+        "await": true
+      },
+      "ACTION_4": {
+        "state_type": "ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ACTION_5"
+        }
+      },
+      "ACTION_5": {
+        "state_type": "ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ASYNC_2"
+        }
+      },
+      "ASYNC_2": {
+        "state_type": "ASYNC_ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "ACTION_6"
+        },
+        "await": true
+      },
+      "ACTION_6": {
+        "state_type": "ACTION",
+        "exp": "{{counter}} = {{counter}} + 1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+
+    public static let END_STATE: String = """
+{
+  "id": "end-state-flow",
+  "views": [
+    {
+      "id": "action",
+      "type": "action",
+      "value": "next",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Tap"
+        }
+      }
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "ACTION_1",
+      "ACTION_1": {
+        "state_type": "ACTION",
+        "exp": "{{foo}}",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
 }

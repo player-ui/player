@@ -175,6 +175,146 @@ class ManagedPlayer14Tests: XCTestCase {
 
         ViewHosting.expel()
     }
+
+    @MainActor func testFlowCompletesSuccessfully() throws {
+        let isCompleted = expectation(description: "isCompleted")
+        let viewModel = ManagedPlayerViewModel(
+            manager: EndFlow(),
+            onComplete: { state in
+                XCTAssertEqual(state.status, .completed)
+                isCompleted.fulfill()
+            }
+        )
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin()],
+            context: .init(),
+            viewModel: viewModel,
+            handleScroll: false,
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        ViewHosting.host(view: player)
+
+        wait(for: [isCompleted], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    @MainActor func testMultiFlowCompletesSuccessfully() throws {
+        let isCompleted = expectation(description: "isCompleted")
+        let viewModel = ManagedPlayerViewModel(
+            manager: MultiEndFlow(),
+            onComplete: { state in
+                XCTAssertEqual(state.status, .completed)
+                isCompleted.fulfill()
+            }
+        )
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin()],
+            context: .init(),
+            viewModel: viewModel,
+            handleScroll: false,
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        ViewHosting.host(view: player)
+
+        wait(for: [isCompleted], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    @MainActor func testActionFlowCompletesSuccessfully() throws {
+        let isCompleted = expectation(description: "isCompleted")
+        let viewModel = ManagedPlayerViewModel(
+            manager: ActionFlowSequence(),
+            onComplete: { state in
+                XCTAssertEqual(state.status, .completed)
+                isCompleted.fulfill()
+            }
+        )
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin()],
+            context: .init(),
+            viewModel: viewModel,
+            handleScroll: false,
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        ViewHosting.host(view: player)
+
+        wait(for: [isCompleted], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    @MainActor func testLongChainFlowCompletesSuccessfully() throws {
+        let isCompleted = expectation(description: "isCompleted")
+        let viewModel = ManagedPlayerViewModel(
+            manager: LongChainFlow(),
+            onComplete: { state in
+                XCTAssertEqual(state.status, .completed)
+                isCompleted.fulfill()
+            }
+        )
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin()],
+            context: .init(),
+            viewModel: viewModel,
+            handleScroll: false,
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        ViewHosting.host(view: player)
+
+        wait(for: [isCompleted], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    @MainActor func testSlowMultiFlowCompletesSuccessfully() throws {
+        let isCompleted = expectation(description: "isCompleted")
+        let viewModel = ManagedPlayerViewModel(
+            manager: SlowMultiFlow(),
+            onComplete: { state in
+                XCTAssertEqual(state.status, .completed)
+                isCompleted.fulfill()
+            }
+        )
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin()],
+            context: .init(),
+            viewModel: viewModel,
+            handleScroll: false,
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        ViewHosting.host(view: player)
+
+        wait(for: [isCompleted], timeout: 10)
+
+        ViewHosting.expel()
+    }
 }
 
 class NeverLoad: FlowManager {
@@ -205,6 +345,71 @@ class ActionLoaded: FlowManager {
     func next(_ result: CompletedState?) async throws -> NextState {
         try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
         return .flow(FlowData.flowAction)
+    }
+}
+
+class EndFlow: FlowManager {
+    init() {}
+    func next(_ result: CompletedState?) async throws -> NextState {
+        if result != nil {
+            return .finished
+        }
+        return .flow(FlowData.END_STATE)
+    }
+}
+
+class MultiEndFlow: FlowManager {
+    var callCount = 0
+    init() {}
+    func next(_ result: CompletedState?) async throws -> NextState {
+        callCount += 1
+        switch callCount {
+        case 1, 2:
+            return .flow(FlowData.END_STATE)
+        default:
+            return .finished
+        }
+    }
+}
+
+class ActionFlowSequence: FlowManager {
+    var callCount = 0
+    init() {}
+    func next(_ result: CompletedState?) async throws -> NextState {
+        callCount += 1
+        switch callCount {
+        case 1:
+            return .flow(FlowData.actionFlow)
+        case 2:
+            return .flow(FlowData.END_STATE)
+        default:
+            return .finished
+        }
+    }
+}
+
+class LongChainFlow: FlowManager {
+    init() {}
+    func next(_ result: CompletedState?) async throws -> NextState {
+        if result != nil {
+            return .finished
+        }
+        return .flow(FlowData.LONG_ACTION_CHAIN)
+    }
+}
+
+class SlowMultiFlow: FlowManager {
+    var callCount = 0
+    init() {}
+    func next(_ result: CompletedState?) async throws -> NextState {
+        callCount += 1
+        try await Task.sleep(nanoseconds: 200_000_000)
+        switch callCount {
+        case 1, 2:
+            return .flow(FlowData.LONG_ACTION_CHAIN)
+        default:
+            return .finished
+        }
     }
 }
 
