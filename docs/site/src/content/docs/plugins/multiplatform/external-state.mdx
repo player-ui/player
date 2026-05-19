@@ -73,19 +73,18 @@ new ExternalStatePlugin([
 
 ## Error handling
 
-The plugin captures an `ExternalStateError` via the `ErrorController` in two cases instead
-of silently stalling the flow:
+The plugin captures an `ExternalStateError` (`type: "externalState"`) via the
+`ErrorController` in two cases instead of silently stalling the flow:
 
-- **No handler matches** — Player transitions to an `EXTERNAL` state with no registered
-  handler. `metadata.reason` is `"missing-handler"`.
-- **Handler returned no transition value** — a handler ran but returned `undefined` (or an
-  empty string). `metadata.reason` is `"missing-transition-value"`.
+- **`missing-handler`** — no registered handler matches the state's `ref`.
+- **`missing-transition-value`** — a handler ran but returned a falsy value
+  (`undefined` or `""`).
 
-In both cases the error has `type: "EXTERNAL-STATE"`, `severity: ERROR`, and
-`metadata.ref` set to the offending state's `ref`.
+`metadata.ref` is set to the offending state's `ref`. Recover via `errorTransitions` or by
+tapping `errorController.hooks.onError`; see [Error Handling](/content/error-handling).
 
-To learn more about how to handle these errors, take a look at the
-[Error Handling docs](/content/error-handling).
+Handlers that **throw** fail the flow directly and bypass the `ErrorController` —
+exceptions are treated as programmer errors, not recoverable content-shape issues.
 
 ## Installation
 

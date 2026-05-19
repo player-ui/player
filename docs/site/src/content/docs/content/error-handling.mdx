@@ -37,7 +37,7 @@ interface PlayerErrorMetadata {
 }
 ```
 
-The built-in error classes (`AssetRenderError`, `AsyncNodeError`, `ResolverError`) all implement this interface. For custom errors, extend `Error` and implement `PlayerErrorMetadata`:
+The built-in error classes (`AssetRenderError`, `AsyncNodeError`, `ResolverError`, `ExternalStateError`) all implement this interface. For custom errors, extend `Error` and implement `PlayerErrorMetadata`:
 
 ```typescript
 class MyPluginError extends Error implements PlayerErrorMetadata {

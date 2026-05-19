@@ -16,7 +16,7 @@ export class ExternalStateError
   extends Error
   implements PlayerErrorMetadata<ExternalStateErrorMetadata>
 {
-  readonly type: string = "EXTERNAL-STATE";
+  readonly type: string = "externalState";
   readonly severity: ErrorSeverity = ErrorSeverity.ERROR;
   readonly metadata: ExternalStateErrorMetadata;
 

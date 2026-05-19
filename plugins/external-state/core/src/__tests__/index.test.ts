@@ -325,10 +325,129 @@ test("only transitions if player still on this external state", async () => {
   ).toBe("EXT_2");
 });
 
+const flowWithErrorTransitions = {
+  id: "test-flow",
+  data: {},
+  views: [
+    {
+      id: "error-view",
+      type: "test",
+    },
+  ],
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "EXT_1",
+      errorTransitions: {
+        externalState: "ERROR_VIEW",
+      },
+      EXT_1: {
+        state_type: "EXTERNAL",
+        ref: "test-1",
+        transitions: { Next: "END_FWD" },
+      },
+      ERROR_VIEW: {
+        state_type: "VIEW",
+        ref: "error-view",
+        transitions: {},
+      },
+      END_FWD: {
+        state_type: "END",
+        outcome: "FWD",
+      },
+    },
+  },
+};
+
+test("missing handler error navigates via content errorTransitions", async () => {
+  const player = new Player({
+    plugins: [new ExternalStatePlugin([])],
+  });
+
+  player.start(flowWithErrorTransitions as Flow);
+
+  await waitFor(() => {
+    const state = player.getState() as InProgressState;
+    expect(state.controllers.flow.current?.currentState?.name).toBe(
+      "ERROR_VIEW",
+    );
+  });
+});
+
+test("missing transition value error navigates via content errorTransitions", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        { ref: "test-1", handlerFunction: () => undefined },
+      ]),
+    ],
+  });
+
+  player.start(flowWithErrorTransitions as Flow);
+
+  await waitFor(() => {
+    const state = player.getState() as InProgressState;
+    expect(state.controllers.flow.current?.currentState?.name).toBe(
+      "ERROR_VIEW",
+    );
+  });
+});
+
+test("missing handler error is observable via onError tap", async () => {
+  const onErrorSpy = vitest.fn().mockReturnValue(true);
+
+  const player = new Player({
+    plugins: [new ExternalStatePlugin([])],
+  });
+
+  player.hooks.errorController.tap("test", (ec) => {
+    ec.hooks.onError.tap("test", onErrorSpy);
+  });
+
+  player.start(externalFlow as Flow);
+
+  await waitFor(() => expect(onErrorSpy).toHaveBeenCalledOnce());
+
+  const error = onErrorSpy.mock.calls[0]?.[0] as ExternalStateError;
+  expect(error).toBeInstanceOf(ExternalStateError);
+  expect(error.type).toBe("externalState");
+  expect(error.metadata).toStrictEqual({
+    ref: "test-1",
+    reason: "missing-handler",
+  });
+});
+
+test("missing transition value error is observable via onError tap", async () => {
+  const onErrorSpy = vitest.fn().mockReturnValue(true);
+
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        { ref: "test-1", handlerFunction: () => undefined },
+      ]),
+    ],
+  });
+
+  player.hooks.errorController.tap("test", (ec) => {
+    ec.hooks.onError.tap("test", onErrorSpy);
+  });
+
+  player.start(externalFlow as Flow);
+
+  await waitFor(() => expect(onErrorSpy).toHaveBeenCalledOnce());
+
+  const error = onErrorSpy.mock.calls[0]?.[0] as ExternalStateError;
+  expect(error).toBeInstanceOf(ExternalStateError);
+  expect(error.metadata).toStrictEqual({
+    ref: "test-1",
+    reason: "missing-transition-value",
+  });
+});
+
 describe("ExternalStateError", () => {
   test("missingHandler has correct shape", () => {
     const error = ExternalStateError.missingHandler("my-ref");
-    expect(error.type).toBe("EXTERNAL-STATE");
+    expect(error.type).toBe("externalState");
     expect(error.metadata).toStrictEqual({
       ref: "my-ref",
       reason: "missing-handler",
@@ -340,7 +459,7 @@ describe("ExternalStateError", () => {
 
   test("missingTransitionValue has correct shape", () => {
     const error = ExternalStateError.missingTransitionValue("my-ref");
-    expect(error.type).toBe("EXTERNAL-STATE");
+    expect(error.type).toBe("externalState");
     expect(error.metadata).toStrictEqual({
       ref: "my-ref",
       reason: "missing-transition-value",
@@ -517,36 +636,6 @@ describe("edge cases", () => {
     expect(error.metadata).toStrictEqual({
       ref: "test-1",
       reason: "missing-handler",
-    });
-  });
-
-  test("registered handler returning undefined - calls captureError with missing-transition-value", async () => {
-    const captureSpy = vitest.fn().mockReturnValue(false);
-
-    const player = new Player({
-      plugins: [
-        new ExternalStatePlugin([
-          {
-            ref: "test-1",
-            handlerFunction: () => undefined,
-          },
-        ]),
-      ],
-    });
-
-    player.hooks.errorController.tap("test", (ec) => {
-      vitest.spyOn(ec, "captureError").mockImplementation(captureSpy);
-    });
-
-    player.start(externalFlow as Flow);
-
-    await waitFor(() => expect(captureSpy).toHaveBeenCalledOnce());
-
-    const error = captureSpy.mock.calls[0]?.[0] as ExternalStateError;
-    expect(error).toBeInstanceOf(ExternalStateError);
-    expect(error.metadata).toStrictEqual({
-      ref: "test-1",
-      reason: "missing-transition-value",
     });
   });
 });

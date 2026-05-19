@@ -94,7 +94,7 @@ Similar to the view node, external states contain a `ref` to describe the extern
 }
 ```
 
-Player will remain in this state until the external handler responds with a transition value to move the current state in the state machine.
+Player will remain in this state until the external handler responds with a transition value to move the current state in the state machine. If no handler matches or the handler returns no transition value, the `ExternalStatePlugin` reports an `ExternalStateError` through the `ErrorController` — see [External State](/plugins/multiplatform/external-state#error-handling).
 
 ### `FLOW`
 

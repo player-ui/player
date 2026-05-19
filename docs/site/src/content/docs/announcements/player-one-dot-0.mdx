@@ -449,11 +449,14 @@ support that.
 
 #### Missing handlers
 
-The plugin leverages the new `ErrorController` to throw an `ExternalStateError` (`type: "EXTERNAL-STATE"`) instead of silently stalling the flow. Flows can recover via `errorTransitions`. These are the cases that will trigger an error:
-1. When no handler matches (`metadata.reason: "missing-handler"`)
-2. When a handler returns no transition value (`metadata.reason: "missing-transition-value"`).
+The plugin now reports an `ExternalStateError` (`type: "externalState"`) through the new
+`ErrorController` instead of silently stalling the flow. Two failure modes:
 
-See the [Error Handling docs](/content/error-handling) for more on recovering from errors.
+1. No handler matches (`metadata.reason: "missing-handler"`)
+2. A handler ran but returned no transition value (`metadata.reason: "missing-transition-value"`)
+
+Flows can recover via `errorTransitions` or by tapping `errorController.hooks.onError`.
+See the [Error Handling docs](/content/error-handling).
 
 ## Breaking Changes (Tooling)
 
