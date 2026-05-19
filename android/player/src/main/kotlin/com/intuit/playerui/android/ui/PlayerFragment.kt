@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ProgressBar
-import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -16,7 +16,7 @@ import androidx.lifecycle.whenStarted
 import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.withContext
 
 /**
  * [Fragment] wrapper integration with the [AndroidPlayer]. Delegates
@@ -154,50 +153,48 @@ public abstract class PlayerFragment :
         playerViewModel.start()
     }
 
-    /** Default suspendable implementation of [handleAssetUpdate] */
+    /** Default implementation of [handleAssetUpdate] */
     @ExperimentalPlayerApi
-    protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset?, animateTransition: Boolean) {
+    protected open fun CoroutineScope.renderIntoPlayerCanvas(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         val startTime = System.currentTimeMillis()
-        val view = asset?.render(requireContext())?.let {
-            // unwrap if we know we have an async view stub, and just wait on the actual view
-            if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
-        }
+        val tracker = asset?.player?.asyncHydrationTrackerPlugin
 
-        view?.doOnLayout {
+        tracker?.hooks?.onHydrationComplete?.tap("renderIntoPlayerCanvas-timing") {
             playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
         }
 
-        // swap to main
-        withContext(Dispatchers.Main) {
-            if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
+        if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
 
-            animateTransition
-                .takeIf { it }
-                ?.let { binding.scrollContainer.scrollTo(0, 0) }
-                ?.let { buildTransitionAnimation() }
-                ?.let { view.transitionInto(binding.playerCanvas, it) }
-                ?: (view into binding.playerCanvas)
+        val context = requireContext()
+        val transition = if (animateTransition) buildTransitionAnimation() else null
+        if (transition != null) {
+            binding.scrollContainer.scrollTo(0, 0)
+            val offscreen = FrameLayout(context)
+            tracker?.hooks?.onHydrationComplete?.tap("renderIntoPlayerCanvas-transition") {
+                val child = offscreen.getChildAt(0)
+                child.transitionInto(binding.playerCanvas, transition)
+            }
+            asset?.run { renderInto(offscreen, context) }
+        } else {
+            asset?.run { renderInto(binding.playerCanvas, context) }
+                ?: run { null into binding.playerCanvas }
         }
     }
 
     /**
      * Handle [asset] updates from the [PlayerViewModel]. By default,
-     * this will invoke [RenderableAsset.render] with no additional
-     * styles and inject that into the view tree.
+     * this will invoke [RenderableAsset.renderInto] and inject that into the view tree.
      */
-    protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
+    protected open fun handleAssetUpdate(asset: RenderableAsset<*>?, animateTransition: Boolean) {
         renderingJob?.cancel("handling new update")
         renderingJob = lifecycleScope.launch {
             whenStarted {
-                // TODO: This'll go away when we can call a suspend version of this
-                withContext(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
-                    try {
-                        renderIntoPlayerCanvas(asset, animateTransition)
-                    } catch (exception: Exception) {
-                        if (exception is CancellationException) throw exception
-                        exception.printStackTrace()
-                        playerViewModel.fail("Error rendering asset", exception)
-                    }
+                try {
+                    renderIntoPlayerCanvas(asset, animateTransition)
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+                    exception.printStackTrace()
+                    playerViewModel.fail("Error rendering asset", exception)
                 }
             }
         }

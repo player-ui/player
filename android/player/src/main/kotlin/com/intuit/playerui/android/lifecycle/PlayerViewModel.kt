@@ -175,7 +175,7 @@ public open class PlayerViewModel(
         if (deferredPlayer.isCompleted) player.release()
     }
 
-    internal fun logRenderTime(asset: RenderableAsset, completionTime: Long) {
+    internal fun logRenderTime(asset: RenderableAsset<*>, completionTime: Long) {
         player.logger.debug("$asset with ID ${asset.asset.id} took ${completionTime}ms to render and display on screen")
     }
 
