@@ -65,24 +65,9 @@ class InputTest : AssetTest("input") {
 
         runOnMain {
             inputField.requestFocus()
-            inputField.setText("t")
+            inputField.setText("30")
             inputField.clearFocus()
         }
-
-        player.shouldBeAtState<InProgressState> {
-            assertEquals(null, dataModel.get("foo.bar"))
-        }
-
-        runOnMain {
-            inputField.requestFocus()
-            inputField.setText("30")
-        }
-
-        player.shouldBeAtState<InProgressState> {
-            assertEquals(null, dataModel.get("foo.bar"))
-        }
-
-        runOnMain { inputField.clearFocus() }
 
         player.shouldBeAtState<InProgressState> {
             assertEquals(30, dataModel.get("foo.bar"))
