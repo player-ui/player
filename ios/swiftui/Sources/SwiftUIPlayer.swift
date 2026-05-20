@@ -129,6 +129,12 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             registry.resetView()
         }
 
+        /// Clear the exceptionHandler of the context to remove reference to the logger
+        /// should be called when ManagedPlayer gets tore down
+        public func clearExceptionHandler() {
+            player?.context.exceptionHandler = nil
+        }
+
         /// Returns `player` but asserts that it is not nil. Used from methods that should not be called
         /// when we are unloaded.
         private var expectedPlayer: JSValue? {
