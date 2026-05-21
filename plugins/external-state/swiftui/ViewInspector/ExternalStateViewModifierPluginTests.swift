@@ -422,6 +422,211 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
 
         ViewHosting.expel()
     }
+
+    // MARK: - Error Handling with Error Controller
+
+    func testMissingHandlerNavigatesViaContentErrorTransitions() {
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [])
+
+        let player = SwiftUIPlayer(
+            flow: .flowWithErrorTransitions,
+            plugins: [ReferenceAssetsPlugin(), plugin],
+            result: Binding(get: {nil}, set: { (result) in
+                switch result {
+                case .success(let completed):
+                    XCTAssertEqual(completed.endState?.outcome, "ERROR")
+                    completionExpectation.fulfill()
+                case .failure:
+                    XCTFail("flow failed")
+                default:
+                    break
+                }
+            }), context: .init(), unloadOnDisappear: false
+        )
+
+        ViewHosting.host(view: player)
+
+        wait(for: [completionExpectation], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    func testMissingTransitionValueNavigatesViaContentErrorTransitions() {
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+            .init(
+                ref: "test-1",
+                handlerFunction: { (_, _, transition) in
+                    return AnyView(Text("External State").onAppear { transition("") })
+                }
+            )
+        ])
+
+        let player = SwiftUIPlayer(
+            flow: .flowWithErrorTransitions,
+            plugins: [ReferenceAssetsPlugin(), plugin],
+            result: Binding(get: {nil}, set: { (result) in
+                switch result {
+                case .success(let completed):
+                    XCTAssertEqual(completed.endState?.outcome, "ERROR")
+                    completionExpectation.fulfill()
+                case .failure:
+                    XCTFail("flow failed")
+                default:
+                    break
+                }
+            }), context: .init(), unloadOnDisappear: false
+        )
+
+        ViewHosting.host(view: player)
+
+        wait(for: [completionExpectation], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    func testMissingHandlerIsObservableViaOnErrorTap() {
+        let onErrorCalled = XCTestExpectation(description: "onError fired")
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [])
+
+        // SwiftUIPlayer starts the flow during init, so taps must be registered via a
+        // plugin's apply() rather than after construction — otherwise the errorController
+        // hook has already fired by the time the test could tap it.
+        let observer = TestPlugin { errorInfo in
+            XCTAssertEqual(errorInfo.type, .externalState)
+            XCTAssertEqual(errorInfo.metadata?["reason"] as? String, "missing-handler")
+            XCTAssertEqual(errorInfo.metadata?["ref"] as? String, "test-1")
+            onErrorCalled.fulfill()
+            return true // suppress default navigation
+        }
+
+        let player = SwiftUIPlayer(
+            flow: .basic,
+            plugins: [ReferenceAssetsPlugin(), plugin, observer],
+            result: Binding(get: {nil}, set: { _ in }),
+            context: .init(), unloadOnDisappear: false
+        )
+
+        ViewHosting.host(view: player)
+
+        wait(for: [onErrorCalled], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    func testMissingTransitionValueIsObservableViaOnErrorTap() {
+        let onErrorCalled = XCTestExpectation(description: "onError fired")
+        let plugin = ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
+            .init(
+                ref: "test-1",
+                handlerFunction: { (_, _, transition) in
+                    return AnyView(Text("External State").onAppear { transition("") })
+                }
+            )
+        ])
+
+        let observer = TestPlugin { errorInfo in
+            XCTAssertEqual(errorInfo.type, .externalState)
+            XCTAssertEqual(errorInfo.metadata?["reason"] as? String, "missing-transition-value")
+            XCTAssertEqual(errorInfo.metadata?["ref"] as? String, "test-1")
+            onErrorCalled.fulfill()
+            return true // suppress default navigation
+        }
+        
+        let player = SwiftUIPlayer(
+            flow: .basic,
+            plugins: [ReferenceAssetsPlugin(), plugin, observer],
+            result: Binding(get: {nil}, set: { _ in }),
+            context: .init(), unloadOnDisappear: false
+        )
+
+        ViewHosting.host(view: player)
+
+        wait(for: [onErrorCalled], timeout: 10)
+
+        ViewHosting.expel()
+    }
+}
+
+/// Registers an onError tap during `apply(player:)`, which runs before `SwiftUIPlayer`
+/// starts the flow. Tapping `player.hooks?.errorController` from the test body after
+/// construction is too late — the hook has already fired.
+private final class TestPlugin: NativePlugin {
+    let pluginName = "OnErrorObserver"
+    private let onError: (JSValueError) -> Bool
+
+    init(onError: @escaping (JSValueError) -> Bool) {
+        self.onError = onError
+    }
+
+    func apply<P>(player: P) where P: HeadlessPlayer {
+        player.hooks?.errorController.tap { [onError] errorController in
+            errorController.hooks.onError.tap { errorInfo in
+                onError(errorInfo)
+            }
+        }
+    }
+}
+
+private extension String {
+    // Use the basic externalFlow (no errorTransitions); the onError tap suppresses navigation.
+    static let basic = """
+    {
+      "id": "test-flow",
+      "data": {},
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "EXT_1",
+          "EXT_1": {
+            "state_type": "EXTERNAL",
+            "ref": "test-1",
+            "transitions": {
+              "Next": "END_FWD"
+            }
+          },
+          "END_FWD": {
+            "state_type": "END",
+            "outcome": "FWD"
+          }
+        }
+      }
+    }
+    """
+
+    /// Flow that declares a flow-level errorTransitions mapping for `externalState`,
+    /// routing missing-handler/missing-transition-value errors to `END_ERROR`.
+    static let flowWithErrorTransitions = """
+    {
+      "id": "test-flow",
+      "data": {},
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "EXT_1",
+          "errorTransitions": {
+            "externalState": "END_ERROR"
+          },
+          "EXT_1": {
+            "state_type": "EXTERNAL",
+            "ref": "test-1",
+            "transitions": {
+              "Next": "END_FWD"
+            }
+          },
+          "END_FWD": {
+            "state_type": "END",
+            "outcome": "FWD"
+          },
+          "END_ERROR": {
+            "state_type": "END",
+            "outcome": "ERROR"
+          }
+        }
+      }
+    }
+    """
 }
 
 extension InspectableSheet: @retroactive PopupPresenter {}

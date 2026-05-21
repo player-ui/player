@@ -18,6 +18,7 @@ export const ErrorTypes = {
   NETWORK: "network",
   PLUGIN: "plugin",
   RENDER: "render",
+  EXTERNAL_STATE: "externalState",
 } as const;
 
 /**

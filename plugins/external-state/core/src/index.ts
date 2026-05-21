@@ -156,7 +156,7 @@ export class ExternalStatePlugin implements PlayerPlugin {
         );
       }
     } catch (error) {
-      // Thrown errors are treated as purposefully unrecoverable: fail the flow rather than 
+      // Thrown errors are treated as purposefully unrecoverable: fail the flow rather than
       // routing through captureError.
       if (error instanceof Error) {
         currentState.fail(error);
@@ -168,9 +168,9 @@ export class ExternalStatePlugin implements PlayerPlugin {
    * Report an ExternalStateError via the errorController.
    */
   private reportError(player: Player, error: ExternalStateError): void {
-    // The compiler believes errorController could be nil, but in practice it should always 
-    // be set by the time this method runs. The logger fallback exists only as defense 
-    // against an unexpected lifecycle regression — if it ever fires, that's a bug to 
+    // The compiler believes errorController could be nil, but in practice it should always
+    // be set by the time this method runs. The logger fallback exists only as defense
+    // against an unexpected lifecycle regression — if it ever fires, that's a bug to
     // investigate, not normal operation.
     if (!this.errorController) {
       player.logger.error(

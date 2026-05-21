@@ -1,5 +1,5 @@
 import type { ErrorMetadata, PlayerErrorMetadata } from "@player-ui/player";
-import { ErrorSeverity } from "@player-ui/player";
+import { ErrorSeverity, ErrorTypes } from "@player-ui/player";
 
 export type ExternalStateErrorReason =
   | "missing-handler"
@@ -16,7 +16,7 @@ export class ExternalStateError
   extends Error
   implements PlayerErrorMetadata<ExternalStateErrorMetadata>
 {
-  readonly type: string = "externalState";
+  readonly type: string = ErrorTypes.EXTERNAL_STATE;
   readonly severity: ErrorSeverity = ErrorSeverity.ERROR;
   readonly metadata: ExternalStateErrorMetadata;
 

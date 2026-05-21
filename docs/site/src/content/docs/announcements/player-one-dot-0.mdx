@@ -3,6 +3,7 @@ title: Player 1.0
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
+import { Aside } from "@astrojs/starlight/components";
 
 ## 1.0!
 
@@ -454,6 +455,12 @@ The plugin now reports an `ExternalStateError` (`type: "externalState"`) through
 
 1. No handler matches (`metadata.reason: "missing-handler"`)
 2. A handler ran but returned no transition value (`metadata.reason: "missing-transition-value"`)
+
+<Aside type="caution" title="Behavior change">
+Any falsy return value from a handler (`undefined`, `""`, `0`, `null`) now triggers
+`missing-transition-value`. Previously only `undefined` was treated as "no transition";
+falsy values that used to silently stall the flow will now be reported.
+</Aside>
 
 Flows can recover via `errorTransitions` or by tapping `errorController.hooks.onError`.
 See the [Error Handling docs](/content/error-handling).
