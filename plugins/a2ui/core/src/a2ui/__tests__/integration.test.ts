@@ -1,7 +1,11 @@
 import { describe, expect, test, vitest } from "vitest";
-import { Player } from "../..";
-import type { InProgressState } from "../../types";
+import { Player } from "@player-ui/player";
+import type { InProgressState } from "@player-ui/player";
 import type { A2UISnapshot } from "../types";
+import { A2UIContentPlugin } from "../../plugins/a2ui-content-plugin";
+
+/** Construct a Player with the A2UI content adapter registered. */
+const a2uiPlayer = () => new Player({ plugins: [new A2UIContentPlugin()] });
 
 describe("Player.start with format: 'a2ui'", () => {
   test("renders a flat A2UI snapshot as a nested resolved view", async () => {
@@ -20,7 +24,7 @@ describe("Player.start with format: 'a2ui'", () => {
       ],
     };
 
-    const player = new Player();
+    const player = a2uiPlayer();
     player.start(snapshot, { format: "a2ui" });
 
     const started = player.getState() as InProgressState;
@@ -65,7 +69,7 @@ describe("Player.start with format: 'a2ui'", () => {
       ],
     };
 
-    const player = new Player();
+    const player = a2uiPlayer();
     const completedPromise = player.start(snapshot, { format: "a2ui" });
 
     const started = player.getState() as InProgressState;
@@ -98,7 +102,7 @@ describe("Player.start with format: 'a2ui'", () => {
       ],
     };
 
-    const player = new Player();
+    const player = a2uiPlayer();
     const completedPromise = player.start(snapshot, { format: "a2ui" });
 
     const started = player.getState() as InProgressState;
@@ -125,7 +129,7 @@ describe("Player.start with format: 'a2ui'", () => {
   });
 
   test("default format: 'player' path is untouched (regression)", async () => {
-    const player = new Player();
+    const player = a2uiPlayer();
     const completedPromise = player.start({
       id: "plain",
       views: [{ id: "v1", type: "text", value: "hi" }],

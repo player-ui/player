@@ -1,4 +1,4 @@
-import type { A2UISnapshot } from "@player-ui/player";
+import type { A2UISnapshot } from "@player-ui/a2ui-plugin";
 
 /**
  * Adapter flattens `action.event.name` into the asset's transition `value`.

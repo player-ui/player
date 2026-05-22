@@ -11,7 +11,7 @@
  */
 
 import type { Asset, Flow, NavigationFlow } from "@player-ui/types";
-import type { Logger } from "../logger";
+import type { Logger } from "@player-ui/player";
 import type {
   A2UIComponent,
   A2UIDynamicValue,

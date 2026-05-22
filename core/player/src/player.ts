@@ -28,10 +28,10 @@ import type {
   CompletedState,
   ErrorState,
   PlayerHooks,
+  ContentMeta,
+  StartOptions,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
-import { adaptA2UIToFlow } from "./a2ui";
-import type { A2UISnapshot, StartOptions } from "./a2ui";
 
 /**
 Variables injected at build time
@@ -125,6 +125,7 @@ export class Player {
     onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
+    transformContent: new SyncWaterfallHook<[unknown, ContentMeta]>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -497,13 +498,14 @@ export class Player {
   }
 
   public async start(
-    payload: Flow | A2UISnapshot,
+    payload: unknown,
     options?: StartOptions,
   ): Promise<CompletedState> {
-    const flow: Flow =
-      options?.format === "a2ui"
-        ? adaptA2UIToFlow(payload as A2UISnapshot, this.logger)
-        : (payload as Flow);
+    const meta: ContentMeta = {
+      format: options?.format ?? "player",
+      version: options?.version,
+    };
+    const flow = this.hooks.transformContent.call(payload, meta) as Flow;
     const ref = Symbol(flow?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */

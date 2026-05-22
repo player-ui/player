@@ -14,7 +14,7 @@
  * unchanged.
  */
 
-import type { Logger } from "../logger";
+import type { Logger } from "@player-ui/player";
 import type { Schema as SchemaType, Validation } from "@player-ui/types";
 import type { A2UICheck, A2UIComponent, A2UIDynamicValue } from "./types";
 import { bindingToSegments, pointerToBinding } from "./binding";

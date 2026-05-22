@@ -11,7 +11,7 @@
  * Player's existing ExpressionEvaluator can dispatch to registered handlers.
  */
 
-import type { Logger } from "../logger";
+import type { Logger } from "@player-ui/player";
 import type { A2UIDynamicValue, A2UIFunctionCall, A2UIPathRef } from "./types";
 import { interpolatePointers, pointerToBinding } from "./binding";
 

@@ -2,6 +2,7 @@ packages:
   - "core/*"
   - "react/*"
   - "plugins/*/*"
+  - "packages/*/*"
   - "tools/*/*"
   - "tools/*"
   - "docs/*"

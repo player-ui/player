@@ -1,4 +1,4 @@
-import type { A2UISnapshot } from "@player-ui/player";
+import type { A2UISnapshot } from "@player-ui/a2ui-plugin";
 
 const snapshot: A2UISnapshot = {
   surfaceId: "choice-picker-multi",

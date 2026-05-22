@@ -584,6 +584,21 @@ importers:
         specifier: workspace:^
         version: link:../../tools/storybook
 
+  packages/a2ui/react:
+    dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../../../plugins/a2ui/core
+      '@player-ui/a2ui-plugin-react':
+        specifier: workspace:^
+        version: link:../../../plugins/a2ui/react
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../../core/player
+      '@player-ui/react':
+        specifier: workspace:^
+        version: link:../../../react/player
+
   plugins/a2ui/core:
     dependencies:
       '@player-ui/asset-transform-plugin':
@@ -601,6 +616,9 @@ importers:
       '@player-ui/player':
         specifier: workspace:^
         version: link:../../../core/player
+      '@player-ui/types':
+        specifier: workspace:^
+        version: link:../../../core/types
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:^
@@ -611,6 +629,9 @@ importers:
 
   plugins/a2ui/mocks:
     dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../core
       '@player-ui/player':
         specifier: workspace:^
         version: link:../../../core/player
@@ -5714,7 +5735,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==, tarball: https://registry.npmjs.org/glob/-/glob-7.2.3.tgz}
-    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+    deprecated: Glob versions prior to v9 are no longer supported
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==, tarball: https://registry.npmjs.org/globals/-/globals-14.0.0.tgz}
@@ -9233,10 +9254,12 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==, tarball: https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==, tarball: https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uvu@0.5.6:

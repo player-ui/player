@@ -4,7 +4,11 @@ import {
   AsyncNodePlugin,
   AsyncNodePluginPlugin,
 } from "@player-ui/async-node-plugin";
-import { A2UIExpressionsPlugin, A2UITransformPlugin } from "./plugins";
+import {
+  A2UIContentPlugin,
+  A2UIExpressionsPlugin,
+  A2UITransformPlugin,
+} from "./plugins";
 
 /**
  * Registers transforms and standard expression functions for the A2UI v0.9.1
@@ -16,6 +20,7 @@ export class A2UIPlugin implements PlayerPlugin {
 
   private readonly metaPlugin = new MetaPlugin([
     new AsyncNodePlugin({ plugins: [new AsyncNodePluginPlugin()] }),
+    new A2UIContentPlugin(),
     new A2UITransformPlugin(),
     new A2UIExpressionsPlugin(),
   ]);

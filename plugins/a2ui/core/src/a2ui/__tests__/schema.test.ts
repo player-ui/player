@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { synthesizeSchema } from "../schema";
 import type { A2UIComponent } from "../types";
-import type { Logger } from "../../logger";
+import type { Logger } from "@player-ui/player";
 
 const component = (overrides: Partial<A2UIComponent>): A2UIComponent =>
   ({ id: "x", component: "TextField", ...overrides }) as A2UIComponent;

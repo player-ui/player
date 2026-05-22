@@ -3,10 +3,8 @@ import { SyncWaterfallHook, AsyncParallelHook } from "tapable-ts";
 import { Subscribe, useSubscribedState } from "@player-ui/react-subscribe";
 import { Registry } from "@player-ui/partial-match-registry";
 import type {
-  A2UISnapshot,
   CompletedState,
   PlayerPlugin,
-  Flow,
   View,
   PlayerInfo,
   StartOptions,
@@ -239,7 +237,7 @@ export class ReactPlayer {
   }
 
   public start(
-    payload: Flow | A2UISnapshot,
+    payload: unknown,
     options?: StartOptions,
   ): Promise<CompletedState> {
     this.setWaitForNextViewUpdate();
