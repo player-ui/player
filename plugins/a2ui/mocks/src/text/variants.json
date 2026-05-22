@@ -1,0 +1,22 @@
+{
+  "surfaceId": "text-variants",
+  "components": [
+    {
+      "id": "root",
+      "component": "Column",
+      "children": ["h1", "h2", "h3", "h4", "h5", "body", "caption"]
+    },
+    { "id": "h1", "component": "Text", "text": "Heading 1", "variant": "h1" },
+    { "id": "h2", "component": "Text", "text": "Heading 2", "variant": "h2" },
+    { "id": "h3", "component": "Text", "text": "Heading 3", "variant": "h3" },
+    { "id": "h4", "component": "Text", "text": "Heading 4", "variant": "h4" },
+    { "id": "h5", "component": "Text", "text": "Heading 5", "variant": "h5" },
+    { "id": "body", "component": "Text", "text": "Body paragraph", "variant": "body" },
+    {
+      "id": "caption",
+      "component": "Text",
+      "text": "Smaller caption",
+      "variant": "caption"
+    }
+  ]
+}

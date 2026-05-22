@@ -1,4 +1,5 @@
 load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@rules_player//player:defs.bzl", "generate_mocks_manifest")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
@@ -8,11 +9,12 @@ tsup_config(name = "tsup_config")
 
 vitest_config(name = "vitest_config")
 
-js_pipeline(
-    package_name = "@player-ui/a2ui-plugin-mocks",
-    peer_deps = [
-        ":node_modules/@player-ui/a2ui-plugin",
-        ":node_modules/@player-ui/player",
-    ],
-    deps = [],
+# Raw snapshot JSONs — the canonical source. Exposed for cross-platform
+# consumers (iOS / Android) and for the top-level //tools/mocks aggregator.
+# Named `snapshots` (not `mocks`) because `js_pipeline` below auto-creates an
+# `npm_package` target named `mocks` from the bazel package directory name.
+filegroup(
+    name = "snapshots",
+    srcs = glob(["src/**/*.json"]),
+    visibility = ["//visibility:public"],
 )

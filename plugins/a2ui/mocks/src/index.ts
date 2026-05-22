@@ -1,21 +1,54 @@
-export { default as rowBasic } from "./row/basic";
-export { default as columnBasic } from "./column/basic";
-export { default as listBasic } from "./list/basic";
-export { default as textBasic } from "./text/basic";
-export { default as textVariants } from "./text/variants";
-export { default as imageBasic } from "./image/basic";
-export { default as iconBasic } from "./icon/basic";
-export { default as dividerBasic } from "./divider/basic";
-export { default as cardBasic } from "./card/basic";
-export { default as modalBasic } from "./modal/basic";
-export { default as tabsBasic } from "./tabs/basic";
-export { default as buttonBasic } from "./button/basic";
-export { default as buttonWithAction } from "./button/with-action";
-export { default as textFieldBasic } from "./text-field/basic";
-export { default as textFieldValidation } from "./text-field/validation";
-export { default as checkBoxBasic } from "./check-box/basic";
-export { default as sliderBasic } from "./slider/basic";
-export { default as dateTimeInputBasic } from "./date-time-input/basic";
-export { default as choicePickerSingle } from "./choice-picker/single-select";
-export { default as choicePickerMulti } from "./choice-picker/multi-select";
-export { default as expressionsShowcase } from "./expressions/showcase";
+/**
+ * Mock snapshots for the A2UI v0.9.1 reference assets. The canonical source
+ * is the `.json` file next to each export — keep these as raw JSON so
+ * non-JS platforms (iOS, Android) can consume them directly without a
+ * TypeScript toolchain.
+ *
+ * The JS named exports below are sugar for storybook / vitest consumers and
+ * stay in lockstep with the JSON files via `import ... from "./...json"`.
+ */
+import buttonBasic from "./button/basic.json";
+import buttonWithAction from "./button/with-action.json";
+import cardBasic from "./card/basic.json";
+import checkBoxBasic from "./check-box/basic.json";
+import choicePickerMulti from "./choice-picker/multi-select.json";
+import choicePickerSingle from "./choice-picker/single-select.json";
+import columnBasic from "./column/basic.json";
+import dateTimeInputBasic from "./date-time-input/basic.json";
+import dividerBasic from "./divider/basic.json";
+import expressionsShowcase from "./expressions/showcase.json";
+import iconBasic from "./icon/basic.json";
+import imageBasic from "./image/basic.json";
+import listBasic from "./list/basic.json";
+import modalBasic from "./modal/basic.json";
+import rowBasic from "./row/basic.json";
+import sliderBasic from "./slider/basic.json";
+import tabsBasic from "./tabs/basic.json";
+import textBasic from "./text/basic.json";
+import textFieldBasic from "./text-field/basic.json";
+import textFieldValidation from "./text-field/validation.json";
+import textVariants from "./text/variants.json";
+
+export {
+  buttonBasic,
+  buttonWithAction,
+  cardBasic,
+  checkBoxBasic,
+  choicePickerMulti,
+  choicePickerSingle,
+  columnBasic,
+  dateTimeInputBasic,
+  dividerBasic,
+  expressionsShowcase,
+  iconBasic,
+  imageBasic,
+  listBasic,
+  modalBasic,
+  rowBasic,
+  sliderBasic,
+  tabsBasic,
+  textBasic,
+  textFieldBasic,
+  textFieldValidation,
+  textVariants,
+};

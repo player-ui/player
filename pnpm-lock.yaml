@@ -538,9 +538,6 @@ importers:
       '@player-ui/a2ui-plugin':
         specifier: workspace:^
         version: link:../../plugins/a2ui/core
-      '@player-ui/a2ui-plugin-mocks':
-        specifier: workspace:^
-        version: link:../../plugins/a2ui/mocks
       '@player-ui/a2ui-plugin-react':
         specifier: workspace:^
         version: link:../../plugins/a2ui/react

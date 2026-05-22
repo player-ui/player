@@ -8,6 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const Showcase = createA2UIStory(
-  async () =>
-    (await import("@player-ui/a2ui-plugin-mocks")).expressionsShowcase,
+  () => import("@player-ui/mocks/expressions/showcase.json"),
 );

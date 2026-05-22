@@ -1,5 +1,5 @@
 import React from "react";
-import type { A2UISnapshot } from "@player-ui/player";
+import type { A2UISnapshot } from "@player-ui/a2ui-plugin";
 import { PlayerStory } from "../player";
 
 export type A2UIStoryLoader = () => Promise<

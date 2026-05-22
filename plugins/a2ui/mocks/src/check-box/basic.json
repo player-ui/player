@@ -1,0 +1,12 @@
+{
+  "surfaceId": "check-box-basic",
+  "data": { "prefs": { "newsletter": false } },
+  "components": [
+    {
+      "id": "root",
+      "component": "CheckBox",
+      "label": "Subscribe to the newsletter",
+      "value": { "path": "/prefs/newsletter" }
+    }
+  ]
+}

@@ -8,5 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const Basic = createA2UIStory(
-  async () => (await import("@player-ui/a2ui-plugin-mocks")).columnBasic,
+  () => import("@player-ui/mocks/column/basic.json"),
 );

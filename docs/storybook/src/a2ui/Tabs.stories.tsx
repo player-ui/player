@@ -8,5 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const Basic = createA2UIStory(
-  async () => (await import("@player-ui/a2ui-plugin-mocks")).tabsBasic,
+  () => import("@player-ui/mocks/tabs/basic.json"),
 );
