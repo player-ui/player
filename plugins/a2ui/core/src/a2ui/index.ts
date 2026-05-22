@@ -20,6 +20,6 @@ export type {
   A2UIChildren,
   A2UITemplatedChildren,
   JsonPointer,
-  StartOptions,
+  A2UIStartOptions,
 } from "./types";
 export { A2UI_EVENT_CONTEXT_NAMESPACE } from "./types";

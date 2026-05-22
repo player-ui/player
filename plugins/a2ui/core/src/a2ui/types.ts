@@ -5,6 +5,8 @@
  * (streaming envelopes, deleteSurface, error responses) is out of scope for v1.
  */
 
+import { StartOptions } from "@player-ui/player";
+
 export type JsonPointer = string;
 
 export type A2UIPathRef = {
@@ -67,8 +69,9 @@ export interface A2UISnapshot {
   data?: unknown;
 }
 
-export type StartOptions = {
-  format?: "player" | "a2ui";
+export const A2UIStartOptions: StartOptions = {
+  format: "a2ui",
+  version: "0.9",
 };
 
 export const A2UI_EVENT_CONTEXT_NAMESPACE = "agent.event.context";
