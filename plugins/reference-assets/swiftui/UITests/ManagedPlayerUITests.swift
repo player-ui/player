@@ -6,28 +6,6 @@ class ManagedPlayerUITests: BaseTestCase {
         app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 
-    /// Taps the element and verifies the expected outcome appears. If the tap has no effect
-    /// (e.g., the JS action handler isn't wired yet due to async SwiftUI binding), retries the tap.
-    private func tapAndAssertElementAppears(
-        _ element: XCUIElement,
-        expectedOutcome: XCUIElement,
-        timeout: TimeInterval = 3,
-        retries: Int = 3
-    ) {
-        for _ in 0..<retries {
-            // If the expected outcome already appeared (from a previous tap that was slow to produce results),
-            // stop immediately instead of tapping again.
-            if expectedOutcome.exists { return }
-            // If the tappable element is gone (a previous tap successfully navigated away),
-            // stop retrying instead of crashing on a missing element.
-            guard element.exists else { break }
-            element.tap()
-            if expectedOutcome.waitForExistence(timeout: timeout) {
-                return
-            }
-        }
-    }
-
     func testSimpleFlow() {
         openFlow("Simple Flows")
         let button1 = app.buttons["first_view"].firstMatch
