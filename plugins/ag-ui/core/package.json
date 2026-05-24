@@ -1,0 +1,16 @@
+{
+  "name": "@player-ui/ag-ui-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@player-ui/a2ui-plugin": "workspace:^",
+    "@player-ui/asset-transform-plugin": "workspace:^",
+    "@player-ui/async-node-plugin": "workspace:^",
+    "@player-ui/expression-plugin": "workspace:^",
+    "@player-ui/meta-plugin": "workspace:^",
+    "@player-ui/types": "workspace:^"
+  },
+  "peerDependencies": {
+    "@player-ui/player": "workspace:^"
+  }
+}

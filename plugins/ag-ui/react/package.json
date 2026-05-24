@@ -1,0 +1,13 @@
+{
+  "name": "@player-ui/ag-ui-plugin-react",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.tsx",
+  "dependencies": {
+    "@player-ui/ag-ui-plugin": "workspace:^",
+    "@player-ui/asset-provider-plugin-react": "workspace:^",
+    "@player-ui/types": "workspace:^"
+  },
+  "peerDependencies": {
+    "@player-ui/react": "workspace:^"
+  }
+}
