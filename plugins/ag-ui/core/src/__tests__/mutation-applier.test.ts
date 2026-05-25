@@ -26,7 +26,7 @@ function makeDeps(): MutationApplierDeps & {
 }
 
 describe("mutation applier", () => {
-  it("appendTranscript pushes assets and emits MultiNode via the parked callback", () => {
+  it("appendTranscript re-emits the full transcript asset via the parked callback", () => {
     const deps = makeDeps();
     const callback = vi.fn();
     deps.state.transcript.callback = callback;
@@ -47,7 +47,11 @@ describe("mutation applier", () => {
     );
 
     expect(callback).toHaveBeenCalledTimes(2);
-    const lastCall = callback.mock.calls[1][0] as { values: unknown[] };
+    const lastCall = callback.mock.calls[1]?.[0] as {
+      type: string;
+      values: unknown[];
+    };
+    expect(lastCall.type).toBe("agui-transcript");
     expect(lastCall.values).toHaveLength(2);
   });
 
@@ -88,7 +92,7 @@ describe("mutation applier", () => {
     );
   });
 
-  it("setSurface re-invokes the parked callback with the new asset", () => {
+  it("setSurface re-invokes the parked callback with the inner asset shape", () => {
     const deps = makeDeps();
     const callback = vi.fn();
     deps.state.surface.callback = callback;
@@ -99,9 +103,7 @@ describe("mutation applier", () => {
       },
       deps,
     );
-    expect(callback).toHaveBeenCalledWith({
-      asset: { id: "form-1", type: "Column" },
-    });
+    expect(callback).toHaveBeenCalledWith({ id: "form-1", type: "Column" });
   });
 
   it("setStatus writes the running flag", () => {

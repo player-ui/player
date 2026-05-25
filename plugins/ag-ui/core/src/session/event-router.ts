@@ -45,12 +45,15 @@ function reasoningBubbleAsset(messageId: string): Asset {
 }
 
 function toolCallCardAsset(toolCallId: string, toolCallName: string): Asset {
+  // `args` is streamed via `streamTextDelta` which lands at
+  // `<base>.content` — read from that exact path so the resolved value is a
+  // string, not the wrapper object.
   return {
     id: `agui-tool-${toolCallId}`,
     type: "agui-tool-call",
     toolCallId,
     toolCallName,
-    args: `{{${AGUI_MESSAGES_PATH}.${toolCallId}.args}}`,
+    args: `{{${AGUI_MESSAGES_PATH}.${toolCallId}.args.content}}`,
     result: `{{${AGUI_MESSAGES_PATH}.${toolCallId}.result}}`,
   } as Asset;
 }
@@ -145,10 +148,12 @@ export function route(event: AGUIEvent, ctx: RouterContext): SessionMutation[] {
       const e = event as { toolCallId: string; toolCallName: string };
       if (ctx.startedToolCallIds.has(e.toolCallId)) return [];
       ctx.startedToolCallIds.add(e.toolCallId);
+      // Seed `args.content` as an empty string so subsequent `streamTextDelta`
+      // append calls land at the same path the asset binding reads from.
       return [
         {
           kind: "setData",
-          path: `${AGUI_MESSAGES_PATH}.${e.toolCallId}.args`,
+          path: `${AGUI_MESSAGES_PATH}.${e.toolCallId}.args.content`,
           value: "",
         },
         {

@@ -142,7 +142,7 @@ describe("event-router.route", () => {
     expect(first).toHaveLength(2);
     expect(first[0]).toEqual({
       kind: "setData",
-      path: `${AGUI_MESSAGES_PATH}.t1.args`,
+      path: `${AGUI_MESSAGES_PATH}.t1.args.content`,
       value: "",
     });
     const second = route(

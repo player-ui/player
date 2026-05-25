@@ -35,6 +35,7 @@ export const parameters = {
         "React Player",
         "Reference Assets",
         "A2UI",
+        "AG-UI",
         ["Docs", "Overview", "Intro"],
       ],
     },

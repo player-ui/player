@@ -541,6 +541,18 @@ importers:
       '@player-ui/a2ui-plugin-react':
         specifier: workspace:^
         version: link:../../plugins/a2ui/react
+      '@player-ui/ag-ui':
+        specifier: workspace:^
+        version: link:../../packages/ag-ui/react
+      '@player-ui/ag-ui-plugin':
+        specifier: workspace:^
+        version: link:../../plugins/ag-ui/core
+      '@player-ui/ag-ui-plugin-mocks':
+        specifier: workspace:^
+        version: link:../../plugins/ag-ui/mocks
+      '@player-ui/ag-ui-plugin-react':
+        specifier: workspace:^
+        version: link:../../plugins/ag-ui/react
       '@player-ui/async-node-plugin':
         specifier: workspace:^
         version: link:../../plugins/async-node/core
@@ -1166,6 +1178,12 @@ importers:
 
   tools/storybook:
     dependencies:
+      '@player-ui/ag-ui':
+        specifier: workspace:^
+        version: link:../../packages/ag-ui/react
+      '@player-ui/ag-ui-plugin':
+        specifier: workspace:^
+        version: link:../../plugins/ag-ui/core
       '@player-ui/beacon-plugin-react':
         specifier: workspace:^
         version: link:../../plugins/beacon/react

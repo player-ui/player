@@ -14,13 +14,13 @@ import {
  * Build the synthetic Flow that hosts an AG-UI session. The flow contains a
  * single VIEW whose root is an `agui-session` asset with three regions:
  *
- *  - `transcript`: an async-node seed with `flatten: true` so each successive
- *    resolution can extend the parent's children list (one trailing seed per
- *    emission keeps the stream open).
- *  - `surface`: a single async-node that hosts the latest A2UI snapshot. The
- *    session plugin re-invokes the resolution callback to swap content in.
- *  - `input`: a static `agui-input-bar` asset bound to `agui.inputValue` whose
- *    action calls the `agui_send` expression.
+ *  - `transcript`: a single async-node seed. Each event re-invokes the parked
+ *    callback with the full `agui-transcript` asset (whose `values` contains
+ *    the accumulated bubble list). React diffing handles bubble add/remove.
+ *  - `surface`: a single async-node that hosts the latest A2UI snapshot. Each
+ *    new snapshot re-invokes the callback with `{ asset: <A2UI tree> }`.
+ *  - `input`: a static `agui-input-bar` asset bound to `agui.inputValue`
+ *    whose action calls the `agui_send` expression.
  *
  * Data model bootstrap covers session metadata + a placeholder for streamed
  * text bubble bindings (`agui.messages.<id>.content`).
@@ -62,18 +62,9 @@ export function buildSessionFlow(threadId?: string): Flow {
         type: "agui-session",
         transcript: {
           asset: {
-            id: "agui-transcript",
-            type: "agui-transcript",
-            values: [
-              {
-                asset: {
-                  async: true,
-                  flatten: true,
-                  id: transcriptSeedId,
-                  type: "agui-transcript-seed",
-                },
-              },
-            ],
+            async: true,
+            id: transcriptSeedId,
+            type: "agui-transcript-seed",
           },
         },
         surface: {

@@ -13,22 +13,23 @@ describe("buildSessionFlow", () => {
     expect(flow.views).toHaveLength(1);
 
     const view = flow.views?.[0] as Record<string, unknown> & {
-      transcript: {
-        asset: { values: Array<{ asset: Record<string, unknown> }> };
-      };
+      transcript: { asset: Record<string, unknown> };
       surface: { asset: Record<string, unknown> };
       input: { asset: { type: string } };
     };
     expect(view.type).toBe("agui-session");
 
-    const transcriptSeed = view.transcript.asset.values[0].asset;
+    const transcriptSeed = view.transcript.asset;
     expect(transcriptSeed.async).toBe(true);
-    expect(transcriptSeed.flatten).toBe(true);
-    expect(transcriptSeed.id.startsWith(TRANSCRIPT_SEED_PREFIX)).toBe(true);
+    expect(
+      (transcriptSeed.id as string).startsWith(TRANSCRIPT_SEED_PREFIX),
+    ).toBe(true);
 
     const surfaceSeed = view.surface.asset;
     expect(surfaceSeed.async).toBe(true);
-    expect(surfaceSeed.id.startsWith(SURFACE_SEED_PREFIX)).toBe(true);
+    expect((surfaceSeed.id as string).startsWith(SURFACE_SEED_PREFIX)).toBe(
+      true,
+    );
 
     expect(view.input.asset.type).toBe("agui-input-bar");
 

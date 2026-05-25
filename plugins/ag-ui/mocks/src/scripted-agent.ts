@@ -33,6 +33,14 @@ export interface ScriptedAgentOptions {
    * tape for that run. Wins over `tape` if provided.
    */
   tapeFor?(runIndex: number, messages: AGUIMessage[]): TapeFrame[];
+  /**
+   * Kick off the first `runAgent()` automatically when the first subscriber
+   * attaches. Useful for stories and demos where you want the tape to play as
+   * soon as the UI hooks up. Off by default so unit tests can drive the agent
+   * explicitly. Only the first attach triggers the auto-run; later subscribers
+   * see whatever the agent emits at its own pace.
+   */
+  autoStart?: boolean;
 }
 
 /**
@@ -46,6 +54,7 @@ export class ScriptedAgent implements AGUIAgent {
 
   private handlers: Set<AGUIEventHandlers> = new Set();
   private runIndex = 0;
+  private autoStarted = false;
 
   constructor(private readonly opts: ScriptedAgentOptions = {}) {
     this.threadId = opts.threadId;
@@ -54,6 +63,16 @@ export class ScriptedAgent implements AGUIAgent {
 
   subscribe(handlers: AGUIEventHandlers): AGUISubscription {
     this.handlers.add(handlers);
+    if (this.opts.autoStart && !this.autoStarted) {
+      this.autoStarted = true;
+      // Defer so the session plugin can finish parking its async-node callbacks
+      // before tape events start arriving. `queueMicrotask` is enough because
+      // the resolver visits the seed nodes synchronously inside the same task
+      // that subscribed us.
+      queueMicrotask(() => {
+        void this.runAgent({});
+      });
+    }
     return {
       unsubscribe: () => {
         this.handlers.delete(handlers);

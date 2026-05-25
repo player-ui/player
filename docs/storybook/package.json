@@ -5,6 +5,10 @@
   "dependencies": {
     "@player-ui/a2ui-plugin": "workspace:^",
     "@player-ui/a2ui-plugin-react": "workspace:^",
+    "@player-ui/ag-ui": "workspace:^",
+    "@player-ui/ag-ui-plugin": "workspace:^",
+    "@player-ui/ag-ui-plugin-mocks": "workspace:^",
+    "@player-ui/ag-ui-plugin-react": "workspace:^",
     "@player-ui/common-types-plugin": "workspace:^",
     "@player-ui/make-flow": "workspace:^",
     "@player-ui/reference-assets-plugin": "workspace:^",

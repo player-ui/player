@@ -1,0 +1,29 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="AG-UI/Intro" />
+
+# AG-UI
+
+`@player-ui/ag-ui` renders an [AG-UI](https://docs.ag-ui.com) agent session
+inside Player. The agent emits standard AG-UI events (text streaming, tool
+calls, state, reasoning) plus `CustomEvent { name: "a2ui", value: <snapshot> }`
+when it wants to put an interactive UI in front of the user. The off-the-shelf
+`AGUIReactPlayer` wires all of this up — drop in an `AbstractAgent` (or the
+included `ScriptedAgent` for stories/tests) and start the player with
+`{ format: "ag-ui" }`.
+
+The session view contains three regions:
+
+- **Transcript** — streams text bubbles, reasoning, and tool-call cards as
+  events arrive. Backed by `async-node-plugin`: a single seed node parks the
+  resolver, and each new event re-invokes the callback with the cumulative
+  asset list.
+- **Surface** — hosts the most recent A2UI snapshot. Delegates to
+  `adaptA2UIToFlow` from `@player-ui/a2ui-plugin` so any A2UI snapshot Player
+  already understands renders inside the chat.
+- **Input bar** — typed text submits via the `agui_send` expression, A2UI
+  form actions submit via `agui_submitSurface`. Both push a user `Message`
+  onto the agent and start a new run.
+
+The stories in this section drive `AGUIReactPlayer` against the
+`ScriptedAgent` mock to demonstrate each event family in isolation.

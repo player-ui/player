@@ -2,6 +2,7 @@ import type { Player, PlayerPlugin } from "@player-ui/player";
 import { AsyncNodePlugin } from "@player-ui/async-node-plugin";
 import {
   applyMutation,
+  buildTranscriptResolution,
   createApplierState,
   type SessionApplierState,
 } from "../session/mutation-applier";
@@ -55,13 +56,9 @@ export class AGUISessionPlugin implements PlayerPlugin {
     asyncNodePlugin.hooks.onAsyncNode.tap(this.name, (node, callback) => {
       if (node.id.startsWith(TRANSCRIPT_SEED_PREFIX)) {
         this.state.transcript.callback = callback;
-        // If events arrived before the resolver hit this seed, replay the
-        // accumulated transcript so first render shows the buffered messages.
-        if (this.state.transcript.assets.length > 0) {
-          callback({
-            values: this.state.transcript.assets.map((a) => ({ asset: a })),
-          });
-        }
+        // Replace the seed with a real `agui-transcript` asset on first hit,
+        // pre-populated with whatever events arrived before the resolver ran.
+        callback(buildTranscriptResolution(this.state.transcript.assets));
         return new Promise((resolve) => {
           this.state.transcript.resolver = resolve;
         });
@@ -69,7 +66,9 @@ export class AGUISessionPlugin implements PlayerPlugin {
       if (node.id.startsWith(SURFACE_SEED_PREFIX)) {
         this.state.surface.callback = callback;
         if (this.state.surface.asset) {
-          callback({ asset: this.state.surface.asset });
+          // Inner asset shape, not `{ asset: ... }` — the seed lives in a
+          // single-asset slot so Player handles the wrapper.
+          callback(this.state.surface.asset);
         }
         return new Promise((resolve) => {
           this.state.surface.resolver = resolve;

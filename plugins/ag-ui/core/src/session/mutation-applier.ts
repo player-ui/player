@@ -106,20 +106,35 @@ function appendTranscript(asset: Asset, deps: MutationApplierDeps): void {
     // resolution will pick up the accumulated list, so just record it.
     return;
   }
-  transcript.callback({
-    values: transcript.assets.map((a) => ({ asset: a })),
-  });
+  transcript.callback(buildTranscriptResolution(transcript.assets));
 }
 
 function setSurface(asset: Asset | null, deps: MutationApplierDeps): void {
   const { surface } = deps.state;
   surface.asset = asset;
   if (!surface.callback) return;
-  if (asset === null) {
-    surface.callback(undefined);
-    return;
-  }
-  surface.callback({ asset });
+  // The surface seed sits at a single-asset slot
+  // (`surface: { asset: { async: true, ... } }`), so the resolved value must
+  // be the inner asset shape — not wrapped in another `{ asset: ... }`.
+  surface.callback(asset ?? undefined);
+}
+
+/**
+ * Build the asset that replaces the transcript seed. Since the seed lives in
+ * a single-asset slot, the resolved value is the agui-transcript asset's own
+ * inner shape (no outer `{ asset: ... }` wrapper). React diffing on `values`
+ * handles bubble add/remove cleanly without MultiNode flatten games.
+ */
+export function buildTranscriptResolution(assets: Asset[]): {
+  id: string;
+  type: string;
+  values: Array<{ asset: Asset }>;
+} {
+  return {
+    id: "agui-transcript",
+    type: "agui-transcript",
+    values: assets.map((a) => ({ asset: a })),
+  };
 }
 
 /**
