@@ -14,6 +14,7 @@ import {
   AGUIReasoning,
   AGUISession,
   AGUISurface,
+  AGUISurfaceBubble,
   AGUITextMessage,
   AGUITranscript,
   AGUIToolCall,
@@ -40,6 +41,7 @@ export class AGUIPlugin implements ReactPlayerPlugin, ExtendedPlayerPlugin {
         ["agui-tool-call", AGUIToolCall],
         ["agui-input-bar", AGUIInputBar],
         ["agui-surface", AGUISurface],
+        ["agui-surface-bubble", AGUISurfaceBubble],
       ]),
     );
   }

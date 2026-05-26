@@ -248,6 +248,7 @@ export const SURFACE_SEED_PREFIX = "agui-surface-seed";
 export const AGUI_DATA_NAMESPACE = "agui";
 export const AGUI_MESSAGES_PATH = `${AGUI_DATA_NAMESPACE}.messages`;
 export const AGUI_STATE_PATH = `${AGUI_DATA_NAMESPACE}.state`;
+export const AGUI_SURFACES_PATH = `${AGUI_DATA_NAMESPACE}.surfaces`;
 export const AGUI_IS_RUNNING_PATH = `${AGUI_DATA_NAMESPACE}.isRunning`;
 export const AGUI_RUN_ID_PATH = `${AGUI_DATA_NAMESPACE}.runId`;
 export const AGUI_THREAD_ID_PATH = `${AGUI_DATA_NAMESPACE}.threadId`;

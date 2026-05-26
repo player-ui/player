@@ -7,6 +7,7 @@ import type {
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import {
   AGUI_INPUT_VALUE_PATH,
+  AGUI_SURFACES_PATH,
   type AGUIAgent,
   type AGUIMessage,
 } from "../session/types";
@@ -67,21 +68,18 @@ export class AGUIExpressionsPlugin implements PlayerPlugin {
       void agent.runAgent({});
     };
 
-    const submitSurface: ExpressionHandler<
-      [string, Record<string, unknown>?],
-      void
-    > = (
+    const submitSurface: ExpressionHandler<[string, string?], void> = (
       ctx: ExpressionContext,
       name: string,
-      data?: Record<string, unknown>,
+      bubbleId?: string,
     ): void => {
-      // When invoked by an A2UI button (rewritten by the bridge), `data` is
-      // omitted — the button's existing `exp` already wrote context vars to
-      // `agent.event.context.*`. Read them back as the structured payload.
+      // The A2UI bridge calls this from a button's `exp` after the button's
+      // context-writes have already landed at `agent.event.context.*`. Read
+      // them back as the structured payload.
       const fromModel = ctx.model.get("agent.event.context") as
         | Record<string, unknown>
         | undefined;
-      const resolvedData = data ?? fromModel ?? {};
+      const resolvedData = fromModel ?? {};
       const summary =
         Object.keys(resolvedData).length > 0
           ? `${name}: ${JSON.stringify(resolvedData)}`
@@ -93,7 +91,19 @@ export class AGUIExpressionsPlugin implements PlayerPlugin {
         data: resolvedData,
       };
       agent.messages.push(message);
-      onUserMessage?.(message);
+      if (bubbleId) {
+        // The submit happened on a transcript-embedded A2UI surface — flip
+        // its in-place state so the form swaps to a summary bubble. Don't
+        // also push a separate user bubble; the surface bubble IS the user's
+        // turn now.
+        ctx.model.set([
+          [`${AGUI_SURFACES_PATH}.${bubbleId}.submitted`, true],
+          [`${AGUI_SURFACES_PATH}.${bubbleId}.summary`, summary],
+        ]);
+      } else {
+        // Programmatic submit (no bubble) — push a user bubble like agui_send.
+        onUserMessage?.(message);
+      }
       void agent.runAgent({});
     };
 

@@ -19,6 +19,7 @@ import { adaptA2UIToFlow, type A2UISnapshot } from "@player-ui/a2ui-plugin";
 export function embedA2UISnapshot(
   snapshot: A2UISnapshot,
   logger?: Logger,
+  bubbleId?: string,
 ): Asset {
   const flow = adaptA2UIToFlow(snapshot, logger);
   const view = flow.views?.[0];
@@ -27,7 +28,7 @@ export function embedA2UISnapshot(
       "[ag-ui] adaptA2UIToFlow produced no view for the supplied A2UI snapshot",
     );
   }
-  return rewriteActions(view as Asset);
+  return rewriteActions(view as Asset, bubbleId);
 }
 
 /**
@@ -36,7 +37,7 @@ export function embedA2UISnapshot(
  * other assets untouched. We mutate in place because the A2UI adapter built
  * the tree freshly for us — no risk of leaking changes back into A2UI state.
  */
-function rewriteActions(asset: Asset): Asset {
+function rewriteActions(asset: Asset, bubbleId?: string): Asset {
   const anyAsset = asset as unknown as Record<string, unknown>;
   // ONLY rewrite buttons — other asset types use `value` for their data
   // binding (e.g. TextField.value is the path to the field's data). Touching
@@ -44,20 +45,20 @@ function rewriteActions(asset: Asset): Asset {
   if (anyAsset.type === "Button" && typeof anyAsset.value === "string") {
     const eventName = anyAsset.value;
     const existingExp = toExpArray(anyAsset.exp);
-    anyAsset.exp = [
-      ...existingExp,
-      `@[agui_submitSurface(${JSON.stringify(eventName)})]@`,
-    ];
+    const submitCall = bubbleId
+      ? `@[agui_submitSurface(${JSON.stringify(eventName)}, ${JSON.stringify(bubbleId)})]@`
+      : `@[agui_submitSurface(${JSON.stringify(eventName)})]@`;
+    anyAsset.exp = [...existingExp, submitCall];
     delete anyAsset.value;
   }
 
   for (const key of Object.keys(anyAsset)) {
     const v = anyAsset[key];
     if (isAssetWrapper(v)) {
-      rewriteActions(v.asset);
+      rewriteActions(v.asset, bubbleId);
     } else if (Array.isArray(v)) {
       for (const item of v) {
-        if (isAssetWrapper(item)) rewriteActions(item.asset);
+        if (isAssetWrapper(item)) rewriteActions(item.asset, bubbleId);
       }
     }
   }

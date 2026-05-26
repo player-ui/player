@@ -10,35 +10,32 @@ interface AGUIInputBarProps {
 }
 
 /**
- * Sticky composer. Tracks local text state for responsiveness, mirrors back to
- * the data model via `setValue`, and fires `agui_send` via the transform's
- * `send()` callback. Disabled while a run is in flight.
+ * Sticky composer. The input is bound directly to the model via `setValue`
+ * (the platform-agnostic transform), so when `agui_send` clears the model
+ * after submit the input goes empty on its own — no React-local state needed.
+ * Disabled while a run is in flight.
  */
 export const AGUIInputBar = (props: AGUIInputBarProps) => {
   const { id, value, isRunning, error, setValue, send } = props;
-  const [local, setLocal] = React.useState<string>(value ?? "");
-
-  React.useEffect(() => {
-    setLocal(value ?? "");
-  }, [value]);
+  const current = value ?? "";
 
   const onSubmit = React.useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      setValue(local);
+      if (current.length === 0) return;
       send();
     },
-    [local, send, setValue],
+    [current, send],
   );
 
   return (
     <form id={id} onSubmit={onSubmit} style={{ display: "flex", gap: 8 }}>
       <input
         type="text"
-        value={local}
+        value={current}
         disabled={Boolean(isRunning)}
         placeholder={isRunning ? "Agent is thinking…" : "Message"}
-        onChange={(e) => setLocal(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
         style={{
           flex: 1,
           padding: "8px 12px",
@@ -48,7 +45,7 @@ export const AGUIInputBar = (props: AGUIInputBarProps) => {
       />
       <button
         type="submit"
-        disabled={Boolean(isRunning) || local.length === 0}
+        disabled={Boolean(isRunning) || current.length === 0}
         style={{
           padding: "8px 16px",
           borderRadius: 8,

@@ -64,4 +64,29 @@ describe("embedA2UISnapshot", () => {
       '@[agui_submitSurface("submitFeedback")]@',
     );
   });
+
+  it("threads bubbleId into the submitSurface call when provided", () => {
+    const asset = embedA2UISnapshot(
+      {
+        surfaceId: "form",
+        components: [
+          { id: "root", component: "Column", children: ["btn"] },
+          {
+            id: "btn",
+            component: "Button",
+            action: { event: { name: "submitFeedback" } },
+          },
+        ],
+      },
+      undefined,
+      "s7",
+    );
+    const btn = (
+      asset as { children?: Array<{ asset: Record<string, unknown> }> }
+    ).children?.[0]?.asset;
+    const exp = btn?.exp as string[];
+    expect(exp[exp.length - 1]).toBe(
+      '@[agui_submitSurface("submitFeedback", "s7")]@',
+    );
+  });
 });

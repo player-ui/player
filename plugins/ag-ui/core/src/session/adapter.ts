@@ -11,23 +11,23 @@ import {
 } from "./types";
 
 /**
- * Build the synthetic Flow that hosts an AG-UI session. The flow contains a
- * single VIEW whose root is an `agui-session` asset with three regions:
+ * Build the synthetic Flow that hosts an AG-UI session. The flow has a single
+ * VIEW whose root is an `agui-session` asset with two regions:
  *
  *  - `transcript`: a single async-node seed. Each event re-invokes the parked
- *    callback with the full `agui-transcript` asset (whose `values` contains
- *    the accumulated bubble list). React diffing handles bubble add/remove.
- *  - `surface`: a single async-node that hosts the latest A2UI snapshot. Each
- *    new snapshot re-invokes the callback with `{ asset: <A2UI tree> }`.
+ *    callback with the accumulated bubble list. The transcript holds every
+ *    kind of turn — assistant text, reasoning, tool calls, **and** A2UI
+ *    surface bubbles (so forms appear inline in the conversation rather than
+ *    in a sidebar).
  *  - `input`: a static `agui-input-bar` asset bound to `agui.inputValue`
  *    whose action calls the `agui_send` expression.
  *
- * Data model bootstrap covers session metadata + a placeholder for streamed
- * text bubble bindings (`agui.messages.<id>.content`).
+ * Data model bootstrap covers session metadata + namespaces for streamed text
+ * (`agui.messages.<id>.content`) and surface bubble state
+ * (`agui.surfaces.<bubbleId>.submitted` / `.summary`).
  */
 export function buildSessionFlow(threadId?: string): Flow {
   const transcriptSeedId = `${TRANSCRIPT_SEED_PREFIX}-0`;
-  const surfaceSeedId = `${SURFACE_SEED_PREFIX}-0`;
 
   return {
     id: SESSION_FLOW_ID,
@@ -38,6 +38,7 @@ export function buildSessionFlow(threadId?: string): Flow {
         runId: null,
         state: {},
         messages: {},
+        surfaces: {},
         error: null,
         inputValue: "",
       },
@@ -76,13 +77,6 @@ export function buildSessionFlow(threadId?: string): Flow {
                 id: transcriptSeedId,
               },
             ],
-          },
-        },
-        surface: {
-          asset: {
-            async: true,
-            id: surfaceSeedId,
-            type: "agui-surface-seed",
           },
         },
         input: {
@@ -124,5 +118,7 @@ export function nextTranscriptSeedId(index: number): string {
 }
 
 export function nextSurfaceSeedId(index: number): string {
+  // Retained for back-compat; the session no longer renders a separate surface
+  // slot — A2UI snapshots now arrive inline as transcript bubbles.
   return `${SURFACE_SEED_PREFIX}-${index}`;
 }

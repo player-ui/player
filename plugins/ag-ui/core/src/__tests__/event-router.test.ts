@@ -85,7 +85,7 @@ describe("event-router.route", () => {
     ]);
   });
 
-  it("CUSTOM event named 'a2ui' produces setSurface with the embedded asset", () => {
+  it("CUSTOM event named 'a2ui' appends a surface bubble to the transcript", () => {
     const snapshot = {
       surfaceId: "s1",
       components: [{ id: "root", component: "Text", text: "hello" }],
@@ -94,10 +94,18 @@ describe("event-router.route", () => {
       { type: "CUSTOM", name: "a2ui", value: snapshot } as AGUIEvent,
       createRouterContext(),
     );
-    expect(mutations).toHaveLength(1);
-    expect(mutations[0]?.kind).toBe("setSurface");
-    if (mutations[0]?.kind === "setSurface") {
-      expect(mutations[0].asset?.type).toBe("Text");
+    // Two setData seeds + one appendTranscript for the bubble.
+    expect(mutations).toHaveLength(3);
+    const append = mutations.find((m) => m.kind === "appendTranscript");
+    expect(append?.kind).toBe("appendTranscript");
+    if (append?.kind === "appendTranscript") {
+      expect(append.asset.type).toBe("agui-surface-bubble");
+      const wrapper = (
+        append.asset as unknown as {
+          surface: { asset: { type: string } };
+        }
+      ).surface;
+      expect(wrapper.asset.type).toBe("Text");
     }
   });
 

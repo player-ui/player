@@ -7,6 +7,7 @@ import {
   AGUI_MESSAGES_PATH,
   AGUI_RUN_ID_PATH,
   AGUI_STATE_PATH,
+  AGUI_SURFACES_PATH,
   type AGUIEvent,
   type SessionMutation,
 } from "./types";
@@ -21,6 +22,13 @@ export interface RouterContext {
   startedMessageIds: Set<string>;
   /** Same idea for tool calls. */
   startedToolCallIds: Set<string>;
+  /**
+   * Monotonic counter used to mint a unique bubble id for each A2UI surface
+   * dropped into the transcript. The id flows through the bridge so the
+   * `agui_submitSurface` expression can target the same bubble when the
+   * user submits — flipping it from form-mode to summary-mode.
+   */
+  surfaceCounter: { n: number };
 }
 
 const A2UI_CUSTOM_EVENT_NAME = "a2ui";
@@ -41,6 +49,33 @@ function reasoningBubbleAsset(messageId: string): Asset {
     type: "agui-reasoning",
     messageId,
     value: `{{${AGUI_MESSAGES_PATH}.${messageId}.content}}`,
+  } as Asset;
+}
+
+/**
+ * Build the transcript bubble that hosts an A2UI surface. The bubble has two
+ * faces controlled by data bindings:
+ *
+ *  - Before submit: renders the embedded A2UI asset tree (`surface`).
+ *  - After submit: renders the `summary` string (set by `agui_submitSurface`
+ *    when the user clicks the form's action button).
+ *
+ * `bubbleId` is woven into the bindings so multiple surfaces in one session
+ * don't collide.
+ */
+function surfaceBubbleAsset(
+  bubbleId: string,
+  surfaceTree: Asset,
+  surfaceId: string,
+): Asset {
+  return {
+    id: `agui-surface-bubble-${bubbleId}`,
+    type: "agui-surface-bubble",
+    bubbleId,
+    surfaceId,
+    surface: { asset: surfaceTree },
+    submitted: `{{${AGUI_SURFACES_PATH}.${bubbleId}.submitted}}`,
+    summary: `{{${AGUI_SURFACES_PATH}.${bubbleId}.summary}}`,
   } as Asset;
 }
 
@@ -204,8 +239,29 @@ export function route(event: AGUIEvent, ctx: RouterContext): SessionMutation[] {
       const e = event as { name: string; value: unknown };
       if (e.name === A2UI_CUSTOM_EVENT_NAME) {
         try {
-          const asset = embedA2UISnapshot(e.value as A2UISnapshot, ctx.logger);
-          return [{ kind: "setSurface", asset }];
+          const snapshot = e.value as A2UISnapshot;
+          const bubbleId = `s${++ctx.surfaceCounter.n}`;
+          const surfaceTree = embedA2UISnapshot(snapshot, ctx.logger, bubbleId);
+          const bubble = surfaceBubbleAsset(
+            bubbleId,
+            surfaceTree,
+            snapshot.surfaceId,
+          );
+          return [
+            // Seed the binding paths so first render reads `false` / "" rather
+            // than the literal binding string when no value exists.
+            {
+              kind: "setData",
+              path: `${AGUI_SURFACES_PATH}.${bubbleId}.submitted`,
+              value: false,
+            },
+            {
+              kind: "setData",
+              path: `${AGUI_SURFACES_PATH}.${bubbleId}.summary`,
+              value: "",
+            },
+            { kind: "appendTranscript", asset: bubble },
+          ];
         } catch (err) {
           ctx.logger?.error?.(
             "[ag-ui] Failed to embed A2UI snapshot from CustomEvent:",
@@ -237,5 +293,6 @@ export function createRouterContext(logger?: Logger): RouterContext {
     logger,
     startedMessageIds: new Set(),
     startedToolCallIds: new Set(),
+    surfaceCounter: { n: 0 },
   };
 }

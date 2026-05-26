@@ -1,13 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { buildSessionFlow } from "../session/adapter";
-import {
-  SESSION_FLOW_ID,
-  SURFACE_SEED_PREFIX,
-  TRANSCRIPT_SEED_PREFIX,
-} from "../session/types";
+import { SESSION_FLOW_ID, TRANSCRIPT_SEED_PREFIX } from "../session/types";
 
 describe("buildSessionFlow", () => {
-  it("produces a single VIEW with transcript + surface async seeds and an input bar", () => {
+  it("produces a single VIEW with a transcript seed and input bar", () => {
     const flow = buildSessionFlow("thread-abc");
     expect(flow.id).toBe(SESSION_FLOW_ID);
     expect(flow.views).toHaveLength(1);
@@ -19,7 +15,6 @@ describe("buildSessionFlow", () => {
           values: Array<Record<string, unknown>>;
         };
       };
-      surface: { asset: Record<string, unknown> };
       input: { asset: { type: string } };
     };
     expect(view.type).toBe("agui-session");
@@ -37,17 +32,15 @@ describe("buildSessionFlow", () => {
       (transcriptSeed.id as string).startsWith(TRANSCRIPT_SEED_PREFIX),
     ).toBe(true);
 
-    const surfaceSeed = view.surface.asset;
-    expect(surfaceSeed.async).toBe(true);
-    expect((surfaceSeed.id as string).startsWith(SURFACE_SEED_PREFIX)).toBe(
-      true,
-    );
-
     expect(view.input.asset.type).toBe("agui-input-bar");
 
     expect((flow.data as { agui: { threadId: string } }).agui.threadId).toBe(
       "thread-abc",
     );
+    // surfaces namespace is pre-seeded so submit-state bindings have a home
+    expect(
+      (flow.data as { agui: { surfaces: unknown } }).agui.surfaces,
+    ).toEqual({});
   });
 
   it("uses null threadId when none is supplied", () => {
