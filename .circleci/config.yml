@@ -37,7 +37,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:2025.03
+      image: android:2025.03.1
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -103,7 +103,7 @@ jobs:
           root: .
           paths:
             - .
-  
+
   bazelrc_fork:
     executor: minimal
     steps:
