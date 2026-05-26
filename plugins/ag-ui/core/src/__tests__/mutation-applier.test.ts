@@ -26,7 +26,7 @@ function makeDeps(): MutationApplierDeps & {
 }
 
 describe("mutation applier", () => {
-  it("appendTranscript re-emits the full transcript asset via the parked callback", () => {
+  it("appendTranscript flushes pending assets and trails a fresh seed", () => {
     const deps = makeDeps();
     const callback = vi.fn();
     deps.state.transcript.callback = callback;
@@ -38,24 +38,20 @@ describe("mutation applier", () => {
       },
       deps,
     );
-    applyMutation(
-      {
-        kind: "appendTranscript",
-        asset: { id: "b", type: "agui-text-message" } as never,
-      },
-      deps,
-    );
 
-    expect(callback).toHaveBeenCalledTimes(2);
-    const lastCall = callback.mock.calls[1]?.[0] as {
-      type: string;
-      values: unknown[];
-    };
-    expect(lastCall.type).toBe("agui-transcript");
-    expect(lastCall.values).toHaveLength(2);
+    expect(callback).toHaveBeenCalledTimes(1);
+    const call = callback.mock.calls[0]?.[0] as Array<Record<string, unknown>>;
+    expect(Array.isArray(call)).toBe(true);
+    expect(call).toHaveLength(2);
+    expect((call[0] as { asset?: { id: string } }).asset?.id).toBe("a");
+    // Trailing entry is the next async seed in the chain.
+    expect(call[1]).toMatchObject({ async: true, flatten: true });
+    // Callback is detached after firing — the next seed will park its own.
+    expect(deps.state.transcript.callback).toBeUndefined();
+    expect(deps.state.transcript.emittedCount).toBe(1);
   });
 
-  it("appendTranscript without a callback still records assets so a late subscriber replays them", () => {
+  it("appendTranscript buffers when no callback is parked", () => {
     const deps = makeDeps();
     applyMutation(
       {
@@ -65,6 +61,7 @@ describe("mutation applier", () => {
       deps,
     );
     expect(deps.state.transcript.assets).toHaveLength(1);
+    expect(deps.state.transcript.emittedCount).toBe(0);
   });
 
   it("streamTextDelta appends to the existing message content", () => {

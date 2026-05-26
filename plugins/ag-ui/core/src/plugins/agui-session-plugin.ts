@@ -1,17 +1,20 @@
+import type { Asset } from "@player-ui/types";
 import type { Player, PlayerPlugin } from "@player-ui/player";
 import { AsyncNodePlugin } from "@player-ui/async-node-plugin";
 import {
   applyMutation,
-  buildTranscriptResolution,
   createApplierState,
+  flushPendingTranscript,
   type SessionApplierState,
 } from "../session/mutation-applier";
 import { createRouterContext, route } from "../session/event-router";
 import {
+  AGUI_MESSAGES_PATH,
   SURFACE_SEED_PREFIX,
   TRANSCRIPT_SEED_PREFIX,
   type AGUIAgent,
   type AGUIEvent,
+  type AGUIMessage,
   type AGUISubscription,
 } from "../session/types";
 
@@ -55,10 +58,10 @@ export class AGUISessionPlugin implements PlayerPlugin {
 
     asyncNodePlugin.hooks.onAsyncNode.tap(this.name, (node, callback) => {
       if (node.id.startsWith(TRANSCRIPT_SEED_PREFIX)) {
+        // Each chained seed parks its own callback here; flush flushes any
+        // assets that arrived before this seed was reached.
         this.state.transcript.callback = callback;
-        // Replace the seed with a real `agui-transcript` asset on first hit,
-        // pre-populated with whatever events arrived before the resolver ran.
-        callback(buildTranscriptResolution(this.state.transcript.assets));
+        flushPendingTranscript(this.state);
         return new Promise((resolve) => {
           this.state.transcript.resolver = resolve;
         });
@@ -66,8 +69,7 @@ export class AGUISessionPlugin implements PlayerPlugin {
       if (node.id.startsWith(SURFACE_SEED_PREFIX)) {
         this.state.surface.callback = callback;
         if (this.state.surface.asset) {
-          // Inner asset shape, not `{ asset: ... }` — the seed lives in a
-          // single-asset slot so Player handles the wrapper.
+          // Single-asset slot — Player wraps in `{ asset: ... }` itself.
           callback(this.state.surface.asset);
         }
         return new Promise((resolve) => {
@@ -122,4 +124,29 @@ export class AGUISessionPlugin implements PlayerPlugin {
     this.state.surface.resolver?.(undefined);
     this.state = createApplierState();
   }
+
+  /**
+   * Render a user-authored message in the transcript. Called by the
+   * expressions plugin (`agui_send` / `agui_submitSurface`) immediately after
+   * pushing onto `agent.messages` — AG-UI agents don't echo user turns
+   * through events, so the UI has to record the bubble locally.
+   */
+  public pushUserMessage(message: AGUIMessage): void {
+    const bubble = userBubbleAsset(message);
+    this.state.transcript.assets.push(bubble);
+    this.dataController?.set({
+      [`${AGUI_MESSAGES_PATH}.${message.id}.content`]: message.content ?? "",
+    });
+    flushPendingTranscript(this.state);
+  }
+}
+
+function userBubbleAsset(message: AGUIMessage): Asset {
+  return {
+    id: `agui-message-${message.id}`,
+    type: "agui-text-message",
+    messageId: message.id,
+    role: message.role,
+    value: `{{${AGUI_MESSAGES_PATH}.${message.id}.content}}`,
+  } as Asset;
 }

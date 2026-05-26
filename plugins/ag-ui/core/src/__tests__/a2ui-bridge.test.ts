@@ -33,4 +33,35 @@ describe("embedA2UISnapshot", () => {
     expect(children).toBeDefined();
     expect(children?.[0]?.asset?.id).toBe("child");
   });
+
+  it("rewrites button event actions to call agui_submitSurface", () => {
+    const asset = embedA2UISnapshot({
+      surfaceId: "form",
+      components: [
+        { id: "root", component: "Column", children: ["btn"] },
+        {
+          id: "btn",
+          component: "Button",
+          action: {
+            event: {
+              name: "submitFeedback",
+              context: { name: { path: "/form/name" } },
+            },
+          },
+        },
+      ],
+    });
+    const btn = (
+      asset as { children?: Array<{ asset: Record<string, unknown> }> }
+    ).children?.[0]?.asset;
+    expect(btn).toBeDefined();
+    // value (transition target) is stripped
+    expect(btn?.value).toBeUndefined();
+    // exp ends with our submitSurface call, preserving any prior context-writes
+    const exp = btn?.exp as string[];
+    expect(Array.isArray(exp)).toBe(true);
+    expect(exp[exp.length - 1]).toBe(
+      '@[agui_submitSurface("submitFeedback")]@',
+    );
+  });
 });

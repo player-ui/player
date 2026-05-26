@@ -62,9 +62,20 @@ export function buildSessionFlow(threadId?: string): Flow {
         type: "agui-session",
         transcript: {
           asset: {
-            async: true,
-            id: transcriptSeedId,
-            type: "agui-transcript-seed",
+            id: "agui-transcript",
+            type: "agui-transcript",
+            // The seed sits directly in the parent's values list (no wrapper)
+            // with `flatten: true`. Resolutions return arrays of asset
+            // wrappers + a fresh trailing seed; the flatten splice extends
+            // the values list each turn, and the trailing seed parks the
+            // next callback. Linked-list streaming.
+            values: [
+              {
+                async: true,
+                flatten: true,
+                id: transcriptSeedId,
+              },
+            ],
           },
         },
         surface: {

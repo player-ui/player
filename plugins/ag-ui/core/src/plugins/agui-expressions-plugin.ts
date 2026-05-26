@@ -11,6 +11,17 @@ import {
   type AGUIMessage,
 } from "../session/types";
 
+export interface AGUIExpressionsPluginOptions {
+  agent: AGUIAgent;
+  /**
+   * Invoked after a user-authored message is pushed onto `agent.messages` so
+   * the UI can render the bubble locally. AG-UI agents typically don't echo
+   * user turns through events — the spec leaves user-message UI rendering to
+   * the client.
+   */
+  onUserMessage?(message: AGUIMessage): void;
+}
+
 /**
  * Registers the expressions content uses to drive an AG-UI agent:
  *
@@ -27,10 +38,10 @@ import {
 export class AGUIExpressionsPlugin implements PlayerPlugin {
   name = "ag-ui-expressions";
 
-  constructor(private readonly opts: { agent: AGUIAgent }) {}
+  constructor(private readonly opts: AGUIExpressionsPluginOptions) {}
 
   apply(player: Player): void {
-    const { agent } = this.opts;
+    const { agent, onUserMessage } = this.opts;
 
     const newId = (): string =>
       `msg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -52,6 +63,7 @@ export class AGUIExpressionsPlugin implements PlayerPlugin {
       };
       agent.messages.push(message);
       ctx.model.set([[AGUI_INPUT_VALUE_PATH, ""]]);
+      onUserMessage?.(message);
       void agent.runAgent({});
     };
 
@@ -59,17 +71,29 @@ export class AGUIExpressionsPlugin implements PlayerPlugin {
       [string, Record<string, unknown>?],
       void
     > = (
-      _ctx: ExpressionContext,
+      ctx: ExpressionContext,
       name: string,
       data?: Record<string, unknown>,
     ): void => {
+      // When invoked by an A2UI button (rewritten by the bridge), `data` is
+      // omitted — the button's existing `exp` already wrote context vars to
+      // `agent.event.context.*`. Read them back as the structured payload.
+      const fromModel = ctx.model.get("agent.event.context") as
+        | Record<string, unknown>
+        | undefined;
+      const resolvedData = data ?? fromModel ?? {};
+      const summary =
+        Object.keys(resolvedData).length > 0
+          ? `${name}: ${JSON.stringify(resolvedData)}`
+          : name;
       const message: AGUIMessage = {
         id: newId(),
         role: "user",
-        content: name,
-        data: data ?? {},
+        content: summary,
+        data: resolvedData,
       };
       agent.messages.push(message);
+      onUserMessage?.(message);
       void agent.runAgent({});
     };
 

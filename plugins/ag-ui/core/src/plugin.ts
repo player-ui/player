@@ -45,12 +45,16 @@ export class AGUIPlugin implements PlayerPlugin {
   private readonly metaPlugin: MetaPlugin;
 
   constructor(opts: AGUIPluginOptions) {
+    const sessionPlugin = new AGUISessionPlugin({ agent: opts.agent });
     this.metaPlugin = new MetaPlugin([
       new AsyncNodePlugin({ plugins: [new AsyncNodePluginPlugin()] }),
       new A2UIPlugin(),
       new AGUIContentPlugin({ agent: opts.agent }),
-      new AGUISessionPlugin({ agent: opts.agent }),
-      new AGUIExpressionsPlugin({ agent: opts.agent }),
+      sessionPlugin,
+      new AGUIExpressionsPlugin({
+        agent: opts.agent,
+        onUserMessage: (msg) => sessionPlugin.pushUserMessage(msg),
+      }),
       new AGUITransformPlugin(),
     ]);
   }
