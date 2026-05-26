@@ -28,11 +28,13 @@ instrumented_unit_test_deps = main_deps + [
 
 kt_android(
     name = "testutils",
+    group = "com.intuit.playerui.android",
     main_deps = main_deps,
 )
 
 kt_android(
     name = "instrumented_unit_testutils",
+    group = "com.intuit.playerui.android",
     main_srcs = glob(["src/instrumented_unit_test_main/kotlin/**/*.kt"]),
     main_deps = instrumented_unit_test_deps,
 )
