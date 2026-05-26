@@ -1,0 +1,52 @@
+import { describe, expect, it } from "vitest";
+import { buildSessionFlow } from "../session/adapter";
+import { SESSION_FLOW_ID, TRANSCRIPT_SEED_PREFIX } from "../session/types";
+
+describe("buildSessionFlow", () => {
+  it("produces a single VIEW with a transcript seed and input bar", () => {
+    const flow = buildSessionFlow("thread-abc");
+    expect(flow.id).toBe(SESSION_FLOW_ID);
+    expect(flow.views).toHaveLength(1);
+
+    const view = flow.views?.[0] as Record<string, unknown> & {
+      transcript: {
+        asset: {
+          type: string;
+          values: Array<Record<string, unknown>>;
+        };
+      };
+      input: { asset: { type: string } };
+    };
+    expect(view.type).toBe("agui-session");
+
+    expect(view.transcript.asset.type).toBe("agui-transcript");
+    // The seed sits directly in the values list (no asset wrapper) with
+    // `flatten: true` so the chained-seed splice extends the parent.
+    const transcriptSeed = view.transcript.asset.values[0] as Record<
+      string,
+      unknown
+    >;
+    expect(transcriptSeed.async).toBe(true);
+    expect(transcriptSeed.flatten).toBe(true);
+    expect(
+      (transcriptSeed.id as string).startsWith(TRANSCRIPT_SEED_PREFIX),
+    ).toBe(true);
+
+    expect(view.input.asset.type).toBe("agui-input-bar");
+
+    expect((flow.data as { agui: { threadId: string } }).agui.threadId).toBe(
+      "thread-abc",
+    );
+    // surfaces namespace is pre-seeded so submit-state bindings have a home
+    expect(
+      (flow.data as { agui: { surfaces: unknown } }).agui.surfaces,
+    ).toEqual({});
+  });
+
+  it("uses null threadId when none is supplied", () => {
+    const flow = buildSessionFlow();
+    expect((flow.data as { agui: { threadId: unknown } }).agui.threadId).toBe(
+      null,
+    );
+  });
+});

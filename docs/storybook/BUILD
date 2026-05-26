@@ -8,6 +8,10 @@ npm_link_all_packages(
 deps = [
     ":node_modules/@player-ui/a2ui-plugin",
     ":node_modules/@player-ui/a2ui-plugin-react",
+    ":node_modules/@player-ui/ag-ui",
+    ":node_modules/@player-ui/ag-ui-plugin",
+    ":node_modules/@player-ui/ag-ui-plugin-mocks",
+    ":node_modules/@player-ui/ag-ui-plugin-react",
     ":node_modules/@player-ui/common-types-plugin",
     ":node_modules/@player-ui/make-flow",
     ":node_modules/@player-ui/reference-assets-plugin",

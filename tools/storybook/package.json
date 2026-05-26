@@ -23,6 +23,8 @@
     "manager.mjs"
   ],
   "dependencies": {
+    "@player-ui/ag-ui": "workspace:^",
+    "@player-ui/ag-ui-plugin": "workspace:^",
     "@player-ui/beacon-plugin-react": "workspace:^",
     "@player-ui/make-flow": "workspace:^",
     "@player-ui/player": "workspace:^",

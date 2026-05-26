@@ -13,6 +13,8 @@ name = "storybook"
 dependencies = [
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/player",
+    ":node_modules/@player-ui/ag-ui",
+    ":node_modules/@player-ui/ag-ui-plugin",
     ":node_modules/@player-ui/beacon-plugin-react",
     ":node_modules/@player-ui/make-flow",
     ":node_modules/@player-ui/metrics-plugin-react",

@@ -1,0 +1,15 @@
+{
+  "name": "@player-ui/ag-ui",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.tsx",
+  "dependencies": {
+    "@player-ui/a2ui-plugin": "workspace:^",
+    "@player-ui/a2ui-plugin-react": "workspace:^",
+    "@player-ui/ag-ui-plugin": "workspace:^",
+    "@player-ui/ag-ui-plugin-react": "workspace:^"
+  },
+  "peerDependencies": {
+    "@player-ui/player": "workspace:^",
+    "@player-ui/react": "workspace:^"
+  }
+}

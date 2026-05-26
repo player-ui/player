@@ -63,6 +63,27 @@ export const PlayerOptionsContext = React.createContext<{
 }>({ options: {} });
 
 /**
+ * Factory that constructs the Player instance a story will drive. The default
+ * factory builds a `ReactPlayer`; stories that need a different Player class
+ * (e.g. `AGUIReactPlayer`) provide a custom factory via this context.
+ *
+ * The returned object must expose `start`, `player`, and `Component` so the
+ * story can drive a flow and render the result — `ReactPlayer` and its
+ * subclasses satisfy this naturally.
+ */
+export type PlayerLike = {
+  start: ReactPlayer["start"];
+  player: ReactPlayer["player"];
+  Component: ReactPlayer["Component"];
+};
+
+export type PlayerFactory = (options: ReactPlayerOptions) => PlayerLike;
+
+export const PlayerFactoryContext = React.createContext<{
+  createPlayer?: PlayerFactory;
+}>({});
+
+/**
  * Content format passed to `ReactPlayer.start`. When `"a2ui"`, the editor
  * value is treated as an A2UI snapshot and Player will adapt it on every
  * start — so users can edit the snapshot live in the JSON editor.
@@ -85,6 +106,7 @@ const PlayerJsonEditorStory = () => {
 
   const { plugins } = React.useContext(ReactPlayerPluginContext);
   const { format } = React.useContext(StartFormatContext);
+  const { createPlayer } = React.useContext(PlayerFactoryContext);
 
   const dispatch = useDispatch();
 
@@ -100,10 +122,13 @@ const PlayerJsonEditorStory = () => {
         setTrackedBeacons((t) => [...t, beacon]);
       },
     });
-    return new ReactPlayer({
+    const playerOptions: ReactPlayerOptions = {
       plugins: [new StorybookPlayerPlugin(dispatch), beaconPlugin, ...plugins],
-    });
-  }, [dispatch, plugins]);
+    };
+    return createPlayer
+      ? createPlayer(playerOptions)
+      : new ReactPlayer(playerOptions);
+  }, [dispatch, plugins, createPlayer]);
 
   /** A callback to start the flow */
   const startFlow = () => {
@@ -265,6 +290,13 @@ export interface PlayerStoryProps {
    * users can edit the snapshot live.
    */
   format?: StartOptions["format"];
+  /**
+   * Override how the Player instance is constructed. Default builds a
+   * `ReactPlayer`. Pass a factory to swap in a subclass — e.g.
+   * `AGUIReactPlayer` — while keeping the rest of the story scaffolding
+   * (JSON editor, events panel, beacons, plugin context) intact.
+   */
+  createPlayer?: PlayerFactory;
 }
 
 /**
@@ -272,7 +304,8 @@ export interface PlayerStoryProps {
  * This handles all of the wiring of the mock into the flow editor, events, etc
  */
 export const PlayerStory = (props: PlayerStoryProps) => {
-  const { flow, storybookControls, options, format, ...other } = props;
+  const { flow, storybookControls, options, format, createPlayer, ...other } =
+    props;
   useContentKind("json");
 
   const MockComp = React.useMemo(
@@ -293,9 +326,11 @@ export const PlayerStory = (props: PlayerStoryProps) => {
               options,
             }}
           >
-            <StartFormatContext.Provider value={{ format }}>
-              <MockComp />
-            </StartFormatContext.Provider>
+            <PlayerFactoryContext.Provider value={{ createPlayer }}>
+              <StartFormatContext.Provider value={{ format }}>
+                <MockComp />
+              </StartFormatContext.Provider>
+            </PlayerFactoryContext.Provider>
           </PlayerOptionsContext.Provider>
         </StorybookControlsContext.Provider>
       </SuspenseSpinner>
