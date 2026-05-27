@@ -13,6 +13,9 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.playerui.android.reference.demo.test.base.AssetUITest
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import org.hamcrest.Matchers.allOf
 import org.junit.Test
 
@@ -26,7 +29,7 @@ class TextUITest : AssetUITest("text") {
     }
 
     @Test
-    fun link() {
+    fun link() = runBlocking {
         launchMock("text-with-link")
 
         val openLink = allOf(
@@ -34,11 +37,18 @@ class TextUITest : AssetUITest("text") {
             hasData("https://www.intuit.com"),
         )
 
-        intending(openLink).respondWith(ActivityResult(RESULT_CANCELED, null))
+        withTimeout(5_000) {
+            suspendCancellableCoroutine<Unit> { cont ->
+                intending(openLink).respondWithFunction {
+                    cont.resume(Unit)
+                    ActivityResult(RESULT_CANCELED, null)
+                }
 
-        waitForViewInRoot(withText("A Link"))
-            .check(matches(isDisplayed()))
-            .perform(click())
+                waitForViewInRoot(withText("A Link"))
+                    .check(matches(isDisplayed()))
+                    .perform(click())
+            }
+        }
 
         intended(openLink)
     }
