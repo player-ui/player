@@ -100,6 +100,8 @@ build_constants(
 )
 
 bazel_dep(name = "rules_java", version = "8.13.0")
+# TODO: Remove when we can upgrade to Kotlin 2.0 (rules_kotlin +2.3.0)
+single_version_override(module_name = "rules_java", version = "8.13.0")
 bazel_dep(name = "rules_kotlin", version = "2.1.8")
 archive_override(
     module_name = "rules_kotlin",
