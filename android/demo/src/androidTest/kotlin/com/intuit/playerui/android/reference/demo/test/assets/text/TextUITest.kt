@@ -18,6 +18,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.hamcrest.Matchers.allOf
 import org.junit.Test
+import kotlin.coroutines.resume
 
 class TextUITest : AssetUITest("text") {
     @Test
