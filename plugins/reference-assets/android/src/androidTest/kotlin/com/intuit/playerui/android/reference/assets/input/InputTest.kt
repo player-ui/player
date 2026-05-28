@@ -25,6 +25,9 @@ class InputTest : AssetTest("input") {
             ?: throw AssertionError("current view is null")
         val inputField = currentView?.findViewById<FormattedEditText>(R.id.input_field) ?: throw AssertionError("current view is null")
 
+        // Drain the main looper so the label TextView is attached before we index into it.
+        runOnMain { }
+
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("This is an input", text.toString())
         }
