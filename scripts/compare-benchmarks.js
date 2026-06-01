@@ -10,6 +10,7 @@ const LOWER_BOUND = -0.1;
 const UPPER_BOUND = 0.05;
 
 function formatHz(hz) {
+  if (hz == null) return "N/A";
   if (hz >= 1_000_000) return `${(hz / 1_000_000).toFixed(2)}M`;
   if (hz >= 1_000) return `${(hz / 1_000).toFixed(2)}K`;
   return hz.toFixed(2);
@@ -104,6 +105,12 @@ for (const currentFile of currentFiles.sort()) {
       continue;
     }
 
+    if (cur.hz == null || base.hz == null) {
+      rows.push(
+        `| \`${key}\` | ${formatHz(cur.hz)} | ${formatHz(base.hz)} | N/A |`,
+      );
+      continue;
+    }
     const delta = (cur.hz - base.hz) / base.hz;
     const pct = (delta * 100).toFixed(1);
     const sign = delta >= 0 ? "+" : "";
@@ -137,6 +144,6 @@ if (sections.length === 0) {
 
 console.log("## Benchmark Results\n");
 console.log(
-  `_Comparison against baseline from \`main\`. ⚠️ = regression (>${LOWER_BOUND * -100}}% slower), ✅ = improvement (>${UPPER_BOUND * 100}% faster)_\n`,
+  `_Comparison against baseline from \`main\`. ⚠️ = regression (>${LOWER_BOUND * -100}% slower), ✅ = improvement (>${UPPER_BOUND * 100}% faster)_\n`,
 );
 console.log(sections.join("\n\n"));
