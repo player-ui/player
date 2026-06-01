@@ -398,7 +398,7 @@ jobs:
             if [ -n "${PR_NUM}" ]; then
               node scripts/compare-benchmarks.js > bench-comparison.md
               if [ -s bench-comparison.md ]; then
-                pnpx auto comment --pr "${PR_NUM}" \
+                npx auto comment --pr "${PR_NUM}" \
                   --message "$(cat bench-comparison.md)" \
                   --context "benchmarks" \
                   --edit
