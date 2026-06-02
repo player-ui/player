@@ -200,7 +200,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     }
 
     internal companion object {
-        private const val BUNDLED_SOURCE_PATH = "core/player/dist/Player.native.js"
+        public const val BUNDLED_SOURCE_PATH = "core/player/dist/Player.native.js"
 
         private const val DEBUG_SOURCE_PATH = "core/player/dist/Player.native.js"
 

@@ -2992,6 +2992,7 @@ public final class com/intuit/playerui/core/managed/AsyncIteratorKt {
 }
 
 public final class com/intuit/playerui/core/player/HeadlessPlayer : com/intuit/playerui/core/player/Player, com/intuit/playerui/core/bridge/NodeWrapper {
+	public static final field BUNDLED_SOURCE_PATH Ljava/lang/String;
 	public fun <init> (Lcom/intuit/playerui/core/bridge/runtime/Runtime;[Lcom/intuit/playerui/core/plugins/Plugin;)V
 	public fun <init> (Ljava/util/List;)V
 	public fun <init> (Ljava/util/List;Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
