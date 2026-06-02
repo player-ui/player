@@ -1,18 +1,32 @@
-public abstract interface class com/intuit/player/plugins/externalAction/ExternalActionHandler {
-	public abstract fun onExternalState (Lcom/intuit/player/jvm/core/flow/state/NavigationFlowExternalState;Lcom/intuit/player/jvm/core/player/state/ControllerState;Lkotlin/jvm/functions/Function1;)V
+public abstract interface class com/intuit/playerui/plugins/externalAction/ExternalActionHandler {
+	public abstract fun onExternalState (Lcom/intuit/playerui/core/flow/state/NavigationFlowExternalState;Lcom/intuit/playerui/core/player/state/ControllerState;Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class com/intuit/player/plugins/externalAction/ExternalActionPlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper, com/intuit/player/jvm/core/plugins/PlayerPlugin {
+public final class com/intuit/playerui/plugins/externalAction/ExternalActionPlugin : com/intuit/playerui/core/plugins/JSScriptPluginWrapper, com/intuit/playerui/core/plugins/PlayerPlugin {
 	public fun <init> ()V
-	public fun <init> (Lcom/intuit/player/plugins/externalAction/ExternalActionHandler;)V
-	public synthetic fun <init> (Lcom/intuit/player/plugins/externalAction/ExternalActionHandler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
-	public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
-	public final fun onExternalAction (Lcom/intuit/player/plugins/externalAction/ExternalActionHandler;)V
+	public fun <init> (Lcom/intuit/playerui/plugins/externalAction/ExternalActionHandler;)V
+	public synthetic fun <init> (Lcom/intuit/playerui/plugins/externalAction/ExternalActionHandler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
+	public fun apply (Lcom/intuit/playerui/core/player/Player;)V
+	public final fun onExternalAction (Lcom/intuit/playerui/plugins/externalAction/ExternalActionHandler;)V
 }
 
-public final class com/intuit/player/plugins/externalAction/ExternalActionPluginKt {
-	public static final fun getExternalActionPlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/plugins/externalAction/ExternalActionPlugin;
-	public static final fun onExternalAction (Lcom/intuit/player/jvm/core/player/Player;Lcom/intuit/player/plugins/externalAction/ExternalActionHandler;)V
+private final class com/intuit/playerui/plugins/externalAction/ExternalActionPlugin$Companion {
+}
+
+final class com/intuit/playerui/plugins/externalAction/ExternalActionPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/bridge/Promise;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/plugins/externalAction/ExternalActionPlugin$apply$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function3 {
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/plugins/externalAction/ExternalActionPluginKt {
+	public static final fun getExternalActionPlugin (Lcom/intuit/playerui/core/player/Player;)Lcom/intuit/playerui/plugins/externalAction/ExternalActionPlugin;
+	public static final fun onExternalAction (Lcom/intuit/playerui/core/player/Player;Lcom/intuit/playerui/plugins/externalAction/ExternalActionHandler;)V
 }
 

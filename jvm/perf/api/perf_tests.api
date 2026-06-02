@@ -1,0 +1,15 @@
+public abstract class com/intuit/playerui/perf/junit/JSEngineTest : com/intuit/playerui/utils/test/RuntimeTest {
+	public static final field Companion Lcom/intuit/playerui/perf/junit/JSEngineTest$Companion;
+	public field testInfo Lorg/junit/jupiter/api/TestInfo;
+	public fun <init> ()V
+	public final fun captureTime (Lkotlin/jvm/functions/Function0;)V
+	public final fun getLogger ()Ljava/util/logging/Logger;
+	public final fun getTestInfo ()Lorg/junit/jupiter/api/TestInfo;
+	public final fun setTestInfo (Lorg/junit/jupiter/api/TestInfo;)V
+	public final fun setup (Lorg/junit/jupiter/api/TestInfo;)V
+}
+
+public final class com/intuit/playerui/perf/junit/JSEngineTest$Companion {
+	public final fun getObjectScript ()Ljava/lang/String;
+}
+
