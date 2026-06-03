@@ -417,4 +417,148 @@ class ExternalStatePluginTests: XCTestCase {
 
         wait(for: [moreSpecificExpectation, lessSpecificExpectation, completionExpectation], timeout: 1)
     }
+
+    // MARK: - Error Handling with Error Controller
+
+    func testMissingHandlerNavigatesViaContentErrorTransitions() {
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        let plugin = ExternalStatePlugin(handlers: [])
+        let player = HeadlessPlayerImpl(plugins: [plugin])
+
+        player.start(flow: .flowWithErrorTransitions) { (result) in
+            switch result {
+            case .success(let state):
+                XCTAssertEqual(state.endState?.outcome, "ERROR")
+                completionExpectation.fulfill()
+            case .failure:
+                XCTFail("flow failed")
+            }
+        }
+
+        wait(for: [completionExpectation], timeout: 2)
+    }
+
+    func testMissingTransitionValueNavigatesViaContentErrorTransitions() {
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        let plugin = ExternalStatePlugin(handlers: [
+            ExternalStateHandler(ref: "test-1") { (_, _, handler) in
+                handler("")
+            }
+        ])
+        let player = HeadlessPlayerImpl(plugins: [plugin])
+
+        player.start(flow: .flowWithErrorTransitions) { (result) in
+            switch result {
+            case .success(let state):
+                XCTAssertEqual(state.endState?.outcome, "ERROR")
+                completionExpectation.fulfill()
+            case .failure:
+                XCTFail("flow failed")
+            }
+        }
+
+        wait(for: [completionExpectation], timeout: 2)
+    }
+
+    func testMissingHandlerIsObservableViaOnErrorTap() {
+        let onErrorCalled = XCTestExpectation(description: "onError fired")
+        let plugin = ExternalStatePlugin(handlers: [])
+        let player = HeadlessPlayerImpl(plugins: [plugin])
+
+        player.hooks?.errorController.tap { errorController in
+            errorController.hooks.onError.tap { errorInfo in
+                XCTAssertEqual(errorInfo.type, .externalState)
+                XCTAssertEqual(errorInfo.metadata?["reason"] as? String, "missing-handler")
+                XCTAssertEqual(errorInfo.metadata?["ref"] as? String, "test-1")
+                onErrorCalled.fulfill()
+                return true // suppress default navigation
+            }
+        }
+
+        player.start(flow: .basic) { _ in }
+        wait(for: [onErrorCalled], timeout: 2)
+    }
+
+    func testMissingTransitionValueIsObservableViaOnErrorTap() {
+        let onErrorCalled = XCTestExpectation(description: "onError fired")
+        let plugin = ExternalStatePlugin(handlers: [
+            ExternalStateHandler(ref: "test-1") { (_, _, handler) in
+                handler("")
+            }
+        ])
+        let player = HeadlessPlayerImpl(plugins: [plugin])
+
+        player.hooks?.errorController.tap { errorController in
+            errorController.hooks.onError.tap { errorInfo in
+                XCTAssertEqual(errorInfo.type, .externalState)
+                XCTAssertEqual(errorInfo.metadata?["reason"] as? String, "missing-transition-value")
+                XCTAssertEqual(errorInfo.metadata?["ref"] as? String, "test-1")
+                onErrorCalled.fulfill()
+                return true // suppress default navigation
+            }
+        }
+
+        player.start(flow: .basic) { _ in }
+        wait(for: [onErrorCalled], timeout: 2)
+    }
+}
+
+private extension String {
+    // Use the basic externalFlow (no errorTransitions); the onError tap suppresses navigation.
+    static let basic = """
+    {
+      "id": "test-flow",
+      "data": {},
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "EXT_1",
+          "EXT_1": {
+            "state_type": "EXTERNAL",
+            "ref": "test-1",
+            "transitions": {
+              "Next": "END_FWD"
+            }
+          },
+          "END_FWD": {
+            "state_type": "END",
+            "outcome": "FWD"
+          }
+        }
+      }
+    }
+    """
+
+    /// Flow that declares a flow-level errorTransitions mapping for `externalState`,
+    /// routing missing-handler/missing-transition-value errors to `END_ERROR`.
+    static let flowWithErrorTransitions = """
+    {
+      "id": "test-flow",
+      "data": {},
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "EXT_1",
+          "errorTransitions": {
+            "externalState": "END_ERROR"
+          },
+          "EXT_1": {
+            "state_type": "EXTERNAL",
+            "ref": "test-1",
+            "transitions": {
+              "Next": "END_FWD"
+            }
+          },
+          "END_FWD": {
+            "state_type": "END",
+            "outcome": "FWD"
+          },
+          "END_ERROR": {
+            "state_type": "END",
+            "outcome": "ERROR"
+          }
+        }
+      }
+    }
+    """
 }

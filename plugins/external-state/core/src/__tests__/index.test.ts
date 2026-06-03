@@ -1,7 +1,7 @@
 import { expect, test, vitest, describe } from "vitest";
 import type { Flow, InProgressState, NamedState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
-import { ExternalStatePlugin } from "..";
+import { ExternalStatePlugin, ExternalStateError } from "..";
 import { waitFor } from "@testing-library/react";
 
 const externalFlow = {
@@ -242,6 +242,12 @@ test("only transitions if player still on this external state", async () => {
             });
           },
         },
+        {
+          ref: "test-2",
+          handlerFunction: () => {
+            return "Next";
+          },
+        },
       ]),
     ],
   });
@@ -317,6 +323,151 @@ test("only transitions if player still on this external state", async () => {
   expect(
     (state as InProgressState).controllers.flow.current?.currentState?.name,
   ).toBe("EXT_2");
+});
+
+const flowWithErrorTransitions = {
+  id: "test-flow",
+  data: {},
+  views: [
+    {
+      id: "error-view",
+      type: "test",
+    },
+  ],
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "EXT_1",
+      errorTransitions: {
+        externalState: "ERROR_VIEW",
+      },
+      EXT_1: {
+        state_type: "EXTERNAL",
+        ref: "test-1",
+        transitions: { Next: "END_FWD" },
+      },
+      ERROR_VIEW: {
+        state_type: "VIEW",
+        ref: "error-view",
+        transitions: {},
+      },
+      END_FWD: {
+        state_type: "END",
+        outcome: "FWD",
+      },
+    },
+  },
+};
+
+test("missing handler error navigates via content errorTransitions", async () => {
+  const player = new Player({
+    plugins: [new ExternalStatePlugin([])],
+  });
+
+  player.start(flowWithErrorTransitions as Flow);
+
+  await waitFor(() => {
+    const state = player.getState() as InProgressState;
+    expect(state.controllers.flow.current?.currentState?.name).toBe(
+      "ERROR_VIEW",
+    );
+  });
+});
+
+test("missing transition value error navigates via content errorTransitions", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        { ref: "test-1", handlerFunction: () => undefined },
+      ]),
+    ],
+  });
+
+  player.start(flowWithErrorTransitions as Flow);
+
+  await waitFor(() => {
+    const state = player.getState() as InProgressState;
+    expect(state.controllers.flow.current?.currentState?.name).toBe(
+      "ERROR_VIEW",
+    );
+  });
+});
+
+test("missing handler error is observable via onError tap", async () => {
+  const onErrorSpy = vitest.fn().mockReturnValue(true);
+
+  const player = new Player({
+    plugins: [new ExternalStatePlugin([])],
+  });
+
+  player.hooks.errorController.tap("test", (ec) => {
+    ec.hooks.onError.tap("test", onErrorSpy);
+  });
+
+  player.start(externalFlow as Flow);
+
+  await waitFor(() => expect(onErrorSpy).toHaveBeenCalledOnce());
+
+  const error = onErrorSpy.mock.calls[0]?.[0] as ExternalStateError;
+  expect(error).toBeInstanceOf(ExternalStateError);
+  expect(error.type).toBe("externalState");
+  expect(error.metadata).toStrictEqual({
+    ref: "test-1",
+    reason: "missing-handler",
+  });
+});
+
+test("missing transition value error is observable via onError tap", async () => {
+  const onErrorSpy = vitest.fn().mockReturnValue(true);
+
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        { ref: "test-1", handlerFunction: () => undefined },
+      ]),
+    ],
+  });
+
+  player.hooks.errorController.tap("test", (ec) => {
+    ec.hooks.onError.tap("test", onErrorSpy);
+  });
+
+  player.start(externalFlow as Flow);
+
+  await waitFor(() => expect(onErrorSpy).toHaveBeenCalledOnce());
+
+  const error = onErrorSpy.mock.calls[0]?.[0] as ExternalStateError;
+  expect(error).toBeInstanceOf(ExternalStateError);
+  expect(error.metadata).toStrictEqual({
+    ref: "test-1",
+    reason: "missing-transition-value",
+  });
+});
+
+describe("ExternalStateError", () => {
+  test("missingHandler has correct shape", () => {
+    const error = ExternalStateError.missingHandler("my-ref");
+    expect(error.type).toBe("externalState");
+    expect(error.metadata).toStrictEqual({
+      ref: "my-ref",
+      reason: "missing-handler",
+    });
+    expect(error.message).toBe(
+      'No handler found for external state with ref: "my-ref". Ensure a handler is registered for this state.',
+    );
+  });
+
+  test("missingTransitionValue has correct shape", () => {
+    const error = ExternalStateError.missingTransitionValue("my-ref");
+    expect(error.type).toBe("externalState");
+    expect(error.metadata).toStrictEqual({
+      ref: "my-ref",
+      reason: "missing-transition-value",
+    });
+    expect(error.message).toBe(
+      'Handler for external state with ref: "my-ref" did not return a transition value. Ensure the handler returns the name of a valid transition.',
+    );
+  });
 });
 
 describe("edge cases", () => {
@@ -439,8 +590,29 @@ describe("edge cases", () => {
     });
   });
 
-  test("no handler registered for external state - no transition occurs", async () => {
-    // Create a player with NO handlers registered
+  test("no handler registered for external state - calls captureError with ExternalStateError", async () => {
+    const player = new Player({
+      plugins: [new ExternalStatePlugin([])],
+    });
+
+    const captureSpy = vitest.fn().mockReturnValue(false);
+    player.hooks.errorController.tap("test", (ec) => {
+      vitest.spyOn(ec, "captureError").mockImplementation(captureSpy);
+    });
+
+    player.start(externalFlow as Flow);
+
+    await waitFor(() => expect(captureSpy).toHaveBeenCalledOnce());
+
+    const error = captureSpy.mock.calls[0]?.[0] as ExternalStateError;
+    expect(error).toBeInstanceOf(ExternalStateError);
+    expect(error.metadata).toStrictEqual({
+      ref: "test-1",
+      reason: "missing-handler",
+    });
+  });
+
+  test("no handler for this ref (but other refs registered) - calls captureError", async () => {
     const player = new Player({
       plugins: [
         new ExternalStatePlugin([
@@ -450,33 +622,21 @@ describe("edge cases", () => {
       ],
     });
 
-    const started = player.start(externalFlow as Flow);
+    const captureSpy = vitest.fn().mockReturnValue(false);
+    player.hooks.errorController.tap("test", (ec) => {
+      vitest.spyOn(ec, "captureError").mockImplementation(captureSpy);
+    });
 
-    // Wait for player to reach the external state
-    await vitest.waitFor(() =>
-      expect(player.getState().status).toBe("in-progress"),
-    );
+    player.start(externalFlow as Flow);
 
-    // Get the current state
-    const state = player.getState() as InProgressState;
-    const currentState = state.controllers.flow.current?.currentState;
+    await waitFor(() => expect(captureSpy).toHaveBeenCalledOnce());
 
-    // Should be stuck on the external state
-    expect(currentState?.name).toBe("EXT_1");
-    expect(currentState?.value.state_type).toBe("EXTERNAL");
-
-    // Wait a bit to ensure no transition occurs
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // Should still be on the external state (no transition occurred)
-    const laterState = player.getState() as InProgressState;
-    const laterCurrentState = laterState.controllers.flow.current?.currentState;
-    expect(laterCurrentState?.name).toBe("EXT_1");
-    expect(laterCurrentState?.value.state_type).toBe("EXTERNAL");
-
-    // Clean up - manually transition to end the flow
-    laterState.controllers.flow.transition("Next");
-    await started;
+    const error = captureSpy.mock.calls[0]?.[0] as ExternalStateError;
+    expect(error).toBeInstanceOf(ExternalStateError);
+    expect(error.metadata).toStrictEqual({
+      ref: "test-1",
+      reason: "missing-handler",
+    });
   });
 });
 

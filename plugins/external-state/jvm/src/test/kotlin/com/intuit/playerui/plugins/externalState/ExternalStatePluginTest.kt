@@ -1,14 +1,19 @@
 package com.intuit.playerui.plugins.externalState
 
+import com.intuit.hooks.BailResult
+import com.intuit.playerui.core.error.ErrorController
 import com.intuit.playerui.core.expressions.evaluate
+import com.intuit.playerui.core.player.PlayerExceptionMetadata
 import com.intuit.playerui.core.player.state.ControllerState
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import com.intuit.playerui.utils.test.setupPlayer
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.assertThrows
@@ -168,5 +173,117 @@ internal class ExternalStatePluginTest : PlayerTest() {
 
         // Last handler registered wins (Prev)
         assertEquals(result.endState.outcome, "BCK")
+    }
+
+    private val flowWithErrorTransitions =
+        """
+{
+  "id": "test-flow",
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "errorTransitions": {
+        "externalState": "END_ERROR"
+      },
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD"
+        }
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_ERROR": {
+        "state_type": "END",
+        "outcome": "ERROR"
+      }
+    }
+  }
+}
+        """
+
+    @TestTemplate
+    fun testMissingHandlerNavigatesViaContentErrorTransitions() = runBlockingTest {
+        val plugin = ExternalStatePlugin(
+            ExternalStateHandler(ref = "different-ref") { _, _, transition ->
+                transition("Next")
+            },
+        )
+
+        setupPlayer(plugin)
+        val result = player.start(flowWithErrorTransitions).await()
+        assertEquals("ERROR", result.endState.outcome)
+    }
+
+    @TestTemplate
+    fun testMissingTransitionValueNavigatesViaContentErrorTransitions() = runBlockingTest {
+        val plugin = ExternalStatePlugin(
+            ExternalStateHandler(ref = "test-1") { _, _, transition ->
+                transition("")
+            },
+        )
+
+        setupPlayer(plugin)
+        val result = player.start(flowWithErrorTransitions).await()
+        assertEquals("ERROR", result.endState.outcome)
+    }
+
+    @TestTemplate
+    fun testMissingHandlerIsObservableViaOnErrorTap() = runBlockingTest {
+        val errorCaptured = CompletableDeferred<Throwable>()
+
+        val plugin = ExternalStatePlugin(
+            ExternalStateHandler(ref = "different-ref") { _, _, transition ->
+                transition("Next")
+            },
+        )
+
+        setupPlayer(plugin)
+        player.hooks.errorController.tap("test") { errorController: ErrorController? ->
+            errorController?.hooks?.onError?.tap("test") { error: Throwable? ->
+                error?.let { errorCaptured.complete(it) }
+                BailResult.Bail(true) // suppress default navigation
+            }
+        }
+
+        player.start(jsonFlow)
+
+        val metadata = errorCaptured.await() as? PlayerExceptionMetadata
+        assertNotNull(metadata)
+        assertEquals("externalState", metadata?.type)
+        assertEquals("missing-handler", metadata?.metadata?.get("reason"))
+        assertEquals("test-1", metadata?.metadata?.get("ref"))
+    }
+
+    @TestTemplate
+    fun testMissingTransitionValueIsObservableViaOnErrorTap() = runBlockingTest {
+        val errorCaptured = CompletableDeferred<Throwable>()
+
+        val plugin = ExternalStatePlugin(
+            ExternalStateHandler(ref = "test-1") { _, _, transition ->
+                transition("")
+            },
+        )
+
+        setupPlayer(plugin)
+        player.hooks.errorController.tap("test") { errorController: ErrorController? ->
+            errorController?.hooks?.onError?.tap("test") { error: Throwable? ->
+                error?.let { errorCaptured.complete(it) }
+                BailResult.Bail(true) // suppress default navigation
+            }
+        }
+
+        player.start(jsonFlow)
+
+        val metadata = errorCaptured.await() as? PlayerExceptionMetadata
+        assertNotNull(metadata)
+        assertEquals("externalState", metadata?.type)
+        assertEquals("missing-transition-value", metadata?.metadata?.get("reason"))
+        assertEquals("test-1", metadata?.metadata?.get("ref"))
     }
 }

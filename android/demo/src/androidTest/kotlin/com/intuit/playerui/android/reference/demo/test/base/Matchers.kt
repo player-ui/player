@@ -1,12 +1,16 @@
 package com.intuit.playerui.android.reference.demo.test.base
 
+import android.text.Spanned
+import android.text.style.ClickableSpan
 import android.view.View
+import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.PerformException
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.util.HumanReadables
 import androidx.test.espresso.util.TreeIterables
@@ -63,5 +67,41 @@ fun waitForView(
                 .withCause(TimeoutException())
                 .build()
         }
+    }
+}
+
+fun clickClickableSpan(text: CharSequence? = null): ViewAction = object : ViewAction {
+    override fun getConstraints(): Matcher<View> = isAssignableFrom(TextView::class.java)
+
+    override fun getDescription() = text
+        ?.let { "click ClickableSpan containing \"$it\"" }
+        ?: "click the ClickableSpan in this TextView"
+
+    override fun perform(uiController: UiController, view: View) {
+        val tv = view as TextView
+        val spannable = tv.text as? Spanned ?: throw PerformException
+            .Builder()
+            .withActionDescription(description)
+            .withViewDescription(HumanReadables.describe(view))
+            .withCause(IllegalStateException("TextView text is not Spanned"))
+            .build()
+
+        val spans = spannable.getSpans(0, spannable.length, ClickableSpan::class.java)
+        val span = if (text == null) {
+            spans.firstOrNull()
+        } else {
+            spans.firstOrNull {
+                val start = spannable.getSpanStart(it)
+                val end = spannable.getSpanEnd(it)
+                spannable.subSequence(start, end).toString() == text
+            }
+        } ?: throw PerformException
+            .Builder()
+            .withActionDescription(description)
+            .withViewDescription(HumanReadables.describe(view))
+            .withCause(IllegalStateException(text?.let { "No ClickableSpan with text \"$it\" found" } ?: "No ClickableSpan found"))
+            .build()
+
+        span.onClick(view)
     }
 }
