@@ -77,6 +77,7 @@ xcui.json
 #SPM
 .build
 .swiftpm
+Package.resolved
 ios/PlayerUI.xcodeproj
 
 

@@ -18,7 +18,7 @@ import {
 } from "../../view";
 import type { Logger } from "../../logger";
 import type { FlowInstance, FlowController } from "../flow";
-import type { DataController } from "../data/controller";
+import type { IDataController } from "../data/types";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
 import type { Node } from "../../view";
@@ -26,7 +26,7 @@ import { ErrorController } from "../error";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
-  model: DataController;
+  model: IDataController;
 
   /** Where to log data */
   logger?: Logger;

@@ -1,6 +1,6 @@
 import { SyncBailHook } from "tapable-ts";
 import type { Logger } from "../../logger";
-import type { DataController } from "../data/controller";
+import type { IDataController } from "../data/types";
 import type { FlowController } from "../flow/controller";
 import type { PlayerError } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
@@ -33,7 +33,7 @@ export interface ErrorControllerOptions {
   /** Callback to fail/reject the flow */
   fail: (error: Error) => void;
   /** Data model for setting errorState (can be set later via setOptions) */
-  model?: DataController;
+  model?: IDataController;
 }
 
 /** The orchestrator for player error handling */

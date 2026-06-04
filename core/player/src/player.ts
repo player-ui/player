@@ -21,6 +21,11 @@ import {
   FlowController,
   ErrorController,
 } from "./controllers";
+import type { IDataController } from "./controllers/data/types";
+import type { BindingParser as IBindingParser } from "./binding";
+import type {
+  DataModelMiddleware,
+} from "./data";
 import { FlowExpPlugin } from "./plugins/flow-exp-plugin";
 import { DefaultExpPlugin } from "./plugins/default-exp-plugin";
 import type {
@@ -80,12 +85,46 @@ export interface ExtendedPlayerPlugin<
   Validators = void,
 > {}
 
+/**
+ * Context passed to a custom DataController factory.
+ * Mirrors the arguments the default `DataController` constructor receives in
+ * `setupFlow`, so a replacement has every input the default does — including
+ * cross-controller wiring (pathResolver, middleware) prepared in topological
+ * order. Replacements must honor the same contract (`IDataController`).
+ */
+export interface DataControllerContext {
+  /** Initial data model from the flow */
+  data: Record<any, unknown> | undefined;
+  /** A means of parsing a raw binding to a Binding object */
+  pathResolver: IBindingParser;
+  /** Middleware drawn from validation + error controllers */
+  middleware: Array<DataModelMiddleware>;
+  /** Logger from the Player */
+  logger?: Logger;
+}
+
+/**
+ * Optional factories that replace built-in Player services. Absent fields fall
+ * back to the default implementation. The factory receives a `ctx` object
+ * with the same inputs the default constructor would have received.
+ *
+ * Designed so a native consumer (Kotlin/Swift) can supply a JS-side proxy
+ * object backed by native code, satisfying the same interface as the default.
+ */
+export interface PlayerServices {
+  /** Custom data controller factory. Replacement must implement `IDataController`. */
+  data?: (ctx: DataControllerContext) => IDataController;
+}
+
 export interface PlayerConfigOptions {
   /** A set of plugins to load  */
   plugins?: PlayerPlugin[];
 
   /** A logger to use */
   logger?: Logger;
+
+  /** Optional factories replacing built-in services. */
+  services?: PlayerServices;
 }
 
 export interface PlayerInfo {
@@ -116,7 +155,7 @@ export class Player {
     viewController: new SyncHook<[ViewController]>(),
     view: new SyncHook<[ViewInstance]>(),
     expressionEvaluator: new SyncHook<[ExpressionEvaluator]>(),
-    dataController: new SyncHook<[DataController]>(),
+    dataController: new SyncHook<[IDataController]>(),
     schema: new SyncHook<[SchemaController]>(),
     validationController: new SyncHook<[ValidationController]>(),
     bindingParser: new SyncHook<[BindingParser]>(),
@@ -222,7 +261,7 @@ export class Player {
     // eslint-disable-next-line prefer-const
     let expressionEvaluator: ExpressionEvaluator;
     // eslint-disable-next-line prefer-const
-    let dataController: DataController;
+    let dataController: IDataController;
 
     const pathResolver = new BindingParser({
       get: (binding) => {
@@ -255,14 +294,18 @@ export class Player {
 
     this.hooks.errorController.call(errorController);
 
-    dataController = new DataController(userFlow.data, {
+    const dataCtx: DataControllerContext = {
+      data: userFlow.data,
       pathResolver,
       middleware: [
         ...validationController.getDataMiddleware(),
         errorController.getDataMiddleware(),
       ],
       logger: this.logger,
-    });
+    };
+    dataController =
+      this.config.services?.data?.(dataCtx) ??
+      new DataController(dataCtx.data, dataCtx);
 
     dataController.hooks.format.tap("player", (value, binding) => {
       const formatter = schema.getFormatter(binding);

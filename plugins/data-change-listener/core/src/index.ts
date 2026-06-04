@@ -1,6 +1,6 @@
 import type {
   Player,
-  DataController,
+  IDataController,
   PlayerPlugin,
   View,
   ViewController,
@@ -231,7 +231,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
       });
     };
 
-    player.hooks.dataController.tap(this.name, (dc: DataController) =>
+    player.hooks.dataController.tap(this.name, (dc: IDataController) =>
       dc.hooks.onUpdate.tap(this.name, (updates, options) => {
         const { silent = false } = options || {};
         if (silent) return;

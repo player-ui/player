@@ -26,6 +26,7 @@ import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.ServicesConfig
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.player.state.inProgressState
@@ -54,7 +55,8 @@ public class AndroidPlayer private constructor(
     public constructor(
         vararg plugins: Plugin,
         config: Config = Config(),
-    ) : this(plugins.toList(), config)
+        services: ServicesConfig? = null,
+    ) : this(plugins.toList(), config, services)
 
     /**
      * Constructor that takes a [context] and collection of [Plugin]s.
@@ -65,7 +67,8 @@ public class AndroidPlayer private constructor(
     public constructor(
         plugins: List<Plugin>,
         config: Config = Config(),
-    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config))
+        services: ServicesConfig? = null,
+    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config, services = services))
 
     /**
      * Allow the [AndroidPlayer] to be built on top of a pre-existing

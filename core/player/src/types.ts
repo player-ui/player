@@ -10,6 +10,7 @@ import type {
   FlowController,
   ErrorController,
 } from "./controllers";
+import type { IDataController } from "./controllers/data/types";
 import type { ReadOnlyDataController } from "./controllers/data/utils";
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import { ViewInstance } from "./view";
@@ -27,7 +28,7 @@ export interface PlayerHooks {
   /** Called when an expression evaluator was created */
   expressionEvaluator: SyncHook<[ExpressionEvaluator], Record<string, any>>;
   /** The hook that creates and manages data */
-  dataController: SyncHook<[DataController], Record<string, any>>;
+  dataController: SyncHook<[IDataController], Record<string, any>>;
   /** Called after the schema is created for a flow */
   schema: SyncHook<[SchemaController], Record<string, any>>;
   /** Manages validations (schema and x-field ) */
@@ -81,7 +82,7 @@ export interface PlayerFlowExecutionData {
 
 export interface ControllerState {
   /** The manager for data for a flow */
-  data: DataController;
+  data: IDataController;
 
   /** The view manager for a flow */
   view: ViewController;

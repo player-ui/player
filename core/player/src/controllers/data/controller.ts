@@ -14,9 +14,12 @@ import type {
 import { PipelinedDataModel, LocalModel } from "../../data";
 import type { RawSetTransaction } from "../../types";
 import { ReadOnlyDataController } from "./utils";
+import type { IDataController } from "./types";
 
 /** The orchestrator for player data */
-export class DataController implements DataModelWithParser<DataModelOptions> {
+export class DataController
+  implements DataModelWithParser<DataModelOptions>, IDataController
+{
   public hooks = {
     resolve: new SyncWaterfallHook(),
     resolveDataStages: new SyncWaterfallHook<[DataPipeline]>(),

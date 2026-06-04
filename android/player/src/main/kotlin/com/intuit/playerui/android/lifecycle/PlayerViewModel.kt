@@ -12,6 +12,7 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncIterationFlow
 import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.ServicesConfig
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
@@ -67,13 +68,21 @@ public open class PlayerViewModel(
 
     protected open val config: AndroidPlayer.Config = AndroidPlayer.Config()
 
+    /**
+     * Optional Kotlin-native service factories supplied via
+     * [com.intuit.playerui.core.player.ServicesConfig]. Override to replace
+     * built-in Player services (e.g. the data controller) with a native
+     * implementation.
+     */
+    protected open val services: ServicesConfig? = null
+
     @ExperimentalPlayerApi
     public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
         // this is unfortunate, but is essentially for ensuring view model has completely initialized
         while (plugins == null) {
             delay(5)
         }
-        AndroidPlayer(plugins + this@PlayerViewModel, config)
+        AndroidPlayer(plugins + this@PlayerViewModel, config, services)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPlayerApi::class)

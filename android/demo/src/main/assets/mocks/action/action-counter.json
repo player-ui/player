@@ -1,0 +1,59 @@
+{
+  "id": "action-counter",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-title",
+          "type": "text",
+          "value": "Counter (Kotlin DataController demo)"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-1",
+            "type": "action",
+            "exp": "{{count}} = {{count}} + 1",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Clicked {{count}} times"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "data": {
+    "count": 0
+  },
+  "schema": {
+    "ROOT": {
+      "count": {
+        "type": "NumberType"
+      }
+    }
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}

@@ -1,4 +1,8 @@
-import type { Player, DataController, PlayerPlugin } from "@player-ui/player";
+import type {
+  Player,
+  IDataController,
+  PlayerPlugin,
+} from "@player-ui/player";
 import { ValidationMiddleware } from "@player-ui/player";
 
 /**
@@ -9,7 +13,7 @@ export class StageRevertDataPlugin implements PlayerPlugin {
   name = "stage-revert-data-plugin";
 
   apply(player: Player) {
-    let dataController: DataController;
+    let dataController: IDataController;
     let commitTransitions: string[];
     let stageData: string;
     let commitShadowModel = false;
@@ -29,7 +33,7 @@ export class StageRevertDataPlugin implements PlayerPlugin {
      * Tapping into data controller hook to intercept data before it gets committed to data model,
      * we are using an instance of ValidationMiddleware when tapping the resolveDataStages hook on DataController
      */
-    player.hooks.dataController.tap(this.name, (dc: DataController) => {
+    player.hooks.dataController.tap(this.name, (dc: IDataController) => {
       dataController = dc;
 
       dc.hooks.resolveDataStages.tap(this.name, (dataPipeline) => {

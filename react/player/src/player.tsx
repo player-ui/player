@@ -9,6 +9,7 @@ import { Registry } from "@player-ui/partial-match-registry";
 import type {
   CompletedState,
   PlayerPlugin,
+  PlayerServices,
   Flow,
   View,
   PlayerInfo,
@@ -58,6 +59,13 @@ export interface ReactPlayerOptions {
 
   /** A set of plugins to apply to this player */
   plugins?: Array<ReactPlayerPlugin>;
+
+  /**
+   * Optional factories that replace built-in Player services with a custom
+   * implementation. Ignored if `player` is supplied (the caller is expected
+   * to have configured services on the headless instance directly).
+   */
+  services?: PlayerServices;
 }
 
 export type ReactPlayerComponentProps = {
@@ -134,7 +142,9 @@ export class ReactPlayer {
       Boolean(p.apply),
     ) as PlayerPlugin[];
 
-    this.player = options?.player ?? new Player({ plugins: playerPlugins });
+    this.player =
+      options?.player ??
+      new Player({ plugins: playerPlugins, services: options?.services });
 
     plugins.forEach((plugin) => {
       if (plugin.applyReact) {

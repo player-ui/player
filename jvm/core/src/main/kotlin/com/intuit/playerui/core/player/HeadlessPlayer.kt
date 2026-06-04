@@ -57,6 +57,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
+    services: ServicesConfig? = null,
 ) : Player(),
     NodeWrapper {
     /** Convenience constructor to allow [plugins] to be passed as varargs */
@@ -66,7 +67,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
         explicitRuntime: Runtime<*>? = null,
         source: URL = bundledSource,
-    ) : this(plugins.toList(), explicitRuntime, source, config)
+        services: ServicesConfig? = null,
+    ) : this(plugins.toList(), explicitRuntime, source, config, services)
 
     public constructor(
         explicitRuntime: Runtime<*>,
@@ -143,7 +145,13 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
             .filterIsInstance<RuntimePlugin>()
             .onEach { it.apply(runtime) }
             .filterIsInstance<JSPluginWrapper>()
-            .let { JSPlayerConfig(it, loggerPlugins) }
+            .let {
+                JSPlayerConfig(
+                    plugins = it,
+                    loggers = loggerPlugins,
+                    services = services?.toInvokableMap() ?: emptyMap(),
+                )
+            }
 
         /** 4. build JS headless player */
         runtime.add("config", config)
