@@ -1,7 +1,25 @@
-public final class com/intuit/player/plugins/settimeout/SetTimeoutPlugin : com/intuit/player/jvm/core/plugins/PlayerPlugin, com/intuit/player/jvm/core/plugins/RuntimePlugin {
-public fun <init> ()V
-public fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler;)V
-public synthetic fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
-public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
+public final class com/intuit/playerui/plugins/settimeout/SetTimeoutPlugin : com/intuit/playerui/core/plugins/PlayerPlugin, com/intuit/playerui/core/plugins/RuntimePlugin {
+	public fun <init> ()V
+	public fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler;Z)V
+	public synthetic fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
+	public fun apply (Lcom/intuit/playerui/core/player/Player;)V
 }
+
+final class com/intuit/playerui/plugins/settimeout/SetTimeoutPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Invokable;J)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/plugins/settimeout/SetTimeoutPlugin$apply$1$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/plugins/settimeout/SetTimeoutPlugin$apply$1$invoke$$inlined$CoroutineExceptionHandler$1 : kotlin/coroutines/AbstractCoroutineContextElement, kotlinx/coroutines/CoroutineExceptionHandler {
+	public fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler$Key;Lcom/intuit/playerui/core/bridge/runtime/Runtime;Lcom/intuit/playerui/plugins/settimeout/SetTimeoutPlugin;)V
+	public fun handleException (Lkotlin/coroutines/CoroutineContext;Ljava/lang/Throwable;)V
+}
+

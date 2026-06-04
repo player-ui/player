@@ -24,5 +24,6 @@ js_pipeline(
         ":node_modules/@player-ui/check-path-plugin",
         ":node_modules/@player-ui/partial-match-registry",
         "//:vitest_config",
-    ]
+    ],
+    benchmark_envs = {"BENCH_PACKAGE_PATH": package_name()},
 )
