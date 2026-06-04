@@ -13,6 +13,7 @@ import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
+import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
@@ -32,6 +33,7 @@ import com.intuit.playerui.core.plugins.logging.loggers
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.nullable
 import java.net.URL
 
 /**
@@ -177,15 +179,15 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
             .onEach { it.apply(this) }
     }
 
-    override fun start(flow: String): Completable<CompletedState> = try {
-        start(runtime.execute("($flow)") as Node)
+    override fun start(flow: String, options: StartOptions?): Completable<CompletedState> = try {
+        start(runtime.execute("($flow)") as Node, options)
     } catch (exception: Exception) {
         val wrapped = PlayerException("Could not load Player content", exception)
         inProgressState?.fail(wrapped) ?: hooks.state.call(hashMapOf(), arrayOf(ErrorState.from(wrapped)))
         PlayerCompletable(Promise.reject(wrapped))
     }
 
-    public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
+    public fun start(flow: Node, options: StartOptions? = null): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow, options))
 
     /** Start a [flow] and subscribe to the result */
     public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> = start(flow).apply {

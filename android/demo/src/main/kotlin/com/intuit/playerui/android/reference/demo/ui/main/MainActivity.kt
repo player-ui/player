@@ -25,11 +25,13 @@ import com.intuit.playerui.android.reference.demo.R
 import com.intuit.playerui.android.reference.demo.model.AssetMock
 import com.intuit.playerui.android.reference.demo.model.StringMock
 import com.intuit.playerui.android.ui.PlayerFragment
+import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.mocks.ClassLoaderMock
 import com.intuit.playerui.utils.mocks.Mock
-import com.intuit.playerui.utils.mocks.getFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -98,23 +100,44 @@ class MainActivity : AppCompatActivity() {
         json?.let { viewModel.launch(json) }
     }
 
-    private fun startFlow(mock: Mock<*>) = launchFlow(
-        when (mock) {
-            is ClassLoaderMock -> mock.getFlow(this.classLoader)
-            is AssetMock -> mock.getFlow(this.assets)
-            is StringMock -> mock.getFlow("")
+    private fun startFlow(mock: Mock<*>) {
+        val raw = when (mock) {
+            is ClassLoaderMock -> mock.read(this.classLoader)
+            is AssetMock -> mock.read(this.assets)
+            is StringMock -> mock.read("")
             else -> throw IllegalArgumentException("mock of type ${mock::class}[$mock] not supported")
-        },
-        mock.name,
-    )
+        }
 
-    private fun launchFlow(flow: String, name: String?) {
+        // A2UI snapshots are not Player flows — they're translated by the A2UI
+        // content plugin when started with `format = "a2ui"`. Detect them by their
+        // structural signature and pass the raw content through untouched. Player
+        // flows continue to be normalized via `makeFlow`.
+        if (isA2UISnapshot(raw)) {
+            launchFlow(raw, mock.name, format = "a2ui")
+        } else {
+            launchFlow(makeFlow(raw).toString(), mock.name)
+        }
+    }
+
+    private fun launchFlow(
+        flow: String,
+        name: String?,
+        format: String? = null,
+    ) {
         drawerLayout.closeDrawer(GravityCompat.START)
         navController.navigate(
             R.id.action_launch_player,
-            name?.let {
-                bundleOf("name" to name, "flow" to flow)
-            } ?: bundleOf("flow" to flow),
+            bundleOf("flow" to flow).apply {
+                name?.let { putString("name", it) }
+                format?.let { putString("format", it) }
+            },
         )
+    }
+
+    private fun isA2UISnapshot(raw: String): Boolean = try {
+        val json = Json.parseToJsonElement(raw).jsonObject
+        json.containsKey("surfaceId") && json.containsKey("components") && !json.containsKey("views")
+    } catch (e: Exception) {
+        false
     }
 }

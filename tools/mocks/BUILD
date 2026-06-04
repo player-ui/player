@@ -13,8 +13,10 @@ filegroup(
     srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS] + [
         "//plugins/reference-assets/mocks:flow-manager",
         # a2ui mocks live alongside a js_pipeline so the directory-level
-        # `mocks` target is the npm_package; the raw JSONs are at `:snapshots`.
-        "//plugins/a2ui/mocks:snapshots",
+        # `mocks` target is the npm_package; the raw JSONs are re-rooted under
+        # `mocks/<group>/<file>` by `:rerooted_mocks` so the manifest generator
+        # derives the correct classpath path (it keys off the last 3 segments).
+        "//plugins/a2ui/mocks:rerooted_mocks",
     ],
     visibility = ["//visibility:public"],
 )
