@@ -374,7 +374,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-
+      - setup_auth
       - run:
           name: Run benchmarks
           command: |
@@ -608,17 +608,18 @@ workflows:
       - build_and_test_ios:
           requires:
             - build
+            - test
 
       - android_test:
           context:
             - Build
           requires:
             - build
+            - test
 
       - test:
           requires:
             - build
-            - build_and_test_ios
 
       - upload_coverage:
           requires:
