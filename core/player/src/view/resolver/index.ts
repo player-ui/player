@@ -8,7 +8,7 @@ import type {
   DataModelWithParser,
   Updates,
 } from "../../data";
-import { DependencyModel, withParser } from "../../data";
+import { DependencyModel, ownedSetIn, withParser } from "../../data";
 import type { ExpressionType } from "../../expressions";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
@@ -372,6 +372,18 @@ export class Resolver {
     const childDependencies = new Set<BindingInstance>();
     dependencyModel.trackSubset("children");
 
+    // Folding multiple children into `resolved` re-clones its shared ancestors
+    // once per child. For nodes with several children, track containers cloned
+    // during this fold in `owned` so each is copied once and later writes mutate
+    // the existing clone. The fresh set guarantees the hook-returned value (and
+    // any reused `previousResult.value`) is never mutated — the first write
+    // always clones. For 0-1 children there is nothing to share, so plain
+    // `setIn` avoids the WeakSet bookkeeping entirely.
+    const childList =
+      "children" in resolvedAST ? resolvedAST.children : undefined;
+    const owned =
+      childList && childList.length > 1 ? new WeakSet<object>() : undefined;
+
     if ("children" in resolvedAST) {
       const newChildren = resolvedAST.children?.map((child) => {
         const computedChildTree = this.computeTree(
@@ -394,15 +406,14 @@ export class Resolver {
         childTreeDeps.forEach((binding) => childDependencies.add(binding));
 
         if (childValue) {
+          let next = childValue;
           if (childNode.type === NodeType.MultiNode && !childNode.override) {
-            const arr = addLast(
-              dlv(resolved, child.path as any[], []),
-              childValue,
-            );
-            resolved = setIn(resolved, child.path, arr);
-          } else {
-            resolved = setIn(resolved, child.path, childValue);
+            next = addLast(dlv(resolved, child.path as any[], []), childValue);
           }
+
+          resolved = owned
+            ? ownedSetIn(resolved, child.path, next, owned)
+            : setIn(resolved, child.path, next);
         }
 
         updated = updated || childUpdated;
@@ -457,16 +468,15 @@ export class Resolver {
         dependencyModel.getDependencies(scope),
     });
 
-    // Merge core + child dependencies without materializing an intermediate
-    // array (cheaper than `new Set([...a, ...b])` once transpiled).
-    const dependencies = new Set(dependencyModel.getDependencies());
-    childDependencies.forEach((bindingDep) => dependencies.add(bindingDep));
-
+    // `addChildReadDep` above already folded every child dependency into the
+    // model's read-deps, so `getDependencies()` returns the complete set. The
+    // model is local to this call and discarded afterward, so hand off its set
+    // directly rather than copying it into a new Set per node.
     const update: NodeUpdate = {
       node: resolvedAST,
       updated,
       value: resolved,
-      dependencies,
+      dependencies: dependencyModel.getDependencies(),
     };
 
     this.hooks.afterNodeUpdate.call(node, rawParent, update);

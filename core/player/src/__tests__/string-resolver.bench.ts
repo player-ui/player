@@ -51,6 +51,28 @@ const nestedObject = {
   },
 };
 
+/**
+ * A large, realistic view-data structure: many sections, each with arrays of
+ * fields carrying a mix of ref-bearing and plain strings (~300 nodes, depth 5,
+ * with arrays). Exercises the recursive traverse + the single-clone path far
+ * more thoroughly than the small fixtures above.
+ */
+const largeNestedObject = {
+  meta: { author: "{{user.name}}", revision: "plain-rev", count: 80 },
+  sections: Array.from({ length: 8 }, (_, s) => ({
+    id: `section-${s}`,
+    title: `Section ${s} for {{user.name}}`,
+    description: "static description with no refs",
+    fields: Array.from({ length: 10 }, (_, f) => ({
+      id: `field-${s}-${f}`,
+      label: `{{a}} label ${f}`,
+      value: f % 2 ? `{{b}}` : `static ${f}`,
+      help: { text: "Help {{c}}", visible: true, order: f },
+      options: ["{{a}}", "plain", "{{b}}"],
+    })),
+  })),
+};
+
 describe("resolveExpressionsInString", () => {
   bench(
     "single expression",
@@ -116,5 +138,13 @@ describe("resolveDataRefs object", () => {
       resolveDataRefs(nestedObject, options);
     },
     { iterations: 10000 },
+  );
+
+  bench(
+    "large nested (8 sections x 10 fields, depth 5)",
+    () => {
+      resolveDataRefs(largeNestedObject, options);
+    },
+    { iterations: 1000 },
   );
 });

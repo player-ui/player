@@ -52,6 +52,17 @@ const batchB: Array<[string, any]> = Array.from({ length: 15 }, (_, i) => [
   i + 200,
 ]);
 
+// Larger transactions to characterize the parse + dequal + structural-share
+// path as batch size grows.
+const batch50A: Array<[string, any]> = Array.from({ length: 50 }, (_, i) => [
+  `form.fields.field${i}.value`,
+  i + 1000,
+]);
+const batch50B: Array<[string, any]> = Array.from({ length: 50 }, (_, i) => [
+  `form.fields.field${i}.value`,
+  i + 2000,
+]);
+
 let tick = 0;
 
 describe("DataController set", () => {
@@ -90,6 +101,15 @@ describe("DataController set", () => {
     () => {
       tick += 1;
       controller.set(tick % 2 ? batchA : batchB);
+    },
+    { iterations: 10000 },
+  );
+
+  bench(
+    "set batch (50, all changed)",
+    () => {
+      tick += 1;
+      controller.set(tick % 2 ? batch50A : batch50B);
     },
     { iterations: 10000 },
   );

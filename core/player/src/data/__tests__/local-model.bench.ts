@@ -42,6 +42,24 @@ const batch: Array<[BindingInstance, any]> = Array.from(
   (_, i) => [new BindingInstance(`form.fields.field${i}.value`), i + 100],
 );
 
+// A larger batch touching all 50 fields under the shared `form.fields` parent.
+const batch50: Array<[BindingInstance, any]> = Array.from(
+  { length: 50 },
+  (_, i) => [new BindingInstance(`form.fields.field${i}.value`), i + 100],
+);
+
+// A batch whose paths fan out across unrelated subtrees (no shared parent),
+// the worst case for structural sharing — should still match plain per-set.
+const batchScattered: Array<[BindingInstance, any]> = [
+  [new BindingInstance("user.name"), "Grace"],
+  [new BindingInstance("user.profile.age"), 31],
+  [new BindingInstance("user.profile.address.zip"), "11111"],
+  [new BindingInstance("user.pets.3.name"), "Rex"],
+  [new BindingInstance("user.pets.20.type"), "fish"],
+  [new BindingInstance("form.fields.field0.value"), 1],
+  [new BindingInstance("form.fields.field49.valid"), false],
+];
+
 describe("LocalModel get", () => {
   const model = new LocalModel(fixture);
 
@@ -99,6 +117,22 @@ describe("LocalModel set", () => {
     "set batch (15)",
     () => {
       new LocalModel(fixture).set(batch);
+    },
+    { iterations: 10000 },
+  );
+
+  bench(
+    "set batch (50, shared parent)",
+    () => {
+      new LocalModel(fixture).set(batch50);
+    },
+    { iterations: 10000 },
+  );
+
+  bench(
+    "set batch (7, scattered paths)",
+    () => {
+      new LocalModel(fixture).set(batchScattered);
     },
     { iterations: 10000 },
   );
