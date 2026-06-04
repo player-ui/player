@@ -55,19 +55,33 @@ const deepBinding = new BindingInstance("automobile.0.car.honda.model.0.body");
 // Fresh instances each iteration deliberately bypass the per-binding
 // normalize cache, exposing the cost of normalizeBinding itself.
 describe("SchemaController getType (uncached binding)", () => {
-  bench("shallow binding", () => {
-    schema.getType(new BindingInstance("owner.name"));
-  }, { iterations: 10000 });
+  bench(
+    "shallow binding",
+    () => {
+      schema.getType(new BindingInstance("owner.name"));
+    },
+    { iterations: 10000 },
+  );
 
-  bench("deep binding (array+record, 6 segments)", () => {
-    schema.getType(new BindingInstance("automobile.0.car.honda.model.0.body"));
-  }, { iterations: 10000 });
+  bench(
+    "deep binding (array+record, 6 segments)",
+    () => {
+      schema.getType(
+        new BindingInstance("automobile.0.car.honda.model.0.body"),
+      );
+    },
+    { iterations: 10000 },
+  );
 });
 
 // Reused instance: normalize is cached after the first call, isolating the
 // per-call merged-object rebuild that getApparentType does today.
 describe("SchemaController getApparentType (cached binding)", () => {
-  bench("repeat same binding", () => {
-    schema.getApparentType(deepBinding);
-  }, { iterations: 10000 });
+  bench(
+    "repeat same binding",
+    () => {
+      schema.getApparentType(deepBinding);
+    },
+    { iterations: 10000 },
+  );
 });

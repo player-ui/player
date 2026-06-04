@@ -234,7 +234,9 @@ export class Resolver {
 
       const value = clonedNode[key];
       if (typeof value === "object" && value !== null) {
-        clonedNode[key] = Array.isArray(value) ? [...value] : { ...value };
+        clonedNode[key] = Array.isArray(value)
+          ? value.slice()
+          : Object.assign({}, value);
       }
     });
 
@@ -455,14 +457,16 @@ export class Resolver {
         dependencyModel.getDependencies(scope),
     });
 
+    // Merge core + child dependencies without materializing an intermediate
+    // array (cheaper than `new Set([...a, ...b])` once transpiled).
+    const dependencies = new Set(dependencyModel.getDependencies());
+    childDependencies.forEach((bindingDep) => dependencies.add(bindingDep));
+
     const update: NodeUpdate = {
       node: resolvedAST,
       updated,
       value: resolved,
-      dependencies: new Set([
-        ...dependencyModel.getDependencies(),
-        ...childDependencies,
-      ]),
+      dependencies,
     };
 
     this.hooks.afterNodeUpdate.call(node, rawParent, update);

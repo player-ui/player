@@ -52,41 +52,69 @@ const nestedObject = {
 };
 
 describe("resolveExpressionsInString", () => {
-  bench("single expression", () => {
-    resolveExpressionsInString("@[ 1 + 2 ]@", options);
-  }, { iterations: 10000 });
+  bench(
+    "single expression",
+    () => {
+      resolveExpressionsInString("@[ 1 + 2 ]@", options);
+    },
+    { iterations: 10000 },
+  );
 
-  bench("embedded expressions", () => {
-    resolveExpressionsInString(
-      "prefix @[ 1 + 2 ]@ middle @[ 3 + 4 ]@ suffix",
-      options,
-    );
-  }, { iterations: 10000 });
+  bench(
+    "embedded expressions",
+    () => {
+      resolveExpressionsInString(
+        "prefix @[ 1 + 2 ]@ middle @[ 3 + 4 ]@ suffix",
+        options,
+      );
+    },
+    { iterations: 10000 },
+  );
 });
 
 describe("resolveDataRefsInString", () => {
-  bench("single ref", () => {
-    resolveDataRefsInString("{{user.name}}", options);
-  }, { iterations: 10000 });
+  bench(
+    "single ref",
+    () => {
+      resolveDataRefsInString("{{user.name}}", options);
+    },
+    { iterations: 10000 },
+  );
 
-  bench("multiple refs", () => {
-    resolveDataRefsInString(
-      "Hi {{user.name}}, you are {{user.title}} from {{a}}",
-      options,
-    );
-  }, { iterations: 10000 });
+  bench(
+    "multiple refs",
+    () => {
+      resolveDataRefsInString(
+        "Hi {{user.name}}, you are {{user.title}} from {{a}}",
+        options,
+      );
+    },
+    { iterations: 10000 },
+  );
 
-  bench("no refs (fast exit)", () => {
-    resolveDataRefsInString("just a plain string with no refs", options);
-  }, { iterations: 10000 });
+  bench(
+    "no refs (fast exit)",
+    () => {
+      resolveDataRefsInString("just a plain string with no refs", options);
+    },
+    { iterations: 10000 },
+  );
 });
 
 describe("resolveDataRefs object", () => {
-  bench("flat (30 keys)", () => {
-    resolveDataRefs(flatObject, options);
-  }, { iterations: 10000 });
+  bench(
+    "flat (30 keys)",
+    () => {
+      resolveDataRefs(flatObject, options);
+    },
+    { iterations: 10000 },
+  );
 
-  bench("nested (depth 3)", () => {
-    resolveDataRefs(nestedObject, options);
-  }, { iterations: 10000 });
+  bench(
+    "nested (depth 3)",
+    () => {
+      resolveDataRefs(nestedObject, options);
+    },
+    { iterations: 10000 },
+  );
 });

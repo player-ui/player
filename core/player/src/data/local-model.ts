@@ -31,11 +31,14 @@ export class LocalModel implements DataModelImpl {
 
   public set(transaction: BatchSetTransaction) {
     const effectiveOperations: Updates = [];
-    transaction.forEach(([binding, value]) => {
-      const oldValue = this.get(binding);
-      this.model = setIn(this.model, binding.asArray(), value) as any;
+    for (let i = 0; i < transaction.length; i++) {
+      const binding = transaction[i][0];
+      const value = transaction[i][1];
+      const path = binding.asArray() as string[];
+      const oldValue = get(this.model, path);
+      this.model = setIn(this.model, path, value) as any;
       effectiveOperations.push({ binding, oldValue, newValue: value });
-    });
+    }
     return effectiveOperations;
   }
 

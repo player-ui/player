@@ -34,7 +34,9 @@ const makeDataFlow = () => ({
     {
       id: "view-1",
       type: "view",
-      title: { asset: { id: "t", type: "text", value: "{{user.name}}'s form" } },
+      title: {
+        asset: { id: "t", type: "text", value: "{{user.name}}'s form" },
+      },
       label: { asset: { id: "l", type: "text", value: "count is {{count}}" } },
       subtitle: {
         asset: { id: "s", type: "text", value: "{{user.name}} ({{count}})" },
@@ -60,9 +62,13 @@ describe("Player.start", () => {
   // Full engine setup + first view resolution. The returned promise stays
   // pending in the VIEW state, which is fine — we measure the synchronous
   // start cost, not flow completion.
-  bench("minimal flow (cold start)", () => {
-    new Player().start(makeMinimalFlow() as any).catch(() => {});
-  }, { iterations: 200 });
+  bench(
+    "minimal flow (cold start)",
+    () => {
+      new Player().start(makeMinimalFlow() as any).catch(() => {});
+    },
+    { iterations: 200 },
+  );
 });
 
 describe("Player data set", () => {
@@ -71,15 +77,19 @@ describe("Player data set", () => {
 
   // The real-world hot loop: a bound-data update drives DataController +
   // Resolver + string-resolver to re-resolve the current view.
-  bench("set bound data triggers re-resolve", () => {
-    tick += 1;
-    state.controllers.data.set([["count", tick]]);
-  }, {
-    setup: () => {
-      const player = new Player();
-      player.start(makeDataFlow() as any).catch(() => {});
-      state = player.getState() as InProgressState;
+  bench(
+    "set bound data triggers re-resolve",
+    () => {
+      tick += 1;
+      state.controllers.data.set([["count", tick]]);
     },
-    iterations: 2000,
-  });
+    {
+      setup: () => {
+        const player = new Player();
+        player.start(makeDataFlow() as any).catch(() => {});
+        state = player.getState() as InProgressState;
+      },
+      iterations: 2000,
+    },
+  );
 });

@@ -47,16 +47,20 @@ export class BindingInstance {
     factory = (rawBinding: RawBinding) => new BindingInstance(rawBinding),
   ) {
     const split = Array.isArray(raw) ? raw : raw.split(".");
-    this.split = split.map((segment) => {
+    const normalized: RawBindingSegment[] = new Array(split.length);
+    for (let i = 0; i < split.length; i++) {
+      const segment = split[i];
       if (typeof segment === "number") {
-        return segment;
+        normalized[i] = segment;
+      } else {
+        const tryNum = Number(segment);
+        // test to make sure turning a numerical string to a number doesn't
+        // change the actual value of the string by getting rid of a leading zero
+        normalized[i] =
+          isNaN(tryNum) || String(tryNum) !== segment ? segment : tryNum;
       }
-
-      const tryNum = Number(segment);
-      // test to make sure turning a numerical string to a number doesn't change
-      // the actual value of the string by getting rid of a leading zero
-      return isNaN(tryNum) || String(tryNum) !== segment ? segment : tryNum;
-    });
+    }
+    this.split = normalized;
     Object.freeze(this.split);
     this.joined = this.split.join(".");
     this.factory = factory;

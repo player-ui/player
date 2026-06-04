@@ -58,31 +58,51 @@ describe("DataController set", () => {
   const controller = makeController();
 
   // Set a binding to its current value: exercises the dequal "unchanged" path.
-  bench("set no-op", () => {
-    controller.set([[shallow, "Ada"]]);
-  }, { iterations: 10000 });
+  bench(
+    "set no-op",
+    () => {
+      controller.set([[shallow, "Ada"]]);
+    },
+    { iterations: 10000 },
+  );
 
-  bench("set changed scalar", () => {
-    tick += 1;
-    controller.set([[shallow, tick]]);
-  }, { iterations: 10000 });
+  bench(
+    "set changed scalar",
+    () => {
+      tick += 1;
+      controller.set([[shallow, tick]]);
+    },
+    { iterations: 10000 },
+  );
 
   // Forces a full deep dequal over a non-trivial object every iteration.
-  bench("set changed object", () => {
-    tick += 1;
-    controller.set([[profile, tick % 2 ? profileA : profileB]]);
-  }, { iterations: 10000 });
+  bench(
+    "set changed object",
+    () => {
+      tick += 1;
+      controller.set([[profile, tick % 2 ? profileA : profileB]]);
+    },
+    { iterations: 10000 },
+  );
 
-  bench("set batch (15, all changed)", () => {
-    tick += 1;
-    controller.set(tick % 2 ? batchA : batchB);
-  }, { iterations: 10000 });
+  bench(
+    "set batch (15, all changed)",
+    () => {
+      tick += 1;
+      controller.set(tick % 2 ? batchA : batchB);
+    },
+    { iterations: 10000 },
+  );
 });
 
 describe("DataController get", () => {
   const controller = makeController();
 
-  bench("get hot", () => {
-    controller.get(shallow);
-  }, { iterations: 10000 });
+  bench(
+    "get hot",
+    () => {
+      controller.get(shallow);
+    },
+    { iterations: 10000 },
+  );
 });
