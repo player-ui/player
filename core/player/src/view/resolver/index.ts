@@ -9,6 +9,7 @@ import type {
   Updates,
 } from "../../data";
 import { DependencyModel, withParser } from "../../data";
+import type { ExpressionType } from "../../expressions";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
 import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
@@ -260,17 +261,16 @@ export class Resolver {
       withParser(dependencyModel, this.options.parseBinding),
     );
 
+    // Object.assign (rather than spread) to avoid the heavier object-spread
+    // helper once transpiled to ES5 for the mobile runtime; behavior is the
+    // same (own enumerable props copied) but this runs on every node.
     const resolveOptions = this.hooks.resolveOptions.call(
-      {
-        ...options,
-        data: {
-          ...options.data,
-          model: depModelWithParser,
-        },
-        evaluate: (exp) =>
+      Object.assign({}, options, {
+        data: Object.assign({}, options.data, { model: depModelWithParser }),
+        evaluate: (exp: ExpressionType) =>
           this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
         node,
-      },
+      }),
       node,
     );
 
@@ -407,7 +407,7 @@ export class Resolver {
 
         updated = updated || childUpdated;
 
-        return { ...child, value: childNode };
+        return Object.assign({}, child, { value: childNode });
       });
 
       resolvedAST.children = newChildren;
