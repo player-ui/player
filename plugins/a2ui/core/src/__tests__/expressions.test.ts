@@ -99,6 +99,56 @@ describe("a2ui expressions — format", () => {
   });
 });
 
+describe("a2ui expressions — format fallbacks (no Intl)", () => {
+  // The Hermes engine (JVM/Android) lacks `Intl`; exercise the pure-JS fallback
+  // by removing the global for the duration of each assertion.
+  const withoutIntl = (fn: () => void) => {
+    const realIntl = (globalThis as any).Intl;
+    (globalThis as any).Intl = undefined;
+    try {
+      fn();
+    } finally {
+      (globalThis as any).Intl = realIntl;
+    }
+  };
+
+  it("formatNumber groups en-US style", () => {
+    withoutIntl(() => {
+      expect(formatNumber(ctx, 1234.5, "en-US")).toBe("1,234.5");
+      expect(formatNumber(ctx, 1234567, "en-US")).toBe("1,234,567");
+      expect(formatNumber(ctx, 0.5, { style: "percent" })).toBe("50%");
+      expect(formatNumber(ctx, "not a number")).toBe("not a number");
+    });
+  });
+
+  it("formatCurrency prefixes a known symbol", () => {
+    withoutIntl(() => {
+      expect(formatCurrency(ctx, 1299.5, "USD", "en-US")).toBe("$1,299.50");
+      expect(formatCurrency(ctx, 9.99, "USD")).toBe("$9.99");
+      // Unmapped currency falls back to a code prefix.
+      expect(formatCurrency(ctx, 5, "ZZZ")).toBe("ZZZ 5.00");
+    });
+  });
+
+  it("formatDate renders a non-empty string", () => {
+    withoutIntl(() => {
+      const iso = "2024-01-15T00:00:00.000Z";
+      expect(formatDate(ctx, iso, "short")).toEqual(expect.any(String));
+      expect(formatDate(ctx, iso, "short").length).toBeGreaterThan(0);
+      expect(formatDate(ctx, "bogus")).toBe("bogus");
+    });
+  });
+
+  it("pluralize uses minimal English rule", () => {
+    withoutIntl(() => {
+      const opts = { one: "1 item", other: "{n} items" };
+      expect(pluralize(ctx, 1, opts)).toBe("1 item");
+      expect(pluralize(ctx, 2, opts)).toBe("{n} items");
+      expect(pluralize(ctx, 0, opts)).toBe("{n} items");
+    });
+  });
+});
+
 describe("a2ui expressions — logic", () => {
   it("and / or / not", () => {
     expect(and(ctx, true, true, 1)).toBe(true);

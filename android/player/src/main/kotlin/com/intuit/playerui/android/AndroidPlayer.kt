@@ -26,6 +26,7 @@ import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.StartOptions
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.player.state.inProgressState
@@ -144,7 +145,7 @@ public class AndroidPlayer private constructor(
 
     override val scope: CoroutineScope by player::scope
 
-    override fun start(flow: String): Completable<CompletedState> = player.start(flow)
+    override fun start(flow: String, options: StartOptions?): Completable<CompletedState> = player.start(flow, options)
 
     private val assetSerializer = RenderableAsset.Serializer(this)
 

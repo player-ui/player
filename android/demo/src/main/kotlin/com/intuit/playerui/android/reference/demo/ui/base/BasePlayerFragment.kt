@@ -19,8 +19,13 @@ import kotlinx.coroutines.launch
 abstract class BasePlayerFragment : PlayerFragment() {
     abstract val flow: String
 
+    /** Optional content format (e.g. `"a2ui"`) for non-Player flows. */
+    open val format: String? = null
+
     override val playerViewModel by viewModels<DemoPlayerViewModel> {
-        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::DemoPlayerViewModel)
+        PlayerViewModel.Factory(AsyncFlowIterator(flow)) { iterator ->
+            DemoPlayerViewModel(iterator, format)
+        }
     }
 
     private val currentPlayerCanvas get() = binding.playerCanvas.getChildAt(0)

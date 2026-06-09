@@ -13,6 +13,7 @@ import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.managed.AsyncIterationManager
 import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.PlayerException
+import com.intuit.playerui.core.player.StartOptions
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
@@ -68,6 +69,14 @@ public open class PlayerViewModel(
 
     protected open val config: AndroidPlayer.Config = AndroidPlayer.Config()
 
+    /**
+     * Optional [StartOptions] describing the content emitted by the flow
+     * iterator. When the content is not already a Player flow (e.g. an A2UI
+     * snapshot), override this to declare its `format` so the matching content
+     * plugin can transform it. Defaults to `null` (content is a Player flow).
+     */
+    protected open val startOptions: StartOptions? = null
+
     @ExperimentalPlayerApi
     public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
         // this is unfortunate, but is essentially for ensuring view model has completely initialized
@@ -117,7 +126,7 @@ public open class PlayerViewModel(
         }
     }
 
-    private fun start(flow: String) = player.start(flow) {
+    private fun start(flow: String) = player.start(flow, startOptions) {
         when {
             it.isSuccess -> player.logger.info(
                 "Flow completed successfully!",

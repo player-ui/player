@@ -23,6 +23,7 @@ main_resources = [
 # Test dependencies
 test_deps = [
     "//jvm/testutils:with-runtimes",
+    "//plugins/a2ui/jvm",
     "//plugins/beacon/jvm",
     "//plugins/common-types/jvm",
     "//plugins/reference-assets/jvm",

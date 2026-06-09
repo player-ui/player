@@ -109,8 +109,13 @@ public abstract class Player : Pluggable {
      * Asynchronously [start] the [flow] represented as a [String]. The
      * [FlowResult] can be obtained by subscribing the the [Completable.onComplete]
      * or by blocking on [Completable.await].
+     *
+     * The optional [options] describe the shape of the supplied content so a
+     * content plugin can transform it into a Player flow before it's started
+     * (e.g. `StartOptions(format = "a2ui")`). When omitted, the content is
+     * assumed to already be a Player flow.
      */
-    public abstract fun start(flow: String): Completable<CompletedState>
+    public abstract fun start(flow: String, options: StartOptions? = null): Completable<CompletedState>
 
     /**
      * Release any resources being used by the [Player] instance and
@@ -141,7 +146,33 @@ public abstract class Player : Pluggable {
     public fun start(flow: String, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> = start(flow).apply {
         onComplete(onComplete)
     }
+
+    /**
+     * [ExperimentalPlayerApi] utility method to [start] a non-Player [flow]
+     * described by [options] while subscribing to the [FlowResult] in the
+     * same call.
+     */
+    @ExperimentalPlayerApi
+    public fun start(
+        flow: String,
+        options: StartOptions?,
+        onComplete: (Result<CompletedState>) -> Unit,
+    ): Completable<CompletedState> = start(flow, options).apply {
+        onComplete(onComplete)
+    }
 }
+
+/**
+ * Options describing the content passed to [Player.start], mirroring the core
+ * `StartOptions`. [format] identifies the input content's format (`"player"`
+ * means it's already a Player flow); [version] is an optional, free-form
+ * content-format version a content plugin can dispatch on.
+ */
+@Serializable
+public data class StartOptions(
+    val format: String? = null,
+    val version: String? = null,
+)
 
 /**
  * Create a child [CoroutineScope] of the [Player.scope], such that it'll inherit the [CoroutineContext],
