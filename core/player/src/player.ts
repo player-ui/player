@@ -297,10 +297,14 @@ export class Player {
     const dataCtx: DataControllerContext = {
       data: userFlow.data,
       pathResolver,
-      middleware: [
-        ...validationController.getDataMiddleware(),
-        errorController.getDataMiddleware(),
-      ],
+      // BENCH: validation + error middleware removed so the JS data pipeline is
+      // a bare LocalModel, matching KotlinDataController's flat-map store (it
+      // ignores ctx.middleware). Not for production.
+      middleware: [],
+      // middleware: [
+      //   ...validationController.getDataMiddleware(),
+      //   errorController.getDataMiddleware(),
+      // ],
       logger: this.logger,
     };
     dataController =

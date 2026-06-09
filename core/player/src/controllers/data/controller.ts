@@ -1,5 +1,6 @@
 import { SyncHook, SyncWaterfallHook, SyncBailHook } from "tapable-ts";
-import { dequal } from "dequal";
+// BENCH: dequal no longer used after stripping dedupe.
+// import { dequal } from "dequal";
 import type { Logger } from "../../logger";
 import type { BindingParser, BindingLike } from "../../binding";
 import { BindingInstance } from "../../binding";
@@ -121,57 +122,16 @@ export class DataController
       ) as BatchSetTransaction;
     }
 
-    // Figure out what the base changes being applied are
-    const setUpdates = normalizedTransaction.reduce<Updates>(
-      (updates, [binding, newVal]) => {
-        const oldVal = this.get(binding, { includeInvalid: true });
-
-        const update = {
-          binding,
-          newValue: newVal,
-          oldValue: oldVal,
-        };
-
-        if (dequal(oldVal, newVal)) {
-          this.logger?.debug(
-            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`,
-          );
-        } else {
-          updates.push(update);
-
-          this.logger?.debug(
-            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`,
-          );
-        }
-
-        return updates;
-      },
-      [],
-    );
-
-    // Get the applied update
+    // BENCH: stripped to match KotlinDataController.applySet. Store the value,
+    // then fire onUpdate with the updates the store already computed. No
+    // separate old-value read loop (LocalModel.set already reads oldValue and
+    // returns it in `result`, so a pre-read would be a redundant second read
+    // the POC doesn't do), no dequal dedupe, no cascade-merge, no onSet, no
+    // logging.
     const result = this.getModel().set(normalizedTransaction, options);
 
-    // Add any extra bindings that were effected
-    const setUpdateBindings = new Set(setUpdates.map((su) => su.binding));
-    result.forEach((tr) => {
-      if (
-        !setUpdateBindings.has(tr.binding) &&
-        (tr.force === true || !dequal(tr.oldValue, tr.newValue))
-      ) {
-        this.logger?.debug(
-          `Path: ${tr.binding.asString()} was changed from: ${
-            tr.oldValue
-          } to: ${tr.newValue}`,
-        );
-        setUpdates.push(tr);
-      }
-    });
-
-    this.hooks.onSet.call(normalizedTransaction);
-
-    if (setUpdates.length > 0) {
-      this.hooks.onUpdate.call(setUpdates, options);
+    if (result.length > 0) {
+      this.hooks.onUpdate.call(result, options);
     }
 
     return result;

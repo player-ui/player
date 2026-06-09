@@ -9,7 +9,7 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
  * for a flow. The Kotlin implementation returns *any* value whose shape
  * satisfies the JS-side `IDataController` interface — typically a
  * `Map<String, Any?>` like
- * [com.intuit.playerui.core.player.services.KotlinDataController.jsView]
+ * [com.intuit.playerui.core.player.services.KotlinDataController.jsClassMirror]
  * — and core will use it as the data controller. Returning `null` falls
  * through to the default JS `DataController`.
  *
@@ -35,21 +35,19 @@ public fun interface DataServiceFactory {
 public data class ServicesConfig(
     val data: DataServiceFactory? = null,
 ) {
-    internal fun toInvokableMap(): Map<String, Invokable<String?>> = buildMap {
+    internal fun toInvokableMap(): Map<String, Invokable<Any?>> = buildMap {
         if (data != null) {
-            // Return type is structurally Any?; the declared Invokable<String?>
-            // is purely for serialization machinery. JS sees whatever the
-            // factory returned (typically a Map<String, Any?> matching
-            // IDataController). The unchecked cast is safe because the
-            // return-type serializer is never invoked on the encode path.
-            @Suppress("UNCHECKED_CAST")
+            // The factory returns the controller (typically a Map<String, Any?>
+            // mirroring IDataController), so the Invokable's return type is Any?.
+            // Only the encode path runs (Kotlin -> JS), which serializes the
+            // function itself and ignores the return-type serializer.
             put(
                 "data",
-                Invokable<Any?> { args ->
+                Invokable { args ->
                     val ctx = args.getOrNull(0) as? Node
                         ?: error("services.data factory: expected a Node ctx as the first argument from core")
                     data.create(ctx)
-                } as Invokable<String?>,
+                },
             )
         }
     }

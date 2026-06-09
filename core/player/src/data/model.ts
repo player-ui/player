@@ -260,7 +260,8 @@ export class PipelinedDataModel implements DataModelImpl {
       transaction,
       options,
     );
-    this.hooks.onSet.call(transaction);
+    // BENCH: internal onSet hook removed (KotlinDataController has no equivalent).
+    // this.hooks.onSet.call(transaction);
     return appliedTransaction;
   }
 

@@ -16,7 +16,7 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
  *   * Owns data as an in-memory `MutableMap<String, Any?>`.
  *   * `get` / `set` / `delete` / `serialize` are Kotlin methods exposed as
  *     `Invokable`s on the JS-facing view.
- *   * `hooks` is a JS object whose properties are [JsTappableHook.jsView]
+ *   * `hooks` is a JS object whose properties are [JsTappableHook.jsClassMirror]
  *     surfaces. JS code does `hooks.onUpdate.tap(...)` and the callback is
  *     registered in the Kotlin hook. Kotlin code fires those hooks via
  *     [JsTappableHook.fire] when state changes.
@@ -77,19 +77,19 @@ public class KotlinDataController(
      * the [com.intuit.playerui.core.player.DataServiceFactory] so core/player
      * uses it in place of the default `DataController`.
      */
-    public val jsView: Map<String, Any?> by lazy {
+    public val jsClassMirror: Map<String, Any?> by lazy {
         mapOf(
             "hooks" to mapOf(
-                "onUpdate" to onUpdateHook.jsView,
-                "onDelete" to onDeleteHook.jsView,
-                "format" to formatHook.jsView,
-                "deformat" to deformatHook.jsView,
-                "resolveDefaultValue" to resolveDefaultHook.jsView,
-                "onSet" to onSetHook.jsView,
-                "onGet" to onGetHook.jsView,
-                "resolve" to resolveHook.jsView,
-                "resolveDataStages" to resolveDataStagesHook.jsView,
-                "serialize" to serializeHook.jsView,
+                "onUpdate" to onUpdateHook.jsClassMirror,
+                "onDelete" to onDeleteHook.jsClassMirror,
+                "format" to formatHook.jsClassMirror,
+                "deformat" to deformatHook.jsClassMirror,
+                "resolveDefaultValue" to resolveDefaultHook.jsClassMirror,
+                "onSet" to onSetHook.jsClassMirror,
+                "onGet" to onGetHook.jsClassMirror,
+                "resolve" to resolveHook.jsClassMirror,
+                "resolveDataStages" to resolveDataStagesHook.jsClassMirror,
+                "serialize" to serializeHook.jsClassMirror,
             ),
             "get" to Invokable { args ->
                 val binding = bindingToKey(args.getOrNull(0))
@@ -113,7 +113,7 @@ public class KotlinDataController(
             // Stubs — not exercised by the demo flow, but present so JS callers
             // don't blow up on a missing method.
             "getModel" to Invokable { _ -> data.toMap() },
-            "makeReadOnly" to Invokable { _ -> jsView },
+            "makeReadOnly" to Invokable { _ -> jsClassMirror },
         )
     }
 

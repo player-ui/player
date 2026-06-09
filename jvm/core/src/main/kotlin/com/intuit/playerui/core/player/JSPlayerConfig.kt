@@ -19,16 +19,15 @@ public data class JSPlayerConfig(
      * default, returning `null` falls through.
      */
     /**
-     * Service factories exposed to JS as `{ data: <fn>, ... }`. Declared as
-     * `Invokable<String?>` purely to satisfy serialization (the return-type
-     * serializer is unused on the encode path; see
+     * Service factories exposed to JS as `{ data: <fn>, ... }`. Each factory
+     * returns the service it produces (the data factory returns a
+     * `Map<String, Any?>` mirroring `IDataController`), hence `Invokable<Any?>`.
+     * Only the encode path runs (Kotlin -> JS); it serializes the function and
+     * ignores the return-type serializer (see
      * [com.intuit.playerui.core.bridge.serialization.serializers.FunctionLikeSerializer.serialize]).
-     * The actual lambda may return whatever shape JS expects (typically a
-     * `Map<String, Any?>` mirroring `IDataController`). Adapter at
-     * [com.intuit.playerui.core.player.ServicesConfig.toInvokableMap] does
-     * the unchecked cast.
+     * Built by [com.intuit.playerui.core.player.ServicesConfig.toInvokableMap].
      */
-    val services: Map<String, Invokable<String?>> = emptyMap(),
+    val services: Map<String, Invokable<@Contextual Any?>> = emptyMap(),
 ) {
     val logger: Map<String, Invokable<Unit>> = mapOf(
         "trace" to Invokable { args -> loggers.forEach { it.trace(*args) } },

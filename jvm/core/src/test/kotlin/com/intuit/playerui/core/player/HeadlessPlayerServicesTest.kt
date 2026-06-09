@@ -72,7 +72,7 @@ internal class HeadlessPlayerServicesTest : PlayerTest() {
         )
 
         val services = ServicesConfig(
-            data = DataServiceFactory { _ -> nativeController.jsView },
+            data = DataServiceFactory { _ -> nativeController.jsClassMirror },
         )
 
         val player = HeadlessPlayer(
@@ -85,7 +85,7 @@ internal class HeadlessPlayerServicesTest : PlayerTest() {
         player.start(simpleFlowString)
 
         // Reach into the JS player and ask its data controller to .get("greeting").
-        // The bridge sees our jsView as a JS Node; calling .get goes through the
+        // The bridge sees our jsClassMirror as a JS Node; calling .get goes through the
         // Node's `get` Invokable, which lands in our Kotlin lambda. If the
         // Kotlin path is what ran, the value is prefixed with `[kotlin-native] `.
         val state = player.inProgressState

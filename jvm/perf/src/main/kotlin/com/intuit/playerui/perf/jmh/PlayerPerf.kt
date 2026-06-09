@@ -4,7 +4,15 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
+import com.intuit.playerui.core.data.DataController
+import com.intuit.playerui.core.data.set
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import com.intuit.playerui.core.player.DataServiceFactory
 import com.intuit.playerui.core.player.HeadlessPlayer
+import com.intuit.playerui.core.player.ServicesConfig
+import com.intuit.playerui.core.player.services.KotlinDataController
+import com.intuit.playerui.core.player.state.InProgressState
+import com.intuit.playerui.core.player.state.dataModel
 import com.intuit.playerui.hermes.bridge.runtime.Hermes
 import com.intuit.playerui.j2v8.bridge.runtime.J2V8
 import kotlinx.coroutines.async
@@ -21,6 +29,7 @@ import org.openjdk.jmh.annotations.Param
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -180,5 +189,106 @@ public open class BenchPlayerFlow : RuntimePerformance() {
             pending.await()
         }
         runtime.release()
+    }
+}
+
+/**
+ * Minimal self-contained flow with one bound data field. Kept inline so the
+ * JMH lib doesn't take a testutils/mock dependency just to start a flow.
+ */
+private const val dataSetFlow = """
+    {
+      "id": "perf-data-set",
+      "views": [
+        { "id": "view-1", "type": "info", "title": { "asset": { "id": "t", "type": "text", "value": "{{count}}" } } }
+      ],
+      "data": { "count": 0, "foo": "", "hi": "" },
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "VIEW_1",
+          "VIEW_1": { "state_type": "VIEW", "ref": "view-1", "transitions": { "*": "END_Done" } },
+          "END_Done": { "state_type": "END", "outcome": "DONE" }
+        }
+      }
+    }
+"""
+
+/**
+ * Isolates the data-controller `set` write path so we can decide whether the
+ * extra JS -> Kotlin -> JS bridging of a native [KotlinDataController] is
+ * "worth it" against the all-JS default `DataController`.
+ *
+ * Player build + flow start + resolving the [dataModel] happen in
+ * `@Setup(Invocation)`, *outside* the measured region. Only `dataModel.set(...)`
+ * is timed. JMH runs every `@Setup(Invocation)` before every `@Benchmark`, so
+ * the JS-only and native cases each get their own state class rather than
+ * sharing one and stepping on each other's setup.
+ *
+ * Compare the two subclasses' results per runtime; the delta is the bridging
+ * overhead the native data store has to beat with native-side gains.
+ */
+@OptIn(ExperimentalPlayerApi::class)
+public abstract class BenchDataControllerSet : RuntimePerformance() {
+
+    protected lateinit var dataModel: DataController; private set
+
+    // Monotonic write value so each invocation is a real change, never a no-op
+    // dedupe in the data model.
+    private var counter: Int = 0
+
+    /** Build + start a player with the given [services], and expose its data model. */
+    protected fun start(services: ServicesConfig?) {
+        val player = HeadlessPlayer(
+            explicitRuntime = setupRuntime(),
+            services = services,
+        )
+        player.start(dataSetFlow)
+        dataModel = (player.state as InProgressState).dataModel
+    }
+
+    // Times ONLY the set. No get: a get would be timed too and would cost the
+    // hybrid arm a second JS->Kotlin->JS crossing the JS arm doesn't pay,
+    // contaminating a set-only comparison. No Blackhole: set is a void
+    // side-effecting call that crosses the JS bridge via an opaque native
+    // Invokable.invoke, which the JIT can't see through or dead-code-eliminate.
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark
+    public fun set() {
+        // count/foo/hi pre-exist in the flow data (updates); newKey is a fresh
+        // top-level binding each run (create).
+        dataModel.set("count" to ++counter)
+        dataModel.set("foo" to "bar")
+        dataModel.set("hi" to "bye")
+        dataModel.set("newKey" to counter)
+    }
+
+    @TearDown(Invocation)
+    public fun teardown() {
+        runtime.release()
+    }
+}
+
+/**
+ * All-JS data controller: Kotlin `set` -> JS core `DataController.set` -> JS
+ * stores + fires `onUpdate` -> returns. One JS hop, the baseline.
+ */
+public open class BenchSetJsDataController : BenchDataControllerSet() {
+    @Setup(Invocation) public fun setup() = start(services = null)
+}
+
+/**
+ * Native data controller: Kotlin `set` -> JS core invokes the native
+ * controller's `set` Invokable -> back into Kotlin to store + fire `onUpdate`
+ * -> back to JS -> returns. The JS -> Kotlin -> JS round trip this exists to
+ * price.
+ */
+@OptIn(ExperimentalPlayerApi::class)
+public open class BenchSetKotlinDataController : BenchDataControllerSet() {
+    @Setup(Invocation) public fun setup() {
+        val native = KotlinDataController(
+            initialData = mapOf("count" to 0, "foo" to "", "hi" to ""),
+        )
+        start(services = ServicesConfig(data = DataServiceFactory { native.jsClassMirror }))
     }
 }

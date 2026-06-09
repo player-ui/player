@@ -36,7 +36,7 @@ public class JsTappableHook {
      * `hook.tap("name", fn)`; the JS callback is registered in the underlying
      * Kotlin [hook] and fires when [fire] (or JS-side `call`) is invoked.
      */
-    public val jsView: Map<String, Invokable<Any?>> = mapOf(
+    public val jsClassMirror: Map<String, Invokable<Any?>> = mapOf(
         "tap" to Invokable { args ->
             val name = (args.getOrNull(0) as? String) ?: "anonymous"
             val callback = args.getOrNull(1) as? Invokable<*>
