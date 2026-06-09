@@ -31,7 +31,7 @@ internal class A2UIColumn(
             verticalArrangement = Layout.verticalArrangement(data.justify),
             horizontalAlignment = Layout.horizontalAlignment(data.align),
         ) {
-            data.children.forEach { it.compose() }
+            data.children.forEach { it.compose(modifier = childLayout(it, data.align)) }
         }
     }
 }

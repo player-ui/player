@@ -38,6 +38,31 @@ internal class A2UIContentIntegrationTest : PlayerTest() {
         }
         """.trimIndent()
 
+    // A2UI snapshot exercising the Intl-backed `formatCurrency` expression. On
+    // Hermes (no `Intl` global) this previously threw `ReferenceError: Property
+    // 'Intl' doesn't exist`; the core format handlers now fall back to pure JS.
+    private val currencySnapshot =
+        """
+        {
+          "surfaceId": "expressions-currency",
+          "data": { "order": { "subtotal": 1299.5 } },
+          "components": [
+            {
+              "id": "root",
+              "component": "Text",
+              "text": {
+                "call": "formatCurrency",
+                "args": {
+                  "value": { "path": "/order/subtotal" },
+                  "currency": "USD",
+                  "locale": "en-US"
+                }
+              }
+            }
+          ]
+        }
+        """.trimIndent()
+
     @TestTemplate
     fun `a2ui snapshot is translated into a renderable flow`() = runBlockingTest {
         player.start(buttonSnapshot, StartOptions(format = "a2ui"))
@@ -53,5 +78,20 @@ internal class A2UIContentIntegrationTest : PlayerTest() {
         // The Button's Text child should be inlined as a nested {asset: ...} node.
         val childAsset = root.getAsset("child")?.asset
         assertEquals("Text", childAsset?.type)
+    }
+
+    @TestTemplate
+    fun `formatCurrency expression resolves without Intl`() = runBlockingTest {
+        player.start(currencySnapshot, StartOptions(format = "a2ui"))
+
+        val state = player.state
+        assertTrue(state is InProgressState) { "Expected currency snapshot to start, but was $state" }
+        state as InProgressState
+
+        val root: Asset? = state.lastViewUpdate
+        assertNotNull(root, "Expected a resolved view for the currency A2UI flow")
+        assertEquals("Text", root!!.type)
+        // Hermes fallback yields "$1,299.50"; full-Intl runtimes yield the same en-US output.
+        assertEquals("\$1,299.50", root.getString("text"))
     }
 }

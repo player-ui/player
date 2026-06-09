@@ -7,6 +7,7 @@ main_exports = [
 
 main_deps = main_exports + [
     "//plugins/a2ui/jvm",
+    "//plugins/pending-transaction/jvm",
     artifact("androidx.compose.material:material"),
     artifact("androidx.compose.material:material-icons-core"),
 ]

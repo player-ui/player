@@ -91,6 +91,109 @@ class A2UIAndroidPluginTest {
     }
 
     @Test
+    fun `button secondary and destructive variants round-trip onto asset data`() {
+        start(
+            """
+            {
+              "surfaceId": "button-variants",
+              "components": [
+                { "id": "root", "component": "Row", "children": ["s", "d"] },
+                { "id": "s", "component": "Button", "child": "sl", "variant": "secondary" },
+                { "id": "sl", "component": "Text", "text": "Secondary" },
+                { "id": "d", "component": "Button", "child": "dl", "variant": "destructive" },
+                { "id": "dl", "component": "Text", "text": "Delete" }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        player.shouldBeAtState<InProgressState> {}
+        runTest {
+            tree.shouldBeAsset<A2UIRow> {
+                val children = getData().children
+                children[0].shouldBeAsset<A2UIButton> { assertEquals("secondary", getData().variant) }
+                children[1].shouldBeAsset<A2UIButton> { assertEquals("destructive", getData().variant) }
+            }
+        }
+    }
+
+    @Test
+    fun `textField date type round-trips onto asset data`() {
+        start(
+            """
+            {
+              "surfaceId": "textfield-date",
+              "components": [
+                { "id": "root", "component": "TextField", "textFieldType": "date", "label": "When" }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        player.shouldBeAtState<InProgressState> {}
+        runTest {
+            tree.shouldBeAsset<A2UITextField> {
+                assertEquals("date", getData().textFieldType)
+            }
+        }
+    }
+
+    @Test
+    fun `bound textField reads its current value from the model`() {
+        start(
+            """
+            {
+              "surfaceId": "textfield-bound",
+              "data": { "user": { "name": "Ada" } },
+              "components": [
+                {
+                  "id": "root",
+                  "component": "TextField",
+                  "label": "Name",
+                  "value": { "path": "/user/name" },
+                  "textFieldType": "shortText"
+                }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        player.shouldBeAtState<InProgressState> {}
+        runTest {
+            tree.shouldBeAsset<A2UITextField> {
+                // currentValue is wired through the core transform from the bound model path.
+                assertEquals("Ada", getData().currentValue)
+            }
+        }
+    }
+
+    @Test
+    fun `row child weight is readable from the child node`() {
+        start(
+            """
+            {
+              "surfaceId": "row-weight",
+              "components": [
+                { "id": "root", "component": "Row", "children": ["a", "b"] },
+                { "id": "a", "component": "Text", "text": "Grow", "weight": 3 },
+                { "id": "b", "component": "Text", "text": "Fixed" }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        player.shouldBeAtState<InProgressState> {}
+        runTest {
+            tree.shouldBeAsset<A2UIRow> {
+                val children = getData().children
+                // childLayout reads weight from the raw child node (React applies it per-child).
+                assertEquals(3.0, children[0].a2uiWeight)
+                assertEquals(null, children[1].a2uiWeight)
+            }
+        }
+    }
+
+    @Test
     fun `common A2UICommon fields round-trip onto asset data`() {
         start(
             """

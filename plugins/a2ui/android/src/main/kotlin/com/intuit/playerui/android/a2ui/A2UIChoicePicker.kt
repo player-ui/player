@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.Checkbox
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.compose.ComposableAsset
@@ -54,7 +56,9 @@ internal class A2UIChoicePicker(
         val multiSelect = (data.maxAllowedSelections ?: 1) > 1
 
         Column(
-            modifier = Modifier.fillMaxWidth().a2uiCommon(data),
+            // Mirror React's role="radiogroup"/"group" so assistive tech reads the
+            // options as a single selection group.
+            modifier = Modifier.fillMaxWidth().a2uiCommon(data).selectableGroup(),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             data.options.forEach { option ->
@@ -68,14 +72,20 @@ internal class A2UIChoicePicker(
                     scope.launch { data.set(next) }
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().selectable(selected = selected, onClick = onSelect),
+                    modifier = Modifier.fillMaxWidth().selectable(
+                        selected = selected,
+                        onClick = onSelect,
+                        role = if (multiSelect) Role.Checkbox else Role.RadioButton,
+                    ),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
+                    // null callbacks: the parent Row handles selection/role so the
+                    // control isn't announced as a separate focusable target.
                     if (multiSelect) {
-                        Checkbox(checked = selected, onCheckedChange = { onSelect() })
+                        Checkbox(checked = selected, onCheckedChange = null)
                     } else {
-                        RadioButton(selected = selected, onClick = onSelect)
+                        RadioButton(selected = selected, onClick = null)
                     }
                     Text(option.label)
                 }

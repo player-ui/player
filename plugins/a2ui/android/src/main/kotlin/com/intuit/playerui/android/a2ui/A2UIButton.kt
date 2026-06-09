@@ -2,6 +2,8 @@ package com.intuit.playerui.android.a2ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +47,16 @@ internal class A2UIButton(
         when (data.variant) {
             "outline" -> OutlinedButton(onClick = onClick, modifier = modifier) { data.child?.compose() }
             "ghost" -> TextButton(onClick = onClick, modifier = modifier) { data.child?.compose() }
+            "secondary" -> Button(
+                onClick = onClick,
+                modifier = modifier,
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
+            ) { data.child?.compose() }
+            "destructive" -> Button(
+                onClick = onClick,
+                modifier = modifier,
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
+            ) { data.child?.compose() }
             else -> Button(onClick = onClick, modifier = modifier) { data.child?.compose() }
         }
     }

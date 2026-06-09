@@ -31,7 +31,7 @@ internal class A2UIRow(
             horizontalArrangement = Layout.horizontalArrangement(data.justify),
             verticalAlignment = Layout.verticalAlignment(data.align),
         ) {
-            data.children.forEach { it.compose() }
+            data.children.forEach { it.compose(modifier = childLayout(it, data.align)) }
         }
     }
 }

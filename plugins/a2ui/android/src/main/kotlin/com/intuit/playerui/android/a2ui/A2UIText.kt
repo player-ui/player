@@ -5,7 +5,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.compose.ComposableAsset
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
@@ -48,7 +47,6 @@ internal class A2UIText(
             text = data.text ?: "",
             style = style,
             fontWeight = fontWeight,
-            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.a2uiCommon(data),
         )
     }
