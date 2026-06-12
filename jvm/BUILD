@@ -41,7 +41,7 @@ optins = [
 kt_kotlinc_options(
     name = "main_options",
     visibility = ["//visibility:public"],
-    x_context_receivers = True,
+    x_context_parameters = True,
     x_explicit_api_mode = "strict",
     x_optin = optins,
 )
@@ -50,7 +50,7 @@ kt_kotlinc_options(
 kt_kotlinc_options(
     name = "test_options",
     visibility = ["//visibility:public"],
-    x_context_receivers = True,
+    x_context_parameters = True,
     x_optin = optins,
 )
 
@@ -62,10 +62,10 @@ ktlint_config(
 
 define_kt_toolchain(
     name = "kotlin_toolchain",
-    api_version = "2.0",
+    api_version = "2.3",
     experimental_use_abi_jars = True,
     kotlinc_options = ":test_options",
-    language_version = "2.0",
+    language_version = "2.3",
 )
 
 # target encapsulating supported runtimes to test against

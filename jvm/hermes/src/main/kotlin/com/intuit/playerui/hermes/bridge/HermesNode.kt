@@ -60,20 +60,20 @@ public class HermesNode(
 
     override fun isEmpty(): Boolean = size == 0
 
-    context(RuntimeThreadContext)
+    context(_: RuntimeThreadContext)
     private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
 
-    context(RuntimeThreadContext)
+    context(_: RuntimeThreadContext)
     private fun getJSIObject(key: String): Object? = getJSIValue(key)
         .takeIf(Value::isObject)
         ?.asObject(runtime)
 
-    context(RuntimeThreadContext)
+    context(_: RuntimeThreadContext)
     private fun getJSIArray(key: String): Array? = getJSIObject(key)
         ?.takeIf { it.isArray(runtime) }
         ?.asArray(runtime)
 
-    context(RuntimeThreadContext)
+    context(_: RuntimeThreadContext)
     private fun getJSIFunction(key: String): Function? = getJSIObject(key)
         ?.takeIf { it.isFunction(runtime) }
         ?.asFunction(runtime)

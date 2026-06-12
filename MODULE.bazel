@@ -8,7 +8,7 @@ bazel_dep(name = "rules_player")
 # Tracking https://github.com/player-ui/rules_player/pull/111 (Bazel 9 support).
 git_override(
     module_name = "rules_player",
-    commit = "1eaafffa3c9f238e006c8fc7c0a57c4b5cc89905",
+    commit = "bf3660cdd3b1c9fd9d25da910341683eb756127f",
     remote = "https://github.com/player-ui/rules_player.git",
 )
 
@@ -108,11 +108,11 @@ build_constants(
 )
 
 bazel_dep(name = "rules_java", version = "9.3.0")
-bazel_dep(name = "rules_kotlin", version = "2.3.10")
+bazel_dep(name = "rules_kotlin", version = "2.3.21")
 archive_override(
     module_name = "rules_kotlin",
     patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.3.10/rules_kotlin-v2.3.10.tar.gz"],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.3.21/rules_kotlin-v2.3.21.tar.gz"],
 )
 
 register_toolchains("//jvm:kotlin_toolchain")

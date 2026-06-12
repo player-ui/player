@@ -232,10 +232,10 @@ internal class V8DecoderTest : J2V8Test() {
             val logger = ComplicatedVarargMethod()
             val function = logger::log
             // assertEquals(retVal, function("someArg", argsAsList.toTypedArray(), 42))
-            function("someArg", argsAsList.toTypedArray())
+            function("someArg", argsAsList.toTypedArray<Any?>())
 
             val result = format.encodeToV8Value(function).v8Function
-            result(format, "someArg", *argsAsList.toTypedArray())
+            result(format, "someArg", *argsAsList.toTypedArray<Any?>())
         }
     }
 
