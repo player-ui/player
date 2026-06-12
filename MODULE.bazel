@@ -5,11 +5,11 @@ module(
 
 bazel_dep(name = "rules_player")
 
-archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-2.4.0",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.4.0.tar.gz"],
-  integrity = "sha256-so3ki94j9QI+LGuoOFeDD/cHN5BtJqp3SthtmKtU1wg="
+# Tracking https://github.com/player-ui/rules_player/pull/111 (Bazel 9 support).
+git_override(
+    module_name = "rules_player",
+    commit = "1eaafffa3c9f238e006c8fc7c0a57c4b5cc89905",
+    remote = "https://github.com/player-ui/rules_player.git",
 )
 
 bazel_dep(name = "platforms", version = "1.1.0")
@@ -137,10 +137,12 @@ use_repo(remote_android_extensions, "android_gmaven_r8")
 # Maven
 bazel_dep(name = "rules_jvm_external", version = "7.0")
 
-# Override for AAR publishing support
-local_path_override(
+# Override for AAR publishing support (rebased onto 7.0 for Bazel 9 support).
+# Tracking https://github.com/sugarmanz/rules_jvm_external/pull/1.
+git_override(
     module_name = "rules_jvm_external",
-    path = "../rules_jvm_external_fork",
+    commit = "c227c81c8fe850034298bca18ef8b841d4513b1f",
+    remote = "https://github.com/KVSRoyal/rules_jvm_external.git",
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
