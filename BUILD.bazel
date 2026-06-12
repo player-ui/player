@@ -2,11 +2,21 @@ load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag", "int_flag")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_player//ios:defs.bzl", "assemble_ios_release", "spm_publish")
+load("@rules_player//internal:defs.bzl", "stamp")
+load("@rules_player//kotlin:defs.bzl", "abi_update_all", "lint_fix_all")
 
 package(default_visibility = ["//visibility:public"])
 
 npm_link_all_packages(
     name = "node_modules",
+)
+
+abi_update_all(
+    name = "kt-abi-update-all",
+)
+
+lint_fix_all(
+    name = "kt-lint-fix-all",
 )
 
 exports_files([

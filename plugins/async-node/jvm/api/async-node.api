@@ -1,21 +1,44 @@
-public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
-	public field hooks Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks;
+public final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin : com/intuit/playerui/core/plugins/JSScriptPluginWrapper {
+	public field hooks Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks;
 	public fun <init> ()V
-	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
-	public final fun getHooks ()Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks;
-	public final fun setHooks (Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks;)V
+	public fun <init> (Lkotlin/jvm/functions/Function3;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function3;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
+	public final fun getHooks ()Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks;
+	public final fun setHooks (Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks;)V
 }
 
-public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks : com/intuit/player/jvm/core/bridge/NodeWrapper {
-	public static final field Companion Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks$Companion;
-	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
-	public final fun getOnAsyncNode ()Lcom/intuit/player/jvm/core/bridge/hooks/NodeAsyncParallelBailHook1;
+private final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Companion {
 }
 
-public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks$Companion {
+public final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks : com/intuit/playerui/core/bridge/NodeWrapper {
+	public static final field Companion Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Companion;
+	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
+	public final fun getOnAsyncNode ()Lcom/intuit/playerui/core/bridge/hooks/NodeAsyncSeriesBailHook2;
+	public final fun getOnAsyncNodeError ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncBailHook2;
+}
+
+public final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePluginKt {
-	public static final fun getAsyncNodePlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin;
+public final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer : com/intuit/playerui/core/bridge/serialization/serializers/NodeWrapperSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer;
 }
+
+synthetic class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer$1;
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$apply$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function4 {
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/util/HashMap;Lcom/intuit/playerui/core/bridge/Node;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/plugins/asyncnode/AsyncNodePluginKt {
+	public static final fun getAsyncNodePlugin (Lcom/intuit/playerui/core/player/Player;)Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin;
+}
+

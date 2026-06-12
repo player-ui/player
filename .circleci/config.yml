@@ -373,9 +373,36 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
+      - setup_auth
+      - run:
+          name: Run benchmarks
+          command: |
+            bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
-      - run: |
-          bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
+      - run:
+          name: Update baseline (main only)
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "main" ]; then
+              find . -path '*/benchmarks/current.json' -not -path './bazel-*' | while read f; do
+                cp "$f" "$(dirname $f)/baseline.json"
+              done
+              git add '*/benchmarks/baseline.json'
+              git diff --staged --quiet || (git commit -m "[skip ci] Update benchmark baseline" && git push origin main)
+            fi
+
+      - run:
+          name: Post benchmark comparison (PR only)
+          command: |
+            PR_NUM=$(echo "${CIRCLE_PULL_REQUEST:-}" | grep -oE '[0-9]+$')
+            if [ -n "${PR_NUM}" ]; then
+              node scripts/compare-benchmarks.js > bench-comparison.md
+              if [ -s bench-comparison.md ]; then
+                npx auto comment --pr "${PR_NUM}" \
+                  --message "$(cat bench-comparison.md)" \
+                  --context "benchmarks" \
+                  --edit
+              fi
+            fi
 
 workflows:
   build_and_test_pr:
@@ -528,6 +555,8 @@ workflows:
 
       - bench_js:
           name: js-benchmark-tests-trunk
+          context:
+            - Publish
           filters:
             branches:
               ignore:
@@ -578,19 +607,26 @@ workflows:
       - build_and_test_ios:
           requires:
             - build
+            - test
 
       - android_test:
           context:
             - Build
           requires:
             - build
+            - test
 
       - test:
           requires:
             - build
-            - build_and_test_ios
 
       - upload_coverage:
+          requires:
+            - test
+
+      - bench_js:
+          context:
+            - Publish
           requires:
             - test
 
