@@ -62,10 +62,10 @@ ktlint_config(
 
 define_kt_toolchain(
     name = "kotlin_toolchain",
-    api_version = "1.8",
+    api_version = "2.0",
     experimental_use_abi_jars = True,
     kotlinc_options = ":test_options",
-    language_version = "1.8",
+    language_version = "2.0",
 )
 
 # target encapsulating supported runtimes to test against

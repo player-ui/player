@@ -93,7 +93,9 @@ export const useInputAsset = (
   config?: InputHookConfig,
 ) => {
   const [localValue, setLocalValue] = React.useState(props.value ?? "");
-  const formatTimerRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
+  const formatTimerRef = React.useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
   const inputBeacon = useInputBeacon(props);
 
   const {

@@ -12,22 +12,26 @@ archive_override(
   integrity = "sha256-so3ki94j9QI+LGuoOFeDD/cHN5BtJqp3SthtmKtU1wg="
 )
 
-bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
 bazel_dep(name = "aspect_rules_js", version = "2.3.8")
-bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
-bazel_dep(name = "aspect_rules_ts", version = "3.6.3")
+bazel_dep(name = "aspect_rules_ts", version = "3.8.10")
 
 # C++
+bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
-bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
 
 ####### Node.js version #########
 bazel_dep(name = "rules_nodejs", version = "6.4.0")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "22.15.1")
+use_repo(node, "nodejs_toolchains")
+
+register_toolchains("@nodejs_toolchains//:all")
 
 #################################
 sh_config_ext = use_extension("@rules_player//shell:defs.bzl", "sh_configure")
@@ -37,13 +41,13 @@ register_toolchains("@local_shell_config//:local_sh_toolchain")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
-bazel_dep(name = "rules_shell", version = "0.7.1")
-bazel_dep(name = "rules_apple", version = "4.3.3", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "apple_support", version = "2.5.2", repo_name = "build_bazel_apple_support")
-bazel_dep(name = "rules_swift", version = "2.9.0")
-bazel_dep(name = "rules_swift_package_manager", version = "1.11.1")
-bazel_dep(name = "swiftlint", version = "0.59.1", repo_name = "SwiftLint")
+bazel_dep(name = "rules_xcodeproj", version = "4.1.0")
+bazel_dep(name = "rules_shell", version = "0.8.0")
+bazel_dep(name = "rules_apple", version = "4.5.3", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "apple_support", version = "2.5.4", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_swift", version = "3.6.1")
+bazel_dep(name = "rules_swift_package_manager", version = "1.19.0")
+bazel_dep(name = "swiftlint", version = "0.63.3", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
@@ -85,7 +89,11 @@ rules_ts_ext = use_extension(
     "ext",
     dev_dependency = True,
 )
-rules_ts_ext.deps()
+# Make sure Bazel is using the same version of TS as the package.json.
+# Otherwise it will default to newest and might change unexpectedly.
+rules_ts_ext.deps(
+    ts_version_from = "//:package.json",
+)
 use_repo(rules_ts_ext, "npm_typescript")
 
 # Kotlin
@@ -99,20 +107,18 @@ build_constants(
     version_file = "//:VERSION",
 )
 
-bazel_dep(name = "rules_java", version = "8.13.0")
-# TODO: Remove when we can upgrade to Kotlin 2.0 (rules_kotlin +2.3.0)
-single_version_override(module_name = "rules_java", version = "8.13.0")
-bazel_dep(name = "rules_kotlin", version = "2.1.8")
+bazel_dep(name = "rules_java", version = "9.3.0")
+bazel_dep(name = "rules_kotlin", version = "2.3.0")
 archive_override(
     module_name = "rules_kotlin",
     patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.3.0/rules_kotlin-v2.3.0.tar.gz"],
 )
 
 register_toolchains("//jvm:kotlin_toolchain")
 
 # Android
-bazel_dep(name = "rules_android", version = "0.7.2")
+bazel_dep(name = "rules_android", version = "0.7.3")
 bazel_dep(name = "rules_android_ndk", version = "0.1.3")
 git_override(
     module_name = "rules_android_ndk",
@@ -129,14 +135,12 @@ remote_android_extensions = use_extension("@bazel_tools//tools/android:android_e
 use_repo(remote_android_extensions, "android_gmaven_r8")
 
 # Maven
-bazel_dep(name = "rules_jvm_external", version = "6.8")
+bazel_dep(name = "rules_jvm_external", version = "7.0")
 
 # Override for AAR publishing support
-git_override(
+local_path_override(
     module_name = "rules_jvm_external",
-    # branch = "maven-export-aar-6.8",
-    commit = "0dc1a97c0403de02e0bf9a03244212a15dae3333",
-    remote = "https://github.com/sugarmanz/rules_jvm_external.git",
+    path = "../rules_jvm_external_fork",
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
@@ -168,7 +172,7 @@ maven.amend_artifact(
 )
 use_repo(maven, "maven")
 
-bazel_dep(name = "rules_robolectric", version = "4.15.1")
+bazel_dep(name = "rules_robolectric", version = "4.16.1")
 
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
