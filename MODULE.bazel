@@ -108,11 +108,11 @@ build_constants(
 )
 
 bazel_dep(name = "rules_java", version = "9.3.0")
-bazel_dep(name = "rules_kotlin", version = "2.3.0")
+bazel_dep(name = "rules_kotlin", version = "2.3.10")
 archive_override(
     module_name = "rules_kotlin",
     patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.3.0/rules_kotlin-v2.3.0.tar.gz"],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.3.10/rules_kotlin-v2.3.10.tar.gz"],
 )
 
 register_toolchains("//jvm:kotlin_toolchain")
