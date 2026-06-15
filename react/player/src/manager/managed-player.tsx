@@ -339,7 +339,7 @@ export const ManagedPlayer = (
     } else if (state?.value === "error") {
       props.onError?.(state?.context.error);
     } else if (state?.value === "running") {
-      props.onStartedFlow?.();
+      props.onStartedFlow?.(state.context.flow);
     }
   }
 

@@ -50,7 +50,7 @@ export interface ManagedPlayerProps extends ReactPlayerOptions {
   manager: FlowManager;
 
   /** A callback when a flow is started */
-  onStartedFlow?: () => void;
+  onStartedFlow?: (flow: Flow) => void;
 
   /** A callback when the entire async iteration is completed */
   onComplete?: (finalState?: CompletedState) => void;
