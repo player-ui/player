@@ -58,6 +58,9 @@ class InputTest : AssetTest("input") {
         val inputNoteContainer = view.findViewById<FrameLayout>(R.id.input_note_container)
         val inputField = view.findViewById<FormattedEditText>(R.id.input_field)
 
+        // Drain the main looper so the label/note TextViews are attached before we index into them.
+        runOnMain { }
+
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("Input with validation and formatting", text.toString())
         }
