@@ -196,7 +196,7 @@ public final class com/intuit/playerui/j2v8/bridge/V8NodeKt {
 
 public abstract interface class com/intuit/playerui/j2v8/bridge/V8ObjectWrapper {
 	public abstract fun getV8Object ()Lcom/eclipsesource/v8/V8Object;
-	public abstract fun release ()V
+	public fun release ()V
 }
 
 public final class com/intuit/playerui/j2v8/bridge/V8ObjectWrapper$DefaultImpls {
@@ -608,11 +608,12 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Valu
 	public static final field MAP Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 	public static final field PRIMITIVE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 	public static final field UNDECIDED Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 	public static fun values ()[Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 }
 
-public synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$WhenMappings {
+public final synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$WhenMappings {
 	public static final synthetic field $EnumSwitchMapping$0 [I
 }
 
@@ -621,7 +622,7 @@ final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncode
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+final synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Ljava/lang/Object;)V
 }
@@ -862,7 +863,7 @@ final class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThreadBlockin
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-synthetic class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThreadBlocking$1$1$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/coroutines/jvm/internal/SuspendFunction, kotlin/jvm/functions/Function2 {
+final synthetic class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThreadBlocking$1$1$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/coroutines/jvm/internal/SuspendFunction, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Lcom/eclipsesource/v8/V8Value;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }

@@ -20,6 +20,9 @@ bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "aspect_rules_ts", version = "3.8.10")
 
 # C++
+# apple_support must come above rules_cc so its CC toolchain registers first and wins
+# toolchain resolution on Apple platforms. https://github.com/bazelbuild/apple_support#bazel-7-setup
+bazel_dep(name = "apple_support", version = "2.5.4", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
@@ -44,7 +47,6 @@ register_toolchains("@local_shell_config//:local_sh_toolchain")
 bazel_dep(name = "rules_xcodeproj", version = "4.1.0")
 bazel_dep(name = "rules_shell", version = "0.8.0")
 bazel_dep(name = "rules_apple", version = "4.5.3", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "apple_support", version = "2.5.4", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_swift", version = "3.6.1")
 bazel_dep(name = "rules_swift_package_manager", version = "1.19.0")
 bazel_dep(name = "swiftlint", version = "0.63.3", repo_name = "SwiftLint")

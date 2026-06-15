@@ -161,10 +161,8 @@ jobs:
           command: |
             bazel build \
               --config=ci-mac \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
-              $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "kind(ios_unit_test|ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test|ios_ui_test, //plugins/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
       - run:
@@ -176,10 +174,8 @@ jobs:
               --experimental_use_llvm_covmap \
               --test_output=all \
               --test_timeout=1800 \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
-              $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)")
+              $(bazel query "kind(ios_unit_test|ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test|ios_ui_test, //plugins/...)")
       - run:
           name: Lint
           command: |
