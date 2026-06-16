@@ -55,6 +55,7 @@ let package = Package(
         .playerPackage(name: "PlayerUI"),
         .playerPackage(name: "PlayerUISwiftUI"),
         .playerPackage(name: "PlayerUIReferenceAssets"),
+        .playerPackage(name: "PlayerUIA2UI"),
         .playerPackage(name: "PlayerUILogger"),
         .playerPackage(name: "PlayerUITestUtilities"),
         .playerPackage(name: "PlayerUITestUtilitiesCore"),
@@ -99,6 +100,18 @@ let package = Package(
                 .target(name: "PlayerUISwiftUIPendingTransactionPlugin")
             ],
             path: "plugins/reference-assets/swiftui",
+            resources: [
+                .process("Resources")
+            ]
+        ),
+        .target(
+            name: "PlayerUIA2UI",
+            dependencies: [
+                .product(name: "SwiftHooks", package: "swift-hooks"),
+                .target(name: "PlayerUI"),
+                .target(name: "PlayerUISwiftUI")
+            ],
+            path: "plugins/a2ui/swiftui",
             resources: [
                 .process("Resources")
             ]
