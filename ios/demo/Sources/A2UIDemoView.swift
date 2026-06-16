@@ -13,8 +13,9 @@ private struct A2UIMock: Identifiable {
     var id: String { name }
 }
 
-/// A self-contained demo screen that renders raw A2UI snapshots through the
-/// `A2UIPlugin`, starting each flow with `StartOptions.a2ui`.
+/// A self-contained demo screen that renders the full canonical A2UI snapshot
+/// catalog (`A2UIMockFlows.all`) through the `A2UIPlugin`, starting each flow with
+/// `StartOptions.a2ui`.
 struct A2UIDemoView: View {
     private let plugins: [NativePlugin] = [
         A2UIPlugin(),
@@ -23,8 +24,12 @@ struct A2UIDemoView: View {
         CommonExpressionsPlugin()
     ]
 
+    private let mocks: [A2UIMock] = A2UIMockFlows.all.map {
+        A2UIMock(name: $0.name, snapshot: $0.snapshot)
+    }
+
     var body: some View {
-        List(Self.mocks) { mock in
+        List(mocks) { mock in
             NavigationLink(mock.name) {
                 A2UIFlowView(snapshot: mock.snapshot, plugins: plugins)
                     .navigationTitle(mock.name)
@@ -52,55 +57,4 @@ private struct A2UIFlowView: View {
             .padding()
         }
     }
-}
-
-private extension A2UIDemoView {
-    static let mocks: [A2UIMock] = [
-        A2UIMock(name: "Text", snapshot: """
-        {
-          "surfaceId": "text-basic",
-          "components": [
-            { "id": "root", "component": "Text", "text": "Hello A2UI", "variant": "body" }
-          ]
-        }
-        """),
-        A2UIMock(name: "Column", snapshot: """
-        {
-          "surfaceId": "column-basic",
-          "components": [
-            { "id": "root", "component": "Column", "children": ["a", "b", "c"], "align": "start" },
-            { "id": "a", "component": "Text", "text": "First", "variant": "h3" },
-            { "id": "b", "component": "Text", "text": "Second" },
-            { "id": "c", "component": "Text", "text": "Third" }
-          ]
-        }
-        """),
-        A2UIMock(name: "Button", snapshot: """
-        {
-          "surfaceId": "button-with-action",
-          "components": [
-            { "id": "root", "component": "Column", "children": ["hint", "btn"] },
-            { "id": "hint", "component": "Text", "text": "Click the button to fire a 'submit' event." },
-            { "id": "btn", "component": "Button", "child": "lbl", "variant": "primary", "action": { "event": { "name": "submit" } } },
-            { "id": "lbl", "component": "Text", "text": "Submit" }
-          ]
-        }
-        """),
-        A2UIMock(name: "TextField", snapshot: """
-        {
-          "surfaceId": "text-field-validation",
-          "data": { "user": { "email": "" } },
-          "components": [
-            {
-              "id": "root",
-              "component": "TextField",
-              "label": "Email",
-              "value": { "path": "/user/email" },
-              "textFieldType": "shortText",
-              "validationRegexp": "^[^@\\\\s]+@[^@\\\\s]+\\\\.[^@\\\\s]+$"
-            }
-          ]
-        }
-        """)
-    ]
 }
