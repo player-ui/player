@@ -1,0 +1,54 @@
+public abstract interface class com/intuit/playerui/plugins/transactions/PendingTransaction {
+	public abstract fun commit ()V
+}
+
+public final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin : com/intuit/playerui/core/plugins/Plugin {
+	public static final field PENDING_TRANSACTION_ID Ljava/lang/String;
+	public fun <init> ()V
+	public final fun commit ()V
+	public final fun getHooks ()Lcom/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks;
+	public final fun register (Lcom/intuit/playerui/plugins/transactions/PendingTransaction;)V
+}
+
+private final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$Companion {
+}
+
+public final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks {
+	public fun <init> ()V
+	public final fun getCommit ()Lcom/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$CommitHook;
+	public final fun getRegister ()Lcom/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$RegisterHook;
+}
+
+public final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$CommitHook : com/intuit/hooks/SyncHook {
+	public fun <init> ()V
+	public final fun call ()V
+}
+
+final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$CommitHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public static final field INSTANCE Lcom/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$CommitHook$call$1;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)V
+}
+
+public final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$RegisterHook : com/intuit/hooks/SyncHook {
+	public fun <init> ()V
+	public final fun call ()V
+}
+
+final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$RegisterHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public static final field INSTANCE Lcom/intuit/playerui/plugins/transactions/PendingTransactionPlugin$PendingTransactionHooks$RegisterHook$call$1;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)V
+}
+
+final class com/intuit/playerui/plugins/transactions/PendingTransactionPlugin$register$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/util/HashMap;)V
+}
+
+public final class com/intuit/playerui/plugins/transactions/PendingTransactionPluginKt {
+	public static final fun commitPendingTransaction (Lcom/intuit/playerui/core/player/Player;)V
+	public static final fun getPendingTransactionPlugin (Lcom/intuit/playerui/core/player/Player;)Lcom/intuit/playerui/plugins/transactions/PendingTransactionPlugin;
+	public static final fun registerPendingTransaction (Lcom/intuit/playerui/core/player/Player;Lcom/intuit/playerui/plugins/transactions/PendingTransaction;)V
+}
+

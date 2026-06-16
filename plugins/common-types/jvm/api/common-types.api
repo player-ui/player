@@ -1,0 +1,4 @@
+public final class com/intuit/playerui/plugins/types/CommonTypesPlugin : com/intuit/playerui/core/plugins/JSScriptPluginWrapper {
+	public fun <init> ()V
+}
+

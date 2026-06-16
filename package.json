@@ -191,7 +191,10 @@
     "ignoredBuiltDependencies": [
       "core-js-pure",
       "yarn"
-    ]
+    ],
+    "patchedDependencies": {
+      "@auto-it/core@11.3.6": "patches/@auto-it__core@11.3.6.patch"
+    }
   },
   "resolutions": {
     "esbuild": "0.19.8",
