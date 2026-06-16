@@ -85,4 +85,6 @@ sh_test(
         "@android_test_orchestrator_apk//file",
         "@android_test_services_apk//file",
     ],
+    # This is needed to access APK files for testing
+    deps = ["@bazel_tools//tools/bash/runfiles"],
 )
