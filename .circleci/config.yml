@@ -397,7 +397,7 @@ jobs:
       - run:
           name: Post benchmark comparison (PR only)
           command: |
-            PR_NUM=$(echo "${CIRCLE_PULL_REQUEST:-}" | grep -oE '[0-9]+$')
+            PR_NUM="${CIRCLE_PULL_REQUEST##*/}"
             if [ -n "${PR_NUM}" ]; then
               node scripts/compare-benchmarks.js > bench-comparison.md
               if [ -s bench-comparison.md ]; then
