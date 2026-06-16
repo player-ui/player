@@ -33,7 +33,7 @@ internal abstract class HermesTest(
         Assertions.assertEquals(format.decodeFromValue<Any?>(a), format.decodeFromValue<Any?>(b))
     }
 
-    context(_: RuntimeThreadContext)
+     context(RuntimeThreadContext)
     fun assertEquivalent(a: Object, b: Object) {
         // verify that all missing keys from another are null or undefined
         val aKeys = HermesNode(a, runtime).keys

@@ -9,7 +9,7 @@ public final class com/intuit/playerui/utils/MakeFlowKt {
 	public static final fun makeFlow (Lkotlinx/serialization/json/JsonElement;)Lkotlinx/serialization/json/JsonElement;
 }
 
-final synthetic class com/intuit/playerui/utils/MakeFlowKt$makeFlowModule$2 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function0 {
+synthetic class com/intuit/playerui/utils/MakeFlowKt$makeFlowModule$2 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function0 {
 	public static final field INSTANCE Lcom/intuit/playerui/utils/MakeFlowKt$makeFlowModule$2;
 	public final fun invoke ()Lcom/intuit/playerui/utils/MakeFlowModule;
 	public synthetic fun invoke ()Ljava/lang/Object;
@@ -57,13 +57,13 @@ public final class com/intuit/playerui/utils/mocks/ClassLoaderMock : com/intuit/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final synthetic class com/intuit/playerui/utils/mocks/ClassLoaderMock$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/utils/mocks/ClassLoaderMock$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lcom/intuit/playerui/utils/mocks/ClassLoaderMock$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -94,7 +94,7 @@ final class com/intuit/playerui/utils/mocks/ClassLoaderMocksReader$mocks$2 : kot
 public abstract interface class com/intuit/playerui/utils/mocks/Mock {
 	public abstract fun getGroup ()Ljava/lang/String;
 	public abstract fun getName ()Ljava/lang/String;
-	public fun getNormalizedPath ()Ljava/lang/String;
+	public abstract fun getNormalizedPath ()Ljava/lang/String;
 	public abstract fun getPath ()Ljava/lang/String;
 	public abstract fun read (Ljava/lang/Object;)Ljava/lang/String;
 }

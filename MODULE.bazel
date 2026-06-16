@@ -8,7 +8,7 @@ bazel_dep(name = "rules_player")
 # Tracking https://github.com/player-ui/rules_player/pull/111 (Bazel 9 support).
 git_override(
     module_name = "rules_player",
-    commit = "bf3660cdd3b1c9fd9d25da910341683eb756127f",
+    commit = "71d5517715703a90d7ead95ff0f9ff4918d22ddf",
     remote = "https://github.com/player-ui/rules_player.git",
 )
 
@@ -109,12 +109,16 @@ build_constants(
     version_file = "//:VERSION",
 )
 
-bazel_dep(name = "rules_java", version = "9.3.0")
-bazel_dep(name = "rules_kotlin", version = "2.3.21")
+bazel_dep(name = "rules_java", version = "8.16.1")
+# Pinned to 8.16.1: its java_tools (v16+) ships a Turbine that supports --header_compilation_output,
+# which Bazel 9 requires. 8.13.0 (java_tools v15) lacks it and fails header compilation.
+# TODO: Remove when we can upgrade to Kotlin 2.0 (rules_kotlin +2.3.0)
+single_version_override(module_name = "rules_java", version = "8.16.1")
+bazel_dep(name = "rules_kotlin", version = "2.1.8")
 archive_override(
     module_name = "rules_kotlin",
     patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.3.21/rules_kotlin-v2.3.21.tar.gz"],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
 )
 
 register_toolchains("//jvm:kotlin_toolchain")
@@ -137,14 +141,13 @@ remote_android_extensions = use_extension("@bazel_tools//tools/android:android_e
 use_repo(remote_android_extensions, "android_gmaven_r8")
 
 # Maven
-bazel_dep(name = "rules_jvm_external", version = "7.0")
+bazel_dep(name = "rules_jvm_external", version = "6.8")
 
-# Override for AAR publishing support (rebased onto 7.0 for Bazel 9 support).
-# Tracking https://github.com/sugarmanz/rules_jvm_external/pull/1.
+# Override for AAR publishing support
 git_override(
     module_name = "rules_jvm_external",
-    commit = "c227c81c8fe850034298bca18ef8b841d4513b1f",
-    remote = "https://github.com/KVSRoyal/rules_jvm_external.git",
+    commit = "0dc1a97c0403de02e0bf9a03244212a15dae3333",
+    remote = "https://github.com/sugarmanz/rules_jvm_external.git",
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")

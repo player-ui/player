@@ -5,7 +5,9 @@ coverage --combined_report=lcov
 # The intention is that none of these modules will ship with Bazel in future versions, but this is the only way to 
 # access these specific modules for now.
 # https://blog.jetbrains.com/clion/2025/11/bazelcon-2025/#rules-moving-out-of-the-binary-autoloads-off-in-bazel-9
-common --incompatible_autoload_externally=+@rules_cc
+# aar_import is needed because rules_jvm_external's generated maven BUILD references it
+# unqualified; in Bazel 9 it must be autoloaded from @rules_android.
+common --incompatible_autoload_externally=+@rules_cc,+aar_import
 
 # C++ Specific Configs
 common --cxxopt=-std=c++17

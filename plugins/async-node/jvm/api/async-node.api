@@ -26,7 +26,7 @@ public final class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$S
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer;
 }
 
-final synthetic class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+synthetic class com/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/plugins/asyncnode/AsyncNodePlugin$Hooks;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;

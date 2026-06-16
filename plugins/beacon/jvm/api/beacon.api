@@ -34,7 +34,7 @@ public final class com/intuit/playerui/plugins/beacon/BeaconPlugin$HookArgs$Seri
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$HookArgs$Serializer;
 }
 
-final synthetic class com/intuit/playerui/plugins/beacon/BeaconPlugin$HookArgs$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+synthetic class com/intuit/playerui/plugins/beacon/BeaconPlugin$HookArgs$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$HookArgs$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$HookArgs;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
@@ -55,7 +55,7 @@ public final class com/intuit/playerui/plugins/beacon/BeaconPlugin$Hooks$Seriali
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$Hooks$Serializer;
 }
 
-final synthetic class com/intuit/playerui/plugins/beacon/BeaconPlugin$Hooks$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+synthetic class com/intuit/playerui/plugins/beacon/BeaconPlugin$Hooks$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$Hooks$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$Hooks;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
@@ -75,13 +75,13 @@ public final class com/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPlugi
 	public fun toString ()Ljava/lang/String;
 }
 
-public final synthetic class com/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$JSBeaconPluginConfig;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -122,13 +122,13 @@ public final class com/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final synthetic class com/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/plugins/beacon/BeaconPlugin$LoggerType;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }

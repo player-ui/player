@@ -535,12 +535,11 @@ public final class com/intuit/playerui/graaljs/bridge/serialization/encoding/Gra
 	public static final field MAP Lcom/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$Mode;
 	public static final field PRIMITIVE Lcom/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$Mode;
 	public static final field UNDECIDED Lcom/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$Mode;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$Mode;
 	public static fun values ()[Lcom/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$Mode;
 }
 
-public final synthetic class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$WhenMappings {
+public synthetic class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$WhenMappings {
 	public static final synthetic field $EnumSwitchMapping$0 [I
 }
 
@@ -549,7 +548,7 @@ final class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValue
 	public final fun invoke (Lorg/graalvm/polyglot/Value;)V
 }
 
-final synthetic class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+synthetic class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Ljava/lang/Object;)V
 }
