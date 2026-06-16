@@ -6,9 +6,9 @@ module(
 bazel_dep(name = "rules_player")
 archive_override(
   module_name = "rules_player",
-  strip_prefix = "rules_player-2.2.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.1.tar.gz"],
-  integrity = "sha256-vRyADsmF6vA865X9euZw5Z4KnGgpht5qzaa/vLxSkYQ="
+  strip_prefix = "rules_player-2.4.0",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.4.0.tar.gz"],
+  integrity = "sha256-so3ki94j9QI+LGuoOFeDD/cHN5BtJqp3SthtmKtU1wg="
 )
 
 bazel_dep(name = "platforms", version = "1.0.0")
