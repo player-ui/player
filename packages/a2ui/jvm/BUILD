@@ -6,7 +6,6 @@ main_exports = [
 
 main_deps = main_exports + [
     "//plugins/a2ui/jvm",
-    "//plugins/common-types/jvm",
 ]
 
 test_deps = [

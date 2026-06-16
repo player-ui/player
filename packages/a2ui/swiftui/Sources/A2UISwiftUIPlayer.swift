@@ -4,7 +4,6 @@ import SwiftUI
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIA2UI
-import PlayerUICommonTypesPlugin
 #endif
 
 /**
@@ -31,7 +30,7 @@ public struct A2UISwiftUIPlayer: View {
         context: SwiftUIPlayer.Context = .shared,
         unloadOnDisappear: Bool = true
     ) {
-        let defaults: [NativePlugin] = [A2UIPlugin(), CommonTypesPlugin()]
+        let defaults: [NativePlugin] = [A2UIPlugin()]
         player = SwiftUIPlayer(
             flow: flow,
             plugins: defaults + plugins,

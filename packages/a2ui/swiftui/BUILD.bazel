@@ -5,7 +5,6 @@ swiftui_plugin(
     deps = [
         "//ios/swiftui:PlayerUISwiftUI",
         "//plugins/a2ui/swiftui:PlayerUIA2UI",
-        "//plugins/common-types/ios:PlayerUICommonTypesPlugin",
     ],
     test_deps = [
         "//ios/test-utils:PlayerUITestUtilities",

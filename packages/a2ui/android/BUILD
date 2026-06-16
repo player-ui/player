@@ -6,7 +6,6 @@ main_exports = [
 
 main_deps = main_exports + [
     "//plugins/a2ui/android:a2ui-android",
-    "//plugins/common-types/jvm",
 ]
 
 kt_android(

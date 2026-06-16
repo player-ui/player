@@ -6,7 +6,6 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.a2ui.A2UIPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 
 /**
  * Builds a [HeadlessPlayer] preconfigured for A2UI content — the A2UIPlugin (content
@@ -30,7 +29,6 @@ public fun A2UIHeadlessPlayer(
     explicitRuntime: Runtime<*>? = null,
 ): HeadlessPlayer = HeadlessPlayer(
     A2UIPlugin(),
-    CommonTypesPlugin(),
     *plugins,
     config = config,
     explicitRuntime = explicitRuntime,

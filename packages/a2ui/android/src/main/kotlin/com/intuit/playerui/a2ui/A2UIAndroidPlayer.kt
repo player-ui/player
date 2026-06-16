@@ -3,7 +3,6 @@ package com.intuit.playerui.a2ui
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.a2ui.A2UIPlugin
 import com.intuit.playerui.core.plugins.Plugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 
 /**
  * Builds an [AndroidPlayer] preconfigured for A2UI content — the [A2UIPlugin] (Compose
@@ -25,7 +24,6 @@ public fun A2UIAndroidPlayer(
     config: AndroidPlayer.Config = AndroidPlayer.Config(),
 ): AndroidPlayer = AndroidPlayer(
     A2UIPlugin(),
-    CommonTypesPlugin(),
     *plugins,
     config = config,
 )
