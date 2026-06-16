@@ -113,6 +113,16 @@ public abstract class Player : Pluggable {
     public abstract fun start(flow: String): Completable<CompletedState>
 
     /**
+     * Asynchronously [start] the [flow] represented as a [String], declaring its
+     * content [format] (default `"player"`, i.e. the [flow] is already a Player
+     * `Flow`). Non-`"player"` formats are recognized and converted by a plugin
+     * tapping the core `transformContent` hook before the flow is run. An
+     * optional content [version] may be supplied for plugins that dispatch across
+     * format versions.
+     */
+    public abstract fun start(flow: String, format: String, version: String? = null): Completable<CompletedState>
+
+    /**
      * Release any resources being used by the [Player] instance and
      * enter the terminal [ReleasedState]. New flows cannot be started
      * and API access is limited to [state] as other APIs will throw
@@ -132,6 +142,14 @@ public abstract class Player : Pluggable {
     @ExperimentalPlayerApi
     public fun start(flow: URL, onComplete: ((Result<CompletedState>) -> Unit)? = null): Completable<CompletedState> =
         onComplete?.let { start(flow.readText(), onComplete) } ?: start(flow.readText())
+
+    /**
+     * Utility method to [start] a flow from a [URL] while declaring its content
+     * [format] (and optional [version]). See [start] for [format] semantics.
+     */
+    @ExperimentalPlayerApi
+    public fun start(flow: URL, format: String, version: String? = null): Completable<CompletedState> =
+        start(flow.readText(), format, version)
 
     /**
      * [ExperimentalPlayerApi] utility method to allow consumers

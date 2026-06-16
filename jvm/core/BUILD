@@ -26,6 +26,7 @@ test_deps = [
     "//plugins/beacon/jvm",
     "//plugins/common-types/jvm",
     "//plugins/reference-assets/jvm",
+    "//plugins/a2ui/jvm",
     artifact("io.mockk:mockk"),
     artifact("org.amshove.kluent:kluent"),
 ]

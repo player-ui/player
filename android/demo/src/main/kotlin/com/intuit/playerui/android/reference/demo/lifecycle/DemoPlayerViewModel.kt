@@ -4,6 +4,7 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayer.Config
 import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
+import com.intuit.playerui.android.a2ui.A2UIPlugin
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
@@ -21,6 +22,9 @@ class DemoPlayerViewModel(
     override val plugins = listOf(
         CommonTypesPlugin(),
         ReferenceAssetsPlugin(),
+        // A2UI assets coexist with the reference assets (PascalCase vs lowercase type
+        // namespaces). Start an A2UI snapshot with `androidPlayer.start(snapshot, "a2ui")`.
+        A2UIPlugin(),
         PendingTransactionPlugin(),
         AsyncHydrationTrackerPlugin(),
     )

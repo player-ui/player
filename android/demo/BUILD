@@ -7,6 +7,7 @@ main_deps = [
     "//jvm/hermes:hermes-android",
     "//jvm/utils",
     "//plugins/reference-assets/android",
+    "//plugins/a2ui/android:a2ui-android",
     "//plugins/common-types/jvm",
     "//tools/mocks:jar",
 
