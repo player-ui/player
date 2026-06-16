@@ -27,9 +27,12 @@ public class RequestTimePlugin: NativePlugin {
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
         requestTimeWebPlugin.context = player.jsPlayerReference?.context
-        player.applyTo(MetricsPlugin.self) { [weak self] plugin in
-            self?.requestTimeWebPlugin.pluginRef?.invokeMethod("apply", withArguments: [plugin])
+
+        guard let metricsPlugin = player.pluginManager.findPlugin(ofType: MetricsPlugin.self) else {
+            return
         }
+
+        self.requestTimeWebPlugin.apply(to: metricsPlugin)
     }
 }
 
@@ -45,6 +48,12 @@ class RequestTimeWebPlugin: JSBasePlugin {
             self.getRequestTime()
         }
         return [JSValue(object: handler, in: context) as Any]
+    }
+
+    fileprivate func apply(to metricsPlugin: MetricsPlugin) {
+        guard let context = metricsPlugin.context else { return }
+        self.setup(context: context)
+        self.pluginRef?.invokeMethod("apply", withArguments: [metricsPlugin.pluginRef])
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
