@@ -1,3 +1,15 @@
+# 0.15.4-next.1 (Thu May 21 2026)
+
+#### 🐛 Bug Fix
+
+- Moved tapAndAssertElementAppears to AssetUITestCase [#867](https://github.com/player-ui/player/pull/867) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
 # 0.15.4-next.0 (Wed Apr 29 2026)
 
 #### 🐛 Bug Fix
