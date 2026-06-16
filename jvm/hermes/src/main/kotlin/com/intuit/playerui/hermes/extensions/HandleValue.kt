@@ -19,13 +19,13 @@ import kotlinx.serialization.DeserializationStrategy
 // thread, rather than these methods trying to figure out when they should defer to evaluateInJSThread, which should
 // help prevent inefficiencies trying to, possibly redundantly, defer to the runtime thread when the APIs require.
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
     is Value -> transform(format)
     else -> this
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 private fun Value.transform(format: JSIFormat): Any? = when {
     isUndefined() -> null
     isNull() -> null
@@ -41,7 +41,7 @@ private fun Value.transform(format: JSIFormat): Any? = when {
     else -> null
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 internal fun Object.transform(format: JSIFormat): Any = format.runtime.evaluateInJSThreadBlocking {
     when {
         isArray(format.runtime) -> asArray(format.runtime).toList(format)
@@ -50,7 +50,7 @@ internal fun Object.transform(format: JSIFormat): Any = format.runtime.evaluateI
     }
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 internal fun Object.filteredKeys(runtime: Runtime): Set<String> {
     val names = getPropertyNames(runtime)
     val size = names.size(runtime)
@@ -69,7 +69,7 @@ internal fun Object.toNode(format: JSIFormat): Node = HermesNode(this, format.ru
     if (it.containsKey("id") && it.containsKey("type")) Asset(it) else it
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.runtime))
     .map { i -> getValueAtIndex(format.runtime, i) }
     .map { it.transform(format) }

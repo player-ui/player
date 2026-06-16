@@ -174,7 +174,7 @@ internal class ObjectTests : HermesTest() {
 
 internal class ArrayTests : HermesTest() {
     // helper for asserting the same values within an Array constructed by arbitrary means
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     private fun Array.assertValues() {
         assertEquals(3, size(runtime))
 

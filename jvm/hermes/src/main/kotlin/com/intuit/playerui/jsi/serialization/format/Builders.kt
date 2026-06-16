@@ -12,28 +12,28 @@ import com.intuit.playerui.jsi.Value
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 @RuntimeBuilderDsl
 public fun JSIFormat.`object`(builder: RuntimeObjectBuilder<Value>.() -> Unit): Object {
     contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
     return RuntimeObjectBuilder(this).apply(builder).build().asObject(runtime)
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 @RuntimeBuilderDsl
 public fun RuntimeObjectBuilder<Value>.`object`(builder: RuntimeObjectBuilder<Value>.() -> Unit): Object {
     contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
     return runtimeObject(builder).asObject(format.runtime as Runtime)
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 @RuntimeBuilderDsl
 public fun JSIFormat.array(builder: RuntimeArrayBuilder<Value>.() -> Unit): Array {
     contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
     return RuntimeArrayBuilder(this).apply(builder).build().asObject(runtime).asArray(runtime)
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 @RuntimeBuilderDsl
 public fun RuntimeObjectBuilder<Value>.array(builder: RuntimeObjectBuilder<Value>.() -> Unit): Array {
     contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }

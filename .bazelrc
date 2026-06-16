@@ -63,6 +63,8 @@ coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 common:ci-base --build_metadata=ROLE=CI
 common:ci-base --remote_build_event_upload=minimal
 common:ci-base --nolegacy_important_outputs
+# Bazel 9 drops the executor's path by default. Add path so we have all the Android CI paths for testing.
+test:ci-base --test_env=PATH
 # Only show progress every 60 seconds on CI.
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
 # but not so often that we produce a long log file that requires a lot of scrolling.

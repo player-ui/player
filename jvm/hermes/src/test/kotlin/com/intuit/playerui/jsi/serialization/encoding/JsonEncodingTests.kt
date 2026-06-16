@@ -27,11 +27,11 @@ internal class JsonEncodingTests : HermesTest() {
         )
     }
     private val expectedJsonString = expectedJson.toString()
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     private val expectedValue get() = Value.createFromJson(runtime, expectedJson)
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     private val expectedObject get() = expectedValue.asObject(runtime)
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     private val expectedFlowResult get() = FlowResult(HermesNode(expectedObject, runtime))
 
     @Test

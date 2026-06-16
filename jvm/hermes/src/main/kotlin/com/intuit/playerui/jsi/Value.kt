@@ -40,28 +40,28 @@ public class PreparedJavaScript(
 public open class Runtime(
     mHybridData: HybridData,
 ) : HybridClass(mHybridData) {
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun evaluateJavaScript(script: String, sourceURL: String = "unknown"): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun evaluateHermesBytecode(bytecode: ByteArray, sourceURL: String = "unknown"): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun prepareJavaScript(script: String, sourceURL: String = "unknown"): PreparedJavaScript
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun evaluatePreparedJavaScript(js: PreparedJavaScript): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun queueMicrotask(callback: Function)
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun drainMicrotasks(maxMicrotasksHint: Int = -1): Boolean
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun global(): Object
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun description(): String
 
     // Note: lazy-initialized via Lazy<T> rather than `by lazy` because Kotlin 2.3
@@ -74,10 +74,10 @@ public open class Runtime(
         }
     }
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public fun jsEquals(a: Value, b: Value): Boolean = jsEqualsLazy.value.call(this, a, b).asBoolean()
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public fun stringify(value: Value): String = global()
         .getPropertyAsObject(this, "JSON")
         .getPropertyAsFunction(this, "stringify")
@@ -89,7 +89,7 @@ public open class Runtime(
 public sealed class JSIValueContainer(
     mHybridData: HybridData,
 ) : HybridClass(mHybridData) {
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public abstract fun asValue(runtime: Runtime): Value
 }
 
@@ -118,25 +118,25 @@ public class Value private constructor(
     // TODO: Consider making this return Number directly, so there aren't assumptions about what will come out of this
     public external fun asNumber(): Double
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun asString(runtime: Runtime): String
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun asBigInt(runtime: Runtime): Long
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun asSymbol(runtime: Runtime): Symbol
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun asObject(runtime: Runtime): Object
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun toString(runtime: Runtime): String
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public fun strictEquals(runtime: Runtime, other: Value): Boolean = strictEquals(runtime, this, other)
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     override fun asValue(runtime: Runtime): Value = this
 
     public companion object {
@@ -146,46 +146,46 @@ public class Value private constructor(
 
         @JvmStatic public external fun from(value: Int): Value
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun from(runtime: Runtime, value: String): Value
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun from(runtime: Runtime, value: Long): Value
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun from(runtime: Runtime, value: Symbol): Value
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun from(runtime: Runtime, value: Object): Value
 
         public val undefined: Value @JvmStatic external get
 
         public val `null`: Value @JvmStatic external get
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun createFromJsonUtf8(runtime: Runtime, json: ByteBuffer): Value
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public fun createFromJsonUtf8(runtime: Runtime, json: ByteArray): Value =
             createFromJsonUtf8(runtime, ByteBuffer.allocateDirect(json.size).apply { put(json) })
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public fun createFromJsonUtf8(runtime: Runtime, json: String): Value = createFromJsonUtf8(
             runtime,
             json.toByteArray(Charsets.UTF_8),
         )
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public fun createFromJson(runtime: Runtime, json: JsonElement): Value = createFromJsonUtf8(runtime, json.toString())
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun strictEquals(
             runtime: Runtime,
             a: Value,
             b: Value,
         ): Boolean
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         public fun from(runtime: Runtime, value: Any?): Value = when (value) {
             null -> `null`
             Unit -> undefined
@@ -260,48 +260,48 @@ private fun handleInvocation(
 public open class Object internal constructor(
     mHybridData: HybridData,
 ) : JSIValueContainer(mHybridData) {
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun instanceOf(runtime: Runtime, ctor: Function): Boolean
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun isArray(runtime: Runtime): Boolean
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun isFunction(runtime: Runtime): Boolean
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun asArray(runtime: Runtime): Array
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun asFunction(runtime: Runtime): Function
 
     // TODO: Expand name to accept PropNameID for non-string based identifiers
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun hasProperty(runtime: Runtime, name: String): Boolean
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun setProperty(
         runtime: Runtime,
         name: String,
         value: Value,
     )
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun getPropertyNames(runtime: Runtime): Array
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun getProperty(runtime: Runtime, name: String): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun getPropertyAsObject(runtime: Runtime, name: String): Object
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun getPropertyAsFunction(runtime: Runtime, name: String): Function
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public override fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public fun setProperty(
         runtime: Runtime,
         name: String,
@@ -309,10 +309,10 @@ public open class Object internal constructor(
     ): Unit = setProperty(runtime, name, value.asValue(runtime))
 
     public companion object {
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun create(runtime: Runtime): Object
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun strictEquals(
             runtime: Runtime,
             a: Object,
@@ -321,19 +321,19 @@ public open class Object internal constructor(
     }
 }
 
- context(RuntimeThreadContext)
+context(RuntimeThreadContext)
 public fun Object(runtime: Runtime): Object = Object.create(runtime)
 
 public class Array private constructor(
     mHybridData: HybridData,
 ) : Object(mHybridData) {
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun size(runtime: Runtime): Int
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun getValueAtIndex(runtime: Runtime, index: Int): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun setValueAtIndex(
         runtime: Runtime,
         index: Int,
@@ -341,7 +341,7 @@ public class Array private constructor(
     )
 
     public companion object {
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun createWithElements(runtime: Runtime, vararg elements: Value): Array
     }
 }
@@ -362,23 +362,23 @@ public class HostFunction(
 public class Function private constructor(
     mHybridData: HybridData,
 ) : Object(mHybridData) {
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun call(runtime: Runtime, vararg args: Value): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun callWithThis(
         runtime: Runtime,
         jsThis: Object,
         vararg value: Value,
     ): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun callAsConstructor(runtime: Runtime, vararg value: Value): Value
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun isHostFunction(runtime: Runtime): Boolean
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public fun callWithThis(
         runtime: Runtime,
         jsThis: Value,
@@ -390,7 +390,7 @@ public class Function private constructor(
     }
 
     public companion object {
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun createFromHostFunction(
             runtime: Runtime,
             name: String,
@@ -399,7 +399,7 @@ public class Function private constructor(
         ): Function
 
         // TODO: Use paramCount to validate args against?
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         public fun createFromHostFunction(
             runtime: Runtime,
             name: String = "unknown",
@@ -407,7 +407,7 @@ public class Function private constructor(
             func: Value.(runtime: Runtime, args: kotlin.Array<out Value>) -> Value,
         ): Function = createFromHostFunction(runtime, name, paramCount, HostFunction { _, thisVal, args -> thisVal.func(runtime, args) })
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         public fun createFromHostFunction(
             runtime: Runtime,
             name: String = "unknown",
@@ -415,7 +415,7 @@ public class Function private constructor(
             func: Value.(args: kotlin.Array<out Value>) -> Value,
         ): Function = createFromHostFunction(runtime, name, paramCount, HostFunction { _, thisVal, args -> thisVal.func(args) })
 
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         public fun createFromHostFunction(format: JSIFormat, func: (args: kotlin.Array<out Any?>) -> Any?): Function =
             createFromHostFunction(
                 format.runtime,
@@ -431,14 +431,14 @@ public class Function private constructor(
 public class Symbol private constructor(
     mHybridData: HybridData,
 ) : JSIValueContainer(mHybridData) {
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public external fun toString(runtime: Runtime): String
 
-     context(RuntimeThreadContext)
+    context(RuntimeThreadContext)
     public override fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
     public companion object {
-         context(RuntimeThreadContext)
+        context(RuntimeThreadContext)
         @JvmStatic public external fun strictEquals(
             runtime: Runtime,
             a: Symbol,
