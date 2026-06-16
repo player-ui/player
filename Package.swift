@@ -56,6 +56,7 @@ let package = Package(
         .playerPackage(name: "PlayerUISwiftUI"),
         .playerPackage(name: "PlayerUIReferenceAssets"),
         .playerPackage(name: "PlayerUIA2UI"),
+        .playerPackage(name: "PlayerUIA2UIPreset"),
         .playerPackage(name: "PlayerUILogger"),
         .playerPackage(name: "PlayerUITestUtilities"),
         .playerPackage(name: "PlayerUITestUtilitiesCore"),
@@ -115,6 +116,16 @@ let package = Package(
             resources: [
                 .process("Resources")
             ]
+        ),
+        .target(
+            name: "PlayerUIA2UIPreset",
+            dependencies: [
+                .target(name: "PlayerUI"),
+                .target(name: "PlayerUISwiftUI"),
+                .target(name: "PlayerUIA2UI"),
+                .target(name: "PlayerUICommonTypesPlugin")
+            ],
+            path: "packages/a2ui/swiftui"
         ),
         .target(
             name: "PlayerUITestUtilitiesCore",
