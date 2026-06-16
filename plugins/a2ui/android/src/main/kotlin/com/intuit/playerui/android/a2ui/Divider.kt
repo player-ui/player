@@ -2,15 +2,15 @@ package com.intuit.playerui.android.a2ui
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Divider as ComposeDivider
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
+import androidx.compose.material.Divider as ComposeDivider
 
 /** Visual separator line, horizontal (default) or vertical. */
 public class Divider(

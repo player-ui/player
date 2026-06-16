@@ -1,7 +1,6 @@
 package com.intuit.playerui.android.a2ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button as ComposeButton
 import androidx.compose.material.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -14,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import androidx.compose.material.Button as ComposeButton
 
 /** Clickable element that triggers an action via the transform-attached [Data.run]. */
 public class Button(

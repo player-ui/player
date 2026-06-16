@@ -3,7 +3,6 @@ package com.intuit.playerui.android.a2ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Checkbox
-import androidx.compose.material.Text as ComposeText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -16,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import androidx.compose.material.Text as ComposeText
 
 /** Boolean toggle control bound to the data model. */
 public class CheckBox(

@@ -2,7 +2,6 @@ package com.intuit.playerui.android.a2ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text as ComposeText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -13,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import androidx.compose.material.Text as ComposeText
 
 /**
  * Date/time entry bound to the data model.

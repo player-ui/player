@@ -2,8 +2,6 @@ package com.intuit.playerui.android.a2ui
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column as ComposeColumn
-import androidx.compose.foundation.layout.Row as ComposeRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +12,8 @@ import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
+import androidx.compose.foundation.layout.Column as ComposeColumn
+import androidx.compose.foundation.layout.Row as ComposeRow
 
 /** Scrollable list of items. Supports a horizontal or vertical direction. */
 public class A2UIList(

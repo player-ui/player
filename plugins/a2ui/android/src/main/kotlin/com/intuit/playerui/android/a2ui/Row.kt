@@ -1,7 +1,6 @@
 package com.intuit.playerui.android.a2ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row as ComposeRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,6 +10,7 @@ import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
+import androidx.compose.foundation.layout.Row as ComposeRow
 
 /** Horizontal layout container — children are arranged left-to-right. */
 public class Row(

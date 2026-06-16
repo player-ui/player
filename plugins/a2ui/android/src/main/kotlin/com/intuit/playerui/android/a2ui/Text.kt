@@ -1,12 +1,12 @@
 package com.intuit.playerui.android.a2ui
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text as ComposeText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
+import androidx.compose.material.Text as ComposeText
 
 /** Display text content with styling guidance via [Data.variant]. */
 public class Text(

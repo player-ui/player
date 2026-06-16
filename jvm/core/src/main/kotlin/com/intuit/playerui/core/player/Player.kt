@@ -120,7 +120,11 @@ public abstract class Player : Pluggable {
      * optional content [version] may be supplied for plugins that dispatch across
      * format versions.
      */
-    public abstract fun start(flow: String, format: String, version: String? = null): Completable<CompletedState>
+    public abstract fun start(
+        flow: String,
+        format: String,
+        version: String? = null,
+    ): Completable<CompletedState>
 
     /**
      * Release any resources being used by the [Player] instance and
@@ -148,8 +152,11 @@ public abstract class Player : Pluggable {
      * [format] (and optional [version]). See [start] for [format] semantics.
      */
     @ExperimentalPlayerApi
-    public fun start(flow: URL, format: String, version: String? = null): Completable<CompletedState> =
-        start(flow.readText(), format, version)
+    public fun start(
+        flow: URL,
+        format: String,
+        version: String? = null,
+    ): Completable<CompletedState> = start(flow.readText(), format, version)
 
     /**
      * [ExperimentalPlayerApi] utility method to allow consumers

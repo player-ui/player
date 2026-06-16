@@ -19,10 +19,8 @@ import com.intuit.playerui.core.plugins.Plugin
  * ```
  */
 @JvmOverloads
-public fun A2UIAndroidPlayer(
-    vararg plugins: Plugin,
-    config: AndroidPlayer.Config = AndroidPlayer.Config(),
-): AndroidPlayer = AndroidPlayer(
+@Suppress("ktlint:standard:function-naming")
+public fun A2UIAndroidPlayer(vararg plugins: Plugin, config: AndroidPlayer.Config = AndroidPlayer.Config()): AndroidPlayer = AndroidPlayer(
     A2UIPlugin(),
     *plugins,
     config = config,

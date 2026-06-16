@@ -1,9 +1,9 @@
 package com.intuit.playerui.a2ui
 
-import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.a2ui.A2UIPlugin
 
@@ -23,6 +23,7 @@ import com.intuit.playerui.plugins.a2ui.A2UIPlugin
  */
 @OptIn(ExperimentalPlayerApi::class)
 @JvmOverloads
+@Suppress("ktlint:standard:function-naming")
 public fun A2UIHeadlessPlayer(
     vararg plugins: Plugin,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),

@@ -19,7 +19,6 @@ import com.intuit.playerui.plugins.a2ui.A2UIPlugin as Transforms
 public class A2UIPlugin :
     AndroidPlayerPlugin,
     JSPluginWrapper by Transforms() {
-
     /** register the A2UI assets — type strings are PascalCase to match the adapter output */
     override fun apply(androidPlayer: AndroidPlayer) {
         androidPlayer.registerAsset("Row", ::Row)
