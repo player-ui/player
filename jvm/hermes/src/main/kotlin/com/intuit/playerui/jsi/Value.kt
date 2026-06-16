@@ -64,10 +64,8 @@ public open class Runtime(
     context(RuntimeThreadContext)
     public external fun description(): String
 
-    // Note: lazy-initialized via Lazy<T> rather than `by lazy` because Kotlin 2.3
-    // disallows context parameters on delegated properties. SYNCHRONIZED mode
-    // preserves the thread-safety guarantee `by lazy` provided.
-    private val jsEqualsLazy: Lazy<Function> = lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+    context(RuntimeThreadContext)
+    protected val jsEquals: Function by lazy {
         @OptIn(UnsafeRuntimeThreadAPI::class)
         evaluateInCurrentThread {
             evaluateJavaScript("(a, b) => a == b").asObject(this@Runtime).asFunction(this@Runtime)
@@ -75,7 +73,7 @@ public open class Runtime(
     }
 
     context(RuntimeThreadContext)
-    public fun jsEquals(a: Value, b: Value): Boolean = jsEqualsLazy.value.call(this, a, b).asBoolean()
+    public fun jsEquals(a: Value, b: Value): Boolean = jsEquals.call(this, a, b).asBoolean()
 
     context(RuntimeThreadContext)
     public fun stringify(value: Value): String = global()

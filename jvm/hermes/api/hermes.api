@@ -529,6 +529,7 @@ public class com/intuit/playerui/jsi/Runtime : com/intuit/playerui/jsi/HybridCla
 	public final fun evaluateJavaScript (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/jsi/Value;
 	public static synthetic fun evaluateJavaScript$default (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/jsi/Value;
 	public final fun evaluatePreparedJavaScript (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/PreparedJavaScript;)Lcom/intuit/playerui/jsi/Value;
+	protected final fun getJsEquals (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Function;
 	public final fun global (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Object;
 	public final fun jsEquals (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Value;Lcom/intuit/playerui/jsi/Value;)Z
 	public final fun prepareJavaScript (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/jsi/PreparedJavaScript;
@@ -537,12 +538,12 @@ public class com/intuit/playerui/jsi/Runtime : com/intuit/playerui/jsi/HybridCla
 	public final fun stringify (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Value;)Ljava/lang/String;
 }
 
-final class com/intuit/playerui/jsi/Runtime$jsEqualsLazy$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+final class com/intuit/playerui/jsi/Runtime$jsEquals$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
 	public final fun invoke ()Lcom/intuit/playerui/jsi/Function;
 	public synthetic fun invoke ()Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/jsi/Runtime$jsEqualsLazy$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/jsi/Runtime$jsEquals$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
 	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
