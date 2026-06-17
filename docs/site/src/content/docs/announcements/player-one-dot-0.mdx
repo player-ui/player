@@ -565,6 +565,20 @@ registry.get(query); // Always returns "more-specific"
 
 ## New Features
 
+### (React) `onStartedFlow` receives the started flow
+
+The `ManagedPlayer` `onStartedFlow` callback now receives the `Flow` that was started, so consumers no longer need to track it separately.
+
+```tsx
+// Before
+onStartedFlow?: () => void;
+
+// After
+onStartedFlow?: (flow: Flow) => void;
+```
+
+**Migration:** No change required — the parameter is additive. Update your handler signature if you want access to the started flow.
+
 ### (iOS) Convenience Methods for `AnyType`
 
 Added `as<T>(_:)` convenience method and `AnyType` (`anyDictionary`) subscripting for type-safe value extraction:
