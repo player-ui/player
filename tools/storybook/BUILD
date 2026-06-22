@@ -17,6 +17,7 @@ dependencies = [
     ":node_modules/@player-ui/metrics-plugin-react",
     "//:node_modules/@vueless/storybook-dark-mode",
     "//:node_modules/storybook",
+    "//:node_modules/@storybook/icons",
     "//:node_modules/@player-tools/xlr",
     "//:node_modules/@player-tools/xlr-utils",
     "//:node_modules/@types/react-redux",
