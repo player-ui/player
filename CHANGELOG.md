@@ -1,3 +1,15 @@
+# 0.15.5-next.0 (Tue Jun 23 2026)
+
+#### 🐛 Bug Fix
+
+- move storybook icons dependency to correct BUILD file [#887](https://github.com/player-ui/player/pull/887) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.15.4 (Tue Jun 16 2026)
 
 #### 🐛 Bug Fix
