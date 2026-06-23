@@ -5,11 +5,16 @@ module(
 
 bazel_dep(name = "rules_player")
 
-archive_override(
+# archive_override(
+#   module_name = "rules_player",
+#   strip_prefix = "rules_player-2.6.0",
+#   urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.6.0.tar.gz"],
+#   integrity = "sha256-hvjFfb31wtJjADh91Ws1oNLvukMM/PYF29TGxfpQaL0="
+# )
+git_override(
   module_name = "rules_player",
-  strip_prefix = "rules_player-2.6.0",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.6.0.tar.gz"],
-  integrity = "sha256-hvjFfb31wtJjADh91Ws1oNLvukMM/PYF29TGxfpQaL0="
+  commit = "ac1d56754fb44e7d92f00f2b301b54cfd1c8233c",
+  remote = "https://github.com/player-ui/rules_player.git",
 )
 
 bazel_dep(name = "platforms", version = "1.1.0")
