@@ -231,8 +231,17 @@ public abstract class RenderableAsset<Data>(
     public fun CoroutineScope.inflate(
         child: RenderableAsset<*>?,
         container: ViewGroup,
-        viewApply: ((View) -> Unit)? = null,
         @StyleRes vararg styles: Style?,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() } ?: return
+        inflateChild(asset, container)
+    }
+
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        viewApply: (View) -> Unit,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() } ?: return
         inflateChild(asset, container, viewApply)
@@ -241,8 +250,8 @@ public abstract class RenderableAsset<Data>(
     public fun CoroutineScope.inflate(
         child: RenderableAsset<*>?,
         container: ViewGroup,
-        viewApply: ((View) -> Unit)? = null,
         @StyleRes styles: Styles?,
+        viewApply: ((View) -> Unit)? = null,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(styles).build() } ?: return
         inflateChild(asset, container, viewApply)
@@ -263,7 +272,17 @@ public abstract class RenderableAsset<Data>(
         container: ViewGroup,
         @StyleRes vararg styles: Style?,
         tag: String,
-        viewApply: ((View) -> Unit)? = null
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() } ?: return
+        inflateChild(asset, container)
+    }
+
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        tag: String,
+        viewApply: (View) -> Unit,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() } ?: return
         inflateChild(asset, container, viewApply)
