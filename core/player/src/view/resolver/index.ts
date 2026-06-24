@@ -265,13 +265,16 @@ export class Resolver {
     // Object.assign (rather than spread) to avoid the heavier object-spread
     // helper once transpiled to ES5 for the mobile runtime; behavior is the
     // same (own enumerable props copied) but this runs on every node.
-    let resolveOptions: Resolve.NodeResolveOptions =
-    Object.assign({}, options, {
-      data: Object.assign({}, options.data, { model: depModelWithParser }),
-      evaluate: (exp: ExpressionType) =>
-        this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
-      node,
-    });
+    let resolveOptions: Resolve.NodeResolveOptions = Object.assign(
+      {},
+      options,
+      {
+        data: Object.assign({}, options.data, { model: depModelWithParser }),
+        evaluate: (exp: ExpressionType) =>
+          this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
+        node,
+      },
+    );
 
     try {
       resolveOptions = this.hooks.resolveOptions.call(resolveOptions, node);
