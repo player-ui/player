@@ -222,7 +222,7 @@ public abstract class RenderableAsset<Data>(
     public fun CoroutineScope.inflate(
         child: RenderableAsset<*>?,
         container: ViewGroup,
-        viewApply: ((View) -> Unit)? = null
+        viewApply: ((View) -> Unit)? = null,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).build() } ?: return
         inflateChild(asset, container, viewApply)
@@ -261,7 +261,7 @@ public abstract class RenderableAsset<Data>(
         child: RenderableAsset<*>?,
         container: ViewGroup,
         tag: String,
-        viewApply: ((View) -> Unit)? = null
+        viewApply: ((View) -> Unit)? = null,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).build() } ?: return
         inflateChild(asset, container, viewApply)
@@ -293,13 +293,17 @@ public abstract class RenderableAsset<Data>(
         container: ViewGroup,
         @StyleRes styles: Styles?,
         tag: String,
-        viewApply: ((View) -> Unit)? = null
+        viewApply: ((View) -> Unit)? = null,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() } ?: return
         inflateChild(asset, container, viewApply)
     }
 
-    private fun CoroutineScope.inflateChild(child: RenderableAsset<*>, container: ViewGroup, viewApply: ((View) -> Unit)? = null) {
+    private fun CoroutineScope.inflateChild(
+        child: RenderableAsset<*>,
+        container: ViewGroup,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
         player.asyncHydrationTrackerPlugin?.preTrackChild(child)
         launch {
             val view = child.render()
