@@ -412,9 +412,7 @@ final class com/intuit/playerui/core/bridge/IsUndefinedKt$isUndefined$1 : kotlin
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/core/bridge/JSErrorException : com/intuit/playerui/core/player/PlayerException, com/intuit/playerui/core/bridge/NodeWrapper {
-	public fun <init> (Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/Throwable;)V
-	public synthetic fun <init> (Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+public class com/intuit/playerui/core/bridge/JSErrorException : com/intuit/playerui/core/player/PlayerException, com/intuit/playerui/core/bridge/NodeWrapper {
 	public fun getMessage ()Ljava/lang/String;
 	public final fun getName ()Ljava/lang/String;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
@@ -424,6 +422,14 @@ final class com/intuit/playerui/core/bridge/JSErrorException$name$2 : kotlin/jvm
 	public static final field INSTANCE Lcom/intuit/playerui/core/bridge/JSErrorException$name$2;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/String;)Ljava/lang/String;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/bridge/JSErrorExceptionWithMetadata : com/intuit/playerui/core/bridge/JSErrorException, com/intuit/playerui/core/bridge/NodeWrapper, com/intuit/playerui/core/player/PlayerExceptionMetadata {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/Throwable;Ljava/lang/String;Lcom/intuit/playerui/core/error/ErrorSeverity;Ljava/util/Map;)V
+	public synthetic fun <init> (Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/Throwable;Ljava/lang/String;Lcom/intuit/playerui/core/error/ErrorSeverity;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getMetadata ()Ljava/util/Map;
+	public fun getSeverity ()Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public fun getType ()Ljava/lang/String;
 }
 
 public final class com/intuit/playerui/core/bridge/MapBackedNode : com/intuit/playerui/core/bridge/Node, java/util/Map, kotlin/jvm/internal/markers/KMappedMarker {
@@ -2109,10 +2115,8 @@ synthetic class com/intuit/playerui/core/constants/ConstantsController$Serialize
 public final class com/intuit/playerui/core/data/BindingKt {
 }
 
-public final class com/intuit/playerui/core/data/DataController : com/intuit/playerui/core/bridge/NodeWrapper {
+public final class com/intuit/playerui/core/data/DataController : com/intuit/playerui/core/data/ReadOnlyDataController {
 	public static final field Companion Lcom/intuit/playerui/core/data/DataController$Companion;
-	public final fun get (Ljava/lang/String;)Ljava/lang/Object;
-	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
 	public final fun set (Ljava/util/List;)V
 	public final fun set (Ljava/util/Map;)V
 }
@@ -2132,7 +2136,6 @@ synthetic class com/intuit/playerui/core/data/DataController$Serializer$1 : kotl
 }
 
 public final class com/intuit/playerui/core/data/DataControllerKt {
-	public static final fun get (Lcom/intuit/playerui/core/data/DataController;)Ljava/util/Map;
 	public static final fun set (Lcom/intuit/playerui/core/data/DataController;[Lkotlin/Pair;)V
 }
 
@@ -2160,6 +2163,146 @@ synthetic class com/intuit/playerui/core/data/DataModelWithParser$Serializer$1 :
 public final class com/intuit/playerui/core/data/DataModelWithParserKt {
 	public static final fun get (Lcom/intuit/playerui/core/data/DataModelWithParser;)Ljava/util/Map;
 	public static final fun set (Lcom/intuit/playerui/core/data/DataModelWithParser;[Lkotlin/Pair;)V
+}
+
+public class com/intuit/playerui/core/data/ReadOnlyDataController : com/intuit/playerui/core/bridge/NodeWrapper {
+	public static final field Companion Lcom/intuit/playerui/core/data/ReadOnlyDataController$Companion;
+	public final fun get (Ljava/lang/String;)Ljava/lang/Object;
+	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
+}
+
+public final class com/intuit/playerui/core/data/ReadOnlyDataController$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/playerui/core/data/ReadOnlyDataController$Serializer : com/intuit/playerui/core/bridge/serialization/serializers/NodeWrapperSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/core/data/ReadOnlyDataController$Serializer;
+}
+
+final class com/intuit/playerui/core/data/ReadOnlyDataController$Serializer$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/core/data/ReadOnlyDataController$Serializer$1;
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/data/ReadOnlyDataController;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/data/ReadOnlyDataControllerKt {
+	public static final fun get (Lcom/intuit/playerui/core/data/ReadOnlyDataController;)Ljava/util/Map;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController : com/intuit/playerui/core/bridge/NodeWrapper {
+	public static final field Companion Lcom/intuit/playerui/core/error/ErrorController$Companion;
+	public final fun captureError (Ljava/lang/Throwable;)Z
+	public final fun clearCurrentError ()V
+	public final fun clearErrors ()V
+	public final fun getCurrentError ()Ljava/lang/Throwable;
+	public final fun getErrors ()Ljava/util/List;
+	public final fun getHooks ()Lcom/intuit/playerui/core/error/ErrorController$Hooks;
+	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$Hooks : com/intuit/playerui/core/bridge/NodeWrapper {
+	public static final field Companion Lcom/intuit/playerui/core/error/ErrorController$Hooks$Companion;
+	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
+	public final fun getOnError ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncBailHook1;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$Hooks$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$Hooks$Serializer : com/intuit/playerui/core/bridge/serialization/serializers/NodeWrapperSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorController$Hooks$Serializer;
+}
+
+synthetic class com/intuit/playerui/core/error/ErrorController$Hooks$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorController$Hooks$Serializer$1;
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/error/ErrorController$Hooks;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$Serializer : com/intuit/playerui/core/bridge/serialization/serializers/NodeWrapperSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorController$Serializer;
+}
+
+synthetic class com/intuit/playerui/core/error/ErrorController$Serializer$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorController$Serializer$1;
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/error/ErrorController;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/error/ErrorSeverity : java/lang/Enum {
+	public static final field Companion Lcom/intuit/playerui/core/error/ErrorSeverity$Companion;
+	public static final field ERROR Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public static final field FATAL Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public static final field WARNING Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public static fun values ()[Lcom/intuit/playerui/core/error/ErrorSeverity;
+}
+
+public final class com/intuit/playerui/core/error/ErrorSeverity$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorSeverity$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/core/error/ErrorSeverity;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/playerui/core/error/ErrorSeverity$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/core/error/ErrorSeverity$Companion$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorSeverity$Companion$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/playerui/core/error/ErrorTypes : java/lang/Enum {
+	public static final field ASSET Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field BINDING Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field Companion Lcom/intuit/playerui/core/error/ErrorTypes$Companion;
+	public static final field DATA Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field EXPRESSION Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field EXTERNAL_STATE Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field NAVIGATION Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field NETWORK Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field PLUGIN Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field RENDER Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field SCHEMA Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field VALIDATION Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static final field VIEW Lcom/intuit/playerui/core/error/ErrorTypes;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/core/error/ErrorTypes;
+	public static fun values ()[Lcom/intuit/playerui/core/error/ErrorTypes;
+}
+
+public final class com/intuit/playerui/core/error/ErrorTypes$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorTypes$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/core/error/ErrorTypes;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/core/error/ErrorTypes;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/playerui/core/error/ErrorTypes$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/core/error/ErrorTypes$Companion$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorTypes$Companion$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface annotation class com/intuit/playerui/core/experimental/ExperimentalPlayerApi : java/lang/annotation/Annotation {
@@ -2922,53 +3065,50 @@ final class com/intuit/playerui/core/logger/TapableLoggerKt$toTypedArrayHook$1$c
 	public final fun invoke (Lkotlin/jvm/functions/Function2;Ljava/util/HashMap;)V
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManager {
+public final class com/intuit/playerui/core/managed/AsyncIterationFlow {
 	public fun <init> (Lcom/intuit/playerui/core/managed/AsyncIterator;)V
 	public final fun getIterator ()Lcom/intuit/playerui/core/managed/AsyncIterator;
 	public final fun getState ()Lkotlinx/coroutines/flow/StateFlow;
 	public final fun next (Lkotlinx/coroutines/CoroutineScope;Ljava/lang/Object;)Lkotlinx/coroutines/Job;
-	public static synthetic fun next$default (Lcom/intuit/playerui/core/managed/AsyncIterationManager;Lkotlinx/coroutines/CoroutineScope;Ljava/lang/Object;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+	public static synthetic fun next$default (Lcom/intuit/playerui/core/managed/AsyncIterationFlow;Lkotlinx/coroutines/CoroutineScope;Ljava/lang/Object;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
 }
 
-public abstract class com/intuit/playerui/core/managed/AsyncIterationManager$State {
+public abstract class com/intuit/playerui/core/managed/AsyncIterationFlow$State {
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManager$State$Done : com/intuit/playerui/core/managed/AsyncIterationManager$State {
-	public static final field INSTANCE Lcom/intuit/playerui/core/managed/AsyncIterationManager$State$Done;
+public final class com/intuit/playerui/core/managed/AsyncIterationFlow$State$Done : com/intuit/playerui/core/managed/AsyncIterationFlow$State {
+	public static final field INSTANCE Lcom/intuit/playerui/core/managed/AsyncIterationFlow$State$Done;
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManager$State$Error : com/intuit/playerui/core/managed/AsyncIterationManager$State {
+public final class com/intuit/playerui/core/managed/AsyncIterationFlow$State$Error : com/intuit/playerui/core/managed/AsyncIterationFlow$State {
 	public fun <init> (Ljava/lang/Exception;)V
 	public final fun getError ()Ljava/lang/Exception;
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManager$State$Item : com/intuit/playerui/core/managed/AsyncIterationManager$State {
+public final class com/intuit/playerui/core/managed/AsyncIterationFlow$State$Item : com/intuit/playerui/core/managed/AsyncIterationFlow$State {
 	public fun <init> (Ljava/lang/Object;)V
 	public final fun getValue ()Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManager$State$NotStarted : com/intuit/playerui/core/managed/AsyncIterationManager$State {
-	public static final field INSTANCE Lcom/intuit/playerui/core/managed/AsyncIterationManager$State$NotStarted;
+public final class com/intuit/playerui/core/managed/AsyncIterationFlow$State$NotStarted : com/intuit/playerui/core/managed/AsyncIterationFlow$State {
+	public static final field INSTANCE Lcom/intuit/playerui/core/managed/AsyncIterationFlow$State$NotStarted;
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManager$State$Pending : com/intuit/playerui/core/managed/AsyncIterationManager$State {
-	public static final field INSTANCE Lcom/intuit/playerui/core/managed/AsyncIterationManager$State$Pending;
+public final class com/intuit/playerui/core/managed/AsyncIterationFlow$State$Pending : com/intuit/playerui/core/managed/AsyncIterationFlow$State {
+	public static final field INSTANCE Lcom/intuit/playerui/core/managed/AsyncIterationFlow$State$Pending;
 }
 
-final class com/intuit/playerui/core/managed/AsyncIterationManager$next$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/core/managed/AsyncIterationFlow$next$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/core/managed/AsyncIterationManagerKt {
-}
-
 public abstract interface class com/intuit/playerui/core/managed/AsyncIterator {
 	public static final field Companion Lcom/intuit/playerui/core/managed/AsyncIterator$Companion;
 	public abstract fun next (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun terminate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun terminate (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/core/managed/AsyncIterator$Companion {
@@ -2978,17 +3118,18 @@ public final class com/intuit/playerui/core/managed/AsyncIterator$Companion {
 
 public final class com/intuit/playerui/core/managed/AsyncIterator$Companion$invoke$1 : com/intuit/playerui/core/managed/AsyncIterator {
 	public fun next (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun terminate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun terminate (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/core/managed/AsyncIterator$DefaultImpls {
 	public static synthetic fun next$default (Lcom/intuit/playerui/core/managed/AsyncIterator;Ljava/lang/Object;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static fun terminate (Lcom/intuit/playerui/core/managed/AsyncIterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun terminate (Lcom/intuit/playerui/core/managed/AsyncIterator;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun terminate$default (Lcom/intuit/playerui/core/managed/AsyncIterator;Ljava/lang/Object;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/core/managed/AsyncIteratorKt {
-	public static final fun AsyncFlowIterator (Ljava/util/List;)Lcom/intuit/playerui/core/managed/AsyncIterator;
-	public static final fun AsyncFlowIterator ([Ljava/lang/String;)Lcom/intuit/playerui/core/managed/AsyncIterator;
+	public static final fun FlowManager (Ljava/util/List;)Lcom/intuit/playerui/core/managed/AsyncIterator;
+	public static final fun FlowManager ([Ljava/lang/String;)Lcom/intuit/playerui/core/managed/AsyncIterator;
 }
 
 public final class com/intuit/playerui/core/player/HeadlessPlayer : com/intuit/playerui/core/player/Player, com/intuit/playerui/core/bridge/NodeWrapper {
@@ -3011,6 +3152,7 @@ public final class com/intuit/playerui/core/player/HeadlessPlayer : com/intuit/p
 	public final fun getRuntime ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
 	public fun getScope ()Lkotlinx/coroutines/CoroutineScope;
 	public fun getState ()Lcom/intuit/playerui/core/player/state/PlayerFlowState;
+	public fun registerPlugin (Lcom/intuit/playerui/core/plugins/Plugin;)V
 	public fun release ()V
 	public final fun start (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/bridge/Completable;
 	public final fun start (Lcom/intuit/playerui/core/bridge/Node;Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/bridge/Completable;
@@ -3135,6 +3277,7 @@ public abstract class com/intuit/playerui/core/player/Player : com/intuit/player
 	public abstract fun getLogger ()Lcom/intuit/playerui/core/logger/TapableLogger;
 	public abstract fun getScope ()Lkotlinx/coroutines/CoroutineScope;
 	public abstract fun getState ()Lcom/intuit/playerui/core/player/state/PlayerFlowState;
+	public abstract fun registerPlugin (Lcom/intuit/playerui/core/plugins/Plugin;)V
 	public abstract fun release ()V
 	public abstract fun start (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
 	public final fun start (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/bridge/Completable;
@@ -3145,6 +3288,7 @@ public abstract class com/intuit/playerui/core/player/Player : com/intuit/player
 public abstract interface class com/intuit/playerui/core/player/Player$Hooks {
 	public static final field Companion Lcom/intuit/playerui/core/player/Player$Hooks$Companion;
 	public abstract fun getDataController ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
+	public abstract fun getErrorController ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public abstract fun getExpressionEvaluator ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public abstract fun getFlowController ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public abstract fun getOnStart ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
@@ -3177,6 +3321,7 @@ synthetic class com/intuit/playerui/core/player/Player$Hooks$Companion$Serialize
 
 public final class com/intuit/playerui/core/player/Player$Hooks$Companion$invoke$1 : com/intuit/playerui/core/player/Player$Hooks$Companion$HooksByNode {
 	public fun getDataController ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
+	public fun getErrorController ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public fun getExpressionEvaluator ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public fun getFlowController ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
@@ -3235,6 +3380,18 @@ public final class com/intuit/playerui/core/player/PlayerException$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public abstract interface class com/intuit/playerui/core/player/PlayerExceptionMetadata {
+	public abstract fun getMetadata ()Ljava/util/Map;
+	public abstract fun getSeverity ()Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public abstract fun getType ()Ljava/lang/String;
+}
+
+public final class com/intuit/playerui/core/player/PlayerExceptionWithMetadata : com/intuit/playerui/core/player/PlayerException, com/intuit/playerui/core/player/PlayerExceptionMetadata {
+	public fun getMetadata ()Ljava/util/Map;
+	public fun getSeverity ()Lcom/intuit/playerui/core/error/ErrorSeverity;
+	public fun getType ()Ljava/lang/String;
+}
+
 public final class com/intuit/playerui/core/player/PlayerFlowStatus : java/lang/Enum {
 	public static final field COMPLETED Lcom/intuit/playerui/core/player/PlayerFlowStatus;
 	public static final field ERROR Lcom/intuit/playerui/core/player/PlayerFlowStatus;
@@ -3258,7 +3415,7 @@ public final class com/intuit/playerui/core/player/state/CompletedState : com/in
 	public static final field Companion Lcom/intuit/playerui/core/player/state/CompletedState$Companion;
 	public fun <init> (Lcom/intuit/playerui/core/bridge/Node;)V
 	public final fun getData ()Lkotlinx/serialization/json/JsonElement;
-	public final fun getDataModel ()Lcom/intuit/playerui/core/data/DataModelWithParser;
+	public final fun getDataModel ()Lcom/intuit/playerui/core/data/ReadOnlyDataController;
 	public final fun getEndState ()Lcom/intuit/playerui/core/flow/state/NavigationFlowEndState;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
 	public fun getStatus ()Lcom/intuit/playerui/core/player/PlayerFlowStatus;
@@ -3284,14 +3441,10 @@ final class com/intuit/playerui/core/player/state/CompletedState$data$2 : kotlin
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/core/player/state/CompletedState$dataModel$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/core/data/DataModelWithParser;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/core/player/state/ControllerState : com/intuit/playerui/core/bridge/NodeWrapper {
 	public static final field Companion Lcom/intuit/playerui/core/player/state/ControllerState$Companion;
-	public final fun getData ()Lcom/intuit/playerui/core/data/DataController;
+	public final fun getData ()Lcom/intuit/playerui/core/data/ReadOnlyDataController;
+	public final fun getError ()Lcom/intuit/playerui/core/error/ErrorController;
 	public final fun getExpression ()Lcom/intuit/playerui/core/expressions/ExpressionController;
 	public final fun getFlow ()Lcom/intuit/playerui/core/flow/FlowController;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;

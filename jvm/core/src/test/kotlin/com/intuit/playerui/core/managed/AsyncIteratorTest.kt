@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 internal class AsyncIteratorTest {
     @Test fun `iterator progresses through predefined items`() = runBlocking {
         val items = arrayOf("first", "second", "third")
-        val iterator = AsyncIterator<String, Boolean>(*items)
+        val iterator = AsyncIterator<String, Boolean, Unit>(*items)
         assertEquals("first", iterator.next(true))
         assertEquals("second", iterator.next(true))
         assertEquals("third", iterator.next(true))
@@ -21,7 +21,7 @@ internal class AsyncIteratorTest {
 
     @Test fun `iterator restarts with null result`() = runBlocking {
         val items = listOf("first", "second", "third")
-        val iterator = AsyncIterator<String, Boolean>(items)
+        val iterator = AsyncIterator<String, Boolean, Unit>(items)
         assertEquals("first", iterator.next())
         assertEquals("second", iterator.next(true))
         assertEquals("third", iterator.next(true))
@@ -38,7 +38,7 @@ internal class AsyncIteratorTest {
         val completedState = mockk<CompletedState>()
 
         val flows = arrayOf("first", "second", "third")
-        val iterator = AsyncFlowIterator(*flows)
+        val iterator = FlowManager(*flows)
         assertEquals("first", iterator.next())
         assertEquals("second", iterator.next(completedState))
         assertEquals("third", iterator.next(completedState))

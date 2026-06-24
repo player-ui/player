@@ -8,13 +8,23 @@
 import Combine
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 public enum AssetRenderError: Error {
     // Thrown when the asset fails to decode its data from the JS runtime into its swift data type
     case decodingFailure(innerError: Error, asset: AssetData? = nil, pathToAsset: [AssetData])
+}
+
+extension AssetRenderError: ErrorWithMetadata {
+    public var type: ErrorTypes { .render }
+    public var severity: ErrorSeverity? { ErrorSeverity.error }
+    public var metadata: [String: Any]? {
+        switch self {
+        case .decodingFailure(_, let asset, _):
+            return ["assetId": asset?.id ?? ""]
+        }
+    }
+    public var jsDescription: String { debugDescription }
 }
 
 extension AssetRenderError: CustomDebugStringConvertible {
@@ -29,6 +39,7 @@ Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset
         }
     }
 }
+
 
 struct MinimumAssetData: AssetData {
     public var id: String

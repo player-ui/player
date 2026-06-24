@@ -110,15 +110,17 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             autoreleasepool {
                 if let ctx = player?.context {
                     ctx.exceptionHandler = nil
-                    ctx.setObject(nil, forKeyedSubscript: "player" as NSString)
                     ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
+                // Break plugin → JSContext/JSValue references
                 partialMatchPlugin.pluginRef = nil
                 partialMatchPlugin.context = nil
+                // Release the JS player instance and all hook JSValues
                 player = nil
                 hooks = nil
                 flow = nil
+                // Release InProgressState which holds PlayerControllers (JSValues)
                 state = nil
             }
             DispatchQueue.main.async { [weak self] in
@@ -176,7 +178,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             do {
                 try registry.decode(value: value)
             } catch {
-                (state as? InProgressState)?.fail(PlayerError.unknownResponse(error))
+                (state as? InProgressState)?.controllers?.error.captureError(error: error)
             }
         }
     }
@@ -297,6 +299,9 @@ public struct SwiftUIPlayerHooks: CoreHooks {
     /// Fired when the DataController changes
     public var dataController: Hook<DataController>
 
+    /// Fired when the ErrorController changes
+    public var errorController: Hook<ErrorController>
+
     /// Fired when the state changes
     public var state: Hook<BaseFlowState>
 
@@ -314,6 +319,7 @@ public struct SwiftUIPlayerHooks: CoreHooks {
         flowController = Hook<FlowController>(baseValue: player, name: "flowController")
         viewController = Hook<ViewController>(baseValue: player, name: "viewController")
         dataController = Hook<DataController>(baseValue: player, name: "dataController")
+        errorController = Hook<ErrorController>(baseValue: player, name: "errorController")
         state = Hook<BaseFlowState>(baseValue: player, name: "state")
         view = SyncWaterfallHook<AnyView>()
         transition = SyncBailHook<Void, PlayerViewTransition>()

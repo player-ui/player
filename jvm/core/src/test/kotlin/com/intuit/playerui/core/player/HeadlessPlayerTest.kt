@@ -27,13 +27,14 @@ import com.intuit.playerui.core.player.state.dataModel
 import com.intuit.playerui.core.player.state.errorState
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
+import com.intuit.playerui.core.plugins.PlayerPlugin
 import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.beacon.BeaconPlugin
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.beacon.beaconPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.filterKeys
 import com.intuit.playerui.utils.normalizeStackTraceElements
 import com.intuit.playerui.utils.test.PlayerTest
@@ -71,7 +72,7 @@ internal class HeadlessPlayerTest :
     override val exceptions = mutableListOf<Throwable>()
 
     val beaconPlugin = BeaconPlugin()
-    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), beaconPlugin)
+    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), beaconPlugin)
 
     @TestTemplate
     fun `test player not started state`() {
@@ -627,5 +628,37 @@ internal class HeadlessPlayerTest :
         logger.warn.invoke("Beacon plugin warn logged") shouldBe null
         logger.error.invoke("Beacon plugin error logged") shouldBe null
         logger.info.invoke("Beacon plugin info logged") shouldBe null
+    }
+
+    @TestTemplate
+    fun `registerPlugin applies PlayerPlugin`() {
+        var applied = false
+        val plugin = object : PlayerPlugin {
+            override fun apply(player: Player) {
+                applied = true
+            }
+        }
+        player.registerPlugin(plugin)
+        assertTrue(applied)
+        assertTrue(player.plugins.contains(plugin))
+    }
+
+    @TestTemplate
+    fun `registerPlugin adds plugin to plugins list`() {
+        val sizeBefore = player.plugins.size
+        val plugin = object : PlayerPlugin {
+            override fun apply(player: Player) {}
+        }
+        player.registerPlugin(plugin)
+        assertEquals(sizeBefore + 1, player.plugins.size)
+    }
+
+    @TestTemplate
+    fun `registerPlugin applies JSScriptPluginWrapper via BeaconPlugin`() {
+        val sizeBefore = player.plugins.size
+        val beaconPlugin2 = BeaconPlugin()
+        player.registerPlugin(beaconPlugin2)
+        assertEquals(sizeBefore + 1, player.plugins.size)
+        assertNotNull(player.findPlugin<BeaconPlugin>())
     }
 }

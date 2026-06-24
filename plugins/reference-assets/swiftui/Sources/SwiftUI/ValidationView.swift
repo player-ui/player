@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /**
  The severity of a validation object

@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import React from "react";
 import type { Flow } from "@player-ui/react";
-import { DSLCompiler } from "@player-tools/dsl";
+import { DSLCompiler } from "@player-lang/react-dsl";
 import {
   configureStore,
   createAction,

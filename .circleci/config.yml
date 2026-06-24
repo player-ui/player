@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:latest
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -37,14 +37,14 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:2024.04.1
+      image: android:2024.11.1
     working_directory: ~/player
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   benchmarks:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:latest
     working_directory: ~/player
     resource_class: large
     environment:
@@ -74,7 +74,6 @@ commands:
       - run:
           command: |
             source ~/.bashrc
-            bundle install
             npx pnpm@10.18.1 install --frozen-lockfile
             npx pnpm@10.18.1 exec auto shipit -vv --only-graduate-with-release-label
           no_output_timeout: 40m
@@ -105,7 +104,7 @@ jobs:
           root: .
           paths:
             - .
-  
+
   bazelrc_fork:
     executor: minimal
     steps:
