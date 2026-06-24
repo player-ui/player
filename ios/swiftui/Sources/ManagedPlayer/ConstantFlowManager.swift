@@ -8,9 +8,7 @@
 import Foundation
 import Combine
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  A `FlowManager` implementation that advances through an array of flows on each
@@ -38,7 +36,7 @@ public class ConstantFlowManager: FlowManager {
      - parameters:
         - result: The result of the current flow
      */
-    public func next(_ result: CompletedState?) async throws -> NextState {
+    public func next(result: CompletedState?) async throws -> String? {
         if result == nil {
             index = 0
         } else if result?.flow.id != previous?.flow.id {
@@ -48,9 +46,9 @@ public class ConstantFlowManager: FlowManager {
         defer { self.previous = result }
         try await Task.sleep(nanoseconds: 1_000_000_000 * UInt64(delay))
         if self.index < self.elements.count {
-            return .flow(self.elements[self.index])
+            return self.elements[self.index]
         } else {
-            return .finished
+            return nil
         }
     }
 }

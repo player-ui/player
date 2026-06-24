@@ -17,7 +17,7 @@ const dataChangeArrayCache = new WeakMap<
 export function caresAboutDataChanges(
   dataChanges?: Set<BindingInstance>,
   dependencies?: Set<BindingInstance>,
-) {
+): boolean {
   if (!dataChanges || !dependencies) {
     return true;
   }

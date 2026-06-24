@@ -10,21 +10,15 @@ import SwiftUI
 import Combine
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
-/**
- An error type for errors from `ManagedPlayer`
- */
+/// An error type for errors from `ManagedPlayer`
 public enum ManagedPlayerError: Error {
     /// An error if the flow was received from the `FlowManager` but was empty
     case emptyFlow
 }
 
-/**
- A wrapper around the `SwiftUIPlayer` that uses a `FlowManager` to proceed through multi-flow experiences
- */
+/// A wrapper around the `SwiftUIPlayer` that uses a `FlowManager` to proceed through multi-flow experiences
 public struct ManagedPlayer<Loading: View, Fallback: View>: View {
     private var plugins: [NativePlugin]
     private var flowManager: FlowManager?
@@ -39,15 +33,13 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
     // For ViewInspector testing
     internal let inspection = Inspection<Self>()
 
-    /**
-     Creates a `ManagedPlayer`
-     - parameters:
-        - plugins: The plugins to use for the `SwiftUIPlayer`
-        - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
-        - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
-        - onError: A handler for when the `SwiftUIPlayer` encounters an error
-        - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
-     */
+    /// Creates a `ManagedPlayer`
+    /// - parameters:
+    ///    - plugins: The plugins to use for the `SwiftUIPlayer`
+    ///    - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
+    ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
+    ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
         plugins: [NativePlugin],
         context: SwiftUIPlayer.Context = .sharedManaged,
@@ -65,16 +57,14 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         plugins.apply(viewModel)
     }
 
-    /**
-     Creates a `ManagedPlayer`
-     - parameters:
-        - plugins: The plugins to use for the `SwiftUIPlayer`
-        - flowManager: The `FlowManager` to use for fetching flows
-        - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
-        - onComplete: A handler for when the `FlowManager` signals that it has no more flows to fetch
-        - onError: A handler for when the `SwiftUIPlayer` encounters an error
-        - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
-     */
+    /// Creates a `ManagedPlayer`
+    /// - parameters:
+    ///    - plugins: The plugins to use for the `SwiftUIPlayer`
+    ///    - flowManager: The `FlowManager` to use for fetching flows
+    ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - onComplete: A handler for when the `FlowManager` signals that it has no more flows to fetch
+    ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
+    ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
         plugins: [NativePlugin],
         flowManager: FlowManager,
@@ -105,10 +95,8 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         ).onReceive(inspection.notice) { self.inspection.visit(self, $0) }
     }
 }
-/**
- A managed version of the `SwiftUIPlayer` that uses a provided `FlowManager` to orchestrate
- loading Player through multiple flows, and showing a loading view in between flows
- */
+/// A managed version of the `SwiftUIPlayer` that uses a provided `FlowManager` to orchestrate
+/// loading Player through multiple flows, and showing a loading view in between flows
 internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     @StateObject private var viewModel: ManagedPlayerViewModel
 
@@ -122,15 +110,13 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
 
     private var handleScroll: Bool
 
-    /**
-     Creates a `ManagedPlayer`
-     - parameters:
-        - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
-        - plugins: The plugins to use for the `SwiftUIPlayer`
-        - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
-        - onError: A handler for when the `SwiftUIPlayer` encounters an error
-        - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
-     */
+    /// Creates a `ManagedPlayer`
+    /// - parameters:
+    ///    - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
+    ///    - plugins: The plugins to use for the `SwiftUIPlayer`
+    ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
+    ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
         viewModel: ManagedPlayerViewModel,
         plugins: [NativePlugin],
@@ -190,7 +176,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                             context.logger.d("loadingState changed to .loading - calling context.unload()")
                             // only call unload if were in loading state
                             context.unload()
-                        } else if case .loaded(let flow) = newState {
+                        } else if case .loaded(_) = newState {
                             context.logger.d("loadingState changed to .loaded")
                         }
                     }
@@ -287,9 +273,7 @@ public typealias ManagedPlayerRetry = () -> Void
 /// A function for resetting the `FlowManager`
 public typealias ManagedPlayerReset = () -> Void
 
-/**
- The context for constructing a fallback component when there is an error in the `FlowManager`
- */
+/// The context for constructing a fallback component when there is an error in the `FlowManager`
 public struct ManagedPlayerErrorContext {
     /// The Error that occurred
     public var error: Error
@@ -300,10 +284,10 @@ public struct ManagedPlayerErrorContext {
     public var reset: ManagedPlayerReset
 }
 
-/**
- A helper for ViewInspector
- */
-internal final class Inspection<V> where V: View {
+/// A helper for ViewInspector.
+/// Marked `@unchecked Sendable` to satisfy `InspectionEmissary` conformance;
+/// this class is only used in test targets and is always accessed from the main thread.
+internal final class Inspection<V>: @unchecked Sendable where V: View {
 
     let notice = PassthroughSubject<UInt, Never>()
     var callbacks = [UInt: (V) -> Void]()

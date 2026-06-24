@@ -7,10 +7,8 @@
 
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /**
  SwiftUI View to wrap the `SwiftUIPlayer` in a scroll view and handle the result

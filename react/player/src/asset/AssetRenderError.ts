@@ -1,9 +1,24 @@
-import type { Asset } from "@player-ui/player";
+import {
+  ErrorSeverity,
+  ErrorTypes,
+  type Asset,
+  type PlayerErrorMetadata,
+} from "@player-ui/player";
 
-export class AssetRenderError extends Error {
+export type AssetRenderErrorMetadata = {
+  assetId: string;
+};
+export class AssetRenderError
+  extends Error
+  implements PlayerErrorMetadata<AssetRenderErrorMetadata>
+{
   private assetParentPath: Array<Asset> = [];
   initialMessage: string;
   innerExceptionMessage: string;
+
+  readonly type: string = ErrorTypes.RENDER;
+  readonly severity: ErrorSeverity = ErrorSeverity.ERROR;
+  readonly metadata: AssetRenderErrorMetadata;
 
   constructor(
     readonly rootAsset: Asset,
@@ -11,6 +26,9 @@ export class AssetRenderError extends Error {
     readonly innerException?: unknown,
   ) {
     super(message);
+    this.metadata = {
+      assetId: rootAsset.id,
+    };
     this.initialMessage = message ?? "";
     this.innerExceptionMessage =
       innerException instanceof Error

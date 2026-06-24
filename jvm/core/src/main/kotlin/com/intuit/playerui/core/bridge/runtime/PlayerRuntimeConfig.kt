@@ -1,5 +1,4 @@
 package com.intuit.playerui.core.bridge.runtime
-
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 /** Base configuration for [Runtime] */

@@ -8,10 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUILogger
-#endif
 
 /**
  A `HeadlessPlayer` implementation for testing purposes. It utilizes @player-ui/make-flow as a means of resolving assets IDs to types
@@ -45,6 +43,8 @@ public class TestHooks: CoreHooks {
     public var viewController: Hook<ViewController>
 
     public var dataController: Hook<DataController>
+    
+    public var errorController: Hook<ErrorController>
 
     public var state: Hook<BaseFlowState>
 
@@ -54,6 +54,7 @@ public class TestHooks: CoreHooks {
         flowController = Hook<FlowController>(baseValue: player, name: "flowController")
         viewController = Hook<ViewController>(baseValue: player, name: "viewController")
         dataController = Hook<DataController>(baseValue: player, name: "dataController")
+        errorController = Hook<ErrorController>(baseValue: player, name: "errorController")
         state = Hook<BaseFlowState>(baseValue: player, name: "state")
         onStart = Hook<FlowType>(baseValue: player, name: "onStart")
     }

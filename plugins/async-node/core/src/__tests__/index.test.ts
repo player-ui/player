@@ -8,6 +8,11 @@ import {
   BeforeTransformFunction,
   Flow,
   NodeType,
+  Logger,
+  ErrorTypes,
+  ErrorSeverity,
+  PlayerErrorMetadata,
+  ErrorMetadata,
 } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
@@ -18,6 +23,19 @@ import {
 } from "../index";
 import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
+import { ExpressionPlugin } from "@player-ui/expression-plugin";
+import { AsyncNodeError } from "../AsyncNodeError";
+
+class ErrorWithProps extends Error implements PlayerErrorMetadata {
+  constructor(
+    message: string,
+    public type: string,
+    public severity?: ErrorSeverity,
+    public metadata?: ErrorMetadata,
+  ) {
+    super(message);
+  }
+}
 
 const transform: BeforeTransformFunction = createAsyncTransform({
   transformAssetType: "chat-message",
@@ -79,7 +97,35 @@ const asyncAssetFrf: Flow = {
       VIEW_1: {
         state_type: "VIEW",
         ref: "my-view",
-        transitions: {},
+        transitions: {
+          "*": "END",
+        },
+      },
+      END: {
+        state_type: "END",
+        outcome: "done",
+      },
+    },
+  },
+};
+
+const nonViewErrorFlow: Flow = {
+  id: "test-flow",
+  views: [],
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "ACTION_1",
+      ACTION_1: {
+        state_type: "ACTION",
+        exp: ["captureError()"],
+        transitions: {
+          "*": "END",
+        },
+      },
+      END: {
+        state_type: "END",
+        outcome: "done",
       },
     },
   },
@@ -1075,7 +1121,7 @@ describe("view", () => {
 
       await waitFor(() => {
         expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
-          new Error("Promise Rejected"),
+          expect.objectContaining({ cause: new Error("Promise Rejected") }),
           expect.anything(),
         );
 
@@ -1105,14 +1151,241 @@ describe("view", () => {
 
       await waitFor(() => {
         expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
-          new Error("Promise Rejected"),
+          expect.objectContaining({ cause: new Error("Promise Rejected") }),
           expect.anything(),
         );
 
         const playerState = player.getState();
         expect(playerState.status).toBe("error");
         const errorState = playerState as ErrorState;
-        expect(errorState.error.message).toBe("Promise Rejected");
+        expect(errorState.error.message).toBe(
+          "An error occured during async node resolution. See cause for details.",
+        );
+        expect(errorState.error).toBeInstanceOf(AsyncNodeError);
+        expect((errorState.error as AsyncNodeError).cause?.message).toBe(
+          "Promise Rejected",
+        );
+      });
+    });
+
+    test("should log and absorb errors occuring outside of an in-progress state", async () => {
+      const vitestLogger: Logger = {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+      };
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+
+      let throwAsyncError: ((err: Error) => void) | undefined;
+
+      plugin.hooks.onAsyncNode.tap("test", async () => {
+        return new Promise((_, rej) => {
+          throwAsyncError = rej;
+        });
+      });
+
+      const plugins = [plugin, new TestAsyncPlugin()];
+
+      const player = new Player({
+        plugins: plugins,
+        logger: vitestLogger,
+      });
+
+      player.start(asyncAssetFrf);
+
+      await vi.waitFor(() => {
+        expect(throwAsyncError).toBeDefined();
+      });
+
+      (player.getState() as InProgressState).controllers.flow.transition(
+        "done",
+      );
+      await vi.waitFor(() => {
+        const playerState = player.getState();
+        expect(playerState.status).toBe("completed");
+      });
+
+      throwAsyncError!(new Error("Test Error"));
+
+      await vi.waitFor(() => {
+        const state = player.getState();
+        // should not leave completed state
+        expect(state.status).toBe("completed");
+
+        expect(vitestLogger.warn).toHaveBeenCalledWith(
+          expect.any(String), // Message doesn't matter, just check that the logged error is correct
+          new Error("Test Error"),
+        );
+      });
+    });
+
+    test("should do nothing with errors when not in a view state", async () => {
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+      // Call capture error in an action state to make sure asyncnodeplugin doesn't try to handle this
+      const expPlugin = new ExpressionPlugin(
+        new Map([
+          [
+            "captureError",
+            () => {
+              (
+                player.getState() as InProgressState
+              ).controllers.error.captureError(
+                new ErrorWithProps(
+                  "Test Error",
+                  ErrorTypes.RENDER,
+                  ErrorSeverity.ERROR,
+                  { assetId: "asset" },
+                ),
+              );
+            },
+          ],
+        ]),
+      );
+      const plugins = [plugin, expPlugin, new TestAsyncPlugin()];
+
+      const player = new Player({
+        plugins: plugins,
+      });
+
+      player.start(nonViewErrorFlow).catch(() => {});
+
+      await vi.waitFor(() => {
+        const state = player.getState();
+        expect(state.status).toBe("error");
+        expect(onAsyncNodeErrorCallback).not.toHaveBeenCalled();
+      });
+    });
+
+    test("should fail to handle errors if the plugin is setup incorrectly", async () => {
+      const vitestLogger: Logger = {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+      };
+      const nodePluginPlugin = new AsyncNodePluginPlugin();
+
+      // Apply AsyncNodePluginPlugin in isolation to observe failures
+      const plugin: PlayerPlugin = {
+        name: "TestPlayerPlugin",
+        apply: (player: Player) => {
+          nodePluginPlugin.applyPlayer(player);
+          player.hooks.view.tap("test", (view) => {
+            nodePluginPlugin.apply(view);
+          });
+        },
+      };
+      const plugins = [plugin, new TestAsyncPlugin()];
+
+      const player = new Player({
+        plugins: plugins,
+        logger: vitestLogger,
+      });
+      player.start(asyncAssetFrf).catch(() => {});
+
+      await vi.waitFor(() => {
+        const state = player.getState();
+        expect(state.status).toBe("in-progress");
+      });
+
+      (player.getState() as InProgressState).controllers.error.captureError(
+        new ErrorWithProps("Test Error", ErrorTypes.VIEW, ErrorSeverity.ERROR, {
+          node: {
+            type: NodeType.Async,
+            value: {},
+          },
+        }),
+      );
+
+      await vi.waitFor(() => {
+        const state = player.getState();
+        expect(state.status).toBe("error");
+        expect(onAsyncNodeErrorCallback).not.toHaveBeenCalled();
+        expect(vitestLogger.warn).toHaveBeenCalledWith(
+          "[AsyncNodePlugin]: No plugin detected. Error handling will fail",
+        );
+      });
+    });
+
+    test("should call onAsyncNodeError hook for any async node involved in generating the current one", async () => {
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+
+      const errorHandler = vi.fn((err: Error, node: Node.Async) => {
+        if (node.id === "async-chat-id-2") {
+          return {
+            asset: {
+              type: "text",
+              value: "text",
+              id: "FIXED",
+            },
+          };
+        }
+
+        return undefined;
+      });
+
+      plugin.hooks.onAsyncNodeError.tap("test", errorHandler);
+
+      let id = 0;
+      plugin.hooks.onAsyncNode.tap("test", () => {
+        const messageId = id++;
+        if (messageId > 5) {
+          throw new Error("Test Error");
+        }
+
+        return Promise.resolve({
+          asset: {
+            type: "chat-message",
+            id: `chat-id-${messageId}`,
+            value: {
+              id: `chat-id-text-${messageId}`,
+              type: "text",
+              value: `Test Message ${messageId}`,
+            },
+          },
+        });
+      });
+
+      const player = new Player({
+        plugins: [plugin, new TestAsyncPlugin()],
+      });
+      player.start(asyncAssetFrf).catch(() => {});
+
+      await vi.waitFor(() => {
+        expect(id).toBeGreaterThan(5);
+        expect(errorHandler).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            id: "async-chat-id-5",
+          }),
+        );
+        expect(errorHandler).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            id: "async-chat-id-4",
+          }),
+        );
+        expect(errorHandler).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            id: "async-chat-id-3",
+          }),
+        );
+        expect(errorHandler).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            id: "async-chat-id-2",
+          }),
+        );
       });
     });
   });

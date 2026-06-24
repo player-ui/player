@@ -8,9 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /**
  Represenation of a Beacon coming from Player
@@ -84,16 +82,7 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     }
     
     override open func getUrlForFile(fileName: String) -> URL? {
-#if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-#else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: BaseBeaconPlugin<DefaultBeacon>.self),
-            pathComponent: "PlayerUI_BaseBeaconPlugin.bundle"
-        )
-#endif
     }
     
     /**

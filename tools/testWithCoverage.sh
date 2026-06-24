@@ -18,7 +18,6 @@ xcrun llvm-profdata merge "$git_root/CoverageData/Coverage.profraw" -output "$gi
 
 find "$git_root/bazel-out/"* -name 'PlayerUI-UI-ViewInspectorTests.xctest' -exec \
     xcrun llvm-cov export \
-    --ignore-filename-regex=".*external\/Pods.*" \
     --ignore-filename-regex=".*ios\/packages\/.*\/ViewInspector/*" \
     --ignore-filename-regex=".*ios\/plugins\/.*\/ViewInspector/*" \
     --instr-profile="$git_root/CoverageData/Coverage.profdata" \
@@ -28,7 +27,6 @@ find "$git_root/bazel-out/"* -name 'PlayerUI-UI-ViewInspectorTests.xctest' -exec
 
 find "$git_root/bazel-out/"* -name 'PlayerUI-Unit-Unit.xctest' -exec \
     xcrun llvm-cov export \
-    --ignore-filename-regex=".*external\/Pods.*" \
     --ignore-filename-regex=".*ios\/packages\/.*\/Tests/*" \
     --ignore-filename-regex=".*ios\/plugins\/.*\/Tests/*" \
     --instr-profile="$git_root/CoverageData/Coverage.profdata" \

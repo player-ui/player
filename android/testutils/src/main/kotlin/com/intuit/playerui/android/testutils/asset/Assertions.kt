@@ -2,7 +2,6 @@ package com.intuit.playerui.android.testutils.asset
 
 import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import kotlinx.coroutines.delay
@@ -14,7 +13,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-public inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(block: T.() -> Unit = {}): T {
+public inline fun <reified T : RenderableAsset<*>> Any?.shouldBeAsset(block: T.() -> Unit = {}): T {
     shouldBeInstanceOf<T>(this)
     block()
     return this
@@ -22,16 +21,9 @@ public inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(block: T.() -
 
 @OptIn(ExperimentalContracts::class)
 public inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit = {}): T {
-    val view = if (T::class != SuspendableAsset.AsyncViewStub::class && this is SuspendableAsset.AsyncViewStub) {
-        runBlocking {
-            awaitView()
-        }
-    } else {
-        this
-    }
-    shouldBeInstanceOf<T>(view)
-    view.assertions()
-    return view
+    shouldBeInstanceOf<T>(this)
+    this.assertions()
+    return this
 }
 
 @OptIn(ExperimentalContracts::class)
