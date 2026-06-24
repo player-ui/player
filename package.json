@@ -97,7 +97,6 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-react": "^7.37.4",
-    "fast-sort": "^3.4.1",
     "github-slugger": "^1.0.0",
     "globby": "^11.0.1",
     "gray-matter": "^4.0.3",
