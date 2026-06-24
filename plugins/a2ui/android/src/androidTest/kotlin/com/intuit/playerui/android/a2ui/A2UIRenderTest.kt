@@ -3,7 +3,6 @@ package com.intuit.playerui.android.a2ui
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAsset
 import com.intuit.playerui.core.plugins.Plugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -14,7 +13,7 @@ import org.junit.Test
  * registered Compose assets render the resulting tree.
  */
 class A2UIRenderTest : AssetTest() {
-    override val plugins: List<Plugin> by lazy { listOf(A2UIPlugin(), CommonTypesPlugin()) }
+    override val plugins: List<Plugin> by lazy { listOf(A2UIPlugin()) }
 
     private val textSnapshot =
         """

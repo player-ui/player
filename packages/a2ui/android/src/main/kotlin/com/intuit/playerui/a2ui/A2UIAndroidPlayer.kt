@@ -6,9 +6,8 @@ import com.intuit.playerui.core.plugins.Plugin
 
 /**
  * Builds an [AndroidPlayer] preconfigured for A2UI content — the [A2UIPlugin] (Compose
- * renderers + content adapter + asset transforms + expression functions) plus
- * [CommonTypesPlugin] for typed data/validation. Start an A2UI snapshot with
- * `start(snapshot, "a2ui")`.
+ * renderers + content adapter + asset transforms + expression functions). Start an A2UI
+ * snapshot with `start(snapshot, "a2ui")`.
  *
  * Any additional [plugins] are appended after the A2UI defaults (mirrors `A2UIReactPlayer`).
  *

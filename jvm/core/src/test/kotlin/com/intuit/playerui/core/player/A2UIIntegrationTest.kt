@@ -4,7 +4,6 @@ import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.a2ui.A2UIPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.test.PlayerTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -18,7 +17,7 @@ import org.junit.jupiter.api.TestTemplate
  * Runs across every JS runtime on the classpath via [TestTemplate].
  */
 internal class A2UIIntegrationTest : PlayerTest() {
-    override val plugins: List<Plugin> = listOf(A2UIPlugin(), CommonTypesPlugin())
+    override val plugins: List<Plugin> = listOf(A2UIPlugin())
 
     private val textSnapshot =
         """

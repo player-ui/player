@@ -2,7 +2,6 @@ import SwiftUI
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIA2UI
-import PlayerUICommonTypesPlugin
 import PlayerUIExpressionPlugin
 import PlayerUICommonExpressionsPlugin
 
@@ -19,7 +18,6 @@ private struct A2UIMock: Identifiable {
 struct A2UIDemoView: View {
     private let plugins: [NativePlugin] = [
         A2UIPlugin(),
-        CommonTypesPlugin(),
         ExpressionPlugin(),
         CommonExpressionsPlugin()
     ]

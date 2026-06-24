@@ -9,8 +9,8 @@ import com.intuit.playerui.plugins.a2ui.A2UIPlugin
 
 /**
  * Builds a [HeadlessPlayer] preconfigured for A2UI content — the A2UIPlugin (content
- * adapter, asset transforms, expression functions) plus [CommonTypesPlugin] for typed
- * data/validation. Start an A2UI snapshot with `start(snapshot, "a2ui")`.
+ * adapter, asset transforms, expression functions). Start an A2UI snapshot with
+ * `start(snapshot, "a2ui")`.
  *
  * Any additional [plugins] are appended after the A2UI defaults, so consumer taps run
  * later and win on conflict (mirrors `A2UIReactPlayer`).

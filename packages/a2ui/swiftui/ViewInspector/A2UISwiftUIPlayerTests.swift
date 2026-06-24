@@ -13,8 +13,7 @@ class A2UISwiftUIPlayerTests: XCTestCase {
             context: .init()
         )
 
-        // The A2UI plugin registers all 16 catalog assets; CommonTypesPlugin
-        // contributes data types, not renderable assets.
+        // The A2UI plugin registers all 16 catalog assets.
         XCTAssertEqual(player.player.assetRegistry.registeredAssets.count, 16)
     }
 }

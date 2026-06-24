@@ -118,8 +118,7 @@ let package = Package(
             dependencies: [
                 .target(name: "PlayerUI"),
                 .target(name: "PlayerUISwiftUI"),
-                .target(name: "PlayerUIA2UI"),
-                .target(name: "PlayerUICommonTypesPlugin")
+                .target(name: "PlayerUIA2UI")
             ],
             path: "packages/a2ui/swiftui"
         ),

@@ -8,8 +8,8 @@ import PlayerUIA2UI
 
 /**
  A `SwiftUIPlayer` preconfigured for A2UI content — the `A2UIPlugin` (SwiftUI renderers +
- content adapter + asset transforms + expression functions) plus `CommonTypesPlugin` for
- typed data/validation — and `StartOptions.a2ui` so the flow is started in the A2UI format.
+ content adapter + asset transforms + expression functions) — and `StartOptions.a2ui` so
+ the flow is started in the A2UI format.
 
  Extra `plugins` are appended after the A2UI defaults so consumer-supplied taps run later
  and win on conflict (mirrors `A2UIReactPlayer`).
