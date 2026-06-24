@@ -12,6 +12,6 @@ js_pipeline(
     deps = [
         "//:node_modules/@types/dlv",
         "//:node_modules/dlv",
-        "//:node_modules/sorted-array",
+        "//:node_modules/fast-sort",
     ],
 )

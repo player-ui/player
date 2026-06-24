@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "@player-ui/reference-assets-plugin-components";
-import { binding as b } from "@player-tools/dsl";
-import type { DSLFlow } from "@player-tools/dsl";
+import { binding as b } from "@player-lang/react-dsl";
+import type { DSLFlow } from "@player-lang/react-dsl";
 
 const view1 = (
   <Input id="input" binding={b`foo.bar`}>

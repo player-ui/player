@@ -76,10 +76,10 @@ will generate the schema:
 
 ## Changing the Name of a Generated Type
 
-To change the name of the generated type at any point in the tree, import the `SchemaTypeName` symbol from the `@player-tools/dsl` and use it as a key on the object whos name you want to change:
+To change the name of the generated type at any point in the tree, import the `SchemaTypeName` symbol from the `@player-lang/react-dsl` and use it as a key on the object whos name you want to change:
 
 ```typescript
-import { SchemaTypeName } from "@player-tools/dsl"
+import { SchemaTypeName } from "@player-lang/react-dsl"
 export default {
   foo: {
     bar: {
@@ -200,7 +200,7 @@ A `DSLSchema` Type is provided in order be able to customize a set of the accept
 
 _Note: A ready-to-use DSLSchema type is shipped with `@player-ui/reference-assets-plugin-components`. This type is predefined with the `DataType` and `ValidatorFunction` references inferred from the `@player-ui/common-types-plugin`. Next, you'll be presented the steps in its creation for reference._
 
-The first step to fill in the `DSLSchema` type with your integration specific values is importing the `DSLSchema` type and the relevant helper types and utilities from `@player-tools/dsl`. For this example we are importing the `@player-ui/common-types-plugin` in order to use its data types and validators. Our first step is to generate the `DataType` and `ValidatorFunction` object types and references:
+The first step to fill in the `DSLSchema` type with your integration specific values is importing the `DSLSchema` type and the relevant helper types and utilities from `@player-lang/react-dsl`. For this example we are importing the `@player-ui/common-types-plugin` in order to use its data types and validators. Our first step is to generate the `DataType` and `ValidatorFunction` object types and references:
 
 ```typescript
 import { 
@@ -209,7 +209,7 @@ import {
   DataTypeRefs,
   ValidatorFunctionRefs,
   getObjectReferences
-} from "@player-tools/dsl"
+} from "@player-lang/react-dsl"
 import {
   dataTypes as commonDataTypes,
   validators as commonValidators
@@ -272,7 +272,7 @@ _Note: The `satisfies` Typescript operator is used instead of type assignment (`
 As the schema is now a TypeScript obejct, you can now directly reference the schema anywhere in content. The `makeBindingsForObject()` function takes your schema object and constructs the bindings opaquely within the object. This allows the use of the native path in your authored content and for the actual underlying binding to be used when the content is compiled. Additionally, as the underlying bindings are exposed, can you can use the native object path with functions like `.toString()`, `.toValue()`, and `toRefString()` like you could with regular string template bindings.
 
 ```jsx
-import { makeBindingsForObject } from '@player-tools/dsl';
+import { makeBindingsForObject } from '@player-lang/react-dsl';
 import { mySchema } from './schema'
 
 const schema = makeBindingsForObject(mySchema)

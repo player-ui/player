@@ -1,3 +1,59 @@
+# 0.15.5-next.0 (Tue Jun 23 2026)
+
+#### 🐛 Bug Fix
+
+- move storybook icons dependency to correct BUILD file [#887](https://github.com/player-ui/player/pull/887) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.4 (Tue Jun 16 2026)
+
+#### 🐛 Bug Fix
+
+- Release main [#886](https://github.com/player-ui/player/pull/886) ([@intuit-svc](https://github.com/intuit-svc))
+- Run release before bench_js to keep auto graduation working [#885](https://github.com/player-ui/player/pull/885) ([@sugarmanz](https://github.com/sugarmanz))
+- Fix release failing when bench_js pushes baseline first [#883](https://github.com/player-ui/player/pull/883) ([@sugarmanz](https://github.com/sugarmanz))
+- Release main [#882](https://github.com/player-ui/player/pull/882) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix Benchmark Updating on `main` [#877](https://github.com/player-ui/player/pull/877) ([@KetanReddy](https://github.com/KetanReddy))
+- Update CI to Run Benchmark Comparisons and Persist Perf Data [#873](https://github.com/player-ui/player/pull/873) ([@KetanReddy](https://github.com/KetanReddy) [@sugarmanz](https://github.com/sugarmanz))
+- Fixed: avoid destructive unload on ManagedPlayer onDisappear [#870](https://github.com/player-ui/player/pull/870) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Moved tapAndAssertElementAppears to AssetUITestCase [#867](https://github.com/player-ui/player/pull/867) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Propagate styles in composable asset [#835](https://github.com/player-ui/player/pull/835) ([@justin-medeiros](https://github.com/justin-medeiros))
+
+#### Authors: 5
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Justin Medeiros ([@justin-medeiros](https://github.com/justin-medeiros))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.15.4-next.2 (Tue Jun 16 2026)
+
+#### 🐛 Bug Fix
+
+- Run release before bench_js to keep auto graduation working [#885](https://github.com/player-ui/player/pull/885) ([@sugarmanz](https://github.com/sugarmanz))
+- Fix release failing when bench_js pushes baseline first [#883](https://github.com/player-ui/player/pull/883) ([@sugarmanz](https://github.com/sugarmanz))
+- Release main [#882](https://github.com/player-ui/player/pull/882) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix Benchmark Updating on `main` [#877](https://github.com/player-ui/player/pull/877) ([@KetanReddy](https://github.com/KetanReddy))
+- Update CI to Run Benchmark Comparisons and Persist Perf Data [#873](https://github.com/player-ui/player/pull/873) ([@KetanReddy](https://github.com/KetanReddy) [@sugarmanz](https://github.com/sugarmanz))
+- Fixed: avoid destructive unload on ManagedPlayer onDisappear [#870](https://github.com/player-ui/player/pull/870) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.4-next.1 (Thu May 21 2026)
 
 #### 🐛 Bug Fix

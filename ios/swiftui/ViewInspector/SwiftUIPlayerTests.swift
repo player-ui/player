@@ -3,7 +3,7 @@
 //  PlayerUI_Tests
 //
 //  Created by Harris Borawski on 3/9/21.
-//  Copyright © 2021 CocoaPods. All rights reserved.
+//  Copyright © 2021 Intuit. All rights reserved.
 //
 
 import Foundation
@@ -48,7 +48,7 @@ class SwiftUIPlayerTests: XCTestCase {
             guard
                 case let .failure(error) = $0,
                 case let .promiseRejected(errorState) = error,
-                errorState.error.contains("Key not found at coding path label.asset.value")
+                errorState.error.message.contains("Key not found at coding path label.asset.value")
             else { return }
             failed.fulfill()
         })

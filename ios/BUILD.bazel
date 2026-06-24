@@ -28,18 +28,13 @@ xcodeproj(
         "//plugins/check-path/ios:PlayerUICheckPathPluginTests",
         "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPluginViewInspectorTests",
 
-        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPluginTests",
-
-        "//plugins/common-types/ios:PlayerUICommonTypesPluginTests",
-        
-        "//plugins/computed-properties/ios:PlayerUIComputedPropertiesPluginTests",
 
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPluginTests",
 
         "//plugins/expression/ios:PlayerUIExpressionPluginTests",
 
-        "//plugins/external-action/ios:PlayerUIExternalActionPluginTests",
-        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPluginViewInspectorTests",
+        "//plugins/external-state/ios:PlayerUIExternalStatePluginTests",
+        "//plugins/external-state/swiftui:PlayerUIExternalStateViewModifierPluginViewInspectorTests",
 
         "//plugins/metrics/swiftui:PlayerUIMetricsPluginViewInspectorTests",
 
@@ -52,8 +47,6 @@ xcodeproj(
 
         "//plugins/a2ui/swiftui:PlayerUIA2UIViewInspectorTests",
         "//packages/a2ui/swiftui:PlayerUIA2UIPresetViewInspectorTests",
-
-        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPluginTests",
 
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"

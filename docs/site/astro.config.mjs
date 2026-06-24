@@ -139,6 +139,10 @@ export default defineConfig({
                 },
               ],
             },
+            {
+              label: "Announcements",
+              autogenerate: { directory: "announcements" },
+            },
           ],
         },
         {

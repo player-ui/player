@@ -26,6 +26,9 @@ public class PlayerControllers {
     /// The ExpressionEvaluator for the current flow
     public let expression: ExpressionEvaluator
 
+    /// The ErrorController for the current flow
+    public let error: ErrorController
+
     public init?(from value: JSValue?) {
         guard let controllers = value else { return nil }
         rawValue = controllers
@@ -33,6 +36,7 @@ public class PlayerControllers {
         flow = FlowController.createInstance(value: rawValue.objectForKeyedSubscript("flow"))
         view = ViewController.createInstance(value: rawValue.objectForKeyedSubscript("view"))
         expression = ExpressionEvaluator.createInstance(value: rawValue.objectForKeyedSubscript("expression"))
+        error = ErrorController.createInstance(value: rawValue.objectForKeyedSubscript("error"))
     }
 }
 
@@ -123,6 +127,14 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
     /// The local data from the flow
     public var data: [String: Any]
 
+    /// Read-only controllers to allow data access after the flow has ended
+    public var controllers: Controllers
+
+    public struct Controllers {
+        /// A read only instance of the Data Controller
+        public var data: ReadOnlyDataController
+    }
+
     /**
      Create an instance of `CompletedState` from a JSValue
      - parameters:
@@ -131,19 +143,29 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
      */
     public static func createInstance(from value: JSValue?) -> CompletedState? {
         guard
-            let flow = value?.objectForKeyedSubscript("flow")
+            let flow = value?.objectForKeyedSubscript("flow"),
+            let controllersJSValue = value?.objectForKeyedSubscript("controllers"),
+            let dataControllerJSValue = controllersJSValue.objectForKeyedSubscript("data")
         else { return nil }
+
         return CompletedState(
             flow: Flow.createInstance(value: flow),
             endState: value.map { NavigationFlowEndState($0.objectForKeyedSubscript("endState")) },
-            data: value?.objectForKeyedSubscript("data")?.toObject() as? [String: Any] ?? [:]
+            data: value?.objectForKeyedSubscript("data")?.toObject() as? [String: Any] ?? [:],
+            controllers: Controllers(data: .createInstance(value: dataControllerJSValue))
         )
     }
 
-    private init(flow: Flow, endState: NavigationFlowEndState?, data: [String: Any]) {
+    private init(
+        flow: Flow,
+        endState: NavigationFlowEndState?,
+        data: [String: Any],
+        controllers: Controllers
+    ) {
         self.flow = flow
         self.endState = endState
         self.data = data
+        self.controllers = controllers
         super.init(status: .completed)
     }
 }
@@ -229,7 +251,7 @@ public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     public var flow: Flow
 
     /// The error message
-    public var error: String
+    public var error: JSValueError
 
     /**
     Create an instance of `ErrorState` from a JSValue
@@ -238,23 +260,15 @@ public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     - returns: A ErrorState object if the JSValue was one
     */
     public static func createInstance(from value: JSValue?) -> ErrorState? {
-        guard let flow = value?.objectForKeyedSubscript("flow") else { return nil }
-
-        let message: String
-        if let errorValue = value?.objectForKeyedSubscript("error"), !errorValue.isUndefined {
-            if let msgValue = errorValue.objectForKeyedSubscript("message"), !msgValue.isUndefined {
-                message = msgValue.toString()
-            } else {
-                message = errorValue.toString()
-            }
-        } else {
-            message = "Unknown error"
-        }
-
-        return ErrorState(flow: Flow.createInstance(value: flow), error: message)
+        guard
+            let flow = value?.objectForKeyedSubscript("flow"),
+            let err = value?.objectForKeyedSubscript("error")
+        else { return nil }
+        
+        return ErrorState(flow: Flow.createInstance(value: flow), error: JSValueError.createInstance(value: err))
     }
 
-    private init(flow: Flow, error: String) {
+    private init(flow: Flow, error: JSValueError) {
         self.flow = flow
         self.error = error
         super.init(status: .error)

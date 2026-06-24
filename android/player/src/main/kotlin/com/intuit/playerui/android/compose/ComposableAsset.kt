@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -17,19 +18,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.intuit.playerui.core.player.state.inProgressState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.KSerializer
 import kotlin.collections.emptyList
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base class for assets that render using Jetpack Compose.
@@ -41,14 +43,14 @@ import kotlin.collections.emptyList
 public abstract class ComposableAsset<Data>(
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
-) : SuspendableAsset<Data>(assetContext, serializer) {
+) : RenderableAsset<Data>(assetContext, serializer) {
     override suspend fun initView(data: Data): View = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
-    override suspend fun View.hydrate(data: Data) {
-        require(this is ComposeView)
-        setContent {
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
+        require(view is ComposeView)
+        view.setContent {
             compose(data = data)
         }
     }
@@ -56,7 +58,22 @@ public abstract class ComposableAsset<Data>(
     @Composable
     public fun compose(data: Data? = null) {
         val data: Data? by produceState(initialValue = data, key1 = this) {
-            value = getData()
+            try {
+                value = getData()
+            } catch (error: Throwable) {
+                if (error is CancellationException) {
+                    throw error
+                }
+
+                player.inProgressState?.controllers?.error?.captureError(
+                    AssetRenderException(assetContext, "Error fetching data while rendering asset. See cause for details", error),
+                )
+                null
+            }
+        }
+
+        SideEffect {
+            player.asyncHydrationTrackerPlugin?.renderingComplete(this@ComposableAsset, completedComposable = true)
         }
 
         data?.let {
@@ -80,15 +97,19 @@ public abstract class ComposableAsset<Data>(
      * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
      */
     @Composable
-    public fun RenderableAsset.compose(
+    public fun RenderableAsset<*>.compose(
         modifier: Modifier = Modifier,
         styles: AssetStyle? = null,
         tag: String? = null,
     ) {
-        val assetTag = tag ?: asset.id
-        val containerModifier = Modifier.testTag(assetTag) then modifier
-        assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
+        val containerModifier = Modifier.testTag(tag ?: asset.id) then modifier
+        var context = assetContext.withContext(LocalContext.current)
+        if (tag != null) {
+            context = context.withTag(tag)
+        }
+        context.build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
+            player.asyncHydrationTrackerPlugin?.preTrackChild(this)
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
@@ -105,11 +126,14 @@ public abstract class ComposableAsset<Data>(
     }
 
     @Composable
-    private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
-        AndroidView(factory = ::FrameLayout, modifier) {
-            hydrationScope.launch(Dispatchers.Main) {
-                render(styles) into it
-            }
+    private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
+        val childAsset = this
+        AndroidView(factory = ::FrameLayout, modifier) { container ->
+            this@ComposableAsset.hydrationScope.inflate(
+                childAsset,
+                container,
+                styles,
+            )
         }
     }
 }

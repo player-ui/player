@@ -23,7 +23,8 @@ interface BaseValidationResponse<T = Validation.Severity> {
   blocking?: boolean | "once";
 }
 
-export interface WarningValidationResponse extends BaseValidationResponse<"warning"> {
+export interface WarningValidationResponse
+  extends BaseValidationResponse<"warning"> {
   /** Warning validations can be dismissed without correcting the error */
   dismiss?: () => void;
 }

@@ -6,9 +6,8 @@ import type { BeaconDataType } from "@player-ui/beacon-plugin";
  * Each view typically has one or more actions that allow the user to navigate away from that view.
  * In addition, several asset types can have actions that apply to that asset only.
  */
-export interface ActionAsset<
-  AnyTextAsset extends Asset = Asset,
-> extends Asset<"action"> {
+export interface ActionAsset<AnyTextAsset extends Asset = Asset>
+  extends Asset<"action"> {
   /** The transition value of the action in the state machine */
   value?: string;
 

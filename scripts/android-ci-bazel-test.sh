@@ -3,7 +3,7 @@
 set -eo pipefail # exit immediately if any command fails.
 
 # Defer installing, creating, and booting an emulator unless required
-EMULATOR_IMG="system-images;android-33;default;x86_64"
+EMULATOR_IMG="system-images;android-35;default;x86_64"
 EMULATOR_READY=$([ "$(adb devices | tail -n +2 | grep -w "device" | wc -l)" -gt 0 ] && echo "true" || echo "false")
 
 create_and_wait_for_emulator() {

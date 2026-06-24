@@ -56,12 +56,12 @@ Not only is the source DSL content a fraction of the output object's size (makin
 
 ## Templates
 
-Templates are included via the `@player-tools/dsl` package. This can be used in any asset slot:
+Templates are included via the `@player-lang/react-dsl` package. This can be used in any asset slot:
 
 ```tsx
 import React from 'react';
 import { dataTypes } from '@player-ui/common-types-plugin';
-import { makeBindingsForObject, Template } from '@player-tools/dsl';
+import { makeBindingsForObject, Template } from '@player-lang/react-dsl';
 
 const schema = {
   foo: [{
@@ -84,13 +84,13 @@ Templates can be nested within one another, and the auto-id generation will hand
 
 ## Switches
 
-The `@player-tools/dsl` module also includes support for _static_ and _dynamic_ switches.
+The `@player-lang/react-dsl` module also includes support for _static_ and _dynamic_ switches.
 
 Use the `isDynamic` flag to denote this should be a `dynamicSwitch` instead of a `staticSwitch`:
 
 ```tsx
 import React from 'react';
-import { Switch } from '@player-tools/dsl';
+import { Switch } from '@player-lang/react-dsl';
 
 <Collection>
   <Collection.Label>

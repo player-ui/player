@@ -86,7 +86,7 @@ build_deps = [
     "//:node_modules/json5",
     "//:node_modules/stringify-object",
     "//:node_modules/esbuild-wasm",
-    "//:node_modules/@player-tools/dsl",
+    "//:node_modules/@player-lang/react-dsl",
     "//:node_modules/@astrojs/starlight-docsearch",
     "//:node_modules/dlv",
     "//:node_modules/unist-util-visit",

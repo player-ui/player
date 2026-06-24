@@ -3,24 +3,22 @@ package com.intuit.playerui.android.reference.demo.lifecycle
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayer.Config
 import com.intuit.playerui.android.a2ui.A2UIPlugin
-import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
+import com.intuit.playerui.android.asset.RenderableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import com.intuit.playerui.core.managed.AsyncFlowIterator
+import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
-import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class DemoPlayerViewModel(
-    iterator: AsyncFlowIterator,
-) : PlayerViewModel(iterator) {
+    manager: FlowManager,
+) : PlayerViewModel(manager) {
     override val plugins = listOf(
-        CommonTypesPlugin(),
         ReferenceAssetsPlugin(),
         // A2UI assets coexist with the reference assets (PascalCase vs lowercase type
         // namespaces). Start an A2UI snapshot with `androidPlayer.start(snapshot, "a2ui")`.
