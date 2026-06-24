@@ -47,6 +47,7 @@ export class BindingInstance {
     factory = (rawBinding: RawBinding) => new BindingInstance(rawBinding),
   ) {
     const split = Array.isArray(raw) ? raw : raw.split(".");
+    //For loop for performance reasons
     const normalized: RawBindingSegment[] = new Array(split.length);
     for (let i = 0; i < split.length; i++) {
       const segment = split[i];
