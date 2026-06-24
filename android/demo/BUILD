@@ -7,7 +7,6 @@ main_deps = [
     "//jvm/hermes:hermes-android",
     "//jvm/utils",
     "//plugins/reference-assets/android",
-    "//plugins/common-types/jvm",
     "//tools/mocks:jar",
 
     artifact("androidx.navigation:navigation-ui-ktx"),
@@ -52,7 +51,6 @@ android_binary(
     custom_package = "com.intuit.playerui.android.reference.demo",
     dex_shards = 4,
     manifest = ":src/main/AndroidManifest.xml",
-    multidex = "native",
     resource_files = glob(
         ["src/main/res/**"],
         allow_empty = True,

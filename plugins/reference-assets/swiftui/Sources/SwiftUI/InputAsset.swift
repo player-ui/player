@@ -1,11 +1,9 @@
 import SwiftUI
 import Combine
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUISwiftUIPendingTransactionPlugin
-#endif
 
 /**
  Represents a DataType that is associated with the asset

@@ -1,0 +1,698 @@
+import { expect, test, vitest, describe } from "vitest";
+import type { Flow, InProgressState, NamedState } from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { ExternalStatePlugin, ExternalStateError } from "..";
+import { waitFor } from "@testing-library/react";
+
+const externalFlow = {
+  id: "test-flow",
+  data: {
+    transitionValue: "Next",
+  },
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "EXT_1",
+      EXT_1: {
+        state_type: "EXTERNAL",
+        ref: "test-1",
+        transitions: {
+          Next: "END_FWD",
+          Prev: "END_BCK",
+        },
+        testProperty: "testValue",
+      },
+      END_FWD: {
+        state_type: "END",
+        outcome: "FWD",
+      },
+      END_BCK: {
+        state_type: "END",
+        outcome: "BCK",
+      },
+    },
+  },
+};
+
+test("handles the external state", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: (state, options) => {
+            return options.data.get("transitionValue");
+          },
+        },
+      ]),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  expect(completed.endState.outcome).toBe("FWD");
+});
+
+test("thrown errors will fail player", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            throw new Error("Bad Code");
+          },
+        },
+      ]),
+    ],
+  });
+
+  await expect(player.start(externalFlow as Flow)).rejects.toThrow();
+
+  expect(player.getState().status).toBe("error");
+});
+
+test("works async", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            return Promise.resolve("Prev");
+          },
+        },
+      ]),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  expect(completed.endState.outcome).toBe("BCK");
+});
+
+test("allows multiple plugins - last one wins", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            return "Next";
+          },
+        },
+      ]),
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            return "Prev";
+          },
+        },
+      ]),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  // Last handler registered wins (Prev)
+  expect(completed.endState.outcome).toBe("BCK");
+});
+
+test("logs debug message when replacing handler", async () => {
+  const mockDebug = vitest.fn();
+
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            return "Next";
+          },
+        },
+      ]),
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            return "Prev";
+          },
+        },
+      ]),
+    ],
+    logger: {
+      trace: vitest.fn(),
+      debug: mockDebug,
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
+    },
+  });
+
+  await player.start(externalFlow as Flow);
+
+  // Should have logged that the handler was replaced
+  const replacementCalls = mockDebug.mock.calls.filter(
+    (call) =>
+      call[0] === "Registry: Replacing existing entry for key " &&
+      JSON.stringify(call[1]) === JSON.stringify({ ref: "test-1" }),
+  );
+  expect(replacementCalls.length).toBeGreaterThan(0);
+});
+
+test("different plugins, more specific match overrides less specific match", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          match: { testProperty: "testValue" },
+          handlerFunction: () => {
+            return "Next";
+          },
+        },
+      ]),
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            return "Prev";
+          },
+        },
+      ]),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  // More specific match (with testProperty) should win, returning "Next" which leads to outcome "FWD"
+  expect(completed.endState.outcome).toBe("FWD");
+});
+
+test("within same plugin, more specific match overrides less specific match", async () => {
+  const moreSpecificHandlerCalled = vitest.fn();
+  const lessSpecificHandlerCalled = vitest.fn();
+
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          match: { testProperty: "testValue" },
+          handlerFunction: () => {
+            moreSpecificHandlerCalled();
+            return "Next";
+          },
+        },
+        {
+          ref: "test-1",
+          handlerFunction: () => {
+            lessSpecificHandlerCalled();
+            return "Prev";
+          },
+        },
+      ]),
+    ],
+  });
+
+  const completed = await player.start(externalFlow as Flow);
+
+  // More specific match should win regardless of insertion order
+  expect(moreSpecificHandlerCalled).toHaveBeenCalledOnce();
+  expect(lessSpecificHandlerCalled).not.toHaveBeenCalled();
+  expect(completed.endState.outcome).toBe("FWD");
+});
+
+test("only transitions if player still on this external state", async () => {
+  let resolver: (() => void) | undefined;
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        {
+          ref: "test-1",
+          handlerFunction: (state, options) => {
+            return new Promise((res) => {
+              // Only save resolver for first external state
+              if (!resolver) {
+                resolver = () => {
+                  res(options.data.get("transitionValue"));
+                };
+              }
+            });
+          },
+        },
+        {
+          ref: "test-2",
+          handlerFunction: () => {
+            return "Next";
+          },
+        },
+      ]),
+    ],
+  });
+
+  player.start({
+    id: "test-flow",
+    data: {
+      transitionValue: "Next",
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "EXT_1",
+        EXT_1: {
+          state_type: "EXTERNAL",
+          ref: "test-1",
+          transitions: {
+            Next: "EXT_2",
+            Prev: "END_BCK",
+          },
+        },
+        EXT_2: {
+          state_type: "EXTERNAL",
+          ref: "test-2",
+          transitions: {
+            Next: "END_FWD",
+            Prev: "END_BCK",
+          },
+        },
+        END_FWD: {
+          state_type: "END",
+          outcome: "FWD",
+        },
+        END_BCK: {
+          state_type: "END",
+          outcome: "BCK",
+        },
+      },
+    },
+  } as Flow);
+
+  let state = player.getState();
+  expect(state.status).toBe("in-progress");
+  expect(
+    (state as InProgressState).controllers.flow.current?.currentState?.name,
+  ).toBe("EXT_1");
+
+  // probably dumb way to wait for async stuff to resolve
+  await new Promise<void>((res) => {
+    /**
+     *
+     */
+    function waitForResolver() {
+      if (resolver) res();
+      else setTimeout(waitForResolver, 50);
+    }
+
+    waitForResolver();
+  });
+
+  (state as InProgressState).controllers.flow.transition("Next");
+
+  state = player.getState();
+  expect(
+    (state as InProgressState).controllers.flow.current?.currentState?.name,
+  ).toBe("EXT_2");
+
+  // Attempt to resolve _after_ Player has transitioned
+  resolver?.();
+
+  // Should be same as prev
+  state = player.getState();
+  expect(
+    (state as InProgressState).controllers.flow.current?.currentState?.name,
+  ).toBe("EXT_2");
+});
+
+const flowWithErrorTransitions = {
+  id: "test-flow",
+  data: {},
+  views: [
+    {
+      id: "error-view",
+      type: "test",
+    },
+  ],
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "EXT_1",
+      errorTransitions: {
+        externalState: "ERROR_VIEW",
+      },
+      EXT_1: {
+        state_type: "EXTERNAL",
+        ref: "test-1",
+        transitions: { Next: "END_FWD" },
+      },
+      ERROR_VIEW: {
+        state_type: "VIEW",
+        ref: "error-view",
+        transitions: {},
+      },
+      END_FWD: {
+        state_type: "END",
+        outcome: "FWD",
+      },
+    },
+  },
+};
+
+test("missing handler error navigates via content errorTransitions", async () => {
+  const player = new Player({
+    plugins: [new ExternalStatePlugin([])],
+  });
+
+  player.start(flowWithErrorTransitions as Flow);
+
+  await waitFor(() => {
+    const state = player.getState() as InProgressState;
+    expect(state.controllers.flow.current?.currentState?.name).toBe(
+      "ERROR_VIEW",
+    );
+  });
+});
+
+test("missing transition value error navigates via content errorTransitions", async () => {
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        { ref: "test-1", handlerFunction: () => undefined },
+      ]),
+    ],
+  });
+
+  player.start(flowWithErrorTransitions as Flow);
+
+  await waitFor(() => {
+    const state = player.getState() as InProgressState;
+    expect(state.controllers.flow.current?.currentState?.name).toBe(
+      "ERROR_VIEW",
+    );
+  });
+});
+
+test("missing handler error is observable via onError tap", async () => {
+  const onErrorSpy = vitest.fn().mockReturnValue(true);
+
+  const player = new Player({
+    plugins: [new ExternalStatePlugin([])],
+  });
+
+  player.hooks.errorController.tap("test", (ec) => {
+    ec.hooks.onError.tap("test", onErrorSpy);
+  });
+
+  player.start(externalFlow as Flow);
+
+  await waitFor(() => expect(onErrorSpy).toHaveBeenCalledOnce());
+
+  const error = onErrorSpy.mock.calls[0]?.[0] as ExternalStateError;
+  expect(error).toBeInstanceOf(ExternalStateError);
+  expect(error.type).toBe("externalState");
+  expect(error.metadata).toStrictEqual({
+    ref: "test-1",
+    reason: "missing-handler",
+  });
+});
+
+test("missing transition value error is observable via onError tap", async () => {
+  const onErrorSpy = vitest.fn().mockReturnValue(true);
+
+  const player = new Player({
+    plugins: [
+      new ExternalStatePlugin([
+        { ref: "test-1", handlerFunction: () => undefined },
+      ]),
+    ],
+  });
+
+  player.hooks.errorController.tap("test", (ec) => {
+    ec.hooks.onError.tap("test", onErrorSpy);
+  });
+
+  player.start(externalFlow as Flow);
+
+  await waitFor(() => expect(onErrorSpy).toHaveBeenCalledOnce());
+
+  const error = onErrorSpy.mock.calls[0]?.[0] as ExternalStateError;
+  expect(error).toBeInstanceOf(ExternalStateError);
+  expect(error.metadata).toStrictEqual({
+    ref: "test-1",
+    reason: "missing-transition-value",
+  });
+});
+
+describe("ExternalStateError", () => {
+  test("missingHandler has correct shape", () => {
+    const error = ExternalStateError.missingHandler("my-ref");
+    expect(error.type).toBe("externalState");
+    expect(error.metadata).toStrictEqual({
+      ref: "my-ref",
+      reason: "missing-handler",
+    });
+    expect(error.message).toBe(
+      'No handler found for external state with ref: "my-ref". Ensure a handler is registered for this state.',
+    );
+  });
+
+  test("missingTransitionValue has correct shape", () => {
+    const error = ExternalStateError.missingTransitionValue("my-ref");
+    expect(error.type).toBe("externalState");
+    expect(error.metadata).toStrictEqual({
+      ref: "my-ref",
+      reason: "missing-transition-value",
+    });
+    expect(error.message).toBe(
+      'Handler for external state with ref: "my-ref" did not return a transition value. Ensure the handler returns the name of a valid transition.',
+    );
+  });
+});
+
+describe("edge cases", () => {
+  test("async action nodes not transitioning from navigation states with *", async () => {
+    const player = new Player({
+      plugins: [
+        new ExternalStatePlugin([
+          {
+            ref: "view_1",
+            handlerFunction: () => {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve("next");
+                }, 100);
+              });
+            },
+          },
+        ]),
+      ],
+    });
+
+    player.hooks.expressionEvaluator.tap("test", (expEval) => {
+      expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(name);
+          }, 10);
+        });
+      });
+    });
+
+    player.start({
+      id: "test-flow",
+      data: {
+        my: {
+          puppy: "Ginger",
+        },
+      },
+      views: [
+        {
+          id: "next",
+          type: "test",
+        },
+        {
+          id: "back",
+          type: "test",
+        },
+        {
+          id: "star",
+          type: "test",
+        },
+      ],
+      navigation: {
+        BEGIN: "FLOW_1",
+        FLOW_1: {
+          startState: "ACTION_1",
+          ACTION_1: {
+            state_type: "ASYNC_ACTION",
+            exp: "{{my.puppy}} = await(testAsync('Daisy'))",
+            transitions: {
+              Daisy: "EXTERNAL_1",
+            },
+            await: true,
+          },
+          EXTERNAL_1: {
+            state_type: "EXTERNAL",
+            ref: "view_1",
+            param: {
+              best: "{{my.puppy}}",
+            },
+            transitions: {
+              next: "VIEW_1",
+              back: "VIEW_2",
+              "*": "VIEW_3",
+            },
+          },
+          VIEW_1: {
+            state_type: "VIEW",
+            ref: "next",
+            transitions: {
+              "*": "END",
+            },
+          },
+          VIEW_2: {
+            state_type: "VIEW",
+            ref: "back",
+            transitions: {
+              "*": "END",
+            },
+          },
+          VIEW_3: {
+            state_type: "VIEW",
+            ref: "star",
+            transitions: {
+              "*": "END",
+            },
+          },
+        },
+      },
+    });
+
+    await vitest.waitFor(() =>
+      expect(player.getState().status).toBe("in-progress"),
+    );
+
+    let currentState: NamedState | undefined;
+
+    await waitFor(() => {
+      const state = player.getState();
+      currentState = (state as InProgressState).controllers.flow.current
+        ?.currentState;
+      expect(currentState?.name).toBe("EXTERNAL_1");
+    });
+
+    await waitFor(() => {
+      const state = player.getState();
+      currentState = (state as InProgressState).controllers.flow.current
+        ?.currentState;
+      expect(currentState?.name).toBe("VIEW_1");
+    });
+  });
+
+  test("no handler registered for external state - calls captureError with ExternalStateError", async () => {
+    const player = new Player({
+      plugins: [new ExternalStatePlugin([])],
+    });
+
+    const captureSpy = vitest.fn().mockReturnValue(false);
+    player.hooks.errorController.tap("test", (ec) => {
+      vitest.spyOn(ec, "captureError").mockImplementation(captureSpy);
+    });
+
+    player.start(externalFlow as Flow);
+
+    await waitFor(() => expect(captureSpy).toHaveBeenCalledOnce());
+
+    const error = captureSpy.mock.calls[0]?.[0] as ExternalStateError;
+    expect(error).toBeInstanceOf(ExternalStateError);
+    expect(error.metadata).toStrictEqual({
+      ref: "test-1",
+      reason: "missing-handler",
+    });
+  });
+
+  test("no handler for this ref (but other refs registered) - calls captureError", async () => {
+    const player = new Player({
+      plugins: [
+        new ExternalStatePlugin([
+          // Register handler for a different ref - not matching our external state
+          { ref: "different-ref", handlerFunction: () => "Next" },
+        ]),
+      ],
+    });
+
+    const captureSpy = vitest.fn().mockReturnValue(false);
+    player.hooks.errorController.tap("test", (ec) => {
+      vitest.spyOn(ec, "captureError").mockImplementation(captureSpy);
+    });
+
+    player.start(externalFlow as Flow);
+
+    await waitFor(() => expect(captureSpy).toHaveBeenCalledOnce());
+
+    const error = captureSpy.mock.calls[0]?.[0] as ExternalStateError;
+    expect(error).toBeInstanceOf(ExternalStateError);
+    expect(error.metadata).toStrictEqual({
+      ref: "test-1",
+      reason: "missing-handler",
+    });
+  });
+});
+
+describe("Type Safety", () => {
+  test("handlers with superfluous match.ref should warn and be skipped", async () => {
+    const superflousHandlerCalled = vitest.fn();
+    const validHandlerCalled = vitest.fn();
+    const warnSpy = vitest.fn();
+
+    const player = new Player({
+      plugins: [
+        new ExternalStatePlugin([
+          // Handler with superfluous match.ref (TypeScript error suppressed for testing)
+          {
+            ref: "test-1",
+            // @ts-expect-error - testing runtime behavior with superfluous match.ref
+            match: { ref: "test-1", testProperty: "testValue" },
+            handlerFunction: () => {
+              superflousHandlerCalled();
+              return "Next";
+            },
+          },
+          // Valid handler - no match.ref
+          {
+            ref: "test-1",
+            handlerFunction: () => {
+              validHandlerCalled();
+              return "Next";
+            },
+          },
+        ]),
+      ],
+      logger: {
+        trace: vitest.fn(),
+        debug: vitest.fn(),
+        info: vitest.fn(),
+        warn: warnSpy,
+        error: vitest.fn(),
+      },
+    });
+
+    const completed = await player.start(externalFlow as Flow);
+
+    // Warning should have been logged for the handler with superfluous match.ref
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      'An ExternalStateHandler contains a superfluous \'match.ref\' property. \'match.ref\' will be ignored. \'ref\' will be used instead. Handler: {"ref":"test-1","match":{"ref":"test-1","testProperty":"testValue"}}',
+    );
+
+    // The handler with superfluous match.ref should NOT have been called (it was skipped)
+    expect(superflousHandlerCalled).not.toHaveBeenCalled();
+
+    // The valid handler should have been called
+    expect(validHandlerCalled).toHaveBeenCalledTimes(1);
+
+    // Flow should complete successfully using the valid handler
+    expect(completed.endState.outcome).toBe("FWD");
+  });
+});

@@ -12,8 +12,8 @@ import type {
   TemplateLiteralType,
   TupleType,
   NamedTypeWithGenerics,
-} from "@player-tools/xlr";
-import type { TopLevelDeclaration } from "@player-tools/xlr-utils";
+} from "@xlr-lib/xlr";
+import type { TopLevelDeclaration } from "@xlr-lib/xlr-utils";
 import ts from "typescript";
 
 const templateTokenize = /(?=true\|false|\.\*|\[0-9]\*)/gm;

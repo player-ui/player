@@ -17,14 +17,17 @@ js_xlr_pipeline(
     ],
     test_deps = [
         ":node_modules/@player-ui/asset-testing-library",
-        ":node_modules/@player-ui/common-types-plugin",
         "//:vitest_config",
     ],
     deps = [
         ":node_modules/@player-ui/asset-transform-plugin",
         ":node_modules/@player-ui/beacon-plugin",
         ":node_modules/@player-ui/async-node-plugin",
+        ":node_modules/@player-ui/common-expressions-plugin",
+        ":node_modules/@player-ui/common-types-plugin",
+        ":node_modules/@player-ui/computed-properties-plugin",
         ":node_modules/@player-ui/expression-plugin",
-        ":node_modules/@player-ui/meta-plugin"
+        ":node_modules/@player-ui/meta-plugin",
     ],
+    cli = "@player-cli/cli"
 )

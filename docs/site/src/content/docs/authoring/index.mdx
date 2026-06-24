@@ -37,8 +37,8 @@ To get started, you'll need the following dependencies in your `package.json`:
 ```json
 {
   "dependencies": {
-    "@player-tools/dsl": "0.4.1",
-    "@player-tools/cli": "0.4.1",
+    "@player-lang/react-dsl": "0.4.1",
+    "@player-cli/cli": "0.4.1",
     "@player-ui/reference-assets-plugin-components": "0.6.0",
     "@types/react": "17.0.39",
     "react": "17.0.2"
@@ -142,14 +142,14 @@ const navigation: Navigation = {
 };
 ```
 
-_Note: The `Navigation` type we're importing here from the `@player-ui/types` package is different than the `Navigation` type from the `@player-tools/dsl` package. The former is the core definition for what the Navigation section of Player content is. The latter has specific replacements to take DSL constructs where normal objects would be defined._
+_Note: The `Navigation` type we're importing here from the `@player-ui/types` package is different than the `Navigation` type from the `@player-lang/react-dsl` package. The former is the core definition for what the Navigation section of Player content is. The latter has specific replacements to take DSL constructs where normal objects would be defined._
 
 ### Bindings and Expressions
 
 Both `binding` and `expression` in the JSX authoring leverages a tagged template, typically abbreviated as `b` and `e` respectively. In a similar fashion to using `css` or `graphql` in a JS file, this enables syntax-highlighting and validation of bindings and expressions within a JS file.
 
 ```tsx
-import { binding as b, expression as e } from "@player-tools/dsl";
+import { binding as b, expression as e } from "@player-lang/react-dsl";
 
 const myBinding = b`foo.bar`;
 const myExpression = e`foo()`;

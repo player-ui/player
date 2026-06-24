@@ -16,8 +16,8 @@ import kotlin.coroutines.resume
 internal class AsyncIterationManagerTest {
     @Test fun `test progresses through predefined flows`(): Unit = runBlocking {
         val completedState = mockk<CompletedState>()
-        val manager = FlowManager(AsyncFlowIterator("first", "second", "third"))
-        assertEquals(AsyncIterationManager.State.NotStarted, manager.state.value)
+        val manager = AsyncIterationFlow(FlowManager("first", "second", "third"))
+        assertEquals(AsyncIterationFlow.State.NotStarted, manager.state.value)
         manager.next()
         assertEquals("first", manager.state.value.item)
         manager.next(completedState)
@@ -25,22 +25,22 @@ internal class AsyncIterationManagerTest {
         manager.next(completedState)
         assertEquals("third", manager.state.value.item)
         manager.next(completedState)
-        assertEquals(AsyncIterationManager.State.Done, manager.state.value)
+        assertEquals(AsyncIterationFlow.State.Done, manager.state.value)
     }
 
     @Test fun `test handles errors`(): Unit = runBlocking {
-        val manager = AsyncIterationManager(
-            object : AsyncIterator<String, Boolean> {
+        val manager = AsyncIterationFlow(
+            object : AsyncIterator<String, Boolean, Boolean> {
                 override suspend fun next(result: Boolean?): String? = throw PlayerException("expected")
             },
         )
-        assertEquals(AsyncIterationManager.State.NotStarted, manager.state.value)
+        assertEquals(AsyncIterationFlow.State.NotStarted, manager.state.value)
         manager.next()
         assertEquals("expected", manager.state.value.error)
     }
 
     @Test fun `test pends until item is provided`(): Unit = runBlocking {
-        class MockIterator : AsyncIterator<String, Boolean> {
+        class MockIterator : AsyncIterator<String, Boolean, Boolean> {
             private var readyToEmit = false
 
             override suspend fun next(result: Boolean?): String? {
@@ -56,31 +56,31 @@ internal class AsyncIterationManagerTest {
             }
         }
         val iterator = MockIterator()
-        val manager = AsyncIterationManager(iterator)
-        assertEquals(AsyncIterationManager.State.NotStarted, manager.state.value)
+        val manager = AsyncIterationFlow(iterator)
+        assertEquals(AsyncIterationFlow.State.NotStarted, manager.state.value)
         val pendingJob = GlobalScope.launch {
             manager.next()
         }
         suspendCancellableCoroutine<Unit> { cont ->
             GlobalScope.launch {
                 manager.state.collect {
-                    if (it == AsyncIterationManager.State.Pending) cont.resume(Unit)
+                    if (it == AsyncIterationFlow.State.Pending) cont.resume(Unit)
                 }
             }
         }
-        assertEquals(AsyncIterationManager.State.Pending, manager.state.value)
+        assertEquals(AsyncIterationFlow.State.Pending, manager.state.value)
         iterator.emit()
         pendingJob.join()
         assertEquals("first", manager.state.value.item)
     }
 
-    private val AsyncIterationManager.State.item get() =
-        (this as AsyncIterationManager.State.Item<*>).value
+    private val AsyncIterationFlow.State.item get() =
+        (this as AsyncIterationFlow.State.Item<*>).value
 
-    private val AsyncIterationManager.State.error get() =
-        (this as AsyncIterationManager.State.Error).error.message
+    private val AsyncIterationFlow.State.error get() =
+        (this as AsyncIterationFlow.State.Error).error.message
 
-    private fun <Result : Any> AsyncIterationManager<*, Result>.next(completedState: Result? = null) = runBlocking {
+    private fun <Result : Any> AsyncIterationFlow<*, Result, *>.next(completedState: Result? = null) = runBlocking {
         next(completedState)
     }
 }

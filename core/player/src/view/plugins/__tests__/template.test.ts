@@ -7,8 +7,13 @@ import { SchemaController } from "../../../schema";
 import { Parser } from "../../parser";
 import { ViewInstance } from "../../view";
 import type { Options } from "../options";
-import { TemplatePlugin, MultiNodePlugin, AssetPlugin } from "../";
-import { StringResolverPlugin, toNodeResolveOptions } from "../..";
+import {
+  TemplatePlugin,
+  MultiNodePlugin,
+  AssetPlugin,
+  StringResolverPlugin,
+} from "../";
+import { toNodeResolveOptions } from "../../resolver";
 import type { View } from "@player-ui/types";
 
 const templateJoinValues = {

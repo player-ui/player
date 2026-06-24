@@ -11,12 +11,12 @@ parameters:
 orbs:
   macos: circleci/macos@2.5.4
   android: circleci/android@3.2.0
-  codecov: codecov/codecov@5.4.3
+  codecov: codecov/codecov@6.0.0
 
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:latest
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -37,14 +37,14 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:2024.04.1
+      image: android:2024.11.1
     working_directory: ~/player
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   benchmarks:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:latest
     working_directory: ~/player
     resource_class: large
     environment:
@@ -74,8 +74,8 @@ commands:
       - run:
           command: |
             source ~/.bashrc
-            bundle install
-            npx auto shipit -vv --only-graduate-with-release-label
+            npx pnpm@10.18.1 install --frozen-lockfile
+            npx pnpm@10.18.1 exec auto shipit -vv --only-graduate-with-release-label
           no_output_timeout: 40m
 
 jobs:
@@ -104,7 +104,7 @@ jobs:
           root: .
           paths:
             - .
-  
+
   bazelrc_fork:
     executor: minimal
     steps:
@@ -388,13 +388,13 @@ jobs:
                 cp "$f" "$(dirname $f)/baseline.json"
               done
               git add '*/benchmarks/baseline.json'
-              git diff --staged --quiet || (git commit -m "[skip ci] Update benchmark baseline" && git push origin main)
+              git diff --staged --quiet || (git commit -m "[skip ci] Update benchmark baseline" && git pull --rebase origin main && git push origin main)
             fi
 
       - run:
           name: Post benchmark comparison (PR only)
           command: |
-            PR_NUM=$(echo "${CIRCLE_PULL_REQUEST:-}" | grep -oE '[0-9]+$')
+            PR_NUM="${CIRCLE_PULL_REQUEST##*/}"
             if [ -n "${PR_NUM}" ]; then
               node scripts/compare-benchmarks.js > bench-comparison.md
               if [ -s bench-comparison.md ]; then
@@ -628,8 +628,9 @@ workflows:
       - bench_js:
           context:
             - Publish
+          # Run after release to avoid messing up Auto
           requires:
-            - test
+            - release
 
       - bundle_analyze:
           name: bundle-analyze

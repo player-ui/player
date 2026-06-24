@@ -20,14 +20,14 @@ public data class AssetContext(
      */
     val player: AndroidPlayer,
     /** Internal factory method used to create new instances of the [RenderableAsset] */
-    internal val factory: (AssetContext) -> RenderableAsset,
+    internal val factory: (AssetContext) -> RenderableAsset<*>,
     val id: String,
 ) {
     public constructor(
         context: Context?,
         asset: Asset,
         player: AndroidPlayer,
-        factory: (AssetContext) -> RenderableAsset,
+        factory: (AssetContext) -> RenderableAsset<*>,
     ) : this(context, asset, player, factory, asset.id)
 
     @Deprecated(
@@ -65,4 +65,4 @@ public fun AssetContext.withStyles(
     )
 }
 
-public fun AssetContext.build(): RenderableAsset = factory(this)
+public fun AssetContext.build(): RenderableAsset<*> = factory(this)

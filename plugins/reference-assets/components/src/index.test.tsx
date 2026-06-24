@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, test, expect } from "vitest";
-import { render, binding as b, expression as e } from "@player-tools/dsl";
+import { render, binding as b, expression as e } from "@player-lang/react-dsl";
 import { Text, Action, Info, Collection, Input, Choice, ChatMessage } from ".";
 
 describe("JSON serialization", () => {
