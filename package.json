@@ -21,10 +21,10 @@
     "@astrojs/starlight-docsearch": "^0.3.0",
     "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/tailwind": "^6.0.2",
-    "@auto-it/all-contributors": "^11.2.0",
-    "@auto-it/omit-release-notes": "^11.2.0",
-    "@auto-it/upload-assets": "^11.2.0",
-    "@auto-it/version-file": "^11.2.0",
+    "@auto-it/all-contributors": "11.3.6",
+    "@auto-it/omit-release-notes": "11.3.6",
+    "@auto-it/upload-assets": "11.3.6",
+    "@auto-it/version-file": "11.3.6",
     "@babel/preset-env": "^7.23.8",
     "@babel/preset-react": "^7.24.1",
     "@babel/preset-typescript": "^7.23.3",
@@ -75,7 +75,7 @@
     "arr-flatten": "^1.1.0",
     "astro": "^5.14.3",
     "astro-pagefind": "^1.8.3",
-    "auto": "^11.2.0",
+    "auto": "11.3.6",
     "autoprefixer": "^10.4.17",
     "babel-loader": "^9.1.3",
     "bowser": "^2.11.0",
@@ -192,7 +192,10 @@
     "ignoredBuiltDependencies": [
       "core-js-pure",
       "yarn"
-    ]
+    ],
+    "patchedDependencies": {
+      "@auto-it/core@11.3.6": "patches/@auto-it__core@11.3.6.patch"
+    }
   },
   "resolutions": {
     "esbuild": "0.19.8",

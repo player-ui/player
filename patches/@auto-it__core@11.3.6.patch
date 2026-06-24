@@ -1,0 +1,13 @@
+diff --git a/dist/auto.js b/dist/auto.js
+index 98aa739a9245219920c378d00bcec76d283b46fe..8809f06667207b5ffbe9241d2bc583ee3c63eec1 100644
+--- a/dist/auto.js
++++ b/dist/auto.js
+@@ -1004,7 +1004,7 @@ class Auto {
+         const isBaseBranch = !isPR && currentBranch === this.baseBranch;
+         const shouldGraduate = !options.onlyGraduateWithReleaseLabel ||
+             (options.onlyGraduateWithReleaseLabel &&
+-                head[0].labels.some((l) => { var _a, _b; return (_b = (_a = this.semVerLabels) === null || _a === void 0 ? void 0 : _a.get("release")) === null || _b === void 0 ? void 0 : _b.includes(l); }));
++                head.length > 0 && head[0].labels.some((l) => { var _a, _b; return (_b = (_a = this.semVerLabels) === null || _a === void 0 ? void 0 : _a.get("release")) === null || _b === void 0 ? void 0 : _b.includes(l); }));
+         const isPrereleaseBranch = (_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.prereleaseBranches) === null || _b === void 0 ? void 0 : _b.some((branch) => currentBranch === branch);
+         const publishPrerelease = isPrereleaseBranch ||
+             (currentBranch === this.baseBranch &&
