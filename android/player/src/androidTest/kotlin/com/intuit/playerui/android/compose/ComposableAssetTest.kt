@@ -14,7 +14,6 @@ import com.intuit.playerui.android.utils.SimpleComposableAsset
 import com.intuit.playerui.android.utils.StyledNestedComposableAsset
 import com.intuit.playerui.android.utils.TextStyleCapturingAsset
 import com.intuit.playerui.android.utils.awaitFirstView
-import com.intuit.playerui.android.utils.waitForCondition
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.flow.Flow
@@ -93,8 +92,9 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
         val data = runBlocking { asset!!.getData() }
 
         composeRule.setContent { asset!!.compose(data) }
-        composeRule.waitForIdle()
-        waitForCondition { TextStyleCapturingAsset.lastCapturedTextStyle != null }
+        composeRule.waitUntil(timeoutMillis = 2_500) {
+            TextStyleCapturingAsset.lastCapturedTextStyle != null
+        }
 
         val captured = TextStyleCapturingAsset.lastCapturedTextStyle
         assertNotNull("TextStyle should have been captured", captured)
@@ -114,8 +114,9 @@ internal class ComposableAssetTest : BaseRenderableAssetTest() {
         val data = runBlocking { asset!!.getData() }
 
         composeRule.setContent { asset!!.compose(data) }
-        composeRule.waitForIdle()
-        waitForCondition { ContextCapturingAsset.lastCapturedContext != null }
+        composeRule.waitUntil(timeoutMillis = 2_500) {
+            ContextCapturingAsset.lastCapturedContext != null
+        }
 
         val capturedContext = ContextCapturingAsset.lastCapturedContext
         assertNotNull(
