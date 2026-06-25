@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
 import androidx.compose.material.Text as ComposeText
@@ -26,7 +26,7 @@ public class Tabs(
     @Serializable
     public data class TabItem(
         val title: String,
-        val child: RenderableAsset? = null,
+        val child: AnyAsset? = null,
     )
 
     @Serializable

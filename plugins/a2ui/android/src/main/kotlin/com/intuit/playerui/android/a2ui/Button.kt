@@ -7,7 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,7 +22,7 @@ public class Button(
     @Serializable
     public data class Data(
         /** Component rendered inside the button (typically a Text). */
-        val child: RenderableAsset? = null,
+        val child: AnyAsset? = null,
         val variant: String? = null,
         /** Attached by the buttonTransform — fires `exp` then the `value` transition. */
         private val run: () -> Unit,

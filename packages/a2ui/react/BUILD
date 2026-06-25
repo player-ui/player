@@ -26,6 +26,7 @@ js_pipeline(
         "//:vitest_config",
     ],
     deps = [
+        ":node_modules/@player-ui/a2ui-plugin",
         ":node_modules/@player-ui/a2ui-plugin-react",
     ],
 )
