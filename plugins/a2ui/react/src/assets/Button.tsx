@@ -5,7 +5,7 @@ import { ButtonComp } from "../components/Button";
 import { commonProps } from "../utils";
 import { openModal } from "../components/modalBus";
 
-export const Button = (props: TransformedButton) => {
+export const Button = (props: TransformedButton): React.JSX.Element => {
   const { id, variant = "primary", run, child, value, exp } = props;
 
   // Actionless buttons (no `value` transition, no `exp` side-effect) double as

@@ -33,26 +33,29 @@ import type {
  * helpers used by the React layer. Components without transforms (Row,
  * Column, etc.) flow through unchanged.
  */
-export class A2UITransformPlugin implements ExtendedPlayerPlugin<
-  [
-    RowAsset,
-    ColumnAsset,
-    ListAsset,
-    TextAsset,
-    ImageAsset,
-    IconAsset,
-    DividerAsset,
-    ButtonAsset,
-    TextFieldAsset,
-    CheckBoxAsset,
-    SliderAsset,
-    DateTimeInputAsset,
-    ChoicePickerAsset,
-    CardAsset,
-    ModalAsset,
-    TabsAsset,
-  ]
-> {
+export class A2UITransformPlugin
+  implements
+    ExtendedPlayerPlugin<
+      [
+        RowAsset,
+        ColumnAsset,
+        ListAsset,
+        TextAsset,
+        ImageAsset,
+        IconAsset,
+        DividerAsset,
+        ButtonAsset,
+        TextFieldAsset,
+        CheckBoxAsset,
+        SliderAsset,
+        DateTimeInputAsset,
+        ChoicePickerAsset,
+        CardAsset,
+        ModalAsset,
+        TabsAsset,
+      ]
+    >
+{
   name = "a2ui-transforms";
 
   apply(player: Player): void {
