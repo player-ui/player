@@ -1,3 +1,4 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_plugin")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//jvm:defs.bzl", "kt_player_module")

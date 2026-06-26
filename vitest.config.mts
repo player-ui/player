@@ -55,6 +55,10 @@ export default defineConfig({
 
     passWithNoTests: true,
 
+    // In Bazel 9, we cannot create a cache because the sandbox's node_modules are no longer writable.
+    // Trying to use a cache will make tests fail with this error: "Error: EPERM: operation not permitted, mkdir"
+    cache: false,
+
     coverage: {
       enabled: Boolean(process.env.COVERAGE_OUTPUT_FILE),
       reportOnFailure: true,

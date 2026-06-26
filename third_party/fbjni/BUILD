@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 load("@player//third_party/fbjni:extract_headers.bzl", "extract_headers")
 

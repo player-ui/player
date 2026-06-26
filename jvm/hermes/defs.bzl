@@ -1,4 +1,6 @@
 load("@rules_android//providers:providers.bzl", "AndroidLibraryAarInfo", "ApkInfo")
+load("@rules_android//rules:rules.bzl", "aar_import", "android_binary")
+load("@rules_java//java/common:java_info.bzl", "JavaInfo")
 
 def _merge_jni_into_android_library_impl(context):
     merged_aar = context.outputs.aar
@@ -51,7 +53,7 @@ def merge_jni_into_android_library(
         exports,
         tags):
     # Let android_binary x-compile our cc_libs for android
-    native.android_binary(
+    android_binary(
         # cc_library targets will be compiled into the name of the android_binary target
         name = cc_name,
         custom_package = "does.not.matter",
@@ -70,7 +72,7 @@ def merge_jni_into_android_library(
     )
 
     # Give local apps something to link against
-    native.aar_import(
+    aar_import(
         name = name,
         aar = aar,
         tags = tags,

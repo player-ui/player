@@ -1,3 +1,5 @@
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+
 def _include_jni_transition(_, __):
     return {
         "//jvm/hermes/src/main/jni:include_jni": True,
