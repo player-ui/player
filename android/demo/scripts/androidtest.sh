@@ -33,9 +33,10 @@ if [[ $DEVICE_API_LEVEL -ge 30 ]]; then
    FORCE_QUERYABLE_OPTION="--force-queryable"
 fi
 
-# Use runfiles to access the APK files provided as data dependencies
-ORCHESTRATOR_APK="${RUNFILES_DIR}/+_repo_rules2+android_test_orchestrator_apk/file/downloaded"
-SERVICES_APK="${RUNFILES_DIR}/+_repo_rules2+android_test_services_apk/file/downloaded"
+# Use runfiles to access the APK files provided as data dependencies.
+# We use rlocation for more robust path resolution. (I.e. using RUNFILES_DIR directly broke in Bazel 9.)
+ORCHESTRATOR_APK="$(rlocation android_test_orchestrator_apk/file/downloaded)"
+SERVICES_APK="$(rlocation android_test_services_apk/file/downloaded)"
 
 cp "$ORCHESTRATOR_APK" orchestrator.apk
 cp "$SERVICES_APK" test_services.apk

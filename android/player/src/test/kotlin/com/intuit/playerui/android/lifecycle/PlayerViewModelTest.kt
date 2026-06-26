@@ -22,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -98,7 +97,6 @@ internal class PlayerViewModelTest {
     @BeforeEach
     fun setup() {
         viewModel = PlayerViewModel(flowManager)
-        every { runtime.scope } returns TestCoroutineScope()
         // TODO: Change to StandardTestDispatcher
         every { runtime.scope } returns CoroutineScope(Dispatchers.Default)
         coEvery { flowManager.terminate(any()) } returns Unit
