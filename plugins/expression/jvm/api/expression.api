@@ -1,7 +1,18 @@
-public final class com/intuit/player/plugins/expression/ExpressionPlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
+public final class com/intuit/playerui/plugins/expression/ExpressionPlugin : com/intuit/playerui/core/plugins/JSScriptPluginWrapper {
 	public fun <init> (Ljava/util/Map;)V
 	public fun <init> ([Lkotlin/Pair;)V
-	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
+	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
 	public final fun getMap ()Ljava/util/Map;
+}
+
+private final class com/intuit/playerui/plugins/expression/ExpressionPlugin$Companion {
+}
+
+final class com/intuit/playerui/plugins/expression/ExpressionPlugin$apply$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/plugins/expression/ExpressionPluginKt {
 }
 

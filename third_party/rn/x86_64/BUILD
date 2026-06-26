@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_import")
+
 cc_import(
     name = "libhermes",
     shared_library = ":libhermes.so",

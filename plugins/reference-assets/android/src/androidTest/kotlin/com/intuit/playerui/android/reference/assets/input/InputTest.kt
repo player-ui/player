@@ -25,6 +25,9 @@ class InputTest : AssetTest("input") {
             ?: throw AssertionError("current view is null")
         val inputField = currentView?.findViewById<FormattedEditText>(R.id.input_field) ?: throw AssertionError("current view is null")
 
+        // Drain the main looper so the label TextView is attached before we index into it.
+        runOnMain { }
+
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("This is an input", text.toString())
         }
@@ -54,6 +57,9 @@ class InputTest : AssetTest("input") {
         val inputLabelContainer = view.findViewById<FrameLayout>(R.id.input_label_container)
         val inputNoteContainer = view.findViewById<FrameLayout>(R.id.input_note_container)
         val inputField = view.findViewById<FormattedEditText>(R.id.input_field)
+
+        // Drain the main looper so the label/note TextViews are attached before we index into them.
+        runOnMain { }
 
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("Input with validation and formatting", text.toString())

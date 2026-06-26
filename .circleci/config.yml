@@ -11,12 +11,12 @@ parameters:
 orbs:
   macos: circleci/macos@2.5.4
   android: circleci/android@3.2.0
-  codecov: codecov/codecov@5.4.3
+  codecov: codecov/codecov@6.0.0
 
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:latest
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -37,14 +37,14 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:2024.04.1
+      image: android:2024.11.1
     working_directory: ~/player
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   benchmarks:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:latest
     working_directory: ~/player
     resource_class: large
     environment:
@@ -74,7 +74,8 @@ commands:
       - run:
           command: |
             source ~/.bashrc
-            npx auto shipit -vv --only-graduate-with-release-label
+            npx pnpm@10.18.1 install --frozen-lockfile
+            npx pnpm@10.18.1 exec auto shipit -vv --only-graduate-with-release-label
           no_output_timeout: 40m
 
 jobs:
@@ -103,7 +104,7 @@ jobs:
           root: .
           paths:
             - .
-  
+
   bazelrc_fork:
     executor: minimal
     steps:
@@ -160,10 +161,8 @@ jobs:
           command: |
             bazel build \
               --config=ci-mac \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
-              $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "kind('ios_unit_test|ios_ui_test', //ios/...)") \
+              $(bazel query "kind('ios_unit_test|ios_ui_test', //plugins/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
       - run:
@@ -175,10 +174,8 @@ jobs:
               --experimental_use_llvm_covmap \
               --test_output=all \
               --test_timeout=1800 \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
-              $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)")
+              $(bazel query "kind('ios_unit_test|ios_ui_test', //ios/...)") \
+              $(bazel query "kind('ios_unit_test|ios_ui_test', //plugins/...)")
       - run:
           name: Lint
           command: |
@@ -373,9 +370,36 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
+      - setup_auth
+      - run:
+          name: Run benchmarks
+          command: |
+            bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
-      - run: |
-          bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
+      - run:
+          name: Update baseline (main only)
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "main" ]; then
+              find . -path '*/benchmarks/current.json' -not -path './bazel-*' | while read f; do
+                cp "$f" "$(dirname $f)/baseline.json"
+              done
+              git add '*/benchmarks/baseline.json'
+              git diff --staged --quiet || (git commit -m "[skip ci] Update benchmark baseline" && git pull --rebase origin main && git push origin main)
+            fi
+
+      - run:
+          name: Post benchmark comparison (PR only)
+          command: |
+            PR_NUM="${CIRCLE_PULL_REQUEST##*/}"
+            if [ -n "${PR_NUM}" ]; then
+              node scripts/compare-benchmarks.js > bench-comparison.md
+              if [ -s bench-comparison.md ]; then
+                npx auto comment --pr "${PR_NUM}" \
+                  --message "$(cat bench-comparison.md)" \
+                  --context "benchmarks" \
+                  --edit
+              fi
+            fi
 
 workflows:
   build_and_test_pr:
@@ -528,6 +552,8 @@ workflows:
 
       - bench_js:
           name: js-benchmark-tests-trunk
+          context:
+            - Publish
           filters:
             branches:
               ignore:
@@ -578,21 +604,29 @@ workflows:
       - build_and_test_ios:
           requires:
             - build
+            - test
 
       - android_test:
           context:
             - Build
           requires:
             - build
+            - test
 
       - test:
           requires:
             - build
-            - build_and_test_ios
 
       - upload_coverage:
           requires:
             - test
+
+      - bench_js:
+          context:
+            - Publish
+          # Run after release to avoid messing up Auto
+          requires:
+            - release
 
       - bundle_analyze:
           name: bundle-analyze

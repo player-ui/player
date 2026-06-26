@@ -66,6 +66,9 @@ public enum class ErrorTypes(
 
     @SerialName("render")
     RENDER("render"),
+
+    @SerialName("externalState")
+    EXTERNAL_STATE("externalState"),
 }
 
 /**

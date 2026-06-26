@@ -1,54 +1,733 @@
-public final class com/intuit/player/jvm/j2v8/bridge/V8NodeKt {
-	public static final fun Node (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;Lcom/eclipsesource/v8/V8Object;)Lcom/intuit/player/jvm/core/bridge/Node;
+public final class com/intuit/playerui/j2v8/V8Null : com/intuit/playerui/j2v8/V8Primitive {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/V8Null;
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/runtime/J2V8 : com/intuit/player/jvm/core/bridge/runtime/PlayerRuntimeFactory {
-	public static final field INSTANCE Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8;
-	public fun create (Lkotlin/jvm/functions/Function1;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
+public class com/intuit/playerui/j2v8/V8Primitive : com/eclipsesource/v8/V8Value {
+	public fun close ()V
+	protected fun createTwin ()Lcom/eclipsesource/v8/V8Value;
+	public fun equals (Ljava/lang/Object;)Z
+	public synthetic fun getRuntime ()Lcom/eclipsesource/v8/V8;
+	public fun getRuntime ()Ljava/lang/Void;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun isReleased ()Z
+	public fun isUndefined ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig : com/intuit/player/jvm/core/bridge/runtime/PlayerRuntimeConfig {
-	public fun <init> ()V
-	public fun <init> (Lcom/eclipsesource/v8/V8;)V
-	public synthetic fun <init> (Lcom/eclipsesource/v8/V8;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Lcom/eclipsesource/v8/V8;
-	public final fun copy (Lcom/eclipsesource/v8/V8;)Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;
-	public static synthetic fun copy$default (Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;Lcom/eclipsesource/v8/V8;ILjava/lang/Object;)Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;
+public final class com/intuit/playerui/j2v8/V8PrimitiveKt {
+}
+
+final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Array$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/V8PrimitiveKt$V8Array$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function2;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1$1 : com/eclipsesource/v8/JavaCallback {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function2;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function2;Lcom/eclipsesource/v8/V8Array;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Object$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/V8PrimitiveKt$V8Object$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/V8PrimitiveKt$getV8Value$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/V8PrimitiveKt$getV8Value$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/V8Node : com/intuit/playerui/core/bridge/Node, com/intuit/playerui/j2v8/bridge/V8ObjectWrapper {
+	public fun <init> (Lcom/eclipsesource/v8/V8Object;Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
+	public fun clear ()V
+	public synthetic fun compute (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun compute (Ljava/lang/String;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public synthetic fun computeIfAbsent (Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;
+	public fun computeIfAbsent (Ljava/lang/String;Ljava/util/function/Function;)Ljava/lang/Object;
+	public synthetic fun computeIfPresent (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun computeIfPresent (Ljava/lang/String;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public final fun containsKey (Ljava/lang/Object;)Z
+	public fun containsKey (Ljava/lang/String;)Z
+	public fun containsValue (Ljava/lang/Object;)Z
+	public fun deserialize (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public final fun entrySet ()Ljava/util/Set;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun get (Ljava/lang/String;)Ljava/lang/Object;
+	public fun getBoolean (Ljava/lang/String;)Ljava/lang/Boolean;
+	public fun getDouble (Ljava/lang/String;)Ljava/lang/Double;
+	public fun getEntries ()Ljava/util/Set;
+	public fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFunction (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun getInt (Ljava/lang/String;)Ljava/lang/Integer;
+	public fun getInvokable (Ljava/lang/String;Lkotlinx/serialization/DeserializationStrategy;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun getKeys ()Ljava/util/Set;
+	public fun getList (Ljava/lang/String;)Ljava/util/List;
+	public fun getLong (Ljava/lang/String;)Ljava/lang/Long;
+	public fun getObject (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Node;
+	public fun getRuntime ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public fun getSerializable (Ljava/lang/String;Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun getSize ()I
+	public fun getString (Ljava/lang/String;)Ljava/lang/String;
+	public fun getV8Object ()Lcom/eclipsesource/v8/V8Object;
+	public fun getValues ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun isEmpty ()Z
+	public fun isReleased ()Z
+	public fun isUndefined ()Z
+	public final fun keySet ()Ljava/util/Set;
+	public synthetic fun merge (Ljava/lang/Object;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun merge (Ljava/lang/String;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun nativeReferenceEquals (Ljava/lang/Object;)Z
+	public synthetic fun put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun put (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putAll (Ljava/util/Map;)V
+	public synthetic fun putIfAbsent (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putIfAbsent (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun release ()V
+	public fun remove (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun remove (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public synthetic fun replace (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public synthetic fun replace (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replace (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun replace (Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replaceAll (Ljava/util/function/BiFunction;)V
+	public final fun size ()I
+	public fun toString ()Ljava/lang/String;
+	public synthetic fun values ()Ljava/util/Collection;
+	public final fun values ()Ljava/util/List;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$entries$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Ljava/util/Set;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$get$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$getFunction$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Function;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$getInvokable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Function;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$getList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Array;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$getObject$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$getSerializable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$hashCode$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/V8Node$hashCode$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Integer;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$keys$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Ljava/util/Set;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$keys$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/util/Set;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$nativeReferenceEquals$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Boolean;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$size$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public final fun invoke ()Ljava/lang/Integer;
+	public synthetic fun invoke ()Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$toString$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/V8Node$toString$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/String;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/V8Node$values$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Ljava/util/List;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/V8NodeKt {
+	public static final fun Node (Lcom/intuit/playerui/core/bridge/runtime/Runtime;Lcom/eclipsesource/v8/V8Object;)Lcom/intuit/playerui/core/bridge/Node;
+}
+
+public abstract interface class com/intuit/playerui/j2v8/bridge/V8ObjectWrapper {
+	public abstract fun getV8Object ()Lcom/eclipsesource/v8/V8Object;
+	public abstract fun release ()V
+}
+
+public final class com/intuit/playerui/j2v8/bridge/V8ObjectWrapper$DefaultImpls {
+	public static fun release (Lcom/intuit/playerui/j2v8/bridge/V8ObjectWrapper;)V
+}
+
+public final class com/intuit/playerui/j2v8/bridge/runtime/J2V8 : com/intuit/playerui/core/bridge/runtime/PlayerRuntimeFactory {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8;
+	public static final field NAME Ljava/lang/String;
+	public fun create (Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig : com/intuit/playerui/core/bridge/runtime/PlayerRuntimeConfig {
+	public fun <init> ()V
+	public fun <init> (Lcom/eclipsesource/v8/V8;Ljava/util/concurrent/ExecutorService;)V
+	public synthetic fun <init> (Lcom/eclipsesource/v8/V8;Ljava/util/concurrent/ExecutorService;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/eclipsesource/v8/V8;
+	public final fun copy (Lcom/eclipsesource/v8/V8;Ljava/util/concurrent/ExecutorService;)Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;
+	public static synthetic fun copy$default (Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;Lcom/eclipsesource/v8/V8;Ljava/util/concurrent/ExecutorService;ILjava/lang/Object;)Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExecutorService ()Ljava/util/concurrent/ExecutorService;
 	public final fun getRuntime ()Lcom/eclipsesource/v8/V8;
 	public fun hashCode ()I
 	public final fun setRuntime (Lcom/eclipsesource/v8/V8;)V
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeContainer : com/intuit/player/jvm/core/bridge/runtime/PlayerRuntimeContainer {
+final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig$executorService$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Ljava/util/concurrent/ExecutorService;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig$executorService$2$1 : java/util/concurrent/ThreadFactory {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig$executorService$2$1;
+	public final fun newThread (Ljava/lang/Runnable;)Ljava/lang/Thread;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeContainer : com/intuit/playerui/core/bridge/runtime/PlayerRuntimeContainer {
 	public fun <init> ()V
-	public fun getFactory ()Lcom/intuit/player/jvm/core/bridge/runtime/PlayerRuntimeFactory;
+	public fun getFactory ()Lcom/intuit/playerui/core/bridge/runtime/PlayerRuntimeFactory;
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/runtime/V8RuntimeKt {
-	public static final fun Runtime ()Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Lcom/eclipsesource/v8/V8;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Lcom/eclipsesource/v8/V8;Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Ljava/lang/String;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Ljava/lang/String;Ljava/nio/file/Path;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static synthetic fun Runtime$default (Lcom/eclipsesource/v8/V8;Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;ILjava/lang/Object;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static synthetic fun Runtime$default (Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static synthetic fun Runtime$default (Ljava/lang/String;Ljava/nio/file/Path;ILjava/lang/Object;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
+public final class com/intuit/playerui/j2v8/bridge/runtime/PlayerRuntimeExceptionKt {
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/serialization/format/BuildersKt {
-	public static final fun v8Array (Lcom/intuit/player/jvm/core/bridge/serialization/format/RuntimeObjectBuilder;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Array;
-	public static final fun v8Array (Lcom/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Array;
-	public static final fun v8Object (Lcom/intuit/player/jvm/core/bridge/serialization/format/RuntimeObjectBuilder;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Object;
-	public static final fun v8Object (Lcom/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Object;
+public final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime : com/intuit/playerui/core/bridge/runtime/Runtime {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;)V
+	public fun add (Ljava/lang/String;Lcom/eclipsesource/v8/V8Value;)V
+	public synthetic fun add (Ljava/lang/String;Ljava/lang/Object;)V
+	public fun clear ()V
+	public synthetic fun compute (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun compute (Ljava/lang/String;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public synthetic fun computeIfAbsent (Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;
+	public fun computeIfAbsent (Ljava/lang/String;Ljava/util/function/Function;)Ljava/lang/Object;
+	public synthetic fun computeIfPresent (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun computeIfPresent (Ljava/lang/String;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public final fun containsKey (Ljava/lang/Object;)Z
+	public fun containsKey (Ljava/lang/String;)Z
+	public fun containsValue (Ljava/lang/Object;)Z
+	public fun deserialize (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public final fun entrySet ()Ljava/util/Set;
+	public fun execute (Ljava/lang/String;)Ljava/lang/Object;
+	public fun executeRaw (Ljava/lang/String;)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun executeRaw (Ljava/lang/String;)Ljava/lang/Object;
+	public final fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun get (Ljava/lang/String;)Ljava/lang/Object;
+	public fun getBoolean (Ljava/lang/String;)Ljava/lang/Boolean;
+	public fun getCheckBlockingThread ()Lkotlin/jvm/functions/Function1;
+	public synthetic fun getConfig ()Lcom/intuit/playerui/core/bridge/runtime/PlayerRuntimeConfig;
+	public fun getConfig ()Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;
+	public synthetic fun getDispatcher ()Lkotlinx/coroutines/CoroutineDispatcher;
+	public fun getDispatcher ()Lkotlinx/coroutines/ExecutorCoroutineDispatcher;
+	public fun getDouble (Ljava/lang/String;)Ljava/lang/Double;
+	public fun getEntries ()Ljava/util/Set;
+	public synthetic fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFormat ()Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;
+	public fun getFunction (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun getInt (Ljava/lang/String;)Ljava/lang/Integer;
+	public fun getInvokable (Ljava/lang/String;Lkotlinx/serialization/DeserializationStrategy;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun getKeys ()Ljava/util/Set;
+	public fun getList (Ljava/lang/String;)Ljava/util/List;
+	public fun getLong (Ljava/lang/String;)Ljava/lang/Long;
+	public fun getObject (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Node;
+	public synthetic fun getRuntime ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public fun getRuntime ()Lcom/intuit/playerui/j2v8/bridge/runtime/V8Runtime;
+	public fun getScope ()Lkotlinx/coroutines/CoroutineScope;
+	public fun getSerializable (Ljava/lang/String;Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun getSize ()I
+	public fun getString (Ljava/lang/String;)Ljava/lang/String;
+	public final fun getV8 ()Lcom/eclipsesource/v8/V8;
+	public fun getValues ()Ljava/util/Collection;
+	public final fun init (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isEmpty ()Z
+	public fun isReleased ()Z
+	public fun isUndefined ()Z
+	public final fun keySet ()Ljava/util/Set;
+	public synthetic fun load (Lcom/intuit/playerui/core/bridge/runtime/ScriptContext;)Ljava/lang/Object;
+	public fun load (Lcom/intuit/playerui/core/bridge/runtime/ScriptContext;)V
+	public synthetic fun merge (Ljava/lang/Object;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun merge (Ljava/lang/String;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun nativeReferenceEquals (Ljava/lang/Object;)Z
+	public synthetic fun put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun put (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putAll (Ljava/util/Map;)V
+	public synthetic fun putIfAbsent (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putIfAbsent (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun release ()V
+	public fun remove (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun remove (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public synthetic fun replace (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public synthetic fun replace (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replace (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun replace (Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replaceAll (Ljava/util/function/BiFunction;)V
+	public fun serialize (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun setCheckBlockingThread (Lkotlin/jvm/functions/Function1;)V
+	public final fun size ()I
+	public fun toString ()Ljava/lang/String;
+	public final fun values ()Ljava/util/Collection;
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8Format : com/intuit/player/jvm/core/bridge/serialization/format/AbstractRuntimeFormat {
-	public fun <init> (Lcom/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8FormatConfiguration;)V
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$add$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$checkBlockingThread$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/runtime/V8Runtime$checkBlockingThread$1;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/lang/Thread;)V
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$execute$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$executeRaw$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$init$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$load$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$release$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$scope$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/coroutines/CoroutineScope;
+}
+
+final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$serialize$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/runtime/V8RuntimeKt {
+	public static final fun Runtime ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static final fun Runtime (Lcom/eclipsesource/v8/V8;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static final fun Runtime (Lcom/eclipsesource/v8/V8;Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static final fun Runtime (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static final fun Runtime (Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static final fun Runtime (Ljava/lang/String;Ljava/nio/file/Path;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static synthetic fun Runtime$default (Lcom/eclipsesource/v8/V8;Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static synthetic fun Runtime$default (Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+	public static synthetic fun Runtime$default (Ljava/lang/String;Ljava/nio/file/Path;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/runtime/Runtime;
+}
+
+public abstract class com/intuit/playerui/j2v8/bridge/serialization/encoding/AbstractV8Decoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeValueDecoder {
+	public synthetic fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Value;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
+	public fun decodeFunction (Lkotlinx/serialization/KSerializer;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun decodeNotNullMark ()Z
+	public fun decodeValue ()Ljava/lang/Object;
+	public synthetic fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFormat ()Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;
+	public fun getValue ()Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun getValue ()Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ArrayListDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeArrayListDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
+	public fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueDecoder;
+	public synthetic fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeBoolean ()Z
+	public fun decodeByte ()B
+	public fun decodeChar ()C
+	public fun decodeDouble ()D
+	public fun decodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeFloat ()F
+	public fun decodeFunction (Lkotlinx/serialization/KSerializer;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeInt ()I
+	public fun decodeLong ()J
+	public fun decodeNode ()Lcom/intuit/playerui/core/bridge/Node;
+	public fun decodeNotNullMark ()Z
+	public fun decodeNull ()Ljava/lang/Void;
+	public fun decodeNullableSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeShort ()S
+	public fun decodeString ()Ljava/lang/String;
+	public fun decodeValue ()Ljava/lang/Object;
+	public fun decodeValueElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public synthetic fun getElementAtIndex (I)Ljava/lang/Object;
+	public synthetic fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFormat ()Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun getValue ()Lcom/eclipsesource/v8/V8Array;
+	public synthetic fun getValue ()Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ArrayListDecoder$keys$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ArrayListDecoder$keys$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)Ljava/util/List;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8DecodersKt {
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8EncodersKt {
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8EncodersKt$writeV8$encoder$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Value;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder : com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function1;)V
+	public fun encodeSerializableValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder$contentMap$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public final fun invoke ()Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun invoke ()Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder$contentMap$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder$contentMap$2$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectClassDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Object;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
+	public fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueDecoder;
+	public synthetic fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeBoolean ()Z
+	public fun decodeByte ()B
+	public fun decodeChar ()C
+	public fun decodeDouble ()D
+	public fun decodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun decodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public fun decodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeFloat ()F
+	public fun decodeFunction (Lkotlinx/serialization/KSerializer;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeInt ()I
+	public fun decodeLong ()J
+	public fun decodeNode ()Lcom/intuit/playerui/core/bridge/Node;
+	public fun decodeNotNullMark ()Z
+	public fun decodeNull ()Ljava/lang/Void;
+	public fun decodeNullableSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeShort ()S
+	public fun decodeString ()Ljava/lang/String;
+	public fun decodeValue ()Ljava/lang/Object;
+	public fun decodeValueElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public synthetic fun getElementAtIndex (I)Ljava/lang/Object;
+	public synthetic fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFormat ()Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun getValue ()Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun getValue ()Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectClassDecoder$keys$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/util/List;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectMapDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectMapDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Object;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
+	public fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueDecoder;
+	public synthetic fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeBoolean ()Z
+	public fun decodeByte ()B
+	public fun decodeChar ()C
+	public fun decodeDouble ()D
+	public fun decodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun decodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public fun decodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeFloat ()F
+	public fun decodeFunction (Lkotlinx/serialization/KSerializer;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeInt ()I
+	public fun decodeLong ()J
+	public fun decodeNode ()Lcom/intuit/playerui/core/bridge/Node;
+	public fun decodeNotNullMark ()Z
+	public fun decodeNull ()Ljava/lang/Void;
+	public fun decodeNullableSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeShort ()S
+	public fun decodeString ()Ljava/lang/String;
+	public fun decodeValue ()Ljava/lang/Object;
+	public fun decodeValueElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public synthetic fun getElementAtIndex (I)Ljava/lang/Object;
+	public synthetic fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFormat ()Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun getValue ()Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun getValue ()Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectMapDecoder$keys$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectMapDecoder$keys$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/util/List;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8SealedClassDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Object;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
+	public fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueDecoder;
+	public synthetic fun buildDecoderForSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeBoolean ()Z
+	public fun decodeByte ()B
+	public fun decodeChar ()C
+	public fun decodeDouble ()D
+	public fun decodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun decodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public fun decodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeFloat ()F
+	public fun decodeFunction (Lkotlinx/serialization/KSerializer;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeInt ()I
+	public fun decodeLong ()J
+	public fun decodeNode ()Lcom/intuit/playerui/core/bridge/Node;
+	public fun decodeNotNullMark ()Z
+	public fun decodeNull ()Ljava/lang/Void;
+	public fun decodeNullableSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeShort ()S
+	public fun decodeString ()Ljava/lang/String;
+	public fun decodeValue ()Ljava/lang/Object;
+	public fun decodeValueElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/Object;
+	public synthetic fun getElementAtIndex (I)Ljava/lang/Object;
+	public synthetic fun getFormat ()Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeFormat;
+	public fun getFormat ()Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun getValue ()Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun getValue ()Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueDecoder : com/intuit/playerui/j2v8/bridge/serialization/encoding/AbstractV8Decoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Value;)V
+}
+
+public class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder : kotlinx/serialization/encoding/AbstractEncoder, com/intuit/playerui/core/bridge/serialization/encoding/FunctionEncoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeEncoder {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;Lkotlin/jvm/functions/Function1;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeEncoder;
+	public fun encodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Z
+	public fun encodeFunction (Lcom/intuit/playerui/core/bridge/Invokable;)V
+	public fun encodeFunction (Ljava/lang/Object;)V
+	public fun encodeFunction (Lkotlin/Function;)V
+	public fun encodeFunction (Lkotlin/reflect/KCallable;)V
+	public fun encodeNode (Lcom/intuit/playerui/core/bridge/Node;)V
+	public fun encodeNull ()V
+	public fun encodeSerializableValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public final fun encodeV8Value (Lcom/eclipsesource/v8/V8Value;)V
+	public fun encodeValue (Ljava/lang/Object;)V
+	protected final fun endEncode ()V
+	public fun endStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+	protected fun getContentList ()Lcom/eclipsesource/v8/V8Array;
+	protected fun getContentMap ()Lcom/eclipsesource/v8/V8Object;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode : java/lang/Enum {
+	public static final field LIST Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static final field MAP Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static final field PRIMITIVE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static final field UNDECIDED Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static fun values ()[Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+}
+
+public synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$WhenMappings {
+	public static final synthetic field $EnumSwitchMapping$0 [I
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$add$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/lang/Object;)V
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$beginStructure$consumer$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Value;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentList$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Array;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentMap$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentMap$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/core/bridge/Invokable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1$1 : com/eclipsesource/v8/JavaCallback {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/core/bridge/Invokable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lcom/intuit/playerui/core/bridge/Invokable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2$1 : com/eclipsesource/v8/JavaCallback {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1 : com/eclipsesource/v8/JavaCallback {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$3$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$set$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/format/BuildersKt {
+	public static final fun v8Array (Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeObjectBuilder;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Array;
+	public static final fun v8Array (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Array;
+	public static final fun v8Object (Lcom/intuit/playerui/core/bridge/serialization/format/RuntimeObjectBuilder;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Object;
+	public static final fun v8Object (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function1;)Lcom/eclipsesource/v8/V8Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8DecodingException : com/intuit/playerui/j2v8/bridge/serialization/format/J2V8SerializationException {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8EncodingException : com/intuit/playerui/j2v8/bridge/serialization/format/J2V8SerializationException {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format : com/intuit/playerui/core/bridge/serialization/format/AbstractRuntimeFormat {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatConfiguration;)V
 	public fun decodeFromRuntimeValue (Lkotlinx/serialization/DeserializationStrategy;Lcom/eclipsesource/v8/V8Value;)Ljava/lang/Object;
 	public synthetic fun decodeFromRuntimeValue (Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun encodeToRuntimeValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Lcom/eclipsesource/v8/V8Value;
@@ -59,19 +738,148 @@ public final class com/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8Fo
 	public final fun parseToV8Value (Ljava/lang/String;)Lcom/eclipsesource/v8/V8Value;
 }
 
-public final class com/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8FormatConfiguration : com/intuit/player/jvm/core/bridge/serialization/format/RuntimeFormatConfiguration {
-	public final fun component1 ()Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
+final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format$parseToRuntimeValue$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format$v8$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public final fun invoke ()Lcom/eclipsesource/v8/V8;
+	public synthetic fun invoke ()Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatConfiguration : com/intuit/playerui/core/bridge/serialization/format/RuntimeFormatConfiguration {
+	public final fun component1 ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
 	public final fun component2 ()Lkotlinx/serialization/modules/SerializersModule;
-	public final fun copy (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;Lkotlinx/serialization/modules/SerializersModule;)Lcom/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8FormatConfiguration;
-	public static synthetic fun copy$default (Lcom/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8FormatConfiguration;Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;Lkotlinx/serialization/modules/SerializersModule;ILjava/lang/Object;)Lcom/intuit/player/jvm/j2v8/bridge/serialization/format/J2V8FormatConfiguration;
+	public final fun copy (Lcom/intuit/playerui/core/bridge/runtime/Runtime;Lkotlinx/serialization/modules/SerializersModule;)Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatConfiguration;
+	public static synthetic fun copy$default (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatConfiguration;Lcom/intuit/playerui/core/bridge/runtime/Runtime;Lkotlinx/serialization/modules/SerializersModule;ILjava/lang/Object;)Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatConfiguration;
 	public fun equals (Ljava/lang/Object;)Z
-	public fun getRuntime ()Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
+	public fun getDiscriminator ()Ljava/lang/String;
+	public fun getRuntime ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract class com/intuit/player/jvm/j2v8/plugins/V8ScriptPluginWrapper : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
+public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatKt {
+}
+
+public class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8SerializationException : com/intuit/playerui/core/bridge/serialization/format/RuntimeSerializationException {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/intuit/playerui/j2v8/bridge/serialization/serializers/V8ValueSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/serializers/V8ValueSerializer;
+	public final fun conform ()Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/eclipsesource/v8/V8Value;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/eclipsesource/v8/V8Value;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class com/intuit/playerui/j2v8/extensions/ArgsKt {
+}
+
+public final class com/intuit/playerui/j2v8/extensions/HandleValueKt {
+}
+
+final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toInvokable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Function;)Lcom/intuit/playerui/core/bridge/Invokable;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toInvokable$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toInvokable$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Function;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)Ljava/util/List;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toNode$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/intuit/playerui/core/bridge/Node;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/HandleValueKt$transform$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Value;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/extensions/InvokeKt {
+}
+
+final class com/intuit/playerui/j2v8/extensions/InvokeKt$invoke$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/j2v8/extensions/InvokeKt$invoke$1;
+	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Array;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/extensions/LockKt {
+}
+
+final class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThread$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThread$2$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThread$2$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function1 {
+	public final fun create (Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThreadBlocking$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThreadBlocking$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function1 {
+	public final fun create (Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+synthetic class com/intuit/playerui/j2v8/extensions/LockKt$evaluateInJSThreadBlocking$1$1$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/coroutines/jvm/internal/SuspendFunction, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Lcom/eclipsesource/v8/V8Value;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/j2v8/extensions/MapKt {
+}
+
+public final class com/intuit/playerui/j2v8/extensions/UnlockKt {
+}
+
+public final class com/intuit/playerui/j2v8/extensions/UnwrapKt {
+}
+
+public final class com/intuit/playerui/j2v8/plugins/V8ScriptPlayerPluginKt {
+}
+
+public abstract class com/intuit/playerui/j2v8/plugins/V8ScriptPluginWrapper : com/intuit/playerui/core/plugins/JSScriptPluginWrapper {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

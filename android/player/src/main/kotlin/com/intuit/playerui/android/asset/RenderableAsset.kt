@@ -219,9 +219,13 @@ public abstract class RenderableAsset<Data>(
 
     // ── Public render entry points ────────────────────────────────────────────
 
-    public fun CoroutineScope.inflate(child: RenderableAsset<*>?, container: ViewGroup) {
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).build() } ?: return
-        inflateChild(asset, container)
+        inflateChild(asset, container, viewApply)
     }
 
     public fun CoroutineScope.inflate(
@@ -236,19 +240,31 @@ public abstract class RenderableAsset<Data>(
     public fun CoroutineScope.inflate(
         child: RenderableAsset<*>?,
         container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        viewApply: (View) -> Unit,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() } ?: return
+        inflateChild(asset, container, viewApply)
+    }
+
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
         @StyleRes styles: Styles?,
+        viewApply: ((View) -> Unit)? = null,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(styles).build() } ?: return
-        inflateChild(asset, container)
+        inflateChild(asset, container, viewApply)
     }
 
     public fun CoroutineScope.inflate(
         child: RenderableAsset<*>?,
         container: ViewGroup,
         tag: String,
+        viewApply: ((View) -> Unit)? = null,
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).build() } ?: return
-        inflateChild(asset, container)
+        inflateChild(asset, container, viewApply)
     }
 
     public fun CoroutineScope.inflate(
@@ -264,17 +280,34 @@ public abstract class RenderableAsset<Data>(
     public fun CoroutineScope.inflate(
         child: RenderableAsset<*>?,
         container: ViewGroup,
-        @StyleRes styles: Styles?,
+        @StyleRes vararg styles: Style?,
         tag: String,
+        viewApply: (View) -> Unit,
     ) {
-        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() } ?: return
-        inflateChild(asset, container)
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() } ?: return
+        inflateChild(asset, container, viewApply)
     }
 
-    private fun CoroutineScope.inflateChild(child: RenderableAsset<*>, container: ViewGroup) {
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        @StyleRes styles: Styles?,
+        tag: String,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() } ?: return
+        inflateChild(asset, container, viewApply)
+    }
+
+    private fun CoroutineScope.inflateChild(
+        child: RenderableAsset<*>,
+        container: ViewGroup,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
         player.asyncHydrationTrackerPlugin?.preTrackChild(child)
         launch {
             val view = child.render()
+            viewApply?.invoke(view)
             withContext(Dispatchers.Main) { view into container }
         }
     }

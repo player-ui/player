@@ -31,4 +31,5 @@ js_pipeline(
         "//:node_modules/leven",
         "//:node_modules/use-sync-external-store",
     ],
+    benchmark_envs = {"BENCH_PACKAGE_PATH": package_name()},
 )

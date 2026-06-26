@@ -71,6 +71,21 @@ new ExternalStatePlugin([
 ]);
 ```
 
+## Error handling
+
+The plugin captures an `ExternalStateError` (`type: "externalState"`) via the
+`ErrorController` in two cases instead of silently stalling the flow:
+
+- **`missing-handler`** — no registered handler matches the state's `ref`.
+- **`missing-transition-value`** — a handler ran but returned a falsy value
+  (`undefined` or `""`).
+
+`metadata.ref` is set to the offending state's `ref`. Recover via `errorTransitions` or by
+tapping `errorController.hooks.onError`; see [Error Handling](/content/error-handling).
+
+Handlers that **throw** fail the flow directly and bypass the `ErrorController` —
+exceptions are treated as programmer errors, not recoverable content-shape issues.
+
 ## Installation
 
 <PlatformTabs>

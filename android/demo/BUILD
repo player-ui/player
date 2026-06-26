@@ -1,6 +1,7 @@
 load("@rules_android//android:rules.bzl", "android_binary")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//android:defs.bzl", "kt_android")
 
 main_deps = [
@@ -51,7 +52,6 @@ android_binary(
     custom_package = "com.intuit.playerui.android.reference.demo",
     dex_shards = 4,
     manifest = ":src/main/AndroidManifest.xml",
-    multidex = "native",
     resource_files = glob(
         ["src/main/res/**"],
         allow_empty = True,
@@ -85,4 +85,6 @@ sh_test(
         "@android_test_orchestrator_apk//file",
         "@android_test_services_apk//file",
     ],
+    # This is needed to access APK files for testing
+    deps = ["@bazel_tools//tools/bash/runfiles"],
 )

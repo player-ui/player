@@ -31,6 +31,7 @@ public enum ErrorTypes: Equatable {
     case network
     case plugin
     case render
+    case externalState
     /// An error type not recognized by this version of the SDK.
     case unknown(String)
 
@@ -47,6 +48,7 @@ public enum ErrorTypes: Equatable {
         case "network": self = .network
         case "plugin": self = .plugin
         case "render": self = .render
+        case "externalState": self = .externalState
         default: self = .unknown(rawValue)
         }
     }
@@ -64,6 +66,7 @@ public enum ErrorTypes: Equatable {
         case .network: return "network"
         case .plugin: return "plugin"
         case .render: return "render"
+        case .externalState: return "externalState"
         case .unknown(let value): return value
         }
     }

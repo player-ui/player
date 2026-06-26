@@ -5,9 +5,15 @@ import type {
   PlayerFlowState,
   NavigationFlowState,
   NavigationFlowExternalState,
+  ErrorController,
+  FlowInstance,
 } from "@player-ui/player";
 import { Registry } from "@player-ui/partial-match-registry";
 import { ExternalStatePluginSymbol } from "./symbols.js";
+import { ExternalStateError } from "./ExternalStateError.js";
+
+export { ExternalStateError } from "./ExternalStateError.js";
+export type { ExternalStateErrorMetadata } from "./ExternalStateError.js";
 
 export type ExternalStateHandlerMatch = Record<string, unknown>;
 
@@ -60,6 +66,11 @@ export class ExternalStatePlugin implements PlayerPlugin {
    */
   private readonly handlers: ExternalStateHandler[];
 
+  /** The error controller to use for this plugin.
+   * Only the first instance of the plugin should tap the error controller hook.
+   */
+  private errorController?: ErrorController;
+
   /** Creates a new ExternalStatePlugin */
   constructor(handlers: ExternalStateHandler[]) {
     this.handlers = handlers;
@@ -74,50 +85,101 @@ export class ExternalStatePlugin implements PlayerPlugin {
       return;
     }
 
+    player.hooks.errorController.tap(this.name, (errorController) => {
+      this.errorController = errorController;
+    });
+
     player.hooks.flowController.tap(this.name, (flowController) => {
       flowController.hooks.flow.tap(this.name, (flow) => {
-        flow.hooks.afterTransition.tap(this.name, async (flowInstance) => {
-          const toState = flowInstance.currentState;
-          const currentState = player.getState();
-
-          if (
-            toState &&
-            toState.value &&
-            isExternal(toState.value) &&
-            isInProgress(currentState)
-          ) {
-            try {
-              const handler = this.registry?.get(toState.value);
-              const transitionValue = await handler?.(
-                toState.value,
-                currentState.controllers,
-              );
-
-              if (transitionValue !== undefined) {
-                const latestState = player.getState();
-
-                // Ensure the Player is still in the same state after waiting for transitionValue
-                if (
-                  isInProgress(latestState) &&
-                  latestState.controllers.flow.current?.currentState?.name ===
-                    toState.name
-                ) {
-                  latestState.controllers.flow.transition(transitionValue);
-                } else {
-                  player.logger.warn(
-                    `External state resolved with [${transitionValue}], but Player already navigated away from [${toState.name}]`,
-                  );
-                }
-              }
-            } catch (error) {
-              if (error instanceof Error) {
-                currentState.fail(error);
-              }
-            }
-          }
+        flow.hooks.afterTransition.tap(this.name, (flowInstance) => {
+          this.handleAfterTransition(player, flowInstance);
         });
       });
     });
+  }
+
+  /**
+   * Resolve an EXTERNAL state transition.
+   */
+  private async handleAfterTransition(
+    player: Player,
+    flowInstance: FlowInstance,
+  ): Promise<void> {
+    const toState = flowInstance.currentState;
+    const currentState = player.getState();
+
+    if (
+      !toState ||
+      !toState.value ||
+      !isExternal(toState.value) ||
+      !isInProgress(currentState)
+    ) {
+      return;
+    }
+
+    try {
+      const handler = this.registry?.get(toState.value);
+
+      if (!handler) {
+        this.reportError(
+          player,
+          ExternalStateError.missingHandler(toState.value.ref),
+        );
+        return;
+      }
+
+      const transitionValue = await handler(
+        toState.value,
+        currentState.controllers,
+      );
+
+      if (!transitionValue) {
+        this.reportError(
+          player,
+          ExternalStateError.missingTransitionValue(toState.value.ref),
+        );
+        return;
+      }
+
+      const latestState = player.getState();
+
+      // Ensure the Player is still in the same state after waiting for transitionValue
+      if (
+        isInProgress(latestState) &&
+        latestState.controllers.flow.current?.currentState?.name ===
+          toState.name
+      ) {
+        latestState.controllers.flow.transition(transitionValue);
+      } else {
+        player.logger.warn(
+          `External state resolved with [${transitionValue}], but Player already navigated away from [${toState.name}]`,
+        );
+      }
+    } catch (error) {
+      // Thrown errors are treated as purposefully unrecoverable: fail the flow rather than
+      // routing through captureError.
+      if (error instanceof Error) {
+        currentState.fail(error);
+      }
+    }
+  }
+
+  /**
+   * Report an ExternalStateError via the errorController.
+   */
+  private reportError(player: Player, error: ExternalStateError): void {
+    // The compiler believes errorController could be nil, but in practice it should always
+    // be set by the time this method runs. The logger fallback exists only as defense
+    // against an unexpected lifecycle regression — if it ever fires, that's a bug to
+    // investigate, not normal operation.
+    if (!this.errorController) {
+      player.logger.error(
+        `${error.message} (errorController was unexpectedly undefined; it should always be set by the time this code runs)`,
+      );
+      return;
+    }
+
+    this.errorController.captureError(error);
   }
 
   /**
