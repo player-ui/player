@@ -38,6 +38,22 @@ class SwiftUIPlayerTests: XCTestCase {
         XCTAssertTrue(context.isLoaded)
     }
 
+    func testLogsInitializationTime() throws {
+        let context = SwiftUIPlayer.Context { JSContext() }
+        context.logger.logLevel = .info
+
+        let logged = expectation(description: "Initialization time logged")
+        context.logger.hooks.info.tap(name: "test") { messages in
+            let message = (messages as? [String])?.first ?? ""
+            guard message.range(of: #"SwiftUIPlayer initialized in \d+ ms\."#, options: .regularExpression) != nil else { return }
+            logged.fulfill()
+        }
+
+        _ = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin()], context: context)
+
+        wait(for: [logged], timeout: 5)
+    }
+
     func testbadDecodeGoesToErrorState() throws {
         var result: Result<CompletedState, PlayerError>?
 
