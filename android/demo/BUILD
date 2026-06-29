@@ -19,7 +19,7 @@ main_deps = [
 
 test_deps = [
     # Don't pull in runtime, that'll be included by the app
-    "//android/testutils",
+    "//android/testutils:testutils-android",
 
     artifact("androidx.test.espresso:espresso-intents"),
     artifact("androidx.test.ext:junit-ktx"),
