@@ -30,21 +30,21 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// Store `value` under the context entry identified by `name`, registering
     /// a human-readable `description` for introspection consumers.
     public func set(name: String, description: String, value: AnyType?) {
-        guard let pluginRef = pluginRef else { return }
+        guard let pluginRef else { return }
         let jsValue = encode(value, in: pluginRef.context)
         pluginRef.invokeMethod("setByName", withArguments: [name, description, jsValue as Any])
     }
 
     /// Read the current value for the entry identified by `name`, or nil if unset.
     public func get(name: String) -> AnyType? {
-        guard let pluginRef = pluginRef,
+        guard let pluginRef,
               let result = pluginRef.invokeMethod("getByName", withArguments: [name]) else { return nil }
         return decode(result)
     }
 
     /// Returns true if the entry identified by `name` has a value or transform.
     public func has(name: String) -> Bool {
-        guard let pluginRef = pluginRef,
+        guard let pluginRef,
               let result = pluginRef.invokeMethod("hasByName", withArguments: [name]) else { return false }
         return result.toBool()
     }
@@ -58,7 +58,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         description: String,
         handler: @escaping (AnyType?, String) -> Void
     ) -> String? {
-        guard let pluginRef = pluginRef else { return nil }
+        guard let pluginRef else { return nil }
         let callback: @convention(block) (JSValue?, JSValue?) -> Void = { [weak self] value, _ in
             handler(self?.decode(value), name)
         }
@@ -73,7 +73,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     public func subscribeAll(
         handler: @escaping (AnyType?, String?, String) -> Void
     ) -> String? {
-        guard let pluginRef = pluginRef else { return nil }
+        guard let pluginRef else { return nil }
         let callback: @convention(block) (JSValue?, JSValue?, JSValue?) -> Void = { [weak self] value, name, description in
             handler(self?.decode(value), name?.toString(), description?.toString() ?? "")
         }
@@ -93,7 +93,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// `get(name:)?.flow.transition?("Next")`. Returns nil if the entry is
     /// unset or fails to decode.
     public func get<T: Decodable>(name: String, as type: T.Type = T.self) -> T? {
-        guard let pluginRef = pluginRef,
+        guard let pluginRef,
               let result = pluginRef.invokeMethod("getByName", withArguments: [name]),
               !result.isUndefined, !result.isNull else { return nil }
         return try? JSONDecoder().decode(T.self, from: result)
@@ -101,7 +101,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
 
     /// Returns the registered entry descriptors (description + value/transform flags).
     public func list() -> [ContextEntryDescriptor] {
-        guard let pluginRef = pluginRef,
+        guard let pluginRef,
               let result = pluginRef.invokeMethod("list", withArguments: []),
               !result.isUndefined, !result.isNull else { return [] }
         return (try? JSONDecoder().decode([ContextEntryDescriptor].self, from: result)) ?? []
@@ -109,7 +109,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
 
     /// Returns the stack of frozen snapshots from prior flows.
     public func history() -> [FrozenContextSnapshot] {
-        guard let pluginRef = pluginRef,
+        guard let pluginRef,
               let result = pluginRef.invokeMethod("history", withArguments: []),
               !result.isUndefined, !result.isNull,
               let count = result.toArray()?.count else { return [] }
@@ -117,16 +117,16 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     }
 
     private func encode(_ value: AnyType?, in context: JSContext) -> Any? {
-        guard let value = value,
+        guard let value,
               let data = try? JSONEncoder().encode(value),
               let dataString = String(data: data, encoding: .utf8) else { return nil }
         return context.evaluateScript("(\(dataString))")
     }
 
     private func decode(_ value: JSValue?) -> AnyType? {
-        guard let value = value, !value.isUndefined, !value.isNull else { return nil }
-        if value.isString, let s = value.toString() {
-            return .string(data: s)
+        guard let value, !value.isUndefined, !value.isNull else { return nil }
+        if value.isString, let string = value.toString() {
+            return .string(data: string)
         }
         // Primitives are not valid top-level JSON for JSONSerialization, so
         // handle them directly before falling back to object decoding.
