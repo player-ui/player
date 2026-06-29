@@ -18,4 +18,8 @@ js_pipeline(
     deps = [
         "//:node_modules/tapable-ts",
     ],
+    test_deps = [
+        ":node_modules/@player-ui/common-types-plugin",
+        ":node_modules/@player-ui/reference-assets-plugin",
+    ],
 )

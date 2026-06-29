@@ -267,6 +267,104 @@ test("subscribeAllByName surfaces the resolved key name and description", () => 
   expect(handler).toHaveBeenCalledWith(true, "flag", "A flag");
 });
 
+test("a function-valued context entry round-trips through get and is callable", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+
+  const addKey = defineContextKey<(a: number, b: number) => number>(
+    "math.add",
+    "Add two numbers",
+  );
+
+  expect(plugin.has(addKey)).toBe(false);
+  plugin.set(addKey, (a, b) => a + b);
+  expect(plugin.has(addKey)).toBe(true);
+  expect(plugin.get(addKey)!(2, 3)).toBe(5);
+});
+
+test("setting a function entry twice replaces the prior implementation", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const key = defineContextKey<() => string>("greet", "Greet");
+
+  plugin.set(key, () => "v1");
+  plugin.set(key, () => "v2");
+  expect(plugin.get(key)!()).toBe("v2");
+});
+
+test("function entries appear in list() like any other entry", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const a = defineContextKey<() => void>("a", "Action A");
+  const b = defineContextKey<() => void>("b", "Action B");
+
+  plugin.set(a, () => undefined);
+  plugin.set(b, () => undefined);
+
+  const descriptions = plugin.list().map((d) => d.description);
+  expect(descriptions).toEqual(
+    expect.arrayContaining(["Action A", "Action B"]),
+  );
+});
+
+test("getByName resolves a function entry so native consumers can invoke it", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const key = defineContextKey<(msg: string) => string>(
+    "echo",
+    "Echo the input",
+  );
+  plugin.set(key, (msg) => `said: ${msg}`);
+
+  const echo = plugin.getByName("echo") as (msg: string) => string;
+  expect(echo("hello")).toBe("said: hello");
+});
+
+test("singleton aliasing shares function entries across ContextPlugin instances", () => {
+  const a = new ContextPlugin();
+  const b = new ContextPlugin();
+  new Player({ plugins: [a, b] });
+  const key = defineContextKey<() => string>("shared", "Shared");
+
+  a.set(key, () => "from-a");
+  expect(b.get(key)!()).toBe("from-a");
+});
+
+test("flow-end freeze replaces a function entry with a throwing tombstone", () => {
+  const plugin = new ContextPlugin();
+  const player = new Player({ plugins: [plugin] });
+  const actionKey = defineContextKey<() => string>("do.thing", "Do the thing");
+
+  player.start(minimalFlow as any);
+  plugin.set(actionKey, () => "live");
+  expect(plugin.get(actionKey)!()).toBe("live");
+
+  // End the flow so the active store is frozen into a history snapshot.
+  player.hooks.onEnd.call();
+
+  const [snapshot] = plugin.history();
+  // Read the frozen entry by key — the same typed access as live context.
+  const frozen = snapshot.get(actionKey);
+  // The capability is preserved (still callable) but poisoned post-flow.
+  expect(typeof frozen).toBe("function");
+  expect(() => frozen!()).toThrowError(/no longer valid/);
+});
+
+test("snapshot.get returns undefined for a key absent when frozen", () => {
+  const plugin = new ContextPlugin();
+  const player = new Player({ plugins: [plugin] });
+  const present = defineContextKey<string>("present", "Present");
+  const absent = defineContextKey<string>("absent", "Absent");
+
+  player.start(minimalFlow as any);
+  plugin.set(present, "here");
+  player.hooks.onEnd.call();
+
+  const [snapshot] = plugin.history();
+  expect(snapshot.get(present)).toBe("here");
+  expect(snapshot.get(absent)).toBeUndefined();
+});
+
 test("getContextPlugin returns the existing plugin or registers a new one", () => {
   const existing = new ContextPlugin();
   const player = new Player({ plugins: [existing] });

@@ -2,5 +2,6 @@ load("//tools/ios:util.bzl", "ios_plugin")
 
 ios_plugin(
     name = "ContextPlugin",
-    resources = ["//plugins/context/core:core_native_bundle"]
+    resources = ["//plugins/context/core:core_native_bundle"],
+    deps = ["//ios/swiftui:PlayerUISwiftUI"],
 )

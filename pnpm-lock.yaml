@@ -765,6 +765,13 @@ importers:
       '@player-ui/player':
         specifier: workspace:^
         version: link:../../../core/player
+    devDependencies:
+      '@player-ui/common-types-plugin':
+        specifier: workspace:^
+        version: link:../../common-types/core
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:^
+        version: link:../../reference-assets/core
 
   plugins/data-change-listener/core:
     dependencies:

@@ -5,6 +5,7 @@ import type {
   FrozenContextEntry,
   FrozenContextSnapshot,
 } from "./types";
+import { nameOfContextKey } from "./key";
 
 type Entry = {
   key: ContextKey;
@@ -16,6 +17,40 @@ type Entry = {
 const deepFreezeEntry = (entry: FrozenContextEntry): FrozenContextEntry => {
   Object.freeze(entry);
   return entry;
+};
+
+/**
+ * A poisoned stand-in for a function captured into a history snapshot. The
+ * key and description survive in the snapshot — the capability *existed* —
+ * but the callable is dead: invoking it throws because the flow it was bound
+ * to has ended. This preserves the distinction between "context that never
+ * held this action" and "an action that is no longer valid".
+ */
+const tombstone = (description: string) => (): never => {
+  throw new Error(
+    `[ContextPlugin] Action "${description}" is no longer valid — its flow has ended`,
+  );
+};
+
+/**
+ * Recursively replace every function in [value] (top-level or nested) with a
+ * {@link tombstone}, so a frozen history snapshot carries no live callables.
+ */
+const tombstoneFunctions = (value: unknown, description: string): unknown => {
+  if (typeof value === "function") {
+    return tombstone(description);
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => tombstoneFunctions(item, description));
+  }
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = tombstoneFunctions(v, description);
+    }
+    return out;
+  }
+  return value;
 };
 
 /**
@@ -132,22 +167,28 @@ export class ContextStore {
   freeze(meta: { flowId?: string; endedAt: number }): FrozenContextSnapshot {
     const frozenEntries: FrozenContextEntry[] = [];
     for (const entry of this.entries.values()) {
-      const value = this.compute(entry.key.symbol);
       if (!entry.hasLiteral && !entry.transform) {
         continue;
       }
+      const computed = this.compute(entry.key.symbol);
+      const value = tombstoneFunctions(computed, entry.key.description);
       frozenEntries.push(
         deepFreezeEntry({
           symbol: entry.key.symbol,
+          name: nameOfContextKey(entry.key),
           description: entry.key.description,
           value,
         }),
       );
     }
+    const bySymbol = new Map(frozenEntries.map((e) => [e.symbol, e.value]));
     const snapshot: FrozenContextSnapshot = {
       flowId: meta.flowId,
       endedAt: meta.endedAt,
       entries: Object.freeze(frozenEntries),
+      get<Value>(key: ContextKey<Value>): Value | undefined {
+        return bySymbol.get(key.symbol) as Value | undefined;
+      },
     };
     return Object.freeze(snapshot);
   }
