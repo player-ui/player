@@ -42,7 +42,7 @@ kt_jvm_library(
     name = "with-runtime",
     visibility = ["//visibility:public"],
     exports = [
-        ":instrumented_unit_testutils_android",
+        ":instrumented-unit-testutils-android",
         "//jvm/hermes:hermes-host",
     ],
 )
