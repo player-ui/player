@@ -87,6 +87,35 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         pluginRef?.invokeMethod("unsubscribe", withArguments: [token])
     }
 
+    /// Read the entry identified by `name`, decoded into a `Decodable` type
+    /// `T` — the same typed access as the JVM `get<T>(name)`. `T` may carry
+    /// `WrappedFunction` members for function-valued fields, so a caller does
+    /// `get(name:)?.flow.transition?("Next")`. Returns nil if the entry is
+    /// unset or fails to decode.
+    public func get<T: Decodable>(name: String, as type: T.Type = T.self) -> T? {
+        guard let pluginRef = pluginRef,
+              let result = pluginRef.invokeMethod("getByName", withArguments: [name]),
+              !result.isUndefined, !result.isNull else { return nil }
+        return try? JSONDecoder().decode(T.self, from: result)
+    }
+
+    /// Returns the registered entry descriptors (description + value/transform flags).
+    public func list() -> [ContextEntryDescriptor] {
+        guard let pluginRef = pluginRef,
+              let result = pluginRef.invokeMethod("list", withArguments: []),
+              !result.isUndefined, !result.isNull else { return [] }
+        return (try? JSONDecoder().decode([ContextEntryDescriptor].self, from: result)) ?? []
+    }
+
+    /// Returns the stack of frozen snapshots from prior flows.
+    public func history() -> [FrozenContextSnapshot] {
+        guard let pluginRef = pluginRef,
+              let result = pluginRef.invokeMethod("history", withArguments: []),
+              !result.isUndefined, !result.isNull,
+              let count = result.toArray()?.count else { return [] }
+        return (0..<count).compactMap { FrozenContextSnapshot(result.objectAtIndexedSubscript($0)) }
+    }
+
     private func encode(_ value: AnyType?, in context: JSContext) -> Any? {
         guard let value = value,
               let data = try? JSONEncoder().encode(value),
@@ -98,6 +127,14 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         guard let value = value, !value.isUndefined, !value.isNull else { return nil }
         if value.isString, let s = value.toString() {
             return .string(data: s)
+        }
+        // Primitives are not valid top-level JSON for JSONSerialization, so
+        // handle them directly before falling back to object decoding.
+        if value.isBoolean {
+            return .bool(data: value.toBool())
+        }
+        if value.isNumber {
+            return .number(data: value.toDouble())
         }
         guard let object = value.toObject(),
               let data = try? JSONSerialization.data(withJSONObject: object),
