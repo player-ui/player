@@ -1,3 +1,17 @@
+# 1.0.1 (Mon Jun 29 2026)
+
+#### 🐛 Bug Fix
+
+- Release main [#895](https://github.com/player-ui/player/pull/895) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix Android testutils publishing [#871](https://github.com/player-ui/player/pull/871) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+
+---
+
 # 1.0.0 (Mon Jun 29 2026)
 
 ### Release Notes
