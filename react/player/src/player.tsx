@@ -9,9 +9,9 @@ import { Registry } from "@player-ui/partial-match-registry";
 import type {
   CompletedState,
   PlayerPlugin,
-  Flow,
   View,
   PlayerInfo,
+  StartOptions,
 } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
@@ -369,10 +369,13 @@ export class ReactPlayer {
     );
   }
 
-  public start(flow: Flow): Promise<CompletedState> {
+  public start(
+    payload: unknown,
+    options?: StartOptions,
+  ): Promise<CompletedState> {
     this.setWaitForNextViewUpdate();
 
-    return this.player.start(flow).finally(async () => {
+    return this.player.start(payload, options).finally(async () => {
       await this.setWaitForNextViewUpdate();
     });
   }

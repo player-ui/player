@@ -540,6 +540,12 @@ importers:
 
   docs/storybook:
     dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../../plugins/a2ui/core
+      '@player-ui/a2ui-plugin-react':
+        specifier: workspace:^
+        version: link:../../plugins/a2ui/react
       '@player-ui/async-node-plugin':
         specifier: workspace:^
         version: link:../../plugins/async-node/core
@@ -579,6 +585,77 @@ importers:
       '@player-ui/storybook':
         specifier: workspace:^
         version: link:../../tools/storybook
+
+  packages/a2ui/react:
+    dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../../../plugins/a2ui/core
+      '@player-ui/a2ui-plugin-react':
+        specifier: workspace:^
+        version: link:../../../plugins/a2ui/react
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../../core/player
+      '@player-ui/react':
+        specifier: workspace:^
+        version: link:../../../react/player
+
+  plugins/a2ui/core:
+    dependencies:
+      '@player-ui/asset-transform-plugin':
+        specifier: workspace:^
+        version: link:../../asset-transform/core
+      '@player-ui/async-node-plugin':
+        specifier: workspace:^
+        version: link:../../async-node/core
+      '@player-ui/expression-plugin':
+        specifier: workspace:^
+        version: link:../../expression/core
+      '@player-ui/meta-plugin':
+        specifier: workspace:^
+        version: link:../../meta-plugin/core
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../../core/player
+      '@player-ui/types':
+        specifier: workspace:^
+        version: link:../../../core/types
+    devDependencies:
+      '@player-ui/asset-testing-library':
+        specifier: workspace:^
+        version: link:../../../tools/asset-testing-library/core
+      '@player-ui/common-types-plugin':
+        specifier: workspace:^
+        version: link:../../common-types/core
+
+  plugins/a2ui/mocks:
+    dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../core
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../../core/player
+
+  plugins/a2ui/react:
+    dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../core
+      '@player-ui/asset-provider-plugin-react':
+        specifier: workspace:^
+        version: link:../../asset-provider/react
+      '@player-ui/partial-match-registry':
+        specifier: workspace:^
+        version: link:../../../core/partial-match-registry
+      '@player-ui/react':
+        specifier: workspace:^
+        version: link:../../../react/player
+    devDependencies:
+      '@player-ui/make-flow':
+        specifier: workspace:^
+        version: link:../../../core/make-flow
 
   plugins/asset-provider/react:
     dependencies:
@@ -1043,6 +1120,9 @@ importers:
       '@player-ui/metrics-plugin-react':
         specifier: workspace:^
         version: link:../../plugins/metrics/react
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../core/player
       '@player-ui/react':
         specifier: workspace:^
         version: link:../../react/player
@@ -8949,10 +9029,12 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==, tarball: https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==, tarball: https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uvu@0.5.6:

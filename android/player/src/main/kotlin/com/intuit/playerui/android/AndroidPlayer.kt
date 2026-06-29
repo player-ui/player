@@ -148,6 +148,12 @@ public class AndroidPlayer private constructor(
 
     override fun start(flow: String): Completable<CompletedState> = player.start(flow)
 
+    override fun start(
+        flow: String,
+        format: String,
+        version: String?,
+    ): Completable<CompletedState> = player.start(flow, format, version)
+
     private val assetSerializer = RenderableAsset.Serializer(this)
 
     /** [Registry] of [RenderableAsset] builders */

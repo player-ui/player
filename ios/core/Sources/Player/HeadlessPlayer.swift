@@ -246,6 +246,18 @@ public extension HeadlessPlayer {
         - completion: A completion handler for when the flow has completed
      */
     func start(flow: String, completion: @escaping (Result<CompletedState, PlayerError>) -> Void) {
+        start(flow: flow, options: nil, completion: completion)
+    }
+
+    /**
+     Starts Player for the given flow, declaring its content format/version
+     - parameters:
+        - flow: The content payload (a Player `Flow`, or another format claimed by a plugin)
+        - options: Describes the content `format`/`version`. When `nil` (or `format == "player"`)
+          the payload is treated as a Player `Flow`. Forwarded to the JS `start(payload, options)`.
+        - completion: A completion handler for when the flow has completed
+     */
+    func start(flow: String, options: StartOptions?, completion: @escaping (Result<CompletedState, PlayerError>) -> Void) {
         // declare these variables outside and reference them inside the errorHandler to prevent retain cycle
         let loggerRef = logger
 
@@ -281,8 +293,14 @@ public extension HeadlessPlayer {
 
         // Should not be possible due to fatalError in constructor, but just for handling optionals safely
         guard let player = jsPlayerReference else { return completion(.failure(PlayerError.playerNotInstantiated)) }
+        var startArgs: [Any] = [flowObject]
+        if let optionsValue = options?.jsValue {
+            // Bridges to a JS `{ format, version }` object so a plugin tapping
+            // `transformContent` can convert non-"player" content.
+            startArgs.append(optionsValue)
+        }
         player
-            .invokeMethod("start", withArguments: [flowObject])
+            .invokeMethod("start", withArguments: startArgs)
             .invokeMethod("then", withArguments: [callback])
             .invokeMethod("catch", withArguments: [catchCallback])
     }

@@ -1,0 +1,23 @@
+{
+  "surfaceId": "button-with-action",
+  "components": [
+    {
+      "id": "root",
+      "component": "Column",
+      "children": ["hint", "btn"]
+    },
+    {
+      "id": "hint",
+      "component": "Text",
+      "text": "Click the button to fire a 'submit' event."
+    },
+    {
+      "id": "btn",
+      "component": "Button",
+      "child": "lbl",
+      "variant": "primary",
+      "action": { "event": { "name": "submit" } }
+    },
+    { "id": "lbl", "component": "Text", "text": "Submit" }
+  ]
+}

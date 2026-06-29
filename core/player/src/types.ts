@@ -15,6 +15,36 @@ import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import { ViewInstance } from "./view";
 
 /**
+ * Metadata describing the incoming content to `Player.start()`. Passed
+ * alongside the raw payload through the `transformContent` hook so plugins
+ * can decide whether to claim/convert it.
+ */
+export interface ContentMeta {
+  /**
+   * Content format identifier. `"player"` (default) means the input is
+   * already a `Flow` and needs no conversion. Anything else is a free-form
+   * string a plugin can recognize.
+   */
+  format: string;
+  /**
+   * Optional format version (e.g., `"0.9"`). Free-form — plugins decide the
+   * convention. Lets a single format plugin dispatch across major/minor
+   * versions without the caller picking a different `format` string.
+   */
+  version?: string;
+}
+
+/**
+ * Options passed to `Player.start()` alongside the payload.
+ */
+export interface StartOptions {
+  /** Identifier of the input content's format. Default: `"player"`. */
+  format?: string;
+  /** Optional content-format version. See `ContentMeta.version`. */
+  version?: string;
+}
+
+/**
  * Public Player Hooks
  */
 export interface PlayerHooks {
@@ -45,6 +75,17 @@ export interface PlayerHooks {
   /** Mutate the Content flow before starting */
   resolveFlowContent: SyncWaterfallHook<
     [Flow<Asset<string>>],
+    Record<string, any>
+  >;
+  /**
+   * Transform raw input content into a Player `Flow` before any state is set
+   * up. Fires at the top of `Player.start()` — after plugins are applied,
+   * before `resolveFlowContent`. Plugins tap this and inspect `meta.format`
+   * (and optionally `meta.version`) to decide whether to convert. Plugins
+   * that don't handle the format pass the content through unchanged.
+   */
+  transformContent: SyncWaterfallHook<
+    [unknown, ContentMeta],
     Record<string, any>
   >;
 }

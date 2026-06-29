@@ -52,7 +52,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
 
         /// Load the supplied flow into this context. If the currently loaded flow is supplied this will do nothing.
         /// If a new flow is supplied then the javascript environment is created or rebuilt around the new flow.
-        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
+        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer, startOptions: StartOptions? = nil) {
             registry.logger = logger
             guard self.player == nil || flow != self.flow else {
                 logger.d("Reusing already loaded flow")
@@ -92,10 +92,10 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 return
             }
 
-            player.start(flow: flow) { [weak self, weak playerValue] (result) in
+            player.start(flow: flow, options: startOptions) { [weak self, weak playerValue] (result) in
                 guard let self, let playerValue, self.player == playerValue else { return }
                 DispatchQueue.main.async { [weak self] in
-                    self?.result = result 
+                    self?.result = result
                 }
             }
         }
@@ -207,18 +207,21 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         - flow: The JSON flow to run
         - plugins: Any plugins to add to Player
         - context: An optional JSContext to use for loading platform shared code
+        - startOptions: Describes the content `format`/`version`. Defaults to `nil` (a Player `Flow`).
+          Pass e.g. `.a2ui` to start a non-Player content format claimed by a plugin.
      */
     public init(
         flow: String,
         plugins: [NativePlugin],
         result: Binding<Result<CompletedState, PlayerError>?>,
         context: Context = .shared,
-        unloadOnDisappear: Bool = true
+        unloadOnDisappear: Bool = true,
+        startOptions: StartOptions? = nil
     ) {
         self._result = result
         self._context = ObservedObject(initialValue: context)
         self.unloadOnDisappear = unloadOnDisappear
-        context.load(flow: flow, plugins: plugins, player: self)
+        context.load(flow: flow, plugins: plugins, player: self, startOptions: startOptions)
     }
 
     /// The SwiftUI View that is this Player flow

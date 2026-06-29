@@ -1,0 +1,21 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="A2UI/Intro" />
+
+# A2UI Reference Assets
+
+These stories render the A2UI v0.9.1 component catalog through Player. Each
+story loads an A2UI snapshot (JSON), runs `adaptA2UIToFlow` from
+`@player-ui/player`, and renders the resulting flow via the
+`@player-ui/a2ui-plugin-react` plugin.
+
+Component coverage (15):
+
+- **Layout** — Row, Column, List
+- **Display** — Text, Image, Icon, Divider
+- **Interactive** — Button, TextField, CheckBox, Slider, DateTimeInput, ChoicePicker
+- **Containers** — Card, Modal, Tabs
+
+Asset `type` strings match the A2UI component identifier verbatim
+(`Row`, `Button`, …) so the adapter's output drops into Player without
+type remapping.

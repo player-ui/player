@@ -29,6 +29,8 @@ import type {
   CompletedState,
   ErrorState,
   PlayerHooks,
+  ContentMeta,
+  StartOptions,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
 
@@ -125,6 +127,7 @@ export class Player {
     onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
+    transformContent: new SyncWaterfallHook<[unknown, ContentMeta]>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -513,8 +516,16 @@ export class Player {
     };
   }
 
-  public async start(payload: Flow): Promise<CompletedState> {
-    const ref = Symbol(payload?.id ?? "payload");
+  public async start(
+    payload: unknown,
+    options?: StartOptions,
+  ): Promise<CompletedState> {
+    const meta: ContentMeta = {
+      format: options?.format ?? "player",
+      version: options?.version,
+    };
+    const flow = this.hooks.transformContent.call(payload, meta) as Flow;
+    const ref = Symbol(flow?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
     const maybeUpdateState = <T extends PlayerFlowState>(newState: T) => {
@@ -537,7 +548,7 @@ export class Player {
     });
 
     try {
-      const { state, start } = this.setupFlow(payload);
+      const { state, start } = this.setupFlow(flow);
       this.setState({
         ref,
         ...state,
@@ -564,7 +575,7 @@ export class Player {
       const errorState: ErrorState = {
         status: "error",
         ref,
-        flow: payload,
+        flow,
         error,
       };
 

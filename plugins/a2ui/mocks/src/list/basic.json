@@ -1,0 +1,19 @@
+{
+  "surfaceId": "list-basic",
+  "data": {
+    "items": ["Apples", "Oranges", "Pears", "Bananas"]
+  },
+  "components": [
+    {
+      "id": "root",
+      "component": "List",
+      "direction": "vertical",
+      "children": { "path": "/items", "componentId": "rowItem" }
+    },
+    {
+      "id": "rowItem",
+      "component": "Text",
+      "text": { "path": "" }
+    }
+  ]
+}
