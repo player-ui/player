@@ -84,6 +84,8 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
     private var onComplete: (CompletedState) -> Void
 
+    private var onStartedFlow: (String) -> Void
+
     /// The `FlowManager` that is used for this instance
     private var manager: FlowManager
 
@@ -94,14 +96,17 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
      - parameters:
         - manager: The `FlowManager` to use for fetching flows
         - onComplete: A handler for when the `FlowManager` signals that it has no more flows to fetch
+        - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was used to start it
         - onError: A handler for when the `SwiftUIPlayer` encounters an error
      */
     public init(
         manager: FlowManager,
-        onComplete: @escaping (CompletedState) -> Void
+        onComplete: @escaping (CompletedState) -> Void,
+        onStartedFlow: @escaping (String) -> Void = { _ in }
     ) {
         self.manager = manager
         self.onComplete = onComplete
+        self.onStartedFlow = onStartedFlow
 
         $result.sink { [weak self] result in
             guard let result = result else { return }
@@ -148,6 +153,9 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
             if !flow.isEmpty {
                 self.flow = flow
                 loadingState = .loaded(flow)
+                // Notify that a flow has started, passing back the in-memory flow that was used to
+                // start Player (avoids deserializing the flow back across the JS bridge)
+                onStartedFlow(flow)
             } else {
                 loadingState = .failed(ManagedPlayerError.emptyFlow)
             }
