@@ -20,7 +20,7 @@ main_deps = main_exports + [
 ]
 
 instrumented_unit_test_deps = main_deps + [
-    ":testutils_android",
+    ":testutils-android",
     artifact("com.google.guava:guava"),
     artifact("org.robolectric:robolectric"),
     artifact("org.robolectric:annotations"),
