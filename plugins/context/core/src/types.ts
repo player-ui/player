@@ -34,6 +34,12 @@ export type SubscriptionToken = `ctx_${number}`;
 
 export type FrozenContextEntry = {
   readonly symbol: symbol;
+  /**
+   * The entry's key name (from `nameOfContextKey`), or `undefined` for
+   * non-namespaced keys. Unlike `symbol`, this is a plain string that survives
+   * the native bridge, so native consumers read snapshot entries by name.
+   */
+  readonly name: string | undefined;
   readonly description: string;
   readonly value: unknown;
 };
@@ -42,4 +48,10 @@ export type FrozenContextSnapshot = {
   readonly flowId?: string;
   readonly endedAt: number;
   readonly entries: ReadonlyArray<FrozenContextEntry>;
+  /**
+   * Read a frozen entry by its key — the same typed access as live context.
+   * Returns `undefined` if the key was not present when the snapshot froze.
+   * Function-valued entries return their tombstone (a throwing callable).
+   */
+  get<Value>(key: ContextKey<Value>): Value | undefined;
 };
