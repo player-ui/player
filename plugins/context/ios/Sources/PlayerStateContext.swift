@@ -42,13 +42,14 @@ public struct PlayerStateContext: Decodable {
         public let canTransition: Bool
         /// Active validations per binding string.
         public let byBinding: [String: [ContextValidation]]
-
-        public struct ContextValidation: Decodable {
-            public let severity: String
-            public let message: String
-            public let displayTarget: String?
-            /// `true`/`false` or the string `"once"`.
-            public let blocking: AnyType?
-        }
     }
+}
+
+/// A single validation, projected to its serializable fields.
+public struct ContextValidation: Decodable {
+    public let severity: String
+    public let message: String
+    public let displayTarget: String?
+    /// `true`/`false` or the string `"once"`.
+    public let blocking: AnyType?
 }

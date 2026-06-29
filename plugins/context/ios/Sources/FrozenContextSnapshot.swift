@@ -25,7 +25,7 @@ public struct FrozenContextSnapshot {
     }
 
     init?(_ snapshot: JSValue?) {
-        guard let snapshot = snapshot, !snapshot.isUndefined, !snapshot.isNull,
+        guard let snapshot, !snapshot.isUndefined, !snapshot.isNull,
               let entriesValue = snapshot.objectForKeyedSubscript("entries"),
               let entriesArray = entriesValue.toArray() else { return nil }
 
@@ -39,7 +39,7 @@ public struct FrozenContextSnapshot {
             let name = entry.objectForKeyedSubscript("name")?.toString()
             let description = entry.objectForKeyedSubscript("description")?.toString() ?? ""
             entries.append(FrozenContextEntry(name: name, description: description))
-            if let name = name, let value = entry.objectForKeyedSubscript("value") {
+            if let name, let value = entry.objectForKeyedSubscript("value") {
                 values[name] = value
             }
         }
