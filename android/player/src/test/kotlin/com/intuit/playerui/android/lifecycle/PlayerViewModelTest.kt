@@ -17,10 +17,12 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -146,7 +148,15 @@ internal class PlayerViewModelTest {
     fun `startedFlows emits the flow used to start the player`() = runBlocking {
         coEvery { flowManager.next(any()) } returns validFlow andThen null
         val started = mutableListOf<String>()
-        val job = launch(Dispatchers.Default) { viewModel.startedFlows.collect { started.add(it) } }
+        // startedFlows is a hot SharedFlow (replay = 0), so gate start() on the collector actually
+        // being subscribed - otherwise the emission can race ahead of the subscription and be missed
+        val subscribed = CompletableDeferred<Unit>()
+        val job = launch(Dispatchers.Default) {
+            viewModel.startedFlows
+                .onSubscription { subscribed.complete(Unit) }
+                .collect { started.add(it) }
+        }
+        subscribed.await()
         viewModel.start()
         suspendUntilCondition(
             getValue = { started.toList() },
@@ -160,7 +170,13 @@ internal class PlayerViewModelTest {
     fun `startedFlows emits once per flow for multiple flows`() = runBlocking {
         coEvery { flowManager.next(any()) } returns validFlow andThen validFlow2 andThen null
         val started = mutableListOf<String>()
-        val job = launch(Dispatchers.Default) { viewModel.startedFlows.collect { started.add(it) } }
+        val subscribed = CompletableDeferred<Unit>()
+        val job = launch(Dispatchers.Default) {
+            viewModel.startedFlows
+                .onSubscription { subscribed.complete(Unit) }
+                .collect { started.add(it) }
+        }
+        subscribed.await()
         viewModel.start()
         suspendUntilCondition(
             getValue = { started.toList() },
