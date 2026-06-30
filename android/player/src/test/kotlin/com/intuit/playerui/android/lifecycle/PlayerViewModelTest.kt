@@ -156,7 +156,8 @@ internal class PlayerViewModelTest {
                 .onSubscription { subscribed.complete(Unit) }
                 .collect { started.add(it) }
         }
-        subscribed.await()
+        // bound every wait so a missed emission fails in seconds rather than at the bazel test timeout
+        withTimeout(5_000) { subscribed.await() }
         viewModel.start()
         suspendUntilCondition(
             getValue = { started.toList() },
@@ -164,6 +165,7 @@ internal class PlayerViewModelTest {
             messageSupplier = { "startedFlows did not emit the started flow, got $it" },
         )
         job.cancel()
+        assertEquals(listOf(validFlow), started)
     }
 
     @Test
@@ -176,7 +178,7 @@ internal class PlayerViewModelTest {
                 .onSubscription { subscribed.complete(Unit) }
                 .collect { started.add(it) }
         }
-        subscribed.await()
+        withTimeout(5_000) { subscribed.await() }
         viewModel.start()
         suspendUntilCondition(
             getValue = { started.toList() },
