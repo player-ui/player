@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** Wrapper of an [AsyncIterator] that captures iterations within a [StateFlow] */
-public class AsyncIterationFlow<Item : Any, Result : Any, Data : Any>(
-    public val iterator: AsyncIterator<Item, Result, Data>,
+public class AsyncIterationFlow<I : Any, Result : Any, Data : Any>(
+    public val iterator: AsyncIterator<I, Result, Data>,
 ) {
+    // Above I is short for Item -- the outer type parameter must not share a name with the nested
+    // State.Item subclass below, or the @Metadata gets corrupted.
     public sealed class State {
         public object NotStarted : State()
 
