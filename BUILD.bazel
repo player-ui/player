@@ -171,6 +171,15 @@ assemble_ios_release(
         # Types Provider
         "//plugins/types-provider/ios:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/ios/",
         "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
+
+        # A2UI
+        "//plugins/a2ui/swiftui:PlayerUIA2UI_Sources": "plugins/a2ui/swiftui/",
+        "//plugins/a2ui/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
+
+        # Packages # 
+
+        # A2UI
+        "//packages/a2ui/swiftui:PlayerUIA2UIPreset_Sources": "packages/a2ui/swiftui",
     },
 )
 
