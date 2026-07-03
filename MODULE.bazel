@@ -6,10 +6,10 @@ module(
 bazel_dep(name = "rules_player")
 
 archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-2.6.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.6.1.tar.gz"],
-  integrity = "sha256-vRBZpHnljz6wBuTUsXT0kHj06B9Av79i6+5EMrie7uc="
+    module_name = "rules_player",
+    strip_prefix = "rules_player-72ec2ea408eb5e6ff125ba8eda960143c84a5d1c",
+    urls = ["https://github.com/player-ui/rules_player/archive/72ec2ea408eb5e6ff125ba8eda960143c84a5d1c.tar.gz"],
+    integrity = "sha256-P1Oi38j0M5KMOIowcDGtKtxWT+lPo65DuLR+i7q1AaU=",
 )
 
 bazel_dep(name = "platforms", version = "1.1.0")
@@ -36,6 +36,10 @@ node.toolchain(node_version = "22.15.1")
 #################################
 sh_config_ext = use_extension("@rules_player//shell:defs.bzl", "sh_configure")
 use_repo(sh_config_ext, "local_shell_config")
+
+# Prebuilt host hermesc compiler for HBC compilation (js_pipeline emit_hbc).
+hermes_ext = use_extension("@rules_player//javascript:extensions.bzl", "hermes")
+use_repo(hermes_ext, "rn_hermesc")
 
 register_toolchains("@local_shell_config//:local_sh_toolchain")
 
@@ -222,15 +226,6 @@ http_archive(
     build_file = "//third_party/rn:hermes_android.BUILD",
     sha256 = "e60a59daf0293fcee17877a715fcd26614c4348855a74365a9564cde9a0fbe7c",
     url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-release.aar".format(RN_VERSION, RN_VERSION),
-)
-
-# Prebuilt host hermesc compiler, shipped in the react-native npm tarball.
-http_archive(
-    name = "rn_hermesc",
-    build_file = "//third_party/rn:hermesc.BUILD",
-    sha256 = "bf4198ba712c09df3de6d493cfaf968498cddb7107ecd48a081a1ce32d18be06",
-    strip_prefix = "package",
-    url = "https://registry.npmjs.org/react-native/-/react-native-{}.tgz".format(RN_VERSION),
 )
 
 git_repository(

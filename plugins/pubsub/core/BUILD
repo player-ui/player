@@ -12,6 +12,7 @@ js_pipeline(
     package_name = "@player-ui/pubsub-plugin",
     build_deps = NATIVE_BUILD_DEPS,
     native_bundle = "PubSubPlugin",
+    emit_hbc = True,
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

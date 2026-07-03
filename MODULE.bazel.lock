@@ -978,6 +978,26 @@
         }
       }
     },
+    "@@rules_player+//javascript:extensions.bzl%hermes": {
+      "general": {
+        "bzlTransitiveDigest": "qEq7hp5SgJqhwtFonjYk1hj03YBQOgv6K501M92i5mE=",
+        "usagesDigest": "BRErsxE6HaCt7eBNKxqDjLQDUE24H150ZoFPYbm2bn8=",
+        "recordedInputs": [
+          "REPO_MAPPING:rules_player+,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "rn_hermesc": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "build_file": "@@rules_player+//javascript/private:hermesc.BUILD",
+              "sha256": "bf4198ba712c09df3de6d493cfaf968498cddb7107ecd48a081a1ce32d18be06",
+              "strip_prefix": "package",
+              "url": "https://registry.npmjs.org/react-native/-/react-native-0.78.1.tgz"
+            }
+          }
+        }
+      }
+    },
     "@@rules_player+//shell:defs.bzl%sh_configure": {
       "general": {
         "bzlTransitiveDigest": "hHBMsvBPNv+aexlCP8obaLYRtsEzjIRKeVm1n2HpZ5s=",

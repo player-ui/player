@@ -12,6 +12,7 @@ js_xlr_pipeline(
     package_name = "@player-ui/reference-assets-plugin",
     build_deps = NATIVE_BUILD_DEPS,
     native_bundle = "ReferenceAssetsPlugin",
+    emit_hbc = True,
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

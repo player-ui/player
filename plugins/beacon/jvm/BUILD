@@ -11,6 +11,7 @@ main_deps = main_exports + [
 
 main_resources = [
     "//plugins/beacon/core:core_native_bundle",
+    "//plugins/beacon/core:core_hbc",
 ]
 
 test_deps = [
