@@ -24,7 +24,7 @@ hermes_compile = rule(
             allow_single_file = True,
         ),
         "_hermesc": attr.label(
-            default = Label("@hermes//:hermesc"),
+            default = Label("@rn_hermesc//:hermesc"),
             allow_single_file = True,
             executable = True,
             cfg = "exec",

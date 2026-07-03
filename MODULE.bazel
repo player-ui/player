@@ -224,6 +224,15 @@ http_archive(
     url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-release.aar".format(RN_VERSION, RN_VERSION),
 )
 
+# Prebuilt host hermesc compiler, shipped in the react-native npm tarball.
+http_archive(
+    name = "rn_hermesc",
+    build_file = "//third_party/rn:hermesc.BUILD",
+    sha256 = "bf4198ba712c09df3de6d493cfaf968498cddb7107ecd48a081a1ce32d18be06",
+    strip_prefix = "package",
+    url = "https://registry.npmjs.org/react-native/-/react-native-{}.tgz".format(RN_VERSION),
+)
+
 git_repository(
     name = "react_native",
     build_file = "//third_party/rn:react_native.BUILD",
