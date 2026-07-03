@@ -3689,8 +3689,8 @@ public abstract class com/intuit/playerui/core/plugins/JSScriptPluginWrapper : c
 	protected field instance Lcom/intuit/playerui/core/bridge/Node;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
 	public final fun buildInstance (Lcom/intuit/playerui/core/bridge/runtime/Runtime;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Node;
 	public static synthetic fun buildInstance$default (Lcom/intuit/playerui/core/plugins/JSScriptPluginWrapper;Lcom/intuit/playerui/core/bridge/runtime/Runtime;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/Node;

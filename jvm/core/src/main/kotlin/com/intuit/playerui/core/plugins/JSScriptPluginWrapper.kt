@@ -18,7 +18,12 @@ public abstract class JSScriptPluginWrapper(
     private val preCompiledScript: ByteArray? = null,
 ) : JSPluginWrapper {
     public constructor(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader) :
-        this(name, classLoader.getResource(sourcePath)!!.readText(), sourcePath, classLoader.getResource(hbcPathFor(sourcePath))?.readBytes())
+        this(
+            name,
+            classLoader.getResource(sourcePath)!!.readText(),
+            sourcePath,
+            classLoader.getResource(hbcPathFor(sourcePath))?.readBytes(),
+        )
 
     final override lateinit var instance: Node protected set
 
