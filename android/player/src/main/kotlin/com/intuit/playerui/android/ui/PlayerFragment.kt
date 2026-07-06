@@ -96,6 +96,11 @@ public abstract class PlayerFragment :
     init {
         lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
+                // forward started flows to the callback
+                playerViewModel.startedFlows
+                    .onEach { onStartedFlow(it) }
+                    .launchIn(this + Dispatchers.Default)
+
                 // forward state events to callbacks
                 playerViewModel.state
                     .onEach {
