@@ -101,6 +101,7 @@ export class ReactPlayer {
   private reactPlayerInfo: ReactPlayerInfo;
 
   constructor(options?: ReactPlayerOptions) {
+    const startTime = new Date();
     this.options = options ?? {};
 
     const Devtools = _window?.__PLAYER_DEVTOOLS_PLUGIN;
@@ -133,6 +134,11 @@ export class ReactPlayer {
       version: this.player.getVersion(),
       commit: this.player.getCommit(),
     };
+
+    // Log the time it took to initialize Player
+    const endTime = new Date();
+    const coldStartTime = endTime.getTime() - startTime.getTime();
+    this.player.logger.info(`ReactPlayer initialized in ${coldStartTime} ms.`);
   }
 
   /** Returns the current version Player */

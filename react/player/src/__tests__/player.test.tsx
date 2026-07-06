@@ -1,7 +1,8 @@
 import { useSubscribedState } from "@player-ui/react-subscribe";
 import { act, render, screen } from "@testing-library/react";
 import React, { Suspense, type ComponentType } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { Player } from "@player-ui/player";
 import { ReactPlayer, type ReactPlayerPlugin } from "../player";
 
 describe("ReactPlayer", () => {
@@ -56,6 +57,26 @@ describe("ReactPlayer", () => {
     // 3. Render and verify the Alternative Component is shown
     await act(() => rp.viewUpdateSubscription.publish(altViewEvent));
     expect(await screen.findByText("Alternative")).toBeDefined();
+  });
+
+  it("should log the initialization time on startup", () => {
+    const info = vi.fn();
+
+    const player = new Player({ plugins: [] });
+    player.logger.addHandler({
+      trace: vi.fn(),
+      debug: vi.fn(),
+      info,
+      warn: vi.fn(),
+      error: vi.fn(),
+    });
+
+    const rp = new ReactPlayer({ player });
+
+    expect(rp.player).toBe(player);
+    expect(info).toHaveBeenCalledWith(
+      expect.stringMatching(/ReactPlayer initialized in \d+ ms\./),
+    );
   });
 
   function registerAssets(reactPlayer: ReactPlayer): void {
