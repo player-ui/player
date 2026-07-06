@@ -1,9 +1,7 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// A single tab — title + body component.
 struct A2UITabItem: Decodable {

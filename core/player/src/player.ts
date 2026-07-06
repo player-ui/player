@@ -3,7 +3,7 @@ import deferred from "p-defer";
 import type { Flow, FlowResult } from "@player-ui/types";
 import queueMicrotask from "queue-microtask";
 
-import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import { SyncBailHook, SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
 import { TapableLogger } from "./logger";
 import type { ExpressionType } from "./expressions";
@@ -127,7 +127,7 @@ export class Player {
     onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
-    transformContent: new SyncWaterfallHook<[unknown, ContentMeta]>(),
+    transformContent: new SyncBailHook<[unknown, ContentMeta], Flow>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -144,6 +144,13 @@ export class Player {
     this.config.plugins?.forEach((plugin) => {
       plugin.apply(this);
     });
+
+    // Default content handler: a `"player"`-format payload is already a `Flow`.
+    // Registered after plugins so a format plugin gets first claim on the bail
+    // hook; this is the fallback that lets `start()` require a `Flow` out.
+    this.hooks.transformContent.tap("player", (payload, meta) =>
+      meta.format === "player" ? (payload as Flow) : undefined,
+    );
   }
 
   /**  Returns currently registered plugins */
@@ -524,8 +531,13 @@ export class Player {
       format: options?.format ?? "player",
       version: options?.version,
     };
-    const flow = this.hooks.transformContent.call(payload, meta) as Flow;
-    const ref = Symbol(flow?.id ?? "payload");
+    const flow = this.hooks.transformContent.call(payload, meta);
+    if (!flow) {
+      throw new Error(
+        `Player.start received content with format "${meta.format}" that no plugin transformed into a Flow.`,
+      );
+    }
+    const ref = Symbol(flow.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
     const maybeUpdateState = <T extends PlayerFlowState>(newState: T) => {

@@ -11,7 +11,7 @@ import type {
   ErrorController,
 } from "./controllers";
 import type { ReadOnlyDataController } from "./controllers/data/utils";
-import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import { SyncBailHook, SyncHook, SyncWaterfallHook } from "tapable-ts";
 import { ViewInstance } from "./view";
 
 /**
@@ -80,14 +80,13 @@ export interface PlayerHooks {
   /**
    * Transform raw input content into a Player `Flow` before any state is set
    * up. Fires at the top of `Player.start()` — after plugins are applied,
-   * before `resolveFlowContent`. Plugins tap this and inspect `meta.format`
-   * (and optionally `meta.version`) to decide whether to convert. Plugins
-   * that don't handle the format pass the content through unchanged.
+   * before `resolveFlowContent`. Being a bail hook, taps inspect `meta.format`
+   * (and optionally `meta.version`) and return a `Flow` to claim the content;
+   * returning `undefined` passes to the next tap. Player registers a default
+   * tap for the `"player"` format that returns the payload as-is, so the hook
+   * is guaranteed to yield a `Flow` and `start()` needs no type-casting.
    */
-  transformContent: SyncWaterfallHook<
-    [unknown, ContentMeta],
-    Record<string, any>
-  >;
+  transformContent: SyncBailHook<[unknown, ContentMeta], Flow<Asset<string>>>;
 }
 
 /** The status for a flow's execution state */

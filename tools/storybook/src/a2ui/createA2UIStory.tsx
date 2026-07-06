@@ -18,9 +18,8 @@ export function createA2UIStory(loader: A2UIStoryLoader, options?: any) {
     <PlayerStory
       flow={async () => {
         const mod = await loader();
-        const snap =
-          (mod as { default?: A2UISnapshot }).default ?? (mod as A2UISnapshot);
-        return { default: snap as unknown as Record<string, unknown> };
+        const snap = "default" in mod ? mod.default : mod;
+        return { default: snap };
       }}
       format="a2ui"
       options={options}

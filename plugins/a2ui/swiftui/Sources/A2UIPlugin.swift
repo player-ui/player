@@ -1,9 +1,7 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /**
  SwiftUI renderers for the A2UI v0.9.1 component catalog.
@@ -56,15 +54,6 @@ public class A2UIPlugin: JSBasePlugin, NativePlugin {
      - returns: A URL if it exists in the bundle
      */
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: A2UIPlugin.self),
-            pathComponent: "PlayerUI_A2UI.bundle"
-        )
-        #endif
     }
 }

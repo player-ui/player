@@ -1,10 +1,8 @@
 import SwiftUI
 import Combine
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// Decoded data for the A2UI `TextField` asset.
 struct A2UITextFieldData: AssetData {

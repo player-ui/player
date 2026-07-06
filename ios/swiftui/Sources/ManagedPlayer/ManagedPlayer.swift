@@ -35,17 +35,15 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
     // For ViewInspector testing
     internal let inspection = Inspection<Self>()
 
-    /**
-     Creates a `ManagedPlayer`
-     - parameters:
-        - plugins: The plugins to use for the `SwiftUIPlayer`
-        - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
-        - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
-        - startOptions: Describes the content `format`/`version` for every flow in the session
-          (defaults to `nil`, i.e. Player `Flow`s). Pass e.g. `.a2ui` for an A2UI experience.
-        - onError: A handler for when the `SwiftUIPlayer` encounters an error
-        - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
-     */
+    /// Creates a `ManagedPlayer`
+    /// - parameters:
+    ///    - plugins: The plugins to use for the `SwiftUIPlayer`
+    ///    - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
+    ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - startOptions: Describes the content `format`/`version` for every flow in the session
+    ///      (defaults to `nil`, i.e. Player `Flow`s). Pass e.g. `.a2ui` for an A2UI experience.
+    ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
+    ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
         plugins: [NativePlugin],
         context: SwiftUIPlayer.Context = .sharedManaged,
@@ -123,17 +121,15 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
 
     private var startOptions: StartOptions?
 
-    /**
-     Creates a `ManagedPlayer`
-     - parameters:
-        - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
-        - plugins: The plugins to use for the `SwiftUIPlayer`
-        - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
-        - startOptions: Describes the content `format`/`version` for every flow in the session
-        - onError: A handler for when the `SwiftUIPlayer` encounters an error
-        - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
-     */
-    public init(
+    /// Creates a `ManagedPlayer`
+    /// - parameters:
+    ///    - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
+    ///    - plugins: The plugins to use for the `SwiftUIPlayer`
+    ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - startOptions: Describes the content `format`/`version` for every flow in the session
+    ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
+    ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
+    init(
         viewModel: ManagedPlayerViewModel,
         plugins: [NativePlugin],
         context: SwiftUIPlayer.Context = .sharedManaged,

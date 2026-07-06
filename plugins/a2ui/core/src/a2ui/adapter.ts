@@ -10,12 +10,19 @@
  * parser/resolver/flow pipeline then runs unchanged.
  */
 
-import type { Asset, Flow, NavigationFlow } from "@player-ui/types";
+import type {
+  Asset,
+  Flow,
+  NavigationFlow,
+  NavigationFlowEndState,
+  NavigationFlowViewState,
+} from "@player-ui/types";
 import type { Logger } from "@player-ui/player";
 import type {
   A2UIComponent,
   A2UIDynamicValue,
   A2UIEventAction,
+  A2UIFunctionCall,
   A2UIFunctionCallAction,
   A2UISnapshot,
 } from "./types";
@@ -201,11 +208,11 @@ function translatePropValue(
   if (isFunctionCall(value)) {
     if (templateScope) {
       return translateFunctionCall(
-        rewritePathsInCall(value, templateScope) as never,
+        rewritePathsInCall(value, templateScope),
         ctx.logger,
       );
     }
-    return translateFunctionCall(value as never, ctx.logger);
+    return translateFunctionCall(value, ctx.logger);
   }
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value)) {
@@ -214,7 +221,18 @@ function translatePropValue(
   return out;
 }
 
-function rewritePathsInCall(value: unknown, scope: string): unknown {
+function rewritePathsInCall(
+  value: A2UIFunctionCall,
+  scope: string,
+): A2UIFunctionCall;
+function rewritePathsInCall(
+  value: A2UIDynamicValue,
+  scope: string,
+): A2UIDynamicValue;
+function rewritePathsInCall(
+  value: A2UIDynamicValue,
+  scope: string,
+): A2UIDynamicValue {
   if (!value || typeof value !== "object") return value;
   if (Array.isArray(value)) {
     return value.map((v) => rewritePathsInCall(v, scope));
@@ -225,22 +243,21 @@ function rewritePathsInCall(value: unknown, scope: string): unknown {
   if (isFunctionCall(value)) {
     return {
       ...value,
-      args: value.args
-        ? (Object.fromEntries(
-            Object.entries(value.args).map(([k, v]) => [
-              k,
-              rewritePathsInCall(v, scope),
-            ]),
-          ) as never)
-        : value.args,
+      args: value.args ? rewriteCallArgs(value.args, scope) : value.args,
     };
   }
-  return Object.fromEntries(
-    Object.entries(value as Record<string, unknown>).map(([k, v]) => [
-      k,
-      rewritePathsInCall(v, scope),
-    ]),
-  );
+  return rewriteCallArgs(value, scope);
+}
+
+function rewriteCallArgs(
+  args: Record<string, A2UIDynamicValue>,
+  scope: string,
+): Record<string, A2UIDynamicValue> {
+  const out: Record<string, A2UIDynamicValue> = {};
+  for (const [k, v] of Object.entries(args)) {
+    out[k] = rewritePathsInCall(v, scope);
+  }
+  return out;
 }
 
 /**
@@ -323,26 +340,25 @@ function buildNavigation(
   surfaceId: string,
   eventNames: Set<string>,
 ): Flow["navigation"] {
-  const view: NavigationFlow[string] = {
+  const view: NavigationFlowViewState = {
     state_type: "VIEW",
     ref: surfaceId,
     transitions: {
       "*": "END_Done",
-    } as Record<string, string>,
-  } as never;
+    },
+  };
 
-  const endStates: Record<string, NavigationFlow[string]> = {
-    END_Done: { state_type: "END", outcome: "done" } as never,
+  const endStates: Record<string, NavigationFlowEndState> = {
+    END_Done: { state_type: "END", outcome: "done" },
   };
 
   for (const name of eventNames) {
     const endName = `END_${name}`;
-    (view as { transitions: Record<string, string> }).transitions[name] =
-      endName;
+    view.transitions[name] = endName;
     endStates[endName] = {
       state_type: "END",
       outcome: name,
-    } as never;
+    };
   }
 
   const flow: NavigationFlow = {

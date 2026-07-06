@@ -1,9 +1,7 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// Decoded data for the A2UI `Modal` asset.
 struct A2UIModalData: AssetData {

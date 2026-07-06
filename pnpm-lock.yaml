@@ -1111,6 +1111,9 @@ importers:
 
   tools/storybook:
     dependencies:
+      '@player-ui/a2ui-plugin':
+        specifier: workspace:^
+        version: link:../../plugins/a2ui/core
       '@player-ui/beacon-plugin-react':
         specifier: workspace:^
         version: link:../../plugins/beacon/react

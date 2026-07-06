@@ -1,9 +1,7 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// A single option in an A2UI `ChoicePicker`.
 struct A2UIChoiceOption: Decodable, Equatable, Identifiable {

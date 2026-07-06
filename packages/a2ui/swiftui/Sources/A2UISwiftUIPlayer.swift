@@ -1,10 +1,8 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIA2UI
-#endif
 
 /**
  A `SwiftUIPlayer` preconfigured for A2UI content — the `A2UIPlugin` (SwiftUI renderers +

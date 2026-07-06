@@ -1,9 +1,7 @@
 import SwiftUI
 
-#if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
-#endif
 
 /// Decoded data for the A2UI `Button` asset.
 struct A2UIButtonData: AssetData {

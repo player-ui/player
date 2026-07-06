@@ -119,7 +119,7 @@ const PlayerJsonEditorStory = () => {
         (jsonEditorValue.value as { surfaceId?: string }).surfaceId,
     );
 
-    wp.start(jsonEditorValue.value as never, format ? { format } : undefined)
+    wp.start(jsonEditorValue.value, format ? { format } : undefined)
       .then(() => {
         setPlayerState("completed");
       })
@@ -204,7 +204,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
   return <Placeholder>Unable to render flow</Placeholder>;
 };
 
-type Mock = Record<string, unknown>;
+type Mock = object;
 type MockFactory = () => Mock;
 type MockFactoryOrPromise = MockFactory | Mock;
 

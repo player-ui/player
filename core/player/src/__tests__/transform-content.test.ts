@@ -35,7 +35,7 @@ describe("transformContent hook", () => {
       name: "greet",
       apply(p) {
         p.hooks.transformContent.tap("greet", (content, meta) => {
-          if (meta.format !== "greet") return content;
+          if (meta.format !== "greet") return undefined;
           const { message } = content as { message: string };
           return { ...flowFor("greet"), data: { message } };
         });
@@ -58,9 +58,10 @@ describe("transformContent hook", () => {
     const orderPlugin: PlayerPlugin = {
       name: "order",
       apply(p) {
-        p.hooks.transformContent.tap("order", (c) => {
+        p.hooks.transformContent.tap("order", () => {
           order.push("transformContent");
-          return c;
+          // Return undefined so Player's default "player" handler claims it.
+          return undefined;
         });
         p.hooks.resolveFlowContent.tap("order", (c) => {
           order.push("resolveFlowContent");
@@ -80,7 +81,7 @@ describe("transformContent hook", () => {
       name: "a",
       apply(p) {
         p.hooks.transformContent.tap("a", (c, meta) =>
-          meta.format === "a" ? flowFor("from-a") : c,
+          meta.format === "a" ? flowFor("from-a") : undefined,
         );
       },
     };
@@ -88,7 +89,7 @@ describe("transformContent hook", () => {
       name: "b",
       apply(p) {
         p.hooks.transformContent.tap("b", (c, meta) =>
-          meta.format === "b" ? flowFor("from-b") : c,
+          meta.format === "b" ? flowFor("from-b") : undefined,
         );
       },
     };
@@ -107,8 +108,8 @@ describe("transformContent hook", () => {
       apply(p) {
         p.hooks.transformContent.tap("probe", (c, meta) => {
           versions.push(meta.version);
-          // For format !== "demo", pass through so default path runs.
-          if (meta.format !== "demo") return c;
+          // For format !== "demo", return undefined so the default path runs.
+          if (meta.format !== "demo") return undefined;
           return flowFor("demo");
         });
       },
@@ -120,5 +121,11 @@ describe("transformContent hook", () => {
     player.start(flowFor("noversion"));
 
     expect(versions).toEqual(["2", "1", undefined]);
+  });
+
+  test("errors when no tap transforms an unknown format into a Flow", async () => {
+    const player = new Player();
+    const result = player.start({ some: "content" }, { format: "unknown" });
+    await expect(result).rejects.toThrow(/format "unknown"/);
   });
 });

@@ -1,8 +1,4 @@
-import {
-  ReactPlayer,
-  type ReactPlayerOptions,
-  type ReactPlayerPlugin,
-} from "@player-ui/react";
+import { ReactPlayer, type ReactPlayerOptions } from "@player-ui/react";
 import { A2UIPlugin } from "@player-ui/a2ui-plugin-react";
 
 export type A2UIReactPlayerOptions = ReactPlayerOptions;
@@ -24,10 +20,7 @@ export class A2UIReactPlayer extends ReactPlayer {
   constructor(options: A2UIReactPlayerOptions = {}) {
     super({
       ...options,
-      plugins: [
-        new A2UIPlugin() as unknown as ReactPlayerPlugin,
-        ...(options.plugins ?? []),
-      ],
+      plugins: [new A2UIPlugin(), ...(options.plugins ?? [])],
     });
   }
 }

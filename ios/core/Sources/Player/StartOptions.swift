@@ -13,7 +13,7 @@ import Foundation
  and needs no conversion. Any other `format` is recognized by a plugin tapping the
  core `transformContent` hook (e.g. the A2UI plugin claims `"a2ui"`).
  */
-public struct StartOptions {
+public struct StartOptions: Equatable, Sendable {
     /// Content-format identifier. `nil`/`"player"` means the payload is already a `Flow`.
     public var format: String?
 
