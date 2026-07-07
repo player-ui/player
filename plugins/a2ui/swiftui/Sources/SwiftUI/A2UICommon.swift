@@ -3,11 +3,9 @@ import SwiftUI
 import PlayerUI
 import PlayerUISwiftUI
 
-/**
- Validation payload attached to an input asset by the transform. Mirrors the JS
- `ValidationResponse` shape. Kept local so the A2UI module does not depend on the
- reference-assets module.
- */
+/// Validation payload attached to an input asset by the transform. Mirrors the JS
+/// `ValidationResponse` shape. Kept local so the A2UI module does not depend on the
+/// reference-assets module.
 public struct A2UIValidationData: Decodable, Equatable {
     public let message: String
     public let severity: String?

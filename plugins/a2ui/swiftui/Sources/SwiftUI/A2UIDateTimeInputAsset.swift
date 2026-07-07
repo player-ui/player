@@ -28,12 +28,10 @@ class A2UIDateTimeInputViewModel: AssetViewModel<A2UIDateTimeInputData> {
     func commit() { data.set?(text) }
 }
 
-/**
- Date/time entry bound to the data model.
-
- Note: renders a free-form text field for the value rather than a native picker, to keep
- parity with the cross-platform string round-trip without an extra dependency.
- */
+/// Date/time entry bound to the data model.
+///
+/// Note: renders a free-form text field for the value rather than a native picker, to keep
+/// parity with the cross-platform string round-trip without an extra dependency.
 final class A2UIDateTimeInputAsset: ControlledAsset<A2UIDateTimeInputData, A2UIDateTimeInputViewModel> {
     public override var view: AnyView { AnyView(A2UIDateTimeInputAssetView(model: model)) }
 }

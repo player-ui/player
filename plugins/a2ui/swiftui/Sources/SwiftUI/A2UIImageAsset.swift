@@ -13,13 +13,11 @@ struct A2UIImageData: AssetData {
     var accessibility: String?
 }
 
-/**
- Display an image from a URL.
-
- Note: the deployment target (iOS 14) predates SwiftUI `AsyncImage`, so this renders a
- labelled placeholder showing the source URL. Gate `AsyncImage` behind `#available(iOS 15, *)`
- to render the actual bitmap.
- */
+/// Display an image from a URL.
+///
+/// Note: the deployment target (iOS 14) predates SwiftUI `AsyncImage`, so this renders a
+/// labelled placeholder showing the source URL. Gate `AsyncImage` behind `#available(iOS 15, *)`
+/// to render the actual bitmap.
 final class A2UIImageAsset: UncontrolledAsset<A2UIImageData> {
     public override var view: AnyView { AnyView(A2UIImageAssetView(model: model)) }
 }
