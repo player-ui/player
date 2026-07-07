@@ -12,7 +12,7 @@ import JavaScriptCore
 import XCTest
 
 class StateTests: XCTestCase {
-    private let context: JSContext = ()!
+    private let context: JSContext = .init()
 
     func testParsesCompletedStateFromJS() {
         // Define a JS value completed state. This may not be what we actually
