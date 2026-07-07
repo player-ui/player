@@ -69,6 +69,7 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
     ///    - flowManager: The `FlowManager` to use for fetching flows
     ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
     ///    - onComplete: A handler for when the `FlowManager` signals that it has no more flows to fetch
+    ///    - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was used to start it
     ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
     ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
@@ -78,13 +79,14 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         handleScroll: Bool = true,
         startOptions: StartOptions? = nil,
         onComplete: @escaping (CompletedState) -> Void,
+        onStartedFlow: @escaping (String) -> Void = { _ in },
         @ViewBuilder fallback: @escaping (ManagedPlayerErrorContext) -> Fallback,
         @ViewBuilder loading: @escaping () -> Loading
     ) {
         self.init(
             plugins: plugins,
             context: context,
-            viewModel: ManagedPlayerViewModel(manager: flowManager, onComplete: onComplete),
+            viewModel: ManagedPlayerViewModel(manager: flowManager, onComplete: onComplete, onStartedFlow: onStartedFlow),
             handleScroll: handleScroll,
             startOptions: startOptions,
             fallback: fallback,

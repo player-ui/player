@@ -26,6 +26,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,8 +95,18 @@ public open class PlayerViewModel(
     private var _state = MutableStateFlow<ManagedPlayerState>(ManagedPlayerState.NotStarted)
     private val _beacons = MutableSharedFlow<String>()
 
+    // Buffer one item so the started flow isn't dropped if a collector hasn't started yet;
+    // flows start sequentially, so at most one is ever buffered.
+    private val _startedFlows = MutableSharedFlow<String>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
     public val state: StateFlow<ManagedPlayerState> get() = _state.asStateFlow()
     public val beacons: SharedFlow<String> get() = _beacons.asSharedFlow()
+
+    /** Emits the flow [String] used to start the player each time a flow is started */
+    public val startedFlows: SharedFlow<String> get() = _startedFlows.asSharedFlow()
 
     init {
         // next() TODO: If we fix the non-final field error, we can prefetch here
@@ -116,16 +127,21 @@ public open class PlayerViewModel(
         }
     }
 
-    private fun start(flow: String) = player.start(flow) {
-        when {
-            it.isSuccess -> player.logger.info(
-                "Flow completed successfully!",
-                it.getOrNull()?.endState,
-            )
-            it.isFailure -> player.logger.error(
-                "Error in Flow!",
-                it.exceptionOrNull(),
-            )
+    private fun start(flow: String) {
+        // Notify that a flow has started, passing back the in-memory flow that was used to start
+        // Player (avoids deserializing the flow back across the JS bridge)
+        _startedFlows.tryEmit(flow)
+        player.start(flow) {
+            when {
+                it.isSuccess -> player.logger.info(
+                    "Flow completed successfully!",
+                    it.getOrNull()?.endState,
+                )
+                it.isFailure -> player.logger.error(
+                    "Error in Flow!",
+                    it.exceptionOrNull(),
+                )
+            }
         }
     }
 

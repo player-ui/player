@@ -1,3 +1,226 @@
+# 1.1.0-next.0 (Mon Jul 06 2026)
+
+### Release Notes
+
+#### Update Android/iOS Managed Players to include `onStartedFlow` callback ([#896](https://github.com/player-ui/player/pull/896))
+
+Brings the React Managed Player's onStartedFlow callback (added in #881) to iOS and Android. Consumers can now be notified when the managed player starts a flow, and receive the flow that was used to start it — without having to track it themselves. For performance, the callback hands back the in-memory flow String that was passed in, rather than reading it back out of Player (which would force a deserialization across the JS bridge).
+
+---
+
+#### 🚀 Enhancement
+
+- Update Android/iOS Managed Players to include `onStartedFlow` callback [#896](https://github.com/player-ui/player/pull/896) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Use `rules_player` 2.6.2 to get ios release notes [#898](https://github.com/player-ui/player/pull/898) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
+# 1.0.1 (Mon Jun 29 2026)
+
+#### 🐛 Bug Fix
+
+- Release main [#895](https://github.com/player-ui/player/pull/895) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix Android testutils publishing [#871](https://github.com/player-ui/player/pull/871) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+
+---
+
+# 1.0.0 (Mon Jun 29 2026)
+
+### Release Notes
+
+#### Player 1.0.0 ([#865](https://github.com/player-ui/player/pull/865))
+
+Full release notes are available on the doc site
+
+#### error controller ([#770](https://github.com/player-ui/player/pull/770))
+
+### Error Controller
+Player now has a built-in ErrorController, instantiated automatically when a flow starts and accessible via controllers.error on all platforms.
+
+#### Core API
+captureError(error) accepts any error implementing the PlayerErrorMetadata interface (type, optional severity, optional metadata). It fires the onError bail hook, writes to errorState in the data model, and navigates via errorTransitions. Returns true if the error was handled (hook bailed or an errorTransitions route was navigated), false if the flow was failed.
+
+onError is a bail hook — returning true takes ownership of the error, preventing errorState from being written and navigation from occurring. Additional state inspection methods: getCurrentError(), getErrors(), clearErrors(), clearCurrentError().
+
+#### Error Navigation
+Flows can define errorTransitions at the node or flow level to route errors to dedicated error views instead of failing the flow:
+
+{ "errorTransitions": { "render": "RENDER_ERROR_VIEW", "\*": "GENERIC_ERROR_VIEW" } }
+Node-level takes precedence over flow-level. The "\*" wildcard matches any unhandled type.
+
+#### Render-Time Error Capture
+Capture asset render errors. Each platform provides an AssetRenderError / AssetRenderException with the failing asset id and full parent path in the error message
+
+#### `ExternalStatePlugin` allows overrides ([#817](https://github.com/player-ui/player/pull/817))
+
+### `ExternalActionPlugin` renamed to `ExternalStatePlugin` with new handler API
+
+**The plugin has been renamed** from `ExternalActionPlugin` to `ExternalStatePlugin`. The name `ExternalState` better reflects what the plugin does — it handles `EXTERNAL` navigation states — and is now used consistently across all platforms.
+
+**The handler API has changed.** Instead of a single function that receives all external states, you now provide an array of handlers. Each handler requires a `ref` (matching the external state's `ref` field) and a `handlerFunction`. An optional `match` object can be provided to match on additional state properties beyond `ref`. See docs site for full examples.
+
+#### Handler matching and specificity
+
+Handlers are matched against the external state using partial object matching on `ref` and any additional properties in `match`. When multiple handlers could match a state, the most specific one wins (the one with the most matching properties).
+
+This allows you to register a general handler for a `ref` and a more specific one for a particular variant:
+
+```typescript
+new ExternalStatePlugin([
+  // Matches any state with ref: "my-action"
+  { ref: "my-action", handlerFunction: () => "default" },
+  // Takes precedence when type: "special" is also present
+  {
+    ref: "my-action",
+    match: { type: "special" },
+    handlerFunction: () => "special",
+  },
+]);
+```
+
+#### Overriding handlers across plugins
+
+Overriding handlers is now supported. When multiple `ExternalStatePlugin` instances register a handler for the same state, the **last registered handler wins**. A `debug` log is emitted when a handler is replaced, so you can tell when an override is happening.
+
+To add more handlers after initial setup, register a new `ExternalStatePlugin` instance. Plugins are typically grouped together and easy to find by name. This makes it straightforward to determine the override order.
+
+We considered allowing more handlers to be added to an `ExternalStatePlugin` after creation, however, this would make it more difficult to figure out the override order. So we do not support that.
+
+#### Missing handlers
+
+For now, If no handler matches an external state, the Player remains on that state and no transition occurs. Ensure every `EXTERNAL` state in your flow has a registered handler.
+
+> [!NOTE]
+> In a future release, unhandled external states will automatically report an error via the Error Controller.
+
+#### Make AnyType Sendable ([#788](https://github.com/player-ui/player/pull/788))
+
+### Breaking Change: `.anyArray` and `.anyDictionary` use `AnyType`
+
+The `AnyType` enum now conforms to `Sendable` protocol and is concurrency-safe. This required removing all APIs that depended on the `Any` type:
+
+```swift
+// Before
+case anyDictionary(data: [String: Any])
+case anyArray(data: [Any])
+
+// After  
+case anyDictionary(data: [String: AnyType])
+case anyArray(data: [AnyType])
+```
+
+#### Migration
+Use `AnyType` cases directly instead of converting from/to `Any`:
+
+```swift
+// Old (removed)
+let anyType = AnyType.anyDictionary(data: ["key": "value"])
+let anyArray = AnyType.anyArray(data: ["key", 2])
+
+// New (Sendable-safe)  
+let anyType = AnyType.anyDictionary(data: ["key": .string(data: "value")])
+let anyArray = AnyType.anyArray(data: [.string(data: "key"), .number(data: 2)])
+```
+
+### Breaking Change: `AnyType` will only decode `.unknownData` with `AnyTypeDecodingContext`
+
+Users are required to provide `AnyTypeDecodingContext` when attempting to decode `anyArray` or `anyDictionary`. The decoder will throw if we need the context but one is not provided. As a side effect of this, `.unknownData` will only be returned when a context is provided. For example:
+
+```swift
+// Before, decoding data = "null"
+let anyType = try? JSONDecoder() // no context
+    .decode(AnyType.self, from: data) // This will return .unknownData
+
+// After, decoding data = "null"
+let anyType = try? JSONDecoder() // no context
+    .decode(AnyType.self, from: data) // This will throw an error
+
+let anyType = try? AnyTypeDecodingContext(rawData: data) // with context
+            .inject(to: JSONDecoder())
+            .decode(AnyType.self, from: data) // This will return .unknownData
+```
+
+### Breaking Change: `AnyTypeDecodingContext.objectFor` is no longer `public`.
+
+All decoding of `AnyType` is now handled internally. So `AnyTypeDecodingContext.objectFor(path: [CodingKey]) throws -> Any` is no longer exposed to users.
+
+### New Features
+
+Added `as<T>(_:)` convenience method and `AnyType` (`anyDictionary`) subscripting for type-safe value extraction:
+
+```swift
+// Before
+if case let .anyDictionary(myDict) = anyType,
+    let title = myDict["title"] as? String {
+    // Do a thing
+}
+
+// After
+let title: String? = anyType["title"]?.as(String.self)
+```
+
+---
+
+#### 💥 Breaking Change
+
+- Player 1.0.0 [#865](https://github.com/player-ui/player/pull/865) ([@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal) [@JunDangIntuit](https://github.com/JunDangIntuit) [@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08) [@sugarmanz](https://github.com/sugarmanz))
+
+#### 🐛 Bug Fix
+
+- Release main [#894](https://github.com/player-ui/player/pull/894) ([@intuit-svc](https://github.com/intuit-svc))
+- Update Module.bazel.lock [#893](https://github.com/player-ui/player/pull/893) ([@KetanReddy](https://github.com/KetanReddy))
+- Release main [#892](https://github.com/player-ui/player/pull/892) ([@intuit-svc](https://github.com/intuit-svc))
+- Migrate to Bazel 9 [#880](https://github.com/player-ui/player/pull/880) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Fix 1.0.0 Branch Issues [#889](https://github.com/player-ui/player/pull/889) ([@KetanReddy](https://github.com/KetanReddy))
+- viewApply function for inflate API [#888](https://github.com/player-ui/player/pull/888) ([@brocollie08](https://github.com/brocollie08))
+- move storybook icons dependency to correct BUILD file [#887](https://github.com/player-ui/player/pull/887) ([@tmarmer](https://github.com/tmarmer))
+- Pass Started Flow Back via Managed Player [#881](https://github.com/player-ui/player/pull/881) ([@KetanReddy](https://github.com/KetanReddy))
+- Handle `external-state` plugin errors with `ErrorController` [#868](https://github.com/player-ui/player/pull/868) ([@KVSRoyal](https://github.com/KVSRoyal) [@sugarmanz](https://github.com/sugarmanz))
+- Revert the removal of clearExceptionHandler method [#869](https://github.com/player-ui/player/pull/869) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- [WIP] Android asset consolidation [#861](https://github.com/player-ui/player/pull/861) ([@brocollie08](https://github.com/brocollie08) [@sugarmanz](https://github.com/sugarmanz))
+- iOS - cleanup unused methods [#864](https://github.com/player-ui/player/pull/864) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Sync with main on palyer 1 dot zero [#863](https://github.com/player-ui/player/pull/863) ([@intuit-svc](https://github.com/intuit-svc) [@JunDangIntuit](https://github.com/JunDangIntuit) [@sugarmanz](https://github.com/sugarmanz) [@justin-medeiros](https://github.com/justin-medeiros))
+- error controller [#770](https://github.com/player-ui/player/pull/770) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@tmarmer](https://github.com/tmarmer))
+- Tooling Major Changes [#860](https://github.com/player-ui/player/pull/860) ([@KetanReddy](https://github.com/KetanReddy) [@JunDangIntuit](https://github.com/JunDangIntuit) [@KVSRoyal](https://github.com/KVSRoyal))
+- Remove unnecessary ios wrappers [#857](https://github.com/player-ui/player/pull/857) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Align Post Initialization Plugin Registration API [#834](https://github.com/player-ui/player/pull/834) ([@KetanReddy](https://github.com/KetanReddy))
+- `ExternalStatePlugin` allows overrides [#817](https://github.com/player-ui/player/pull/817) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Fix Circular Dependencies [#840](https://github.com/player-ui/player/pull/840) ([@KetanReddy](https://github.com/KetanReddy))
+- Return read only data model with CompletedState on JVM [#816](https://github.com/player-ui/player/pull/816) ([@KetanReddy](https://github.com/KetanReddy))
+- Replace `sorted-array` dep with `fast-sort` dep [#818](https://github.com/player-ui/player/pull/818) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Drop CocoaPods support [#814](https://github.com/player-ui/player/pull/814) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Align FlowManager APIs across platforms [#805](https://github.com/player-ui/player/pull/805) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Make AnyType Sendable [#788](https://github.com/player-ui/player/pull/788) ([@JJ-Intuit](https://github.com/JJ-Intuit) [@KVSRoyal](https://github.com/KVSRoyal))
+- iOS CompletedState includes a read-only data controller; omit `set` from core [#786](https://github.com/player-ui/player/pull/786) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 10
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Chloe ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Jeremy Jessup ([@JJ-Intuit](https://github.com/JJ-Intuit))
+- Justin Medeiros ([@justin-medeiros](https://github.com/justin-medeiros))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 1.0.0-next.0 (Wed Jun 24 2026)
 
 ### Release Notes
