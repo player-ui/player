@@ -208,7 +208,7 @@ function translatePropValue(
   if (isFunctionCall(value)) {
     if (templateScope) {
       return translateFunctionCall(
-        rewritePathsInCall(value, templateScope),
+        rewriteFunctionCallPaths(value, templateScope),
         ctx.logger,
       );
     }
@@ -222,14 +222,6 @@ function translatePropValue(
 }
 
 function rewritePathsInCall(
-  value: A2UIFunctionCall,
-  scope: string,
-): A2UIFunctionCall;
-function rewritePathsInCall(
-  value: A2UIDynamicValue,
-  scope: string,
-): A2UIDynamicValue;
-function rewritePathsInCall(
   value: A2UIDynamicValue,
   scope: string,
 ): A2UIDynamicValue {
@@ -241,12 +233,24 @@ function rewritePathsInCall(
     return { path: scopedPointer(value.path, scope) };
   }
   if (isFunctionCall(value)) {
-    return {
-      ...value,
-      args: value.args ? rewriteCallArgs(value.args, scope) : value.args,
-    };
+    return rewriteFunctionCallPaths(value, scope);
   }
   return rewriteCallArgs(value, scope);
+}
+
+/**
+ * Rewrite the paths inside a function call's args, preserving its
+ * `A2UIFunctionCall` type so callers can hand the result straight to
+ * `translateFunctionCall`.
+ */
+function rewriteFunctionCallPaths(
+  call: A2UIFunctionCall,
+  scope: string,
+): A2UIFunctionCall {
+  return {
+    ...call,
+    args: call.args ? rewriteCallArgs(call.args, scope) : call.args,
+  };
 }
 
 function rewriteCallArgs(
