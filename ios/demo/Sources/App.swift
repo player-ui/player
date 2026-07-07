@@ -46,10 +46,10 @@ struct MainView: View {
     }
 
     var showAlert: Binding<Bool> {
-        Binding(get: { result != nil }) { newValue in
+        Binding(get: { result != nil }, set: { newValue in
             guard !newValue else { return }
             result = nil
-        }
+        })
     }
 
     private var plugins: [NativePlugin] {

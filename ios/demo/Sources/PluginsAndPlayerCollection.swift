@@ -201,7 +201,8 @@ public struct PluginsAndPlayerCollection: View {
                         Alert(
                             title: completionMessage != "" ? Text("FlowCompleted") : Text("Info"),
                             message: Text(
-                                "Data: \n \($pubsubEventName.wrappedValue) \n Completion: \($completionMessage.wrappedValue)"
+                                "Data: \n \($pubsubEventName.wrappedValue) \n "
+                                    + "Completion: \($completionMessage.wrappedValue)"
                             ),
                             dismissButton: .default(Text("OK"))
                         )

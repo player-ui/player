@@ -53,6 +53,7 @@ public enum ErrorTypes: Equatable {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     public init(_ rawValue: String) {
         switch rawValue {
         case "expression": self = .expression

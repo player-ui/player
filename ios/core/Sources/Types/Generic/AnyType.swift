@@ -7,6 +7,8 @@
 
 import Foundation
 
+// swiftlint:disable file_length
+
 /// A union type to match the JS core players any type
 ///
 /// This type is `Sendable` and uses recursive cases for complex types.
@@ -55,7 +57,7 @@ public enum AnyType: Hashable, Sendable {
     /// The underlying data was not in a known format. For example, it was a "null".
     case unknownData
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     public func hash(into hasher: inout Hasher) {
         switch self {
         case let .string(data):
@@ -111,6 +113,7 @@ public extension AnyType {
     /// let dict = AnyType.anyDictionary(data: ["title": .string(data: "Hello")])
     /// let title: String? = dict["title"]?.as(String.self)
     /// ```
+    // swiftlint:disable:next cyclomatic_complexity
     func `as`<T>(_: T.Type) -> T? {
         switch self {
         case let .string(data):
@@ -171,7 +174,7 @@ public extension AnyType {
 }
 
 extension AnyType: Equatable {
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     public static func == (lhs: AnyType, rhs: AnyType) -> Bool {
         switch (lhs, rhs) {
         case let (.string(lhv), .string(rhv)): return lhv == rhv
@@ -196,7 +199,6 @@ extension AnyType: Decodable {
     /// Construct AnyType by decoding
     /// - parameters:
     ///   - decoder: A decoder to decode from
-    // swiftlint:disable cyclomatic_complexity
     public init(from decoder: Decoder) throws {
         if let dictionary = try? decoder.singleValueContainer().decode([String: String].self) {
             self = .dictionary(data: dictionary)
@@ -263,6 +265,7 @@ extension AnyType: Encodable {
     /// Encode to an encoder
     /// - parameters:
     ///   - encoder: The encoder to encode the value to
+    // swiftlint:disable:next cyclomatic_complexity
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -309,7 +312,7 @@ extension AnyType: Encodable {
 ///
 /// - Note: Required when decoding JSON containing mixed-type arrays or dictionaries
 public struct AnyTypeDecodingContext {
-    static let key: CodingUserInfoKey = (rawValue: "AnyTypeDecodingContext")!
+    static let key: CodingUserInfoKey! = CodingUserInfoKey(rawValue: "AnyTypeDecodingContext")
 
     private var rawData: Data
 
@@ -346,6 +349,7 @@ public struct AnyTypeDecodingContext {
     }
 
     /// Decodes a raw JSON object to AnyType
+    // swiftlint:disable:next cyclomatic_complexity
     private static func decode(from value: Any) -> AnyType {
         // Handle primitives
         if let string = value as? String {
@@ -398,7 +402,8 @@ public enum AnyTypeDecodingError: Error {
         switch self {
         case .missingDecodingContext:
             return """
-            Attempted to decode data as an AnyType.anyArray, AnyType.anyDictionary, or AnyType.unknownData but `AnyTypeDecodingContext` is missing.
+            Attempted to decode data as an AnyType.anyArray, AnyType.anyDictionary, or \
+            AnyType.unknownData but `AnyTypeDecodingContext` is missing.
             Create a context with `let context = AnyTypeDecodingContext(rawData: data)`.
             Add the context to the decoder's userInfo by calling `context.inject(to: decoder)`.
             """

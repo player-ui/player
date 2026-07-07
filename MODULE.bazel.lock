@@ -350,7 +350,7 @@
         "recordedInputs": [
           "REPO_MAPPING:aspect_rules_ts+,aspect_rules_ts aspect_rules_ts+",
           "REPO_MAPPING:aspect_rules_ts+,bazel_tools bazel_tools",
-          "FILE:@@//package.json 1a1fc0f6219010184b43f2c5107dd38b51c447d8087ad23f9f492ec8fa1d74db"
+          "FILE:@@//package.json e6ac289e3a49423c7783f1ed235e5cd88606c7c24f1c02d8725e26b259af99a9"
         ],
         "generatedRepoSpecs": {
           "npm_typescript": {
@@ -1386,6 +1386,73 @@
           "explicitRootModuleDirectDevDeps": [],
           "useAllRepos": "NO",
           "reproducible": false
+        }
+      }
+    },
+    "@@swiftlint+//bazel:extensions.bzl%extra_rules": {
+      "general": {
+        "bzlTransitiveDigest": "bQaIwIVfdP8t32ZvwG0ZM8y3N7Q6hhlgHsz7avAKFFs=",
+        "usagesDigest": "ObdUK4AVHbUsn2En6qO9lAjwbTu1cc4968qI20zsRfI=",
+        "recordedInputs": [],
+        "generatedRepoSpecs": {
+          "swiftlint_extra_rules": {
+            "repoRuleId": "@@swiftlint+//bazel:deps.bzl%extra_swift_sources",
+            "attributes": {}
+          }
+        }
+      }
+    },
+    "@@swiftlint+//bazel:repos.bzl%swiftlint_repos_bzlmod": {
+      "general": {
+        "bzlTransitiveDigest": "s0OfPc+YZJ5vKUNKhwQWh4xKB4PER5sWeDKA3frych8=",
+        "usagesDigest": "++Ol3ruKD4ys9BRQdvlodpellaCRE/qeLEL074LesPQ=",
+        "recordedInputs": [
+          "REPO_MAPPING:swiftlint+,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "SwiftSyntax": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "39b3c675e5f21c40ef7e74f2b94c20df22c609ef282b9c16ce15937e390ed6ac",
+              "strip_prefix": "swift-syntax-604.0.0-prerelease-2026-04-21",
+              "url": "https://github.com/swiftlang/swift-syntax/archive/refs/tags/604.0.0-prerelease-2026-04-21.tar.gz"
+            }
+          },
+          "SwiftyTextTable": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "b77d403db9f33686caeb2a12986997fb02a0819e029e669c6b9554617c4fd6ae",
+              "build_file": "@@swiftlint+//bazel:SwiftyTextTable.BUILD",
+              "strip_prefix": "SwiftyTextTable-0.9.0",
+              "url": "https://github.com/scottrhoyt/SwiftyTextTable/archive/refs/tags/0.9.0.tar.gz"
+            }
+          },
+          "CollectionConcurrencyKit": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "9083fe6f8b4f820bfb5ef5c555b31953116f158ec113e94c6406686e78da34aa",
+              "build_file": "@@swiftlint+//bazel:CollectionConcurrencyKit.BUILD",
+              "strip_prefix": "CollectionConcurrencyKit-0.2.0",
+              "url": "https://github.com/JohnSundell/CollectionConcurrencyKit/archive/refs/tags/0.2.0.tar.gz"
+            }
+          },
+          "CryptoSwift": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "81b1ba186e2edcff47bcc2a3b6a242df083ba2f64bfb42209f79090cb8d7f889",
+              "build_file": "@@swiftlint+//bazel:CryptoSwift.BUILD",
+              "strip_prefix": "CryptoSwift-1.9.0",
+              "url": "https://github.com/krzyzanowskim/CryptoSwift/archive/refs/tags/1.9.0.tar.gz"
+            }
+          },
+          "FilenameMatcher": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "c0a6041be02ddd12f1cdde089f84dfa70e33e384cc476a786542a536d8401c6e",
+              "strip_prefix": "swift-filename-matcher-2.0.1",
+              "url": "https://github.com/ileitch/swift-filename-matcher/archive/refs/tags/2.0.1.tar.gz"
+            }
+          }
         }
       }
     },

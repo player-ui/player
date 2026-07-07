@@ -58,6 +58,8 @@ excluded:
     - plugins/expression/ios/Tests
     - plugins/external-action/ios/Tests
     - plugins/external-action/swiftui/ViewInspector
+    - plugins/external-state/ios/Tests
+    - plugins/external-state/swiftui/ViewInspector
     - plugins/metrics/swiftui/ViewInspector
     - plugins/pending-transaction/swiftui/ViewInspector
     - plugins/pubsub/ios/Tests

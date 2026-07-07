@@ -358,7 +358,9 @@ extension JSContext {
 }
 
 private extension JSValue {
-    /// put getState in extension so it can be accessed by the computed property in HeadlessPlayer.state and also inside the ErrorHandler by the playerReference
+    /// put getState in extension so it can be accessed by the computed property in
+    /// HeadlessPlayer.state and
+    /// also inside the ErrorHandler by the playerReference
     func getState() -> BaseFlowState? {
         guard let jsState = invokeMethod("getState", withArguments: [])
         else { return nil }

@@ -41,19 +41,21 @@ struct TextAssetView: View {
 /// A `ViewModifier` to make a `View` open a string URL
 struct LinkModifier: ViewModifier {
     /// The URL location to visit
-    let destination: URL
+    let destination: URL?
 
     /// Constructs a `LinkModifier` with a string destination
     /// - parameters:
     ///   - destination: A string URL destination
     init(_ destination: String) {
-        self.destination = URL(string: destination)!
+        self.destination = URL(string: destination)
     }
 
     func body(content: Content) -> some View {
         content
             .onTapGesture {
-                UIApplication.shared.open(destination)
+                if let destination {
+                    UIApplication.shared.open(destination)
+                }
             }
             .foregroundColor(Color(red: 0.000, green: 0.467, blue: 0.773))
     }

@@ -89,6 +89,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
     /// object,
     /// once the context has been provided.
     /// - returns: An array of arguments to construct the plugin
+    // swiftlint:disable:next function_body_length
     override open func getArguments() -> [Any] {
         guard let context else { return [] }
 

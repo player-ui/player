@@ -98,7 +98,8 @@ open class BaseAssetRegistry<WrapperType: Decodable & AssetContainer>: PlayerReg
             if asset == registry[index].assetType {
                 logger?
                     .t(
-                        "Duplicate Registration skipped for \(String(describing: match)) asset: \(String(describing: asset))"
+                        "Duplicate Registration skipped for \(String(describing: match)) "
+                            + "asset: \(String(describing: asset))"
                     )
             } else {
                 logger?.w("Overriding registration for match: \(String(describing: match))")
@@ -223,7 +224,7 @@ extension JSValue {
 public extension Decoder {
     /// A `CodingUserInfoKey` to fetch the decoding function for this decoder
     var decodeFunctionKey: CodingUserInfoKey {
-        CodingUserInfoKey(rawValue: "decodeFunction")!
+        CodingUserInfoKey.decodeSUI
     }
 }
 

@@ -115,8 +115,9 @@ public enum FlowLoader {
                         isDirectory: &isDir
                     )
                     if !isDir.boolValue {
-                        let data = fileManager.contents(atPath: "\(subdirectory)/\(name)")
-                        let json = String(data: data!, encoding: .utf8)!
+                        guard let data = fileManager.contents(atPath: "\(subdirectory)/\(name)"),
+                              let json = String(data: data, encoding: .utf8)
+                        else { return [] }
                         return [(
                             name: name.lowercased().replacingOccurrences(of: ".json", with: ""),
                             flow: json

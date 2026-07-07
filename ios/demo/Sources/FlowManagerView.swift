@@ -58,9 +58,9 @@ public struct FlowManagerView: View {
                         }
                     )
 
-                    Button(action: { complete = true }) {
+                    Button(action: { complete = true }, label: {
                         Text("Terminate Flow")
-                    }
+                    })
                 }
             }
         }.navigationBarTitle(Text(navTitle))
