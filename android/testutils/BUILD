@@ -20,19 +20,19 @@ main_deps = main_exports + [
 ]
 
 instrumented_unit_test_deps = main_deps + [
-    ":testutils",
+    ":testutils-android",
     artifact("com.google.guava:guava"),
     artifact("org.robolectric:robolectric"),
     artifact("org.robolectric:annotations"),
 ]
 
 kt_android(
-    name = "testutils",
+    name = "testutils-android",
     main_deps = main_deps,
 )
 
 kt_android(
-    name = "instrumented_unit_testutils",
+    name = "instrumented-unit-testutils-android",
     main_srcs = glob(["src/instrumented_unit_test_main/kotlin/**/*.kt"]),
     main_deps = instrumented_unit_test_deps,
 )
@@ -42,7 +42,7 @@ kt_jvm_library(
     name = "with-runtime",
     visibility = ["//visibility:public"],
     exports = [
-        ":instrumented_unit_testutils",
+        ":instrumented-unit-testutils-android",
         "//jvm/hermes:hermes-host",
     ],
 )

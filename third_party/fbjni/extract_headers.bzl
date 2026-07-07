@@ -1,3 +1,5 @@
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+
 def _extract_headers_impl(ctx):
     cc_info = ctx.attr.lib[CcInfo]
     headers = [header for header in cc_info.compilation_context.headers.to_list()]
