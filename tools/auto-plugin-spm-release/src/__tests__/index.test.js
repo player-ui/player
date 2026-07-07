@@ -1,10 +1,8 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import * as core from "@auto-it/core";
 
 // Capture every execPromise call (git/unzip/gh/rm) instead of running them.
-const execPromise = vi.fn<[string, string[]], Promise<string>>();
-vi.mock("@auto-it/core", () => ({
-  execPromise: (cmd: string, args: string[]) => execPromise(cmd, args),
-}));
+const execPromise = vi.spyOn(core, "execPromise");
 
 import SpmReleasePlugin, {
   buildReleaseNotes,
@@ -24,30 +22,30 @@ const RELEASE_URL = "https://github.com/player-ui/player/releases/tag/1.2.3";
 
 /** Minimal fake Auto that captures the afterRelease tap and log output. */
 function makeFakeAuto() {
-  const logs: string[] = [];
-  let tapped: ((ctx: any) => Promise<void>) | undefined;
+  const logs = [];
+  let tapped;
   const auto = {
     git: { options: { owner: "player-ui", repo: "player" } },
     logger: {
       log: {
-        info: (m: string) => logs.push(`INFO ${m}`),
-        warn: (m: string) => logs.push(`WARN ${m}`),
+        info: (m) => logs.push(`INFO ${m}`),
+        warn: (m) => logs.push(`WARN ${m}`),
       },
-      verbose: { info: (m: string) => logs.push(`VERB ${m}`) },
+      verbose: { info: (m) => logs.push(`VERB ${m}`) },
     },
     hooks: {
       afterRelease: {
-        tapPromise: (_name: string, fn: (ctx: any) => Promise<void>) => {
+        tapPromise: (_name, fn) => {
           tapped = fn;
         },
       },
     },
   };
-  return { auto, logs, run: (ctx: any) => tapped!(ctx) };
+  return { auto, logs, run: (ctx) => tapped(ctx) };
 }
 
 /** A release ctx with an html_url response, as auto provides after publishing. */
-function releaseCtx(overrides: Record<string, unknown> = {}) {
+function releaseCtx(overrides = {}) {
   return {
     newVersion: "1.2.3",
     releaseNotes: "#### Bug Fix\n- x",
@@ -112,7 +110,7 @@ describe("pure helpers", () => {
 describe("SpmReleasePlugin afterRelease", () => {
   test("stable: clones, unzips, commits, annotates tag, pushes, creates Release", async () => {
     const { auto, run } = makeFakeAuto();
-    new SpmReleasePlugin(OPTIONS).apply(auto as any);
+    new SpmReleasePlugin(OPTIONS).apply(auto);
 
     await run(releaseCtx());
 
@@ -124,7 +122,6 @@ describe("SpmReleasePlugin afterRelease", () => {
       "push",
     ]);
 
-    // Clone uses the supplied SSH URL; branch is the stable target.
     const clone = execPromise.mock.calls.find(
       ([cmd, args]) => cmd === "git" && args[0] === "clone",
     );
@@ -134,7 +131,6 @@ describe("SpmReleasePlugin afterRelease", () => {
     );
     expect(checkout?.[1]).toContain("main");
 
-    // Tag is annotated with the source release URL.
     const tag = execPromise.mock.calls.find(
       ([cmd, args]) => cmd === "git" && args.includes("tag"),
     );
@@ -144,7 +140,6 @@ describe("SpmReleasePlugin afterRelease", () => {
     const unzip = execPromise.mock.calls.find(([cmd]) => cmd === "unzip");
     expect(unzip?.[1]).toEqual(["-o", OPTIONS.zipPath, "-d", "publishRepo"]);
 
-    // GitHub Release created with copied notes.
     const gh = ghCall();
     expect(gh?.[1].slice(0, 3)).toEqual(["release", "create", "1.2.3"]);
     expect(gh?.[1]).toContain(OPTIONS.targetRepo);
@@ -153,7 +148,7 @@ describe("SpmReleasePlugin afterRelease", () => {
 
   test("falls back to owner/repo when the release response has no html_url", async () => {
     const { auto, run } = makeFakeAuto();
-    new SpmReleasePlugin(OPTIONS).apply(auto as any);
+    new SpmReleasePlugin(OPTIONS).apply(auto);
 
     await run(releaseCtx({ response: undefined }));
 
@@ -165,7 +160,7 @@ describe("SpmReleasePlugin afterRelease", () => {
 
   test("prerelease: pushes annotated tag on release-line branch, NO GitHub Release", async () => {
     const { auto, run } = makeFakeAuto();
-    new SpmReleasePlugin(OPTIONS).apply(auto as any);
+    new SpmReleasePlugin(OPTIONS).apply(auto);
 
     await run(releaseCtx({ newVersion: "1.2.3-next.0" }));
 
@@ -182,7 +177,7 @@ describe("SpmReleasePlugin afterRelease", () => {
 
   test("skips (and warns) when required options are missing", async () => {
     const { auto, logs, run } = makeFakeAuto();
-    new SpmReleasePlugin({ targetRepo: "x" }).apply(auto as any);
+    new SpmReleasePlugin({ targetRepo: "x" }).apply(auto);
 
     await run(releaseCtx());
 
@@ -192,7 +187,7 @@ describe("SpmReleasePlugin afterRelease", () => {
 
   test("skips when no version was released", async () => {
     const { auto, run } = makeFakeAuto();
-    new SpmReleasePlugin(OPTIONS).apply(auto as any);
+    new SpmReleasePlugin(OPTIONS).apply(auto);
 
     await run(releaseCtx({ newVersion: undefined }));
 
@@ -201,13 +196,13 @@ describe("SpmReleasePlugin afterRelease", () => {
 
   test("propagates a gh failure instead of swallowing it", async () => {
     // Fail only the `gh` call; git/unzip succeed.
-    execPromise.mockImplementation(async (cmd: string) => {
+    execPromise.mockImplementation(async (cmd) => {
       if (cmd === "gh")
         throw new Error("HTTP 422: Release.tag_name already exists");
       return "";
     });
     const { auto, run } = makeFakeAuto();
-    new SpmReleasePlugin(OPTIONS).apply(auto as any);
+    new SpmReleasePlugin(OPTIONS).apply(auto);
 
     await expect(run(releaseCtx())).rejects.toThrow("already exists");
   });
