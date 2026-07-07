@@ -3,8 +3,8 @@ import JavaScriptCore
 
 /// A parser for creating bindings from a string
 public class BindingParser {
-    internal var value: JSValue?
-    internal var options: BindingParserOptions
+    var value: JSValue?
+    var options: BindingParserOptions
 
     /// Create a BindingParser
     /// - Parameters:
@@ -19,7 +19,7 @@ public class BindingParser {
         value = context
             .getClassReference("Player.BindingParser", load: { $0.loadCore() })?
             .construct(withArguments: [[
-                "get": JSValue(object: getCallback, in: context) as Any
+                "get": JSValue(object: getCallback, in: context) as Any,
             ]])
     }
 
@@ -35,7 +35,7 @@ public class BindingParser {
 
 /// A path in the data model
 public class BindingInstance: Decodable {
-    internal var value: JSValue?
+    var value: JSValue?
 
     /// Create a BindingInstance, a path to data in the data model
     /// - Parameters:
@@ -53,25 +53,25 @@ public class BindingInstance: Decodable {
         self.value = value
     }
 
-    ///Create a BindingInstance from a decoder
-    required public init(from decoder: Decoder) throws {
+    /// Create a BindingInstance from a decoder
+    public required init(from decoder: Decoder) throws {
         value = try decoder.getJSValue()
     }
 
     /// Retrieve this Binding as an array
     /// - Returns: The array of segments in the binding
     public func asArray() -> [String]? {
-        return value?
+        value?
             .invokeMethod("asArray", withArguments: [])
             .toArray()
-            /// Array indices are automatically treated as ints, so we need to map
+            // Array indices are automatically treated as ints, so we need to map
             .map { $0 as? String ?? String(describing: $0) }
     }
 
     /// Retrieve this Binding as its string form
     /// - Returns: The string representation of this binding
     public func asString() -> String? {
-        return value?.invokeMethod("asString", withArguments: []).toString()
+        value?.invokeMethod("asString", withArguments: []).toString()
     }
 }
 
@@ -92,14 +92,15 @@ public struct BindingParserOptions {
 /// A data model that stores things in an in-memory JS object
 public class LocalModel {
     /// Reference to the JavaScript LocalModel
-    internal var value: JSValue?
+    var value: JSValue?
 
     /// Create a new LocalModel
     /// - Parameters:
     ///   - data: The data to start with
     ///   - context: The JSContext to create it in
     public init(data: [String: Any] = [:], in context: JSContext) {
-        value = context.getClassReference("Player.LocalModel", load: { $0.loadCore() })?.construct(withArguments: [data])
+        value = context.getClassReference("Player.LocalModel", load: { $0.loadCore() })?
+            .construct(withArguments: [data])
     }
 
     /// Get a value in the model for a given binding
@@ -110,9 +111,13 @@ public class LocalModel {
     }
 
     /// Set data in the model
-    /// - Parameter transaction: An array of transaction objects, tuples of ``BindingInstance`` and the value to set
+    /// - Parameter transaction: An array of transaction objects, tuples of ``BindingInstance`` and
+    /// the value to set
     public func set(transaction: [(BindingInstance, Any)]) {
-        value?.invokeMethod("set", withArguments: [transaction.map { [$0.0.value as Any, $0.1] as [Any] }])
+        value?.invokeMethod(
+            "set",
+            withArguments: [transaction.map { [$0.0.value as Any, $0.1] as [Any] }]
+        )
     }
 
     /// Get a value in the model for a given path

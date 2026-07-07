@@ -4,20 +4,19 @@
 //  Created by Zhao Xia Wu on 2023-11-01.
 //
 
-import SwiftUI
 import PlayerUI
-import PlayerUISwiftUI
-import PlayerUIReferenceAssets
-import PlayerUIMetricsPlugin
 import PlayerUIExternalStateViewModifierPlugin
+import PlayerUIMetricsPlugin
+import PlayerUIReferenceAssets
+import PlayerUISwiftUI
+import SwiftUI
 
-/**
- SwiftUI View to wrap the `ManagedPlayer` and handle the result
- for use in UI testing
- */
+/// SwiftUI View to wrap the `ManagedPlayer` and handle the result
+/// for use in UI testing
 public struct FlowManagerView: View {
     let flowSequence: [String]
     let navTitle: String
+
     @State private var complete = false
 
     public var body: some View {
@@ -25,7 +24,7 @@ public struct FlowManagerView: View {
             if complete {
                 VStack {
                     Text("Flow Completed").font(.title)
-                    Button(action: {complete = false}, label: { Text("Start Over " )})
+                    Button(action: { complete = false }, label: { Text("Start Over ") })
                 }
             } else {
                 VStack {
@@ -35,12 +34,12 @@ public struct FlowManagerView: View {
                         onComplete: { _ in
                             complete = true
                         },
-                        fallback: { (context) in
+                        fallback: { context in
                             VStack {
                                 Text(context.error.localizedDescription)
 
                                 switch context.error as? PlayerError {
-                                case .promiseRejected(error: let errorState) :
+                                case let .promiseRejected(error: errorState):
                                     Text(errorState.error.message)
                                 default:
                                     EmptyView()
@@ -70,14 +69,16 @@ public struct FlowManagerView: View {
     private var plugins: [NativePlugin] {
         [
             ReferenceAssetsPlugin(),
-            MetricsPlugin { (render, _, flow) in
-                print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
+            MetricsPlugin { render, _, flow in
+                print(
+                    "Render: \(render?.duration ?? 0)ms | Request \(flow?.flow.requestTime ?? 0)ms"
+                )
             },
             ExternalStateViewModifierPlugin<ExternalStateSheetModifier>(handlers: [
                 .init(
                     ref: "test-1",
                     handlerFunction: { _, _, transition in
-                        return AnyView(
+                        AnyView(
                             Text("External State")
                                 .onAppear {
                                     print("Managed Player External State triggered")
@@ -87,8 +88,8 @@ public struct FlowManagerView: View {
                                 }
                         )
                     }
-                )
-            ])
+                ),
+            ]),
         ]
     }
 }

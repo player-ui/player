@@ -7,16 +7,16 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
-import SwiftUI
 @testable import PlayerUI
-@testable import PlayerUITestUtilities
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
+import SwiftUI
+import XCTest
 
 class ValidationTests: SwiftUIAssetUnitTestCase {
-    func testErrorValidation() {
+    func testErrorValidation() throws {
         let validation = """
         {
           "type": "required",
@@ -25,7 +25,10 @@ class ValidationTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let val = try? JSONDecoder().decode(ValidationData.self, from: validation.data(using: .utf8)!) else {
+        guard let val = try? JSONDecoder().decode(
+            ValidationData.self,
+            from: try XCTUnwrap(validation.data(using: .utf8))
+        ) else {
             return XCTFail("could not get validation")
         }
         XCTAssertEqual(val.severity, ValidationSeverity.error)
@@ -33,7 +36,7 @@ class ValidationTests: SwiftUIAssetUnitTestCase {
         XCTAssertEqual(val.severity.color, Color(red: 0.835, green: 0.169, blue: 0.118))
     }
 
-    func testWarningValidation() {
+    func testWarningValidation() throws {
         let validation = """
         {
           "type": "required",
@@ -43,7 +46,10 @@ class ValidationTests: SwiftUIAssetUnitTestCase {
         """
         let dismissExpect = XCTestExpectation(description: "dismiss called")
 
-        guard var val = try? JSONDecoder().decode(ValidationData.self, from: validation.data(using: .utf8)!) else {
+        guard var val = try? JSONDecoder().decode(
+            ValidationData.self,
+            from: try XCTUnwrap(validation.data(using: .utf8))
+        ) else {
             return XCTFail("could not get validation")
         }
         val.dismiss = getWrappedFunction {

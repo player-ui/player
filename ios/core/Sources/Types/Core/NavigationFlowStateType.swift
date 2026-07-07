@@ -22,6 +22,19 @@ public enum NavigationFlowStateType: Equatable {
     /// if new state types are added on the JS side.
     case unknown(String)
 
+    /// The raw `state_type` string as it appears in the flow JSON.
+    public var rawValue: String {
+        switch self {
+        case .view: return "VIEW"
+        case .action: return "ACTION"
+        case .asyncAction: return "ASYNC_ACTION"
+        case .flow: return "FLOW"
+        case .external: return "EXTERNAL"
+        case .end: return "END"
+        case let .unknown(value): return value
+        }
+    }
+
     /// Creates a `NavigationFlowStateType` from the raw `state_type` string in the flow JSON.
     /// Unrecognized values are captured as `.unknown(rawValue)` rather than discarded.
     public init(_ rawValue: String) {
@@ -34,19 +47,6 @@ public enum NavigationFlowStateType: Equatable {
         case "END": self = .end
         default:
             self = .unknown(rawValue)
-        }
-    }
-
-    /// The raw `state_type` string as it appears in the flow JSON.
-    public var rawValue: String {
-        switch self {
-        case .view: return "VIEW"
-        case .action: return "ACTION"
-        case .asyncAction: return "ASYNC_ACTION"
-        case .flow: return "FLOW"
-        case .external: return "EXTERNAL"
-        case .end: return "END"
-        case .unknown(let value): return value
         }
     }
 }

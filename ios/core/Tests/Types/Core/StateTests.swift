@@ -7,12 +7,12 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+import XCTest
 
 class StateTests: XCTestCase {
-    let context = JSContext()!
+    private let context: JSContext = ()!
 
     func testParsesCompletedStateFromJS() {
         // Define a JS value completed state. This may not be what we actually
@@ -37,7 +37,8 @@ class StateTests: XCTestCase {
         let countFromData = completedState?.data["count"] as? Int
         XCTAssertEqual(countFromData, 1)
         let dataController = completedState?.controllers.data
-        let countFromDataController = dataController?.get(binding: .init(stringLiteral: "count")) as? Int
+        let countFromDataController = dataController?
+            .get(binding: .init(stringLiteral: "count")) as? Int
         XCTAssertEqual(countFromDataController, 1)
     }
 }

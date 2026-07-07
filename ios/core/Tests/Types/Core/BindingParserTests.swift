@@ -1,10 +1,10 @@
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+import XCTest
 
 class LocalModelTests: XCTestCase {
-    func testLocalModel() {
-        let context = JSContext()!
+    func testLocalModel() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let model = LocalModel(data: ["foo": "bar"], in: context)
 
@@ -17,8 +17,8 @@ class LocalModelTests: XCTestCase {
 }
 
 class BindingParserTests: XCTestCase {
-    func testBindingParser() {
-        let context = JSContext()!
+    func testBindingParser() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let options = BindingParserOptions(get: { _ in nil })
         let parser = BindingParser(options: options, in: context)
@@ -28,8 +28,8 @@ class BindingParserTests: XCTestCase {
         XCTAssertEqual(["baz", "1", "key"], parser.parse(path: "baz[1].key")?.asArray())
     }
 
-    func testBindingParserThroughModel() {
-        let context = JSContext()!
+    func testBindingParserThroughModel() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let model = LocalModel(data: ["foo": ["baz": "value"], "bar": "baz"], in: context)
 
@@ -39,13 +39,16 @@ class BindingParserTests: XCTestCase {
         XCTAssertEqual(["foo"], parser.parse(path: "foo")?.asArray())
         XCTAssertEqual(["foo", "bar"], parser.parse(path: "foo.bar")?.asArray())
 
-        XCTAssertEqual("value", parser.parse(path: "foo.{{bar}}").map { model.get(binding: $0)?.toString() })
+        XCTAssertEqual(
+            "value",
+            parser.parse(path: "foo.{{bar}}").map { model.get(binding: $0)?.toString() }
+        )
     }
 }
 
 class BindingInstanceTests: XCTestCase {
-    func testSimpleBinding() {
-        let context = JSContext()!
+    func testSimpleBinding() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let binding = BindingInstance(rawBinding: "foo.bar", in: context)
 

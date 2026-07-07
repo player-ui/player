@@ -7,28 +7,24 @@
 //
 
 import Foundation
-import XCTest
-import SwiftUI
-import ViewInspector
-
 @testable import PlayerUI
+@testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
 @testable import PlayerUITestUtilitiesCore
-@testable import PlayerUISwiftUI
-@testable import PlayerUIInternalTestUtilities
+import SwiftUI
+import ViewInspector
+import XCTest
 
 class AssetFlowViewTests: XCTestCase {
-  override func setUp() {
-        XCUIApplication().terminate()
-    }
     func testVersionBodies() throws {
         let flow = FlowData.COUNTER
 
         let view = AssetFlowView(
             flow: flow,
             plugins: [
-                ReferenceAssetsPlugin()
+                ReferenceAssetsPlugin(),
             ]
         ) { _ in
         }
@@ -40,7 +36,7 @@ class AssetFlowViewTests: XCTestCase {
     }
 
     // swiftlint:disable function_body_length
-    func testAssetFlowView() throws {
+    func testAssetFlowView() {
         let flow = """
         {
           "id": "generated-flow",
@@ -107,7 +103,7 @@ class AssetFlowViewTests: XCTestCase {
             flow: flow,
             plugins: [
                 ReferenceAssetsPlugin(),
-                ForceTransitionPlugin()
+                ForceTransitionPlugin(),
             ]
         ) { _ in
             transitioned.fulfill()
@@ -117,14 +113,18 @@ class AssetFlowViewTests: XCTestCase {
         wait(for: [transitioned], timeout: 2)
         ViewHosting.expel()
     }
+
+    override func setUp() {
+        XCUIApplication().terminate()
+    }
 }
 
 class ForceTransitionPlugin: NativePlugin {
     var pluginName: String = "ForceTransition"
 
-    func apply<P>(player: P) where P: HeadlessPlayer {
+    func apply<P: HeadlessPlayer>(player: P) {
         guard let player = player as? SwiftUIPlayer else { return }
-        player.hooks?.flowController.tap({ flowController in
+        player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.afterTransition.tap { _ in
                     guard let state = player.state as? InProgressState else { return }
@@ -135,6 +135,6 @@ class ForceTransitionPlugin: NativePlugin {
                     }
                 }
             }
-        })
+        }
     }
 }

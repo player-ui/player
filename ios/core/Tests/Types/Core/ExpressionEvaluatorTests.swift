@@ -7,11 +7,10 @@
 //
 
 import Foundation
-import XCTest
-
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class ExpressionEvaluatorTests: XCTestCase {
     func testExpressionEvaluator() {
@@ -19,7 +18,8 @@ class ExpressionEvaluatorTests: XCTestCase {
 
         player.start(flow: FlowData.COUNTER, completion: { _ in })
         XCTAssertNotNil(player.state as? InProgressState)
-        guard let state = player.state as? InProgressState else { return XCTFail("state was not InProgressState") }
+        guard let state = player.state as? InProgressState
+        else { return XCTFail("state was not InProgressState") }
         XCTAssertNotNil(state.controllers?.expression.evaluate("{{count}} = 6"))
         XCTAssertNotNil(state.controllers?.expression.evaluate(["{{count}} = 6", "{{count}}"]))
     }

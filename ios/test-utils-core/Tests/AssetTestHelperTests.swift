@@ -1,24 +1,16 @@
-import XCTest
 @testable import PlayerUI
-@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUILogger
+@testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class AssetTestHelperTests: XCTestCase {
-    let helper = AssetTestHelper<TestWrapper, BaseAssetRegistry<TestWrapper>> {
+    private let helper = AssetTestHelper<TestWrapper, BaseAssetRegistry<TestWrapper>> {
         BaseAssetRegistry<TestWrapper>(logger: TapableLogger())
     }
 
-    struct TestPlugin: NativePlugin {
-        var pluginName: String = "TestPlugin"
-        func apply<P>(player: P) where P: HeadlessPlayer {
-            guard let player = player as? TestPlayer<TestWrapper, BaseAssetRegistry<TestWrapper>> else { return }
-            player.assetRegistry.register("test", asset: TestAssetType.self)
-        }
-    }
-
-    var plugins: [NativePlugin] = [
-        TestPlugin()
+    private var plugins: [NativePlugin] = [
+        TestPlugin(),
     ]
 
     func testRegistration() {
@@ -91,5 +83,15 @@ class AssetTestHelperTests: XCTestCase {
 
         XCTAssertNotNil(asset)
         XCTAssertEqual("test value", asset?.value)
+    }
+
+    struct TestPlugin: NativePlugin {
+        var pluginName: String = "TestPlugin"
+
+        func apply<P: HeadlessPlayer>(player: P) {
+            guard let player = player as? TestPlayer<TestWrapper, BaseAssetRegistry<TestWrapper>>
+            else { return }
+            player.assetRegistry.register("test", asset: TestAssetType.self)
+        }
     }
 }

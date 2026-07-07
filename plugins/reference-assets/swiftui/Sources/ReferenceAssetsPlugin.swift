@@ -1,18 +1,21 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
-/**
- Reference Assets for the `SwiftUIPlayer`
- */
+/// Reference Assets for the `SwiftUIPlayer`
 public class ReferenceAssetsPlugin: JSBasePlugin, NativePlugin {
-    /**
-    Tap into `Player` hooks during player creation
-    - parameters:
-       - player: The `HeadlessPlayer` that is applying this plugin
-    */
-    public func apply<P>(player: P) where P: HeadlessPlayer {
+    /// Constructs the SwiftUIReferenceAssetsPlugin
+    public convenience init() {
+        self.init(
+            fileName: "ReferenceAssetsPlugin.native",
+            pluginName: "ReferenceAssetsPlugin.ReferenceAssetsPlugin"
+        )
+    }
+
+    /// Tap into `Player` hooks during player creation
+    /// - parameters:
+    ///   - player: The `HeadlessPlayer` that is applying this plugin
+    public func apply<P: HeadlessPlayer>(player: P) {
         if let registry = player.assetRegistry as? SwiftUIRegistry {
             registry.register("action", asset: ActionAsset.self)
             registry.register("text", asset: TextAsset.self)
@@ -21,19 +24,11 @@ public class ReferenceAssetsPlugin: JSBasePlugin, NativePlugin {
             registry.register("info", asset: InfoAsset.self)
         }
     }
-    /**
-     Constructs the SwiftUIReferenceAssetsPlugin
-     */
-    public convenience init() {
-        self.init(fileName: "ReferenceAssetsPlugin.native", pluginName: "ReferenceAssetsPlugin.ReferenceAssetsPlugin")
-    }
 
-    /**
-     Retrieve the transforms from the JS bundle
-     - parameters:
-        - fileName: The name of the file to fetch
-     - returns: A URL if it exists in the bundle
-     */
+    /// Retrieve the transforms from the JS bundle
+    /// - parameters:
+    ///   - fileName: The name of the file to fetch
+    /// - returns: A URL if it exists in the bundle
     override open func getUrlForFile(fileName: String) -> URL? {
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
     }

@@ -5,12 +5,11 @@
 //  Created by Harris Borawski on 3/26/21.
 //
 
-import Foundation
-import SwiftUI
 import Combine
+import Foundation
 import JavaScriptCore
-
 import PlayerUI
+import SwiftUI
 
 /// An error type for errors from `ManagedPlayer`
 public enum ManagedPlayerError: Error {
@@ -18,20 +17,32 @@ public enum ManagedPlayerError: Error {
     case emptyFlow
 }
 
-/// A wrapper around the `SwiftUIPlayer` that uses a `FlowManager` to proceed through multi-flow experiences
+/// A wrapper around the `SwiftUIPlayer` that uses a `FlowManager` to proceed through multi-flow
+/// experiences
 public struct ManagedPlayer<Loading: View, Fallback: View>: View {
+    /// For ViewInspector testing
+    let inspection: Inspection<Self> = .init()
+
     private var plugins: [NativePlugin]
     private var flowManager: FlowManager?
-    @ObservedObject private var context: SwiftUIPlayer.Context
-
     private var loading: () -> Loading
     private var fallback: (ManagedPlayerErrorContext) -> Fallback
     private var viewModel: ManagedPlayerViewModel
 
     private var handleScroll: Bool
 
-    // For ViewInspector testing
-    internal let inspection = Inspection<Self>()
+    @ObservedObject private var context: SwiftUIPlayer.Context
+
+    public var body: some View {
+        ManagedPlayer14(
+            viewModel: viewModel,
+            plugins: plugins,
+            context: context,
+            handleScroll: handleScroll,
+            fallback: fallback,
+            loading: loading
+        ).onReceive(inspection.notice) { inspection.visit(self, $0) }
+    }
 
     /// Creates a `ManagedPlayer`
     /// - parameters:
@@ -62,8 +73,10 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
     ///    - plugins: The plugins to use for the `SwiftUIPlayer`
     ///    - flowManager: The `FlowManager` to use for fetching flows
     ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
-    ///    - onComplete: A handler for when the `FlowManager` signals that it has no more flows to fetch
-    ///    - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was used to start it
+    ///    - onComplete: A handler for when the `FlowManager` signals that it has no more flows to
+    /// fetch
+    ///    - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was
+    /// used to start it
     ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
     ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
@@ -79,38 +92,52 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         self.init(
             plugins: plugins,
             context: context,
-            viewModel: ManagedPlayerViewModel(manager: flowManager, onComplete: onComplete, onStartedFlow: onStartedFlow),
+            viewModel: ManagedPlayerViewModel(
+                manager: flowManager,
+                onComplete: onComplete,
+                onStartedFlow: onStartedFlow
+            ),
             handleScroll: handleScroll,
             fallback: fallback,
             loading: loading
         )
     }
-
-    public var body: some View {
-        ManagedPlayer14(
-            viewModel: viewModel,
-            plugins: plugins,
-            context: context,
-            handleScroll: handleScroll,
-            fallback: fallback,
-            loading: loading
-        ).onReceive(inspection.notice) { self.inspection.visit(self, $0) }
-    }
 }
+
 /// A managed version of the `SwiftUIPlayer` that uses a provided `FlowManager` to orchestrate
 /// loading Player through multiple flows, and showing a loading view in between flows
-internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
-    @StateObject private var viewModel: ManagedPlayerViewModel
-
+struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     private var plugins: [NativePlugin]
-    @ObservedObject private var context: SwiftUIPlayer.Context
-
-    @State private var inViewState = false
-
     private var loading: () -> Loading
     private var fallback: (ManagedPlayerErrorContext) -> Fallback
 
     private var handleScroll: Bool
+
+    @StateObject private var viewModel: ManagedPlayerViewModel
+
+    @ObservedObject private var context: SwiftUIPlayer.Context
+
+    @State private var inViewState = false
+
+    var body: some View {
+        bodyContent(viewModel.stateTransition.call() ?? .identity)
+            .onDisappear {
+                context.clearExceptionHandler()
+            }
+    }
+
+    var scrollPlugin: [NativePlugin] {
+        guard
+            plugins.filter({ $0 is ScrollPlugin }).isEmpty,
+            handleScroll
+        else { return [] }
+        return [ScrollPlugin()]
+    }
+
+    private var isViewLoaded: Bool {
+        guard case .loaded = viewModel.loadingState else { return false }
+        return inViewState
+    }
 
     /// Creates a `ManagedPlayer`
     /// - parameters:
@@ -119,7 +146,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
     ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
     ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
-    public init(
+    init(
         viewModel: ManagedPlayerViewModel,
         plugins: [NativePlugin],
         context: SwiftUIPlayer.Context = .sharedManaged,
@@ -129,22 +156,21 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.plugins = plugins
-        self._context = ObservedObject(initialValue: context)
+        _context = ObservedObject(initialValue: context)
         self.loading = loading
         self.fallback = fallback
         self.handleScroll = handleScroll
     }
 
-    public var body: some View {
-        bodyContent(viewModel.stateTransition.call() ?? .identity)
-            .onDisappear {
-                context.clearExceptionHandler()
-            }
-    }
-
-    private var isViewLoaded: Bool {
-        guard case .loaded = viewModel.loadingState else { return false }
-        return inViewState
+    func makePlayerView(flow: String) -> some View {
+        SwiftUIPlayer(
+            flow: flow,
+            plugins: plugins + [viewModel] + scrollPlugin +
+                [ToggleInViewPlugin(isViewLoaded: $inViewState)],
+            result: $viewModel.result,
+            context: context,
+            unloadOnDisappear: false
+        )
     }
 
     private func bodyContent(_ transitionInfo: PlayerViewTransition) -> some View {
@@ -156,29 +182,38 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                         context.unload()
                         Task { await viewModel.next() }
                     }
-                case .retry(let prevResult):
+                case let .retry(prevResult):
                     Color.clear.onAppear {
                         context.unload()
                         Task { await viewModel.next(prevResult) }
                     }
-                case .failed(let error):
-                    fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset)).onAppear { context.unload() }
-                case .loading, .loaded:
-                    /// to prevent alternative between loaded and loading state when flows reach multiple non VIEW states after another causing flickering of the loading spinner, change the opacity to show either the loading view or the player view
+                case let .failed(error):
+                    fallback(ManagedPlayerErrorContext(
+                        error: error,
+                        retry: viewModel.retry,
+                        reset: viewModel.reset
+                    )).onAppear { context.unload() }
+                case .loaded, .loading:
+                    // to prevent alternative between loaded and loading state when flows reach
+                    // multiple non VIEW states after another causing flickering of the loading
+                    // spinner, change the opacity to show either the loading view or the player
+                    // view
                     ZStack {
-                        // use isViewLoaded to determine when the loader is shown instead of checking for .loading case
+                        // use isViewLoaded to determine when the loader is shown instead of
+                        // checking for .loading case
                         loading().opacity(isViewLoaded ? 0 : 1)
-                        
-                        if case .loaded(let flow) = viewModel.loadingState {
+
+                        if case let .loaded(flow) = viewModel.loadingState {
                             makePlayerView(flow: flow).opacity(isViewLoaded ? 1 : 0)
                         }
                     }
                     .onChange(of: viewModel.loadingState) { newState in
                         if case .loading = newState {
-                            context.logger.d("loadingState changed to .loading - calling context.unload()")
+                            context.logger
+                                .d("loadingState changed to .loading - calling context.unload()")
                             // only call unload if were in loading state
                             context.unload()
-                        } else if case .loaded(_) = newState {
+                        } else if case .loaded = newState {
                             context.logger.d("loadingState changed to .loaded")
                         }
                     }
@@ -187,65 +222,47 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
         }
         .animation(transitionInfo.animationCurve, value: viewModel.loadingState)
     }
-
-    func makePlayerView(flow: String) -> some View {
-        SwiftUIPlayer(
-            flow: flow,
-            plugins: plugins + [viewModel] + scrollPlugin + [ToggleInViewPlugin(isViewLoaded: self.$inViewState)],
-            result: $viewModel.result,
-            context: context,
-            unloadOnDisappear: false
-        )
-    }
-
-    var scrollPlugin: [NativePlugin] {
-        guard
-            plugins.filter({ $0 as? ScrollPlugin != nil }).count == 0,
-            handleScroll
-        else { return [] }
-        return [ScrollPlugin()]
-    }
 }
 
-/// A plugin for the passed into the SwiftUIPlayer for determining when a view has been loaded based on the binding passed in
+/// A plugin for the passed into the SwiftUIPlayer for determining when a view has been loaded based
+/// on the binding passed in
 /// updates that binding to false once the view disappears
-fileprivate class ToggleInViewPlugin: NativePlugin {
+private class ToggleInViewPlugin: NativePlugin {
+    var pluginName: String = "ToggleInViewPlugin"
 
-    @Binding public var isViewLoaded: Bool
+    @Binding var isViewLoaded: Bool
 
-    public init(isViewLoaded: Binding<Bool>) {
-        self._isViewLoaded = isViewLoaded
+    init(isViewLoaded: Binding<Bool>) {
+        _isViewLoaded = isViewLoaded
     }
 
-   public var pluginName: String = "ToggleInViewPlugin"
-
-   public func apply<P>(player: P) where P: HeadlessPlayer {
+    func apply<P: HeadlessPlayer>(player: P) {
         guard let player = player as? SwiftUIPlayer else { return }
 
-       player.hooks?.flowController.tap { flowController in
+        player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap { [weak self] _, newState in
-                    // set isViewLoaded back to false to show loading spinner when we transition to non view
+                    // set isViewLoaded back to false to show loading spinner when we transition to
+                    // non view
                     if (newState.value as? NavigationFlowViewState) == nil {
                         DispatchQueue.main.async {
-                          self?.$isViewLoaded.wrappedValue = false
+                            self?.$isViewLoaded.wrappedValue = false
                         }
-
                     }
                 }
             }
         }
 
-       // ensures we only set isViewLoaded to true once a view has been loaded
-        player.hooks?.viewController.tap({ (viewController) in
-            viewController.hooks.view.tap { (view) in
-                view.hooks.onUpdate.tap { [weak self] val in
+        // ensures we only set isViewLoaded to true once a view has been loaded
+        player.hooks?.viewController.tap { viewController in
+            viewController.hooks.view.tap { view in
+                view.hooks.onUpdate.tap { [weak self] _ in
                     DispatchQueue.main.async {
                         self?.$isViewLoaded.wrappedValue = true
                     }
                 }
             }
-        })
+        }
     }
 }
 
@@ -262,7 +279,9 @@ public extension SwiftUIPlayer.Context {
 }
 
 private extension JSContext {
-    static var sharedManaged: JSContext! { JSContext(virtualMachine: .playerShared) }
+    static var sharedManaged: JSContext! {
+        JSContext(virtualMachine: .playerShared)
+    }
 }
 
 private extension JSVirtualMachine {
@@ -282,17 +301,17 @@ public struct ManagedPlayerErrorContext {
     /// A function for retrying the previous flow load (recalls `next` with the same CompletedState)
     public var retry: ManagedPlayerRetry
 
-    /// A function for resetting the `FlowManager` (calls `next` with `nil` to fetch the first flow again)
+    /// A function for resetting the `FlowManager` (calls `next` with `nil` to fetch the first flow
+    /// again)
     public var reset: ManagedPlayerReset
 }
 
 /// A helper for ViewInspector.
 /// Marked `@unchecked Sendable` to satisfy `InspectionEmissary` conformance;
 /// this class is only used in test targets and is always accessed from the main thread.
-internal final class Inspection<V>: @unchecked Sendable where V: View {
-
-    let notice = PassthroughSubject<UInt, Never>()
-    var callbacks = [UInt: (V) -> Void]()
+final class Inspection<V: View>: @unchecked Sendable {
+    let notice: PassthroughSubject<UInt, Never> = .init()
+    var callbacks: [UInt: (V) -> Void] = [:]
 
     func visit(_ view: V, _ line: UInt) {
         if let callback = callbacks.removeValue(forKey: line) {
