@@ -161,6 +161,7 @@ iOS Development requires a bit more set-up.
 1. Install git hooks:
 
    ```bash
+   pnpm i
    pnpm run prepare
    ```
 
