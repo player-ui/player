@@ -25,6 +25,7 @@ struct A2UIDividerAssetView: View {
                 .accessibility(identifier: model.data.id)
         } else {
             Divider()
+                .frame(maxHeight: model.data.axis == "vertical" ? .infinity : nil)
                 .accessibility(identifier: model.data.id)
         }
     }

@@ -20,9 +20,9 @@ struct A2UIIconAssetView: View {
     @ObservedObject var model: AssetViewModel<A2UIIconData>
 
     var body: some View {
-        let name = model.data.name?.stringValue
+        let name = model.data.name?.stringValue ?? ""
         // Pass the name through as an SF Symbol; fall back to a neutral glyph.
-        Image(systemName: (name?.isEmpty == false ? name! : "questionmark.circle"))
+        Image(systemName: name.isEmpty ? "questionmark.circle" : name)
             .accessibility(label: Text(model.data.accessibility ?? name ?? ""))
             .accessibility(identifier: model.data.id)
     }
