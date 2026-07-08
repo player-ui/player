@@ -162,7 +162,6 @@ iOS Development requires a bit more set-up.
 
    ```bash
    pnpm i
-   pnpm run prepare
    ```
 
    These hooks include auto-formatting and will run for all staged files pre-commit.
