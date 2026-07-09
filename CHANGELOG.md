@@ -1,3 +1,41 @@
+# 1.1.0-next.1 (Thu Jul 09 2026)
+
+#### 🐛 Bug Fix
+
+- Log cold start time [#890](https://github.com/player-ui/player/pull/890) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Use `pnpm` with `husky` not `yarn` [#901](https://github.com/player-ui/player/pull/901) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 1
+
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
+# 1.1.0-next.0 (Mon Jul 06 2026)
+
+### Release Notes
+
+#### Update Android/iOS Managed Players to include `onStartedFlow` callback ([#896](https://github.com/player-ui/player/pull/896))
+
+Brings the React Managed Player's onStartedFlow callback (added in #881) to iOS and Android. Consumers can now be notified when the managed player starts a flow, and receive the flow that was used to start it — without having to track it themselves. For performance, the callback hands back the in-memory flow String that was passed in, rather than reading it back out of Player (which would force a deserialization across the JS bridge).
+
+---
+
+#### 🚀 Enhancement
+
+- Update Android/iOS Managed Players to include `onStartedFlow` callback [#896](https://github.com/player-ui/player/pull/896) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Use `rules_player` 2.6.2 to get ios release notes [#898](https://github.com/player-ui/player/pull/898) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.0.1 (Mon Jun 29 2026)
 
 #### 🐛 Bug Fix

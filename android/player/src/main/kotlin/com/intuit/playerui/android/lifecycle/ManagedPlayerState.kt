@@ -39,6 +39,9 @@ public sealed class ManagedPlayerState {
         /** Handler that is invoked when the [PlayerViewModel] reaches an [Running] state */
         public fun onRunning(inProgressState: Running) {}
 
+        /** Handler that is invoked when the player starts a flow, passing the flow [String] used to start it */
+        public fun onStartedFlow(flow: String) {}
+
         /** Handler that is invoked when the [PlayerViewModel] reaches the [Done] state */
         public fun onDone(doneState: Done) {}
 

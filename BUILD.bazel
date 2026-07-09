@@ -179,6 +179,7 @@ spm_publish(
     zip = ":PlayerUI_SPM",
     # SPM Release Repo
     repository = "git@github.com:player-ui/playerui-swift-package.git",
+    source_repo = "github.com/player-ui/player"
 )
 
 # SwiftLint

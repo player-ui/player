@@ -48,6 +48,69 @@ class ManagedPlayerViewModelTests: XCTestCase {
         await fulfillment(of: [completed], timeout: 2)
     }
 
+    func testViewModelOnStartedFlow() async throws {
+        let flowManager = ConstantFlowManager([flow1], delay: 0)
+
+        let started = expectation(description: "onStartedFlow called")
+        var startedFlows: [String] = []
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in}, onStartedFlow: { flow in
+            startedFlows.append(flow)
+            started.fulfill()
+        })
+
+        await viewModel.next()
+        await fulfillment(of: [started], timeout: 2)
+        XCTAssertEqual(startedFlows, [self.flow1])
+    }
+
+    func testViewModelOnStartedFlowMultiFlow() async throws {
+        let flowManager = ConstantFlowManager([flow1, flow2], delay: 0)
+
+        let started = expectation(description: "onStartedFlow called for each flow")
+        started.expectedFulfillmentCount = 2
+        var startedFlows: [String] = []
+        let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in}, onStartedFlow: { flow in
+            startedFlows.append(flow)
+            started.fulfill()
+        })
+
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 } action: { await viewModel.next() }
+
+        let result = """
+        {
+            "status": "completed",
+            "flow": "",
+            "endState": {
+                "outcome":"done"
+            }
+        }
+        """
+
+        let stateObj = JSContext()?.evaluateScript("(\(result))")
+
+        let state = CompletedState.createInstance(from: stateObj)!
+
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 } action: { viewModel.result = .success(state) }
+
+        await fulfillment(of: [started], timeout: 2)
+        XCTAssertEqual(startedFlows, [self.flow1, self.flow2])
+    }
+
+    func testViewModelOnStartedFlowNotCalledForEmptyFlow() {
+        var startedFlows: [String] = []
+        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([FlowData.COUNTER]), onComplete: {_ in}, onStartedFlow: { startedFlows.append($0) })
+
+        model.handleNextFlow("")
+
+        XCTAssertTrue(startedFlows.isEmpty)
+        switch model.loadingState {
+        case .failed(let error):
+            XCTAssertEqual(error as? ManagedPlayerError, ManagedPlayerError.emptyFlow)
+        default:
+            XCTFail("Should Have entered failed state")
+        }
+    }
+
     func testViewModelSuccessMultiFlow() async throws {
         let flowManager = ConstantFlowManager([flow1, flow2], delay: 0)
 
