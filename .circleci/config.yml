@@ -462,6 +462,7 @@ workflows:
           requires:
             - bazelrc
             - build-trunk
+            - lint-ios-trunk
 
       - build_and_test_ios:
           name: build-ios-fork
@@ -472,6 +473,7 @@ workflows:
           requires:
             - build-fork
             - bazelrc_fork
+            - lint-ios-fork
 
       - lint_ios:
           name: lint-ios-trunk
@@ -501,7 +503,6 @@ workflows:
           requires:
             - test-trunk
             - build-ios-trunk
-            - lint-ios-trunk
             - android-test-trunk
 
       - test:

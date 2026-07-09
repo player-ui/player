@@ -1,4 +1,4 @@
---swiftversion 5.5
+--swiftversion 5.9
 --exclude .build,.swiftpm,xcode/.build,bazel-*
 --indent 4
 --allman false
