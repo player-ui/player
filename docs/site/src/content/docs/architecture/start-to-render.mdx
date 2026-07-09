@@ -1,3 +1,8 @@
+---
+title: "What Happens When You Start a Flow (core)"
+---
+
+```mermaid
 %% Player: start(flow) -> rendered view
 %% Shows the controllers spun up by Player.start, the FlowController state machine,
 %% and the ViewController -> Parser -> Resolver pipeline that produces a rendered view.
@@ -74,3 +79,5 @@ flowchart TD
 
     Rendered -.user action.-> Transition
     Rendered -.data change.-> DataPipe(["see data-change-pipeline.mmd"])
+
+```

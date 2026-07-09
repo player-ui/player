@@ -1,3 +1,8 @@
+---
+title: "What Happens When Data Changes"
+---
+
+```mermaid
 %% Player: data change pipeline
 %% Shows what happens from a dataController.set/delete call through the model
 %% middleware, validation, ViewController microtask batching, and incremental
@@ -68,3 +73,5 @@ flowchart TD
     VMW -.-> SE1
     LocalModel -.-> SE2
     SE1 -.-> SE3
+
+```
