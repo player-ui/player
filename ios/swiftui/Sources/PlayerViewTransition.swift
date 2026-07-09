@@ -61,15 +61,15 @@ public struct PlayerViewTransition: Equatable {
 
         var transition: AnyTransition {
             switch self {
-            case let .named(_, transition): return transition
-            case let .unnamed(transition): return transition
+            case let .named(_, transition): transition
+            case let .unnamed(transition): transition
             }
         }
 
         static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case let (.named(lName, _), .named(rName, _)): return lName == rName
-            default: return false
+            case let (.named(lName, _), .named(rName, _)): lName == rName
+            default: false
             }
         }
     }

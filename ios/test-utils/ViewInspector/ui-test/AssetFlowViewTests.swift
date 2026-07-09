@@ -122,7 +122,7 @@ class AssetFlowViewTests: XCTestCase {
 class ForceTransitionPlugin: NativePlugin {
     var pluginName: String = "ForceTransition"
 
-    func apply<P: HeadlessPlayer>(player: P) {
+    func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in

@@ -589,7 +589,7 @@ class AnyTypeTests: XCTestCase {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
         let data = try? encoder.encode(data)
-        guard let data = data else { return nil }
+        guard let data else { return nil }
         return String(data: data, encoding: .utf8)
     }
 }

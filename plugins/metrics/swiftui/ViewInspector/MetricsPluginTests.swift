@@ -21,7 +21,7 @@ class TapCounterPlugin: NativePlugin {
     var pluginName: String = "TapCounter"
     var count = 0
 
-    func apply<P: HeadlessPlayer>(player: P) {
+    func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         player.hooks?.view.interceptRegister { info in
             self.count += 1

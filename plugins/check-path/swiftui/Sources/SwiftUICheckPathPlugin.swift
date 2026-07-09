@@ -11,7 +11,7 @@ public class SwiftUICheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
         self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         player.hooks?.view.tap(name: pluginName) { [weak self] view in
             AnyView(view.environment(\.checkPath, self))

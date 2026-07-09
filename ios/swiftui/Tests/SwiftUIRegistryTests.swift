@@ -423,8 +423,8 @@ class SwiftUIRegistryTests: XCTestCase {
         }
 
         let updatedJSString = jsString
-            .replacingOccurrences(of: "value1", with: "value3")
-            .replacingOccurrences(of: "value2", with: "value4")
+            .replacing("value1", with: "value3")
+            .replacing("value2", with: "value4")
         guard let updatedJSValue = context.evaluateScript(updatedJSString) else {
             return XCTFail("could not create JSValue")
         }

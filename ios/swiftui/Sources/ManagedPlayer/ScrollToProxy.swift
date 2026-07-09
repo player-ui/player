@@ -15,7 +15,7 @@ import SwiftUI
 /// assets to
 /// ensure they are visible when focused.
 public protocol ScrollToProxy {
-    func scrollTo<Item: Hashable>(_ item: Item, anchor: UnitPoint?)
+    func scrollTo(_ item: some Hashable, anchor: UnitPoint?)
 }
 
 /// ScrollViewProxy is only available on 14+
@@ -51,7 +51,7 @@ public extension EnvironmentValues {
 }
 
 public extension ScrollToProxy {
-    func scrollTo<Item: Hashable>(_ item: Item) {
+    func scrollTo(_ item: some Hashable) {
         scrollTo(item, anchor: nil)
     }
 }
@@ -60,6 +60,6 @@ private struct ScrollToEnvironmentKey: EnvironmentKey {
     static let defaultValue: ScrollToProxy = VoidScrollToProxy()
 
     private struct VoidScrollToProxy: ScrollToProxy {
-        func scrollTo<Item: Hashable>(_: Item, anchor _: UnitPoint?) {}
+        func scrollTo(_: some Hashable, anchor _: UnitPoint?) {}
     }
 }

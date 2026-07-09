@@ -84,7 +84,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         bag.forEach { $0.cancel() }
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         player.hooks?.state.tap { [weak self] state in
             guard let inProgress = state as? InProgressState else {
                 self?.currentState = nil
@@ -170,11 +170,11 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.idle, .idle): return true
-            case (.loading, .loading): return true
-            case let (.loaded(lll), .loaded(rrr)) where lll == rrr: return true
-            case let (.retry(lll), .retry(rrr)) where lll === rrr: return true
-            default: return false
+            case (.idle, .idle): true
+            case (.loading, .loading): true
+            case let (.loaded(lll), .loaded(rrr)) where lll == rrr: true
+            case let (.retry(lll), .retry(rrr)) where lll === rrr: true
+            default: false
             }
         }
     }

@@ -72,7 +72,7 @@ extension JSContext {
         getJSClass(jsClass)?.construct(withArguments: withArguments)
     }
 
-    func error<E: Error & JSConvertibleError>(for error: E) -> JSValue? {
+    func error(for error: some Error & JSConvertibleError) -> JSValue? {
         if let jsValueError = error as? JSValueError {
             // If the error originated in JS, just return the original object
             return jsValueError.originalJSError

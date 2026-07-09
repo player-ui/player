@@ -88,7 +88,7 @@ class AssetTestHelperTests: XCTestCase {
     struct TestPlugin: NativePlugin {
         var pluginName: String = "TestPlugin"
 
-        func apply<P: HeadlessPlayer>(player: P) {
+        func apply(player: some HeadlessPlayer) {
             guard let player = player as? TestPlayer<TestWrapper, BaseAssetRegistry<TestWrapper>>
             else { return }
             player.assetRegistry.register("test", asset: TestAssetType.self)

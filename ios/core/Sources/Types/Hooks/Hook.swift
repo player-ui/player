@@ -40,7 +40,7 @@ public class BaseAsyncJSHook: BaseJSHook {
     /// Creates a promise with common error handling for async operations
     /// - Parameter asyncWork: The async work to execute
     /// - Returns: A JavaScript promise
-    func createAsyncPromise<Result>(_ asyncWork: @escaping () async throws -> Result) -> JSValue {
+    func createAsyncPromise(_ asyncWork: @escaping () async throws -> some Any) -> JSValue {
         let promise = JSUtilities.createPromise(context: context) { resolve, reject in
             Task {
                 do {
@@ -118,7 +118,7 @@ public class Hook2<T: CreatedFromJSValue, U: CreatedFromJSValue>: BaseJSHook {
     ///
     /// - parameters:
     /// - hook: A function to run when the JS hook is fired
-    public func tap<R>(_ hook: @escaping (T, U) -> R) {
+    public func tap(_ hook: @escaping (T, U) -> some Any) {
         let tapMethod: @convention(block) (JSValue?, JSValue?) -> Any? = { value, value2 in
             guard
                 let val = value,
@@ -285,7 +285,7 @@ public class AsyncHook<T: CreatedFromJSValue>: BaseAsyncJSHook {
                 let hookValue = T.createInstance(value: val) as? T
             else { return JSValue() }
 
-            return self.createAsyncPromise {
+            return createAsyncPromise {
                 try await hook(hookValue)
             }
         }
@@ -319,7 +319,7 @@ public class AsyncHook2<T: CreatedFromJSValue, U: CreatedFromJSValue>: BaseAsync
                     let hookValue2 = U.createInstance(value: val2) as? U
                 else { return JSValue() }
 
-                return self.createAsyncPromise {
+                return createAsyncPromise {
                     try await hook(hookValue, hookValue2)
                 }
             }

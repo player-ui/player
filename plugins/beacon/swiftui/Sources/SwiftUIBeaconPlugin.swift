@@ -24,7 +24,7 @@ open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>
         self.plugins = plugins
     }
 
-    open func apply<P: HeadlessPlayer>(player: P) {
+    open func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         let beacon = beacon(assetBeacon:)
         player.hooks?.view.tap(name: "BeaconPlugin") { view in
@@ -51,12 +51,12 @@ public class BeaconContext: ObservableObject {
     /// - id: The ID of the asset that triggered the beacon
     /// - metaData: `BeaconableMetaData` to include as extra data to the core BeaconPlugin
     /// - data: Additional arbitrary data to include in the beacon
-    public func beacon<MetaDataType: BeaconableMetaData>(
+    public func beacon(
         action: String,
         element: String,
         id: String,
         type: String? = nil,
-        metaData: MetaDataType? = nil,
+        metaData: (some BeaconableMetaData)? = nil,
         data: AnyType? = nil
     ) {
         beaconFn(

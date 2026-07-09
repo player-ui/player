@@ -236,7 +236,7 @@ private class ToggleInViewPlugin: NativePlugin {
         _isViewLoaded = isViewLoaded
     }
 
-    func apply<P: HeadlessPlayer>(player: P) {
+    func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
 
         player.hooks?.flowController.tap { flowController in
@@ -266,7 +266,7 @@ private class ToggleInViewPlugin: NativePlugin {
     }
 }
 
-private extension Collection where Element == NativePlugin {
+private extension Collection<NativePlugin> {
     func apply(_ model: ManagedPlayerViewModel) {
         compactMap { $0 as? ManagedPlayerPlugin }.forEach { $0.apply(model) }
     }

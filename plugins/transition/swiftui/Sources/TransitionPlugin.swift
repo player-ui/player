@@ -30,7 +30,7 @@ public class TransitionPlugin: NativePlugin, ManagedPlayerPlugin {
         self.popTransition = popTransition
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         let pushTransition = pushTransition
         let popTransition = popTransition

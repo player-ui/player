@@ -16,9 +16,9 @@ public protocol NativePlugin {
     /// Apply the plugin to Player
     /// - parameters:
     ///   - player: Player to apply to
-    func apply<P: HeadlessPlayer>(player: P)
+    func apply(player: some HeadlessPlayer)
 }
 
 public extension NativePlugin {
-    func apply<P: HeadlessPlayer>(player _: P) {}
+    func apply(player _: some HeadlessPlayer) {}
 }

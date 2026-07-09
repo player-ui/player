@@ -43,7 +43,7 @@ open class SwiftUIAssetUnitTestCase: XCTestCase, NativePlugin {
     /// Apply this class as a plugin to a `HeadlessPlayer` implementation
     /// - parameters:
     ///   - player: Player to apply to
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         if let registry = player.assetRegistry as? SwiftUIRegistry {
             register(registry: registry)
         }

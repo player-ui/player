@@ -25,13 +25,13 @@ public enum NavigationFlowStateType: Equatable {
     /// The raw `state_type` string as it appears in the flow JSON.
     public var rawValue: String {
         switch self {
-        case .view: return "VIEW"
-        case .action: return "ACTION"
-        case .asyncAction: return "ASYNC_ACTION"
-        case .flow: return "FLOW"
-        case .external: return "EXTERNAL"
-        case .end: return "END"
-        case let .unknown(value): return value
+        case .view: "VIEW"
+        case .action: "ACTION"
+        case .asyncAction: "ASYNC_ACTION"
+        case .flow: "FLOW"
+        case .external: "EXTERNAL"
+        case .end: "END"
+        case let .unknown(value): value
         }
     }
 

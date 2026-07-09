@@ -200,7 +200,7 @@ class HeadlessPlayerTests: XCTestCase {
                 "native-only-plugin"
             }
 
-            func apply<P: HeadlessPlayer>(player _: P) {
+            func apply(player _: some HeadlessPlayer) {
                 onApply()
             }
         }

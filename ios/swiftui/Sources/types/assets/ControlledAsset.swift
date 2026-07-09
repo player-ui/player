@@ -26,7 +26,7 @@ extension AssetRenderError: ErrorWithMetadata {
     public var metadata: [String: Any]? {
         switch self {
         case let .decodingFailure(_, asset, _):
-            return ["assetId": asset?.id ?? ""]
+            ["assetId": asset?.id ?? ""]
         }
     }
 
@@ -39,7 +39,7 @@ extension AssetRenderError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
         case let .decodingFailure(innerError, asset, pathToAsset):
-            return """
+            """
             An error occured while decoding an asset.
             Caused by: \(innerError.playerDescription)
             Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?

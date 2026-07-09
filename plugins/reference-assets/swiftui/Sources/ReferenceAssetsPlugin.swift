@@ -15,7 +15,7 @@ public class ReferenceAssetsPlugin: JSBasePlugin, NativePlugin {
     /// Tap into `Player` hooks during player creation
     /// - parameters:
     ///   - player: The `HeadlessPlayer` that is applying this plugin
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         if let registry = player.assetRegistry as? SwiftUIRegistry {
             registry.register("action", asset: ActionAsset.self)
             registry.register("text", asset: TextAsset.self)

@@ -83,7 +83,7 @@ class SwiftUIPlayerTests: XCTestCase {
         })
         let context = SwiftUIPlayer.Context { JSContext() }
         _ = SwiftUIPlayer(
-            flow: FlowData.COUNTER.replacingOccurrences(of: "value\"", with: "valu\""),
+            flow: FlowData.COUNTER.replacing("value\"", with: "valu\""),
             plugins: [ReferenceAssetsPlugin()],
             result: binding,
             context: context
@@ -116,7 +116,7 @@ class SwiftUIPlayerTests: XCTestCase {
 class ViewHookPlugin: NativePlugin {
     var pluginName: String = "ViewHookPlugin"
 
-    func apply<P: HeadlessPlayer>(player: P) {
+    func apply(player: some HeadlessPlayer) {
         guard let swiftuiplayer = player as? SwiftUIPlayer else { return }
         swiftuiplayer.hooks?.view.tap(name: pluginName) { view in
             AnyView(view.foregroundColor(.black))

@@ -30,8 +30,8 @@ extension PlayerError: JSConvertibleError {
     public var jsDescription: String {
         switch self {
         case let .unknownResponse(error):
-            return error.playerDescription
-        default: return localizedDescription
+            error.playerDescription
+        default: localizedDescription
         }
     }
 }
@@ -202,7 +202,7 @@ public extension HeadlessPlayer {
     /// Registers a plugin with player after instantiation
     /// Primarily for plugins to be able to add other plugins to player
     /// - Parameter plugin: The plugin to register
-    func registerPlugin<P: JSBasePlugin>(_ plugin: P) {
+    func registerPlugin(_ plugin: some JSBasePlugin) {
         assert(
             jsPlayerReference != nil,
             "Cannot register plugins before setuPlayer(context:plugins:) is called"
@@ -291,14 +291,14 @@ public extension HeadlessPlayer {
         }
     }
 
-    func findPlugin<Plugin: WithSymbol>(_ plugin: Plugin.Type) -> JSValue? {
+    func findPlugin(_ plugin: (some WithSymbol).Type) -> JSValue? {
         jsPlayerReference?
             .invokeMethod("findPlugin", withArguments: [
                 jsPlayerReference?.context.getSymbol(plugin.symbol) as Any,
             ])
     }
 
-    func applyTo<Plugin: WithSymbol>(_ plugin: Plugin.Type, apply: @escaping (JSValue) -> Void) {
+    func applyTo(_ plugin: (some WithSymbol).Type, apply: @escaping (JSValue) -> Void) {
         guard let plugin = findPlugin(plugin) else { return }
         apply(plugin)
     }

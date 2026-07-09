@@ -215,7 +215,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
 
             hooks.viewController.tap { [weak self, weak playerValue] controller in
                 guard let self, let playerValue, self.player == playerValue else { return }
-                self.onViewController(controller)
+                onViewController(controller)
             }
 
             hooks.state.tap { [weak self] newState in
@@ -240,8 +240,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         ///   - viewController: The new ViewController instance
         private func onViewController(_ viewController: ViewController) {
             viewController.hooks.view.tap { [weak self, weak expectedPlayer] view in
-                guard let self, let expectedPlayer, self.player == expectedPlayer else { return }
-                self.onView(view)
+                guard let self, let expectedPlayer, player == expectedPlayer else { return }
+                onView(view)
             }
         }
 
@@ -252,8 +252,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             view.hooks.onUpdate.tap { [weak self, weak expectedPlayer] value in
                 Task { @MainActor [weak self] in
                     guard let self, let expectedPlayer,
-                          self.player == expectedPlayer else { return }
-                    self.onUpdate(value)
+                          player == expectedPlayer else { return }
+                    onUpdate(value)
                 }
             }
         }

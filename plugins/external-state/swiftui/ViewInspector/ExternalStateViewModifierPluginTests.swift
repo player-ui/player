@@ -192,7 +192,7 @@ class ExternalStateViewModifierPluginTests: XCTestCase {
                 self.expectation = expectation
             }
 
-            func apply<P: HeadlessPlayer>(player: P) {
+            func apply(player: some HeadlessPlayer) {
                 player.hooks?.flowController.tap { flowController in
                     flowController.hooks.flow.tap { flow in
                         flow.hooks.afterTransition.tap { [weak self] newFlow in
@@ -580,7 +580,7 @@ private final class TestPlugin: NativePlugin {
         self.onError = onError
     }
 
-    func apply<P: HeadlessPlayer>(player: P) {
+    func apply(player: some HeadlessPlayer) {
         player.hooks?.errorController.tap { [onError] errorController in
             errorController.hooks.onError.tap { errorInfo in
                 onError(errorInfo)

@@ -37,19 +37,19 @@ public enum ErrorTypes: Equatable {
 
     public var rawValue: String {
         switch self {
-        case .expression: return "expression"
-        case .binding: return "binding"
-        case .view: return "view"
-        case .asset: return "asset"
-        case .navigation: return "navigation"
-        case .validation: return "validation"
-        case .data: return "data"
-        case .schema: return "schema"
-        case .network: return "network"
-        case .plugin: return "plugin"
-        case .render: return "render"
-        case .externalState: return "externalState"
-        case let .unknown(value): return value
+        case .expression: "expression"
+        case .binding: "binding"
+        case .view: "view"
+        case .asset: "asset"
+        case .navigation: "navigation"
+        case .validation: "validation"
+        case .data: "data"
+        case .schema: "schema"
+        case .network: "network"
+        case .plugin: "plugin"
+        case .render: "render"
+        case .externalState: "externalState"
+        case let .unknown(value): value
         }
     }
 

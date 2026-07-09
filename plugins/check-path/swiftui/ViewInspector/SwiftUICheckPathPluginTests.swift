@@ -14,7 +14,7 @@ class SwiftUICheckPathPluginTests: XCTestCase {
 
         let appear = baseView.on(\.didAppear) { view in
             let value = try view.actualView().checkPath
-            guard let value = value else { return }
+            guard let value else { return }
             XCTAssertEqual(value.getParentProp(id: "action-label"), "label")
             XCTAssertTrue(value.hasParentContext(id: "action-label", query: "action"))
             XCTAssertNotNil(value.getParentContext(id: "action-label", query: "action"))

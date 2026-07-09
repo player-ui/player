@@ -23,7 +23,7 @@ public class PrintLoggerPlugin: NativePlugin {
     }
 
     /// Applies itself to Player
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         player.logger.logLevel = logLevel
 
         player.logger

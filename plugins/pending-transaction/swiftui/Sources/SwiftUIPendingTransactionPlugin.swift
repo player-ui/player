@@ -31,7 +31,7 @@ public class SwiftUIPendingTransactionPlugin<T: Identifiable & Hashable>: Native
         self.keyPath = keyPath
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
 
         // transactionContext should attach to decoder prior to decoding a view
@@ -142,7 +142,7 @@ public extension CodingUserInfoKey {
 
 extension JSONDecoder {
     /// Sets the TransactionContext for the user info on the decoder
-    func setPendingTransaction<T>(_ transaction: TransactionContext<T>?) {
+    func setPendingTransaction(_ transaction: TransactionContext<some Any>?) {
         userInfo[.pendingTransactionContext] = transaction
     }
 }

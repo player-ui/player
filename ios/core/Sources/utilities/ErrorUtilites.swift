@@ -32,7 +32,7 @@ extension Swift.DecodingError {
                     return $0
                 }
                 .joined(separator: ".")
-                .replacingOccurrences(of: ".[", with: "[")
+                .replacing(".[", with: "[")
         }
 
         let messageForDecodingErrorContext = { (context: Context) -> String in

@@ -16,7 +16,7 @@ public class ScrollPlugin: NativePlugin {
         ignoredEdges = edgesIgnoringSafeArea
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         let ignoredEdges = ignoredEdges
         player.hooks?.view.tap(name: pluginName) { view in

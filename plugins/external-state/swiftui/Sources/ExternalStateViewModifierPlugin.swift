@@ -56,7 +56,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
         )
     }
 
-    open func apply<P: HeadlessPlayer>(player: P) {
+    open func apply(player: some HeadlessPlayer) {
         guard let player = player as? SwiftUIPlayer else { return }
         player.hooks?.view.tap(name: pluginName) { view -> AnyView in
             return AnyView(view.modifier(ModifierType(plugin: self)))
@@ -195,10 +195,10 @@ public struct ExternalStateSheetModifier: ExternalStateViewModifier {
 // MARK: ViewInspector
 
 extension View {
-    func inspectableSheet<Sheet: View>(
+    func inspectableSheet(
         isPresented: Binding<Bool>,
         onDismiss: (() -> Void)? = nil,
-        @ViewBuilder content: @escaping () -> Sheet
+        @ViewBuilder content: @escaping () -> some View
     ) -> some View {
         modifier(
             InspectableSheet(isPresented: isPresented, onDismiss: onDismiss, popupBuilder: content)

@@ -26,11 +26,11 @@ public enum LogLevel: Int, CustomStringConvertible, Comparable, CaseIterable {
 
     public var description: String {
         switch self {
-        case .trace: return "trace"
-        case .debug: return "debug"
-        case .info: return " info"
-        case .warning: return " WARN"
-        case .error: return "ERROR"
+        case .trace: "trace"
+        case .debug: "debug"
+        case .info: " info"
+        case .warning: " WARN"
+        case .error: "ERROR"
         }
     }
 

@@ -50,8 +50,8 @@ final class ModelCache {
         return entries[key] as? T
     }
 
-    func set<T: AssetViewModel<ModelData>, ModelData>(
-        _ entry: T,
+    func set(
+        _ entry: some AssetViewModel<some Any>,
         forKey id: String,
         codingPath: [CodingKey]
     ) {

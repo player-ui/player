@@ -52,8 +52,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
         autoreleasepool {
             let player2 = SwiftUIPlayer(
-                flow: FlowData.COUNTER.replacingOccurrences(
-                    of: "counter-flow",
+                flow: FlowData.COUNTER.replacing(
+                    "counter-flow",
                     with: "counter-flow-2"
                 ),
                 plugins: [],
@@ -87,8 +87,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
         for i in 0 ..< 5 {
             autoreleasepool {
-                let flow = FlowData.COUNTER.replacingOccurrences(
-                    of: "counter-flow",
+                let flow = FlowData.COUNTER.replacing(
+                    "counter-flow",
                     with: "counter-flow-\(i)"
                 )
                 let player = SwiftUIPlayer(

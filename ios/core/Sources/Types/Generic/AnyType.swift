@@ -160,15 +160,15 @@ public extension AnyType {
     subscript(key: String) -> AnyType? {
         switch self {
         case let .dictionary(data):
-            return data[key].map { .string(data: $0) }
+            data[key].map { .string(data: $0) }
         case let .numberDictionary(data):
-            return data[key].map { .number(data: $0) }
+            data[key].map { .number(data: $0) }
         case let .booleanDictionary(data):
-            return data[key].map { .bool(data: $0) }
+            data[key].map { .bool(data: $0) }
         case let .anyDictionary(data):
-            return data[key]
+            data[key]
         default:
-            return nil
+            nil
         }
     }
 }
@@ -177,19 +177,19 @@ extension AnyType: Equatable {
     // swiftlint:disable:next cyclomatic_complexity
     public static func == (lhs: AnyType, rhs: AnyType) -> Bool {
         switch (lhs, rhs) {
-        case let (.string(lhv), .string(rhv)): return lhv == rhv
-        case let (.bool(lhv), .bool(rhv)): return lhv == rhv
-        case let (.number(lhv), .number(rhv)): return lhv == rhv
-        case let (.dictionary(lhv), .dictionary(rhv)): return lhv == rhv
-        case let (.numberDictionary(lhv), .numberDictionary(rhv)): return lhv == rhv
-        case let (.booleanDictionary(lhv), .booleanDictionary(rhv)): return lhv == rhv
-        case let (.array(lhv), .array(rhv)): return lhv == rhv
-        case let (.numberArray(lhv), .numberArray(rhv)): return lhv == rhv
-        case let (.booleanArray(lhv), .booleanArray(rhv)): return lhv == rhv
-        case let (.anyDictionary(lhv), .anyDictionary(rhv)): return lhv == rhv
-        case let (.anyArray(lhv), .anyArray(rhv)): return lhv == rhv
-        case (.unknownData, .unknownData): return true
-        default: return false
+        case let (.string(lhv), .string(rhv)): lhv == rhv
+        case let (.bool(lhv), .bool(rhv)): lhv == rhv
+        case let (.number(lhv), .number(rhv)): lhv == rhv
+        case let (.dictionary(lhv), .dictionary(rhv)): lhv == rhv
+        case let (.numberDictionary(lhv), .numberDictionary(rhv)): lhv == rhv
+        case let (.booleanDictionary(lhv), .booleanDictionary(rhv)): lhv == rhv
+        case let (.array(lhv), .array(rhv)): lhv == rhv
+        case let (.numberArray(lhv), .numberArray(rhv)): lhv == rhv
+        case let (.booleanArray(lhv), .booleanArray(rhv)): lhv == rhv
+        case let (.anyDictionary(lhv), .anyDictionary(rhv)): lhv == rhv
+        case let (.anyArray(lhv), .anyArray(rhv)): lhv == rhv
+        case (.unknownData, .unknownData): true
+        default: false
         }
     }
 }
@@ -401,7 +401,7 @@ public enum AnyTypeDecodingError: Error {
     public var localizedDescription: String {
         switch self {
         case .missingDecodingContext:
-            return """
+            """
             Attempted to decode data as an AnyType.anyArray, AnyType.anyDictionary, or \
             AnyType.unknownData but `AnyTypeDecodingContext` is missing.
             Create a context with `let context = AnyTypeDecodingContext(rawData: data)`.

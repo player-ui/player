@@ -23,7 +23,7 @@ public class RequestTimePlugin: NativePlugin {
         requestTimeWebPlugin = RequestTimeWebPlugin(getRequestTime)
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         requestTimeWebPlugin.context = player.jsPlayerReference?.context
         player.applyTo(MetricsPlugin.self) { [weak self] plugin in
             self?.requestTimeWebPlugin.pluginRef?.invokeMethod("apply", withArguments: [plugin])
@@ -85,7 +85,7 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
         onRenderEnd = handler
     }
 
-    public func apply<P: HeadlessPlayer>(player: P) {
+    public func apply(player: some HeadlessPlayer) {
         guard trackRenderTime, let player = player as? SwiftUIPlayer else { return }
         let renderEnd = renderEnd
         player.hooks?.view.tap(name: pluginName) { view -> AnyView in

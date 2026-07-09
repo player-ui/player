@@ -283,7 +283,7 @@ extension JSONDecoder {
         return try decode(T.self, from: data)
     }
 
-    func setDecodeAssetFunction<Asset>(_ function: @escaping DecodeAssetFunction<Asset>) {
+    func setDecodeAssetFunction(_ function: @escaping DecodeAssetFunction<some Any>) {
         userInfo[.decodeSUI] = function
     }
 

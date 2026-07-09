@@ -24,9 +24,9 @@ public extension ValidationSeverity {
     var color: Color {
         switch self {
         case .warning:
-            return Color(red: 0.976, green: 0.341, blue: 0.000)
+            Color(red: 0.976, green: 0.341, blue: 0.000)
         default:
-            return Color(red: 0.835, green: 0.169, blue: 0.118)
+            Color(red: 0.835, green: 0.169, blue: 0.118)
         }
     }
 
@@ -34,9 +34,9 @@ public extension ValidationSeverity {
     var textColor: Color {
         switch self {
         case .warning:
-            return Color(red: 0.000, green: 0.000, blue: 0.000)
+            Color(red: 0.000, green: 0.000, blue: 0.000)
         default:
-            return Color(red: 0.835, green: 0.169, blue: 0.118)
+            Color(red: 0.835, green: 0.169, blue: 0.118)
         }
     }
 

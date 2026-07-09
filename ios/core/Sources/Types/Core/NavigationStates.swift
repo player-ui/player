@@ -113,9 +113,9 @@ public class NavigationFlowActionState: NavigationFlowTransitionableState {
     /// An expression to execute. The return value determines the transition to take
     public var exp: Expression {
         if let multi = rawValue.objectForKeyedSubscript("exp").toObject() as? [String] {
-            return .multi(exp: multi)
+            .multi(exp: multi)
         } else {
-            return .single(exp: rawValue.objectForKeyedSubscript("exp").toString())
+            .single(exp: rawValue.objectForKeyedSubscript("exp").toString())
         }
     }
 
@@ -130,9 +130,9 @@ public class NavigationFlowAsyncActionState: NavigationFlowTransitionableState {
     /// An expression to execute. The return value determines the transition to take
     public var exp: Expression {
         if let multi = rawValue.objectForKeyedSubscript("exp").toObject() as? [String] {
-            return .multi(exp: multi)
+            .multi(exp: multi)
         } else {
-            return .single(exp: rawValue.objectForKeyedSubscript("exp").toString())
+            .single(exp: rawValue.objectForKeyedSubscript("exp").toString())
         }
     }
 

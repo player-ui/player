@@ -62,10 +62,10 @@ public struct BeaconableAsset: Codable, Equatable {
     ///   - id: The ID of the asset that fired the beacon
     ///   - type: The type of the asset that fired the beacon
     ///   - metaData: Beacon applicable metaData from the asset that fired the beacon
-    public init<MetaDataType: BeaconableMetaData>(
+    public init(
         id: String,
         type: String? = nil,
-        metaData: MetaDataType? = nil
+        metaData: (some BeaconableMetaData)? = nil
     ) {
         self.id = id
         self.type = type
