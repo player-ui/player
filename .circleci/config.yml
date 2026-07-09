@@ -208,8 +208,10 @@ jobs:
 
       - run:
           name: Homebrew Dependencies
+          # mint has no versions in homebrew, so pin the homebrew version with it
+          # This is mint 0.18.0
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install mint@0.18.0
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f682012776a07b711896a7294bf262534f0dfc98/Formula/m/mint.rb
 
       - run:
           name: Swift Lint and Format
