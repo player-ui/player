@@ -19,14 +19,8 @@ struct A2UIDividerAssetView: View {
     @ObservedObject var model: AssetViewModel<A2UIDividerData>
 
     var body: some View {
-        if model.data.axis == "vertical" {
-            Divider()
-                .frame(maxHeight: .infinity)
-                .accessibility(identifier: model.data.id)
-        } else {
-            Divider()
+        Divider()
                 .frame(maxHeight: model.data.axis == "vertical" ? .infinity : nil)
                 .accessibility(identifier: model.data.id)
-        }
     }
 }
