@@ -38,36 +38,12 @@ excluded:
     - ios/demo/Sources/String+Extensions.swift
     # Test folders. SwiftLint is pretty strict about test files unnecessarily, so we exclude them.
     # SwiftFormat still covers these.
-    - ios/core/Tests
-    - ios/logger/Tests
-    - ios/swiftui/Tests
-    - ios/swiftui/ViewInspector
-    - ios/test-utils-core/Tests
-    - ios/test-utils/Tests
-    - ios/test-utils/ViewInspector
-    - plugins/async-node/ios/Tests
-    - plugins/async-node/ios/ViewInspector
-    - plugins/beacon/ios/Tests
-    - plugins/beacon/swiftui/ViewInspector
-    - plugins/check-path/ios/Tests
-    - plugins/check-path/swiftui/ViewInspector
-    - plugins/common-expressions/ios/Tests
-    - plugins/common-types/ios/Tests
-    - plugins/computed-properties/ios/Tests
-    - plugins/console-logger/ios/Tests
-    - plugins/expression/ios/Tests
-    - plugins/external-action/ios/Tests
-    - plugins/external-action/swiftui/ViewInspector
-    - plugins/external-state/ios/Tests
-    - plugins/external-state/swiftui/ViewInspector
-    - plugins/metrics/swiftui/ViewInspector
-    - plugins/pending-transaction/swiftui/ViewInspector
-    - plugins/pubsub/ios/Tests
-    - plugins/reference-assets/swiftui/UITests
-    - plugins/reference-assets/swiftui/ViewInspector
-    - plugins/stage-revert-data/ios/Tests
-    - plugins/transition/swiftui/ViewInspector
-    - plugins/types-provider/ios/Tests
+    - ios/*/Tests
+    - ios/*/ViewInspector
+    - ios/*/UITests
+    - plugins/*/Tests
+    - plugins/*/UITests
+    - plugins/*/ViewInspector
 
 opt_in_rules:
     # Enforces Swift 5.7+ shorthand `guard let foo` over verbose `guard let foo = foo` to reduce visual clutter

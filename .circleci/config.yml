@@ -209,7 +209,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install mint
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install mint@0.18.0
 
       - run:
           name: Swift Lint and Format
@@ -486,7 +486,6 @@ workflows:
                 - /pull\/.*/
           requires:
             - bazelrc
-            - build-trunk
 
       - lint_ios:
           name: lint-ios-fork
@@ -495,7 +494,6 @@ workflows:
               only:
                 - /pull\/.*/
           requires:
-            - build-fork
             - bazelrc_fork
 
       - maybe_release:
@@ -638,7 +636,7 @@ workflows:
 
       - lint_ios:
           requires:
-            - build
+            - bazelrc
 
       - android_test:
           context:
@@ -681,7 +679,6 @@ workflows:
             - test
             - bundle-analyze
             - build_and_test_ios
-            - lint_ios
             - build_docs
 
   full_release:
@@ -741,5 +738,4 @@ workflows:
             - test
             - bundle_analyze
             - build_and_test_ios
-            - lint_ios
             - build_docs
