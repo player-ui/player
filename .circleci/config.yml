@@ -207,18 +207,11 @@ jobs:
           at: ~/player
 
       - run:
-          name: Homebrew Dependencies
-          # mint has no versions in homebrew, so pin the homebrew version with it
-          # This is mint 0.18.0
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f682012776a07b711896a7294bf262534f0dfc98/Formula/m/mint.rb
-
-      - run:
           name: Swift Lint and Format
           command: |
-            mint bootstrap
-            mint run swiftlint lint --strict
-            mint run swiftformat ios plugins --lint
+            swift run --package-path xcode mint bootstrap
+            swift run --package-path xcode mint run swiftlint lint --strict ios plugins
+            swift run --package-path xcode mint run swiftformat ios plugins --lint
 
   test:
     executor: base
