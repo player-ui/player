@@ -3,7 +3,7 @@
 //  PlayerUI_Tests
 //
 //  Created by Harris Borawski on 8/23/21.
-//  Copyright © 2021 CocoaPods. All rights reserved.
+//  Copyright © 2021 Intuit. All rights reserved.
 //
 
 import Foundation
@@ -184,6 +184,21 @@ class HeadlessPlayerTests: XCTestCase {
         XCTAssertNotNil(plugin.context)
     }
 
+    func testRegisterNativePlugin() {
+        var applied = false
+        class NativeOnlyPlugin: NativePlugin {
+            var onApply: () -> Void
+            init(onApply: @escaping () -> Void) { self.onApply = onApply }
+            var pluginName: String { "native-only-plugin" }
+            func apply<P: HeadlessPlayer>(player: P) { onApply() }
+        }
+        let player = HeadlessPlayerImpl(plugins: [])
+        player.start(flow: FlowData.COUNTER) { _ in }
+        let plugin = NativeOnlyPlugin(onApply: { applied = true })
+        player.registerPlugin(plugin)
+        XCTAssertTrue(applied)
+    }
+
     func testEmptyFlowObject() {
         let player = HeadlessPlayerImpl(plugins: [])
         player.start(flow: "{}") { (result) in
@@ -194,8 +209,9 @@ class HeadlessPlayerTests: XCTestCase {
             case .failure(let error):
                 switch error {
                 case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating 'this.navigation.BEGIN')")
-                default: break
+                    XCTAssertEqual(errorState.error.message, "undefined is not an object (evaluating 'this.navigation.BEGIN')")
+                default:
+                    XCTFail("Should throw PlayerError.promiseRejected")
                 }
             }
         }
@@ -210,9 +226,9 @@ class HeadlessPlayerTests: XCTestCase {
                 XCTFail("should have failed")
             case .failure(let error):
                 switch error {
-                case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating \'o.navigation\')")
-                default: break
+                case .jsConversionFailure: break
+                default:
+                    XCTFail("Should throw PlayerError.jsConversionFailure")
                 }
             }
         }

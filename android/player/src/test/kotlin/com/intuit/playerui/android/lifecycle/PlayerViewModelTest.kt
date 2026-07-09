@@ -6,7 +6,7 @@ import com.intuit.playerui.android.utils.CoroutineTestDispatcherExtension
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.Runtime
-import com.intuit.playerui.core.managed.AsyncFlowIterator
+import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
@@ -17,12 +17,14 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,10 +41,13 @@ internal class PlayerViewModelTest {
     private val validFlow =
         "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW_1\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
 
+    private val validFlow2 =
+        "{\"id\": \"id2\",\"navigation\": {\"BEGIN\": \"FLOW_1\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
+
     private val invalidFlow =
         "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
 
-    @MockK lateinit var flowIterator: AsyncFlowIterator
+    @MockK lateinit var flowManager: FlowManager
 
     @MockK lateinit var runtime: Runtime<*>
 
@@ -97,11 +102,10 @@ internal class PlayerViewModelTest {
 
     @BeforeEach
     fun setup() {
-        viewModel = PlayerViewModel(flowIterator)
-        every { runtime.scope } returns TestCoroutineScope()
+        viewModel = PlayerViewModel(flowManager)
         // TODO: Change to StandardTestDispatcher
         every { runtime.scope } returns CoroutineScope(Dispatchers.Default)
-        coEvery { flowIterator.terminate() } returns Unit
+        coEvery { flowManager.terminate(any()) } returns Unit
     }
 
     @AfterEach
@@ -111,7 +115,7 @@ internal class PlayerViewModelTest {
     fun `test factory`() {
         assertNotNull(
             PlayerViewModel
-                .Factory(flowIterator) {
+                .Factory(flowManager) {
                     PlayerViewModel(it)
                 }.create(PlayerViewModel::class.java),
         )
@@ -124,32 +128,77 @@ internal class PlayerViewModelTest {
 
     @Test
     fun `apply android player onUpdate`() = runBlocking {
-        coEvery { flowIterator.next(any()) } returns SimpleAsset.sampleFlow.toString()
+        coEvery { flowManager.next(any()) } returns SimpleAsset.sampleFlow.toString()
         viewModel.start()
-        coVerify(exactly = 1) { flowIterator.next(any()) }
+        coVerify(exactly = 1) { flowManager.next(any()) }
         assertPlayerState<InProgressState>()
         Level.Warn.assertLogged("WARN: AndroidPlayer: Warning in flow: simple-asset of type simple is not registered")
     }
 
     @Test
     fun `apply android player state hook tap`() = runBlocking {
-        coEvery { flowIterator.next(any()) } returns validFlow andThen invalidFlow
+        coEvery { flowManager.next(any()) } returns validFlow andThen invalidFlow
         viewModel.start()
-        coVerify(exactly = 1) { flowIterator.next(null) }
-        coVerify(exactly = 1) { flowIterator.next(any()) }
+        coVerify(exactly = 1) { flowManager.next(null) }
+        coVerify(exactly = 1) { flowManager.next(any()) }
         assertEquals("Error: No flow defined for: FLOW", assertPlayerState<ErrorState>().error.message)
     }
 
     @Test
-    fun `start calls next on manager`() {
-        coEvery { flowIterator.next(any()) } returns SimpleAsset.sampleFlow.toString()
+    fun `startedFlows emits the flow used to start the player`() = runBlocking {
+        coEvery { flowManager.next(any()) } returns validFlow andThen null
+        val started = mutableListOf<String>()
+        // startedFlows is a hot SharedFlow (replay = 0), so gate start() on the collector actually
+        // being subscribed - otherwise the emission can race ahead of the subscription and be missed
+        val subscribed = CompletableDeferred<Unit>()
+        val job = launch(Dispatchers.Default) {
+            viewModel.startedFlows
+                .onSubscription { subscribed.complete(Unit) }
+                .collect { started.add(it) }
+        }
+        // bound every wait so a missed emission fails in seconds rather than at the bazel test timeout
+        withTimeout(5_000) { subscribed.await() }
         viewModel.start()
-        coVerify(exactly = 1) { flowIterator.next(null) }
+        suspendUntilCondition(
+            getValue = { started.toList() },
+            condition = { it.contains(validFlow) },
+            messageSupplier = { "startedFlows did not emit the started flow, got $it" },
+        )
+        job.cancel()
+        assertEquals(listOf(validFlow), started)
+    }
+
+    @Test
+    fun `startedFlows emits once per flow for multiple flows`() = runBlocking {
+        coEvery { flowManager.next(any()) } returns validFlow andThen validFlow2 andThen null
+        val started = mutableListOf<String>()
+        val subscribed = CompletableDeferred<Unit>()
+        val job = launch(Dispatchers.Default) {
+            viewModel.startedFlows
+                .onSubscription { subscribed.complete(Unit) }
+                .collect { started.add(it) }
+        }
+        withTimeout(5_000) { subscribed.await() }
+        viewModel.start()
+        suspendUntilCondition(
+            getValue = { started.toList() },
+            condition = { it.containsAll(listOf(validFlow, validFlow2)) },
+            messageSupplier = { "startedFlows did not emit both flows, got $it" },
+        )
+        assertEquals(listOf(validFlow, validFlow2), started)
+        job.cancel()
+    }
+
+    @Test
+    fun `start calls next on manager`() {
+        coEvery { flowManager.next(any()) } returns SimpleAsset.sampleFlow.toString()
+        viewModel.start()
+        coVerify(exactly = 1) { flowManager.next(null) }
     }
 
     @Test
     fun `start eventually finishes if iterator does not return a new flow`() = runBlocking {
-        coEvery { flowIterator.next(any()) } returns null
+        coEvery { flowManager.next(any()) } returns null
         viewModel.start()
         val doneState = assertManagedPlayerState<ManagedPlayerState.Done>()
         assertEquals(ManagedPlayerState.Done(null), doneState)
@@ -157,7 +206,7 @@ internal class PlayerViewModelTest {
 
     @Test
     fun `start happy path`() = runBlocking {
-        coEvery { flowIterator.next(any()) } returns validFlow andThen null
+        coEvery { flowManager.next(any()) } returns validFlow andThen null
         viewModel.start()
         assertPlayerState<CompletedState>()
         Level.Info.assertLogged("INFO: AndroidPlayer: Flow completed successfully!, {state_type=END, outcome=done}")
@@ -165,7 +214,7 @@ internal class PlayerViewModelTest {
 
     @Test
     fun `start error path`() = runBlocking {
-        coEvery { flowIterator.next(any()) } returns invalidFlow
+        coEvery { flowManager.next(any()) } returns invalidFlow
         viewModel.start()
         assertPlayerState<ErrorState>()
         Level.Error.assertLogged("ERROR: AndroidPlayer: Error in Flow!, {}")
@@ -175,7 +224,7 @@ internal class PlayerViewModelTest {
     @Test
     fun `start will emit error state if iterator errors out`() = runBlocking {
         val exception = Exception("oh no")
-        coEvery { flowIterator.next(any()) } throws exception
+        coEvery { flowManager.next(any()) } throws exception
         viewModel.start()
         val errorState = assertManagedPlayerState<ManagedPlayerState.Error>()
         assertEquals("oh no", errorState.exception.message)
@@ -193,7 +242,7 @@ internal class PlayerViewModelTest {
 
     @Test
     fun `onCleared releases player`() = runBlocking {
-        coEvery { flowIterator.terminate() } returns Unit
+        coEvery { flowManager.terminate(any()) } returns Unit
         viewModel.apply(runtime)
         viewModel.player.start(SimpleAsset.sampleFlow.toString())
         viewModel.onCleared()
@@ -211,7 +260,7 @@ internal class PlayerViewModelTest {
         viewModel.player.hooks.release.tap("releaseTest") {
             released = true
         }
-        coEvery { flowIterator.next(null) } returns SimpleAsset.sampleFlow.toString()
+        coEvery { flowManager.next(null) } returns SimpleAsset.sampleFlow.toString()
         viewModel.release()
         assertThrows<PlayerRuntimeException> {
             viewModel.player.start(SimpleAsset.sampleFlow.toString())
@@ -222,7 +271,7 @@ internal class PlayerViewModelTest {
     @Test
     fun `test fail`() = runBlocking {
         val exception = Exception("oh no")
-        coEvery { flowIterator.next(any()) } returns SimpleAsset.sampleFlow.toString()
+        coEvery { flowManager.next(any()) } returns SimpleAsset.sampleFlow.toString()
         viewModel.start()
 
         assertPlayerState<InProgressState>()
@@ -233,38 +282,38 @@ internal class PlayerViewModelTest {
 
     @Test
     fun `retry should start player if not started`() {
-        coEvery { flowIterator.next(any()) } returns SimpleAsset.sampleFlow.toString()
+        coEvery { flowManager.next(any()) } returns SimpleAsset.sampleFlow.toString()
         viewModel.retry()
-        coVerify(exactly = 1) { flowIterator.next(null) }
+        coVerify(exactly = 1) { flowManager.next(null) }
     }
 
     @Test
     fun `retry should call manager next if it's running`() = runBlocking {
-        coEvery { flowIterator.next(any()) } returns SimpleAsset.sampleFlow.toString()
+        coEvery { flowManager.next(any()) } returns SimpleAsset.sampleFlow.toString()
         viewModel.start()
 
         assertManagedPlayerState<ManagedPlayerState.Running>()
 
         viewModel.retry()
-        coVerify(exactly = 2) { flowIterator.next(null) }
+        coVerify(exactly = 2) { flowManager.next(null) }
     }
 
     @Test
     fun `retry should call manager next if it's in error state`() = runBlocking {
         val exception = Exception("oh no")
-        coEvery { flowIterator.next(any()) } throws exception
+        coEvery { flowManager.next(any()) } throws exception
         viewModel.start()
 
         assertManagedPlayerState<ManagedPlayerState.Error>()
 
         viewModel.retry()
-        coVerify(exactly = 2) { flowIterator.next(null) }
+        coVerify(exactly = 2) { flowManager.next(null) }
     }
 
     @Test
     fun `view model can be cleared successfully if player is never used`() = runBlocking {
         val exception = Exception("oh no")
-        coEvery { flowIterator.next(any()) } throws exception
+        coEvery { flowManager.next(any()) } throws exception
         viewModel.start()
 
         assertManagedPlayerState<ManagedPlayerState.Error>()

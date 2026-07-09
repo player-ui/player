@@ -9,9 +9,7 @@ import Foundation
 import Combine
 import SwiftHooks
 
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 /// A plugin used by the ManagedPlayer.
 ///
@@ -84,9 +82,9 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     /// The last completed state
     private var prevResult: CompletedState?
 
-    private var prevState: NextState?
-
     private var onComplete: (CompletedState) -> Void
+
+    private var onStartedFlow: (String) -> Void
 
     /// The `FlowManager` that is used for this instance
     private var manager: FlowManager
@@ -98,14 +96,17 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
      - parameters:
         - manager: The `FlowManager` to use for fetching flows
         - onComplete: A handler for when the `FlowManager` signals that it has no more flows to fetch
+        - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was used to start it
         - onError: A handler for when the `SwiftUIPlayer` encounters an error
      */
     public init(
         manager: FlowManager,
-        onComplete: @escaping (CompletedState) -> Void
+        onComplete: @escaping (CompletedState) -> Void,
+        onStartedFlow: @escaping (String) -> Void = { _ in }
     ) {
         self.manager = manager
         self.onComplete = onComplete
+        self.onStartedFlow = onStartedFlow
 
         $result.sink { [weak self] result in
             guard let result = result else { return }
@@ -139,25 +140,26 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
             self.flow = nil
 
             do {
-                let nextState = try await self.manager.next(state)
-                self.handleNextState(nextState)
+                let nextFlow = try await self.manager.next(result: state)
+                self.handleNextFlow(nextFlow)
             } catch {
                 self.loadingState = .failed(error)
             }
         }
     }
 
-    func handleNextState(_ state: NextState) {
-        prevState = state
-        switch state {
-        case .flow(let flow):
+    func handleNextFlow(_ nextFlow: String?) {
+        if let flow = nextFlow {
             if !flow.isEmpty {
                 self.flow = flow
                 loadingState = .loaded(flow)
+                // Notify that a flow has started, passing back the in-memory flow that was used to
+                // start Player (avoids deserializing the flow back across the JS bridge)
+                onStartedFlow(flow)
             } else {
                 loadingState = .failed(ManagedPlayerError.emptyFlow)
             }
-        case .finished:
+        } else {
             guard let finalState = prevResult else { return }
             onComplete(finalState)
         }

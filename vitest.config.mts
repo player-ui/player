@@ -1,6 +1,27 @@
 import { configDefaults, defineConfig } from "vitest/config";
 import type { UserConfig } from "vitest/node";
 import path from "node:path";
+import fs from "node:fs";
+
+function benchmarkPaths() {
+  // In a bazel run, BUILD_WORKSPACE_DIRECTORY + BENCH_PACKAGE_PATH give us
+  // the source-tree package root so writes land in the right place.
+  // In a direct pnpm vitest bench run, CWD is the package directory.
+  const workspaceDir = process.env.BUILD_WORKSPACE_DIRECTORY;
+  const pkgPath = process.env.BENCH_PACKAGE_PATH;
+  const benchDir =
+    workspaceDir && pkgPath
+      ? path.join(workspaceDir, pkgPath, "benchmarks")
+      : path.join(process.cwd(), "benchmarks");
+
+  const outputJson = path.join(benchDir, "current.json");
+  const compareFile = path.join(benchDir, "baseline.json");
+
+  return {
+    outputJson,
+    ...(fs.existsSync(compareFile) ? { compare: compareFile } : {}),
+  };
+}
 
 export default defineConfig({
   test: {
@@ -19,6 +40,7 @@ export default defineConfig({
     ],
     benchmark: {
       exclude: [...configDefaults.exclude, "bazel-*/**"],
+      ...benchmarkPaths(),
     },
     setupFiles: [
       path.join(
@@ -32,6 +54,10 @@ export default defineConfig({
     },
 
     passWithNoTests: true,
+
+    // In Bazel 9, we cannot create a cache because the sandbox's node_modules are no longer writable.
+    // Trying to use a cache will make tests fail with this error: "Error: EPERM: operation not permitted, mkdir"
+    cache: false,
 
     coverage: {
       enabled: Boolean(process.env.COVERAGE_OUTPUT_FILE),

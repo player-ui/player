@@ -2,11 +2,10 @@ package com.intuit.playerui.android.lifecycle
 
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.core.managed.AsyncIterationManager
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 
-/** State of a managed player which serves as an aggregation of the players [state][PlayerFlowState] and the managers [state][AsyncIterationManager.State] */
+/** State of a managed player which serves as an aggregation of the players [state][PlayerFlowState] and the managers [state][AsyncIterationFlow.State] */
 public sealed class ManagedPlayerState {
     /** Initial state of the [PlayerViewModel] */
     public object NotStarted : ManagedPlayerState()
@@ -21,7 +20,7 @@ public sealed class ManagedPlayerState {
 
     /** State containing the current [asset] representation of the current in-progress flow */
     public data class Running(
-        public val asset: RenderableAsset?,
+        public val asset: RenderableAsset<*>?,
         public val animateViewTransition: Boolean,
     ) : ManagedPlayerState()
 
@@ -39,6 +38,9 @@ public sealed class ManagedPlayerState {
 
         /** Handler that is invoked when the [PlayerViewModel] reaches an [Running] state */
         public fun onRunning(inProgressState: Running) {}
+
+        /** Handler that is invoked when the player starts a flow, passing the flow [String] used to start it */
+        public fun onStartedFlow(flow: String) {}
 
         /** Handler that is invoked when the [PlayerViewModel] reaches the [Done] state */
         public fun onDone(doneState: Done) {}

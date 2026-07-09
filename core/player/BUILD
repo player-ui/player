@@ -35,6 +35,7 @@ js_pipeline(
         "//:node_modules/timm",
         "//:node_modules/ts-nested-error",
     ],
+    benchmark_envs = {"BENCH_PACKAGE_PATH": package_name()},
 )
 
 # Source files consumed by docs generation (e.g., hooks reference).

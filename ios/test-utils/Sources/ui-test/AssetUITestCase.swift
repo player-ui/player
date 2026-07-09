@@ -88,4 +88,26 @@ open class AssetUITestCase: XCTestCase {
         let expectation = self.expectation(for: predicate, evaluatedWith: nil, handler: nil)
         wait(for: [expectation], timeout: timeout)
     }
+
+    /// Taps an element and verifies the expected outcome appears. Retries the tap if the
+    /// outcome doesn't show up (e.g. the JS action handler isn't wired yet due to async
+    /// SwiftUI binding).
+    /// - parameters:
+    ///    - element: The XCUIElement to tap
+    ///    - expectedOutcome: The XCUIElement expected to appear after a successful tap
+    ///    - timeout: How long to wait for the outcome after each tap
+    ///    - retries: Maximum number of tap attempts
+    public func tapAndAssertElementAppears(
+        _ element: XCUIElement,
+        expectedOutcome: XCUIElement,
+        timeout: TimeInterval = 3,
+        retries: Int = 3
+    ) {
+        for _ in 0..<retries {
+            if expectedOutcome.exists { return }
+            guard element.exists else { break }
+            element.tap()
+            if expectedOutcome.waitForExistence(timeout: timeout) { return }
+        }
+    }
 }

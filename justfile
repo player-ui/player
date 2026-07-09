@@ -58,12 +58,15 @@ lint-kt:
 
 [doc('Fix all auto-fixable KT lint errors')]
 format-kt:
-  #!/usr/bin/env bash
-  set -u +e -o pipefail
+  bazel run kt-lint-fix-all
 
-  for target in $(bazel query --noshow_progress --output=label "kind('ktlint_fix rule', //...)"); do
-    bazel run "$target"
-  done
+[doc('Test KT for backwards compatibility changes')]
+check-abi-kt:
+  bazel test $(bazel query --noshow_progress --output=label "kind('abi_check_test rule', //...)" | tr '\n' ' ')
+
+[doc('Fix all auto-fixable KT lint errors')]
+update-abi-kt:
+  bazel run kt-abi-update-all
 
 ### End Kotlin ###
 

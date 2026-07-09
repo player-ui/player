@@ -252,9 +252,7 @@ export const usePersistentStateMachine = (options: {
         oldManagedState.state?.value === "running" &&
         playerState?.status === "in-progress"
       ) {
-        previousManager.current.terminate?.(
-          playerState.controllers.data.serialize(),
-        );
+        previousManager.current.terminate?.(playerState);
       }
     }
 
@@ -341,7 +339,7 @@ export const ManagedPlayer = (
     } else if (state?.value === "error") {
       props.onError?.(state?.context.error);
     } else if (state?.value === "running") {
-      props.onStartedFlow?.();
+      props.onStartedFlow?.(state.context.flow);
     }
   }
 
@@ -352,7 +350,7 @@ export const ManagedPlayer = (
       const playerState = state?.context.reactPlayer.player.getState();
 
       if (state?.value === "running" && playerState?.status === "in-progress") {
-        props.manager.terminate?.(playerState.controllers.data.serialize());
+        props.manager.terminate?.(playerState);
       }
     };
   }, [props.manager, state?.context.reactPlayer.player, state?.value]);

@@ -12,7 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.R
-import com.intuit.playerui.android.asset.DecodableAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.compose.AssetStyle
 import com.intuit.playerui.android.compose.ComposableAsset
@@ -24,8 +24,9 @@ import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.utils.makeFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalPlayerApi::class)
@@ -53,21 +54,24 @@ internal class SimpleComposableAsset(
     }
 }
 
-@Suppress("DEPRECATION_ERROR")
 @OptIn(ExperimentalPlayerApi::class)
 internal class NestedComposableAsset(
     assetContext: AssetContext,
-) : ComposableAsset<Node>(assetContext, NodeSerializer()) {
-    val nested: RenderableAsset? = expand("nested")
+) : ComposableAsset<NestedComposableAsset.Data>(assetContext, Data.serializer()) {
+    @Serializable
+    data class Data(
+        val label: String? = null,
+        val nested: AnyAsset? = null,
+    )
 
     @Composable
-    override fun content(data: Node) {
+    override fun content(data: Data) {
         Box(modifier = Modifier.testTag("nested-compose")) {
             Text(
-                text = data.getString("label") ?: "parent",
+                text = data.label ?: "parent",
                 modifier = Modifier.testTag("nested-compose-label"),
             )
-            nested?.compose(tag = "child-tag")
+            data.nested?.compose(tag = "child-tag")
         }
     }
 
@@ -121,16 +125,15 @@ internal class TextStyleCapturingAsset(
  * View-based asset that captures its context in a static companion
  * so tests can assert the context was styled correctly.
  */
-@Suppress("DEPRECATION_ERROR")
 internal class ContextCapturingAsset(
     assetContext: AssetContext,
-) : DecodableAsset<Node>(assetContext, Node.serializer()) {
-    override fun initView(): View {
-        lastCapturedContext = context
-        return TextView(context)
+) : RenderableAsset<Node>(assetContext, NodeSerializer()) {
+    override suspend fun initView(data: Node): View {
+        lastCapturedContext = requireContext()
+        return TextView(requireContext())
     }
 
-    override fun View.hydrate() = Unit
+    override fun CoroutineScope.hydrate(view: View, data: Node) = Unit
 
     companion object {
         var lastCapturedContext: Context? = null
@@ -145,12 +148,14 @@ internal class ContextCapturingAsset(
  * A ComposableAsset that passes [AssetStyle] with xmlStyles to its nested child.
  * Used to test style propagation through the Compose layer.
  */
-@Suppress("DEPRECATION_ERROR")
 @OptIn(ExperimentalPlayerApi::class)
 internal class StyledNestedComposableAsset(
     assetContext: AssetContext,
-) : ComposableAsset<Node>(assetContext, NodeSerializer()) {
-    val nested: RenderableAsset? = expand("nested")
+) : ComposableAsset<StyledNestedComposableAsset.Data>(assetContext, Data.serializer()) {
+    @Serializable
+    data class Data(
+        val nested: AnyAsset? = null,
+    )
 
     private val styles = object : AssetStyle {
         override val textStyle: TextStyle = TextStyle(fontSize = 24.sp)
@@ -158,9 +163,9 @@ internal class StyledNestedComposableAsset(
     }
 
     @Composable
-    override fun content(data: Node) {
+    override fun content(data: Data) {
         Box(modifier = Modifier.testTag("styled-nested-compose")) {
-            nested?.compose(styles = styles, tag = "styled-child-tag")
+            data.nested?.compose(styles = styles, tag = "styled-child-tag")
         }
     }
 
@@ -186,7 +191,6 @@ internal class StyledNestedComposableAsset(
         )
 
         /** Compose (styled) → Compose → XML view chain (3-level). */
-        @OptIn(InternalPlayerApi::class)
         val styledComposeToViewFlow = makeFlow(
             Json.encodeToJsonElement(
                 GenericSerializer(),

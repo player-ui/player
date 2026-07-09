@@ -11,7 +11,7 @@ import com.intuit.playerui.android.reference.demo.lifecycle.DemoPlayerViewModel
 import com.intuit.playerui.android.ui.PlayerFragment
 import com.intuit.playerui.core.bridge.serialization.json.prettify
 import com.intuit.playerui.core.bridge.toJson
-import com.intuit.playerui.core.managed.AsyncFlowIterator
+import com.intuit.playerui.core.managed.FlowManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,7 +20,7 @@ abstract class BasePlayerFragment : PlayerFragment() {
     abstract val flow: String
 
     override val playerViewModel by viewModels<DemoPlayerViewModel> {
-        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::DemoPlayerViewModel)
+        PlayerViewModel.Factory(FlowManager(flow), ::DemoPlayerViewModel)
     }
 
     private val currentPlayerCanvas get() = binding.playerCanvas.getChildAt(0)

@@ -24,7 +24,6 @@ main_resources = [
 test_deps = [
     "//jvm/testutils:with-runtimes",
     "//plugins/beacon/jvm",
-    "//plugins/common-types/jvm",
     "//plugins/reference-assets/jvm",
     artifact("io.mockk:mockk"),
     artifact("org.amshove.kluent:kluent"),

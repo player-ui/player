@@ -1,13 +1,22 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag", "int_flag")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_player//ios:defs.bzl", "assemble_ios_release", "spm_publish")
 load("@rules_player//internal:defs.bzl", "stamp")
-load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
+load("@rules_player//kotlin:defs.bzl", "abi_update_all", "lint_fix_all")
 
 package(default_visibility = ["//visibility:public"])
 
 npm_link_all_packages(
     name = "node_modules",
+)
+
+abi_update_all(
+    name = "kt-abi-update-all",
+)
+
+lint_fix_all(
+    name = "kt-lint-fix-all",
 )
 
 exports_files([
@@ -20,6 +29,8 @@ exports_files([
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
+    "LICENSE",
+    "Package.swift",
 ])
 
 js_library(
@@ -86,28 +97,13 @@ js_library(
 
 ##### Start iOS #####
 
-# Update the version in the podspec
-stamp(
-    name = "PlayerUI_Podspec",
-    files = ["//:PlayerUI.podspec"],
-    stable = True,
-    stamp = -1,
-    substitutions = {
-        "0.0.1-placeholder": "{STABLE_VERSION}",
-    },
-)
-
-exports_files([
-    "PlayerUI.podspec",
-])
-
-assemble_pod(
-    name = "PlayerUI_Pod",
-    srcs = glob([
-        "LICENSE",
-        "Package.swift",
-    ]),
+assemble_ios_release(
+    name = "PlayerUI_SPM",
     data = {
+        # Root level files
+        "//:LICENSE": "",
+        "//:Package.swift": "",
+
         # Core
         "//ios/core:PlayerUI_Sources": "ios/core/",
         "//core/player:player_native_bundle": "ios/core/Resources/",
@@ -141,18 +137,6 @@ assemble_pod(
         "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPlugin_Sources": "plugins/check-path/swiftui/",
         "//plugins/check-path/core:core_native_bundle": "plugins/check-path/ios/Resources/",
 
-        # Common Expressions
-        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPlugin_Sources": "plugins/common-expressions/ios/",
-        "//plugins/common-expressions/core:core_native_bundle": "plugins/common-expressions/ios/Resources/",
-
-        # Common Types
-        "//plugins/common-types/ios:PlayerUICommonTypesPlugin_Sources": "plugins/common-types/ios/",
-        "//plugins/common-types/core:core_native_bundle": "plugins/common-types/ios/Resources/",
-
-        # Computed Properties
-        "//plugins/computed-properties/ios:PlayerUIComputedPropertiesPlugin_Sources": "plugins/computed-properties/ios/",
-        "//plugins/computed-properties/core:core_native_bundle": "plugins/computed-properties/ios/Resources/",
-
         # Console Logger (PrintLoggerPlugin)
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPlugin_Sources": "plugins/console-logger/ios/",
 
@@ -160,10 +144,10 @@ assemble_pod(
         "//plugins/expression/ios:PlayerUIExpressionPlugin_Sources": "plugins/expression/ios/",
         "//plugins/expression/core:core_native_bundle": "plugins/expression/ios/Resources/",
 
-        # External Action
-        "//plugins/external-action/ios:PlayerUIExternalActionPlugin_Sources": "plugins/external-action/ios/",
-        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPlugin_Sources": "plugins/external-action/swiftui/",
-        "//plugins/external-action/core:core_native_bundle": "plugins/external-action/ios/Resources/",
+        # External State
+        "//plugins/external-state/ios:PlayerUIExternalStatePlugin_Sources": "plugins/external-state/ios/",
+        "//plugins/external-state/swiftui:PlayerUIExternalStateViewModifierPlugin_Sources": "plugins/external-state/swiftui/",
+        "//plugins/external-state/core:core_native_bundle": "plugins/external-state/ios/Resources/",
 
         # Metrics
         "//plugins/metrics/swiftui:PlayerUIMetricsPlugin_Sources": "plugins/metrics/swiftui/",
@@ -181,10 +165,6 @@ assemble_pod(
         "//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources": "plugins/reference-assets/swiftui/Resources/",
         "//plugins/reference-assets/core:core_native_bundle": "plugins/reference-assets/swiftui/Resources/js/",
 
-        # Stage Revert Data
-        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPlugin_Sources": "plugins/stage-revert-data/ios/",
-        "//plugins/stage-revert-data/core:core_native_bundle": "plugins/stage-revert-data/ios/Resources/",
-
         # Transition
         "//plugins/transition/swiftui:PlayerUITransitionPlugin_Sources": "plugins/transition/swiftui",
 
@@ -192,26 +172,14 @@ assemble_pod(
         "//plugins/types-provider/ios:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/ios/",
         "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
     },
-    podspec = ":PlayerUI_Podspec",
 )
 
-ios_publish(
+spm_publish(
     name = "ios_publish",
-    zip = ":PlayerUI_Pod",
+    zip = ":PlayerUI_SPM",
     # SPM Release Repo
     repository = "git@github.com:player-ui/playerui-swift-package.git",
-    # CocoaPods
-    podspec = ":PlayerUI_Podspec",
-    executable = "bundle exec pod",
-    globalFlags = [
-        # because jenkins runs as root
-        "--allow-root",
-    ],
-    pushFlags = [
-        # skip tests because it never runs them right
-        # and they're run as part of the build pipeline anyway
-        "--skip-tests",
-    ],
+    source_repo = "github.com/player-ui/player"
 )
 
 # SwiftLint

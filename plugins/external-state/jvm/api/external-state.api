@@ -1,0 +1,44 @@
+public final class com/intuit/playerui/plugins/externalState/ExternalStateHandler {
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler$Function;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler$Function;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/Map;
+	public final fun component3 ()Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler$Function;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler$Function;)Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler;
+	public static synthetic fun copy$default (Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler;Ljava/lang/String;Ljava/util/Map;Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler$Function;ILjava/lang/Object;)Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHandlerFunction ()Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler$Function;
+	public final fun getMatch ()Ljava/util/Map;
+	public final fun getRef ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/intuit/playerui/plugins/externalState/ExternalStateHandler$Function {
+	public abstract fun invoke (Lcom/intuit/playerui/core/flow/state/NavigationFlowExternalState;Lcom/intuit/playerui/core/player/state/ControllerState;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin : com/intuit/playerui/core/plugins/JSScriptPluginWrapper, com/intuit/playerui/core/plugins/PlayerPlugin {
+	public fun <init> ([Lcom/intuit/playerui/plugins/externalState/ExternalStateHandler;)V
+	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
+	public fun apply (Lcom/intuit/playerui/core/player/Player;)V
+}
+
+private final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin$Companion {
+}
+
+final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin$apply$jsHandlers$1$callback$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/bridge/Promise;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin$apply$jsHandlers$1$callback$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function3 {
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/plugins/externalState/ExternalStatePluginKt {
+	public static final fun getExternalStatePlugin (Lcom/intuit/playerui/core/player/Player;)Lcom/intuit/playerui/plugins/externalState/ExternalStatePlugin;
+}
+

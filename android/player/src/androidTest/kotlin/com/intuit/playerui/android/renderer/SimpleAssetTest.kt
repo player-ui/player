@@ -4,10 +4,14 @@ import android.widget.TextView
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.R
+import com.intuit.playerui.android.build
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.SimpleAsset.Companion.sampleFlow
 import com.intuit.playerui.android.utils.stringify
 import com.intuit.playerui.android.withContext
+import com.intuit.playerui.android.withStyles
+import com.intuit.playerui.android.withTag
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -23,59 +27,52 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with no styles`() {
-        val simple = SimpleAsset(assetContext).render(appContext)
+    fun `test rendering with no styles`() = runBlocking {
+        val simple = SimpleAsset(assetContext).awaitRender(appContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with some styles`() {
-        val simple = SimpleAsset(assetContext.withContext(appContext)).run {
-            render(R.style.Theme_AppCompat)
-        }
+    fun `test rendering with some styles`() = runBlocking {
+        val simple = assetContext.withContext(appContext).withStyles(R.style.Theme_AppCompat).build().awaitRender(appContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with some styles using another render method`() {
-        val simple = SimpleAsset(assetContext.withContext(appContext)).run {
-            render(listOf(R.style.Theme_AppCompat))
-        }
+    fun `test rendering with some styles using another render method`() = runBlocking {
+        val simple = assetContext.withContext(appContext).withStyles(listOf(R.style.Theme_AppCompat)).build().awaitRender(appContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with some styles and a tag`() {
-        val simple = SimpleAsset(assetContext.withContext(appContext)).run {
-            render(R.style.Theme_AppCompat, tag = "tag")
-        }
+    fun `test rendering with some styles and a tag`() = runBlocking {
+        val simple = assetContext.withContext(appContext).withStyles(R.style.Theme_AppCompat).withTag("tag").build().awaitRender(appContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with some styles and a tag using another render method`() {
-        val simple = SimpleAsset(assetContext.withContext(appContext)).run {
-            render(listOf(R.style.Theme_AppCompat), "tag")
-        }
+    fun `test rendering with some styles and a tag using another render method`() = runBlocking {
+        val simple = assetContext
+            .withContext(appContext)
+            .withStyles(listOf(R.style.Theme_AppCompat))
+            .withTag("tag")
+            .build()
+            .awaitRender(appContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with tag`() {
+    fun `test rendering with tag`() = runBlocking {
         player.start(sampleFlow.stringify())
 
-        val asset = SimpleAsset(assetContext.withContext(appContext))
+        val firstView = assetContext.withContext(appContext).build().awaitRender(appContext)
+        assertTrue(firstView is TextView)
 
-        with(asset) {
-            val firstView = asset.render()
-            assertTrue(firstView is TextView)
+        val secondView = assetContext.withContext(appContext).withTag("tag").build().awaitRender(appContext)
+        assertTrue(secondView is TextView)
 
-            val secondView = asset.render("tag")
-            assertTrue(secondView is TextView)
-
-            assertEquals(secondView, asset.render("tag"))
-            assertNotEquals(firstView, secondView)
-        }
+        assertEquals(secondView, assetContext.withContext(appContext).withTag("tag").build().awaitRender(appContext))
+        assertNotEquals(firstView, secondView)
     }
 
     @Test
