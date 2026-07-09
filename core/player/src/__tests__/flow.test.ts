@@ -1,10 +1,9 @@
-import { test, vitest, expect } from "vitest";
+import { test, vitest, expect, describe } from "vitest";
 import type { FlowController, NamedState } from "../controllers";
 import type { DataController } from "..";
 import { Player } from "..";
 import type { InProgressState } from "../types";
 import { waitFor } from "@testing-library/react";
-import { describe } from "node:test";
 
 test("transitions on action nodes", async () => {
   const player = new Player();

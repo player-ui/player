@@ -24,6 +24,13 @@ function benchmarkPaths() {
 }
 
 export default defineConfig({
+  resolve: {
+    // Bazel lays out inputs as a symlink tree; Vite 8 resolves symlinks to
+    // their real path by default, which escapes the sandbox (e.g. the shared
+    // vitest.setup.ts points back into bazel-out/bin). Preserve symlinks so
+    // paths stay sandbox-relative.
+    preserveSymlinks: true,
+  },
   test: {
     environment: "happy-dom",
     exclude: [

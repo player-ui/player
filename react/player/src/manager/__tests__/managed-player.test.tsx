@@ -17,7 +17,7 @@ vitest.mock("@player-ui/metrics-plugin", async () => {
 
   return {
     ...actual,
-    RequestTimeWebPlugin: vitest.fn().mockImplementation(() => {
+    RequestTimeWebPlugin: vitest.fn().mockImplementation(function () {
       return { apply: vitest.fn() };
     }),
   };
