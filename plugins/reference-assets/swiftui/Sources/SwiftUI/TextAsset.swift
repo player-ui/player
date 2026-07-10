@@ -48,6 +48,9 @@ struct LinkModifier: ViewModifier {
     ///   - destination: A string URL destination
     init(_ destination: String) {
         self.destination = URL(string: destination)
+        if self.destination == nil {
+            print("Error: Link has no destination. URL is nil.")
+        }
     }
 
     func body(content: Content) -> some View {

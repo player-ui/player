@@ -9,7 +9,6 @@
 --enable isEmpty
 --enable noGuardInTests
 --enable organizeDeclarations
---enable preferSwiftStringAPI
 --enable propertyTypes
 --enable singlePropertyPerLine
 --enable sortSwitchCases

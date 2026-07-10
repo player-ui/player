@@ -119,7 +119,7 @@ public enum FlowLoader {
                               let json = String(data: data, encoding: .utf8)
                         else { return [] }
                         return [(
-                            name: name.lowercased().replacing(".json", with: ""),
+                            name: name.lowercased().replacingOccurrences(of: ".json", with: ""),
                             flow: json
                         )]
                     }
@@ -134,8 +134,8 @@ public enum FlowLoader {
                 (
                     // Remove the section name from the beginning of the name, and remove dashes
                     name: flow.name
-                        .replacing("\(folder.lowercased())-", with: "")
-                        .replacing("-", with: " "),
+                        .replacingOccurrences(of: "\(folder.lowercased())-", with: "")
+                        .replacingOccurrences(of: "-", with: " "),
                     flow: flow.flow
                 )
             })
