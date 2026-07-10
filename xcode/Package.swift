@@ -14,7 +14,8 @@ import PackageDescription
 /// even though they would not use it
 /// this can cause conflicts for packages not used by the product at runtime
 ///
-/// So this file is used to generate dependencies for bazel so we can keep the actual Package.swift clean
+/// So this file is used to generate dependencies for bazel so we can keep the actual Package.swift
+/// clean
 /// since the spm rules for bazel only work from a Package.swift
 let package = Package(
     name: "PlayerUIBazelDependencies",
@@ -26,8 +27,9 @@ let package = Package(
         // Actual Dependencies
         .package(url: "https://github.com/intuit/swift-hooks.git", .upToNextMajor(from: "0.1.0")),
 
-        // Used to manage SwiftLint and SwiftFormat
-        .package(url: "https://github.com/yonaskolb/Mint.git", exact: "0.18.0"),
+        // Linters
+        .package(url: "https://github.com/realm/SwiftLint.git", exact: "0.63.2"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat.git", exact: "0.61.0"),
 
         // Testing Dependencies
         .package(

@@ -1373,7 +1373,7 @@
           "REPO_MAPPING:rules_swift_package_manager+,bazel_skylib bazel_skylib+",
           "REPO_MAPPING:rules_swift_package_manager+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_swift_package_manager+,cgrindel_bazel_starlib cgrindel_bazel_starlib+",
-          "FILE:@@//xcode/Package.resolved cadfa13f7fdd2b2579d9c0011a622ed984650d26d540ae61253d5ed0f30f7f3a"
+          "FILE:@@//xcode/Package.resolved abff48d3b78be89d4c5a57e4692f87a96a754a9c71c6810e735cf65f729c76ac"
         ],
         "generatedRepoSpecs": {
           "swift_package": {
@@ -1397,13 +1397,27 @@
               "target_deps": {}
             }
           },
-          "swiftpkg_mint": {
+          "swiftpkg_swiftlint": {
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
-              "bazel_package_name": "swiftpkg_mint",
-              "commit": "7bc67a0b925b949c8becc327bc08f56eeadc0051",
-              "remote": "https://github.com/yonaskolb/Mint.git",
-              "version": "0.18.0",
+              "bazel_package_name": "swiftpkg_swiftlint",
+              "commit": "88952528a590ed366c6f76f6bfb980b5ebdcefc1",
+              "remote": "https://github.com/realm/SwiftLint.git",
+              "version": "0.63.2",
+              "env": {},
+              "env_inherit": [],
+              "cached_json_directory": "",
+              "replace_scm_with_registry": false,
+              "target_deps": {}
+            }
+          },
+          "swiftpkg_swiftformat": {
+            "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
+            "attributes": {
+              "bazel_package_name": "swiftpkg_swiftformat",
+              "commit": "397309e73621d6355d3a7fb832ca233ac9dd5254",
+              "remote": "https://github.com/nicklockwood/SwiftFormat.git",
+              "version": "0.61.0",
               "env": {},
               "env_inherit": [],
               "cached_json_directory": "",
@@ -1425,13 +1439,13 @@
               "target_deps": {}
             }
           },
-          "swiftpkg_pathkit": {
+          "swiftpkg_collectionconcurrencykit": {
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
-              "bazel_package_name": "swiftpkg_pathkit",
-              "commit": "3bfd2737b700b9a36565a8c94f4ad2b050a5e574",
-              "remote": "https://github.com/kylef/PathKit.git",
-              "version": "1.0.1",
+              "bazel_package_name": "swiftpkg_collectionconcurrencykit",
+              "commit": "b4f23e24b5a1bff301efc5e70871083ca029ff95",
+              "remote": "https://github.com/JohnSundell/CollectionConcurrencyKit.git",
+              "version": "0.2.0",
               "env": {},
               "env_inherit": [],
               "cached_json_directory": "",
@@ -1439,13 +1453,13 @@
               "target_deps": {}
             }
           },
-          "swiftpkg_rainbow": {
+          "swiftpkg_cryptoswift": {
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
-              "bazel_package_name": "swiftpkg_rainbow",
-              "commit": "cdf146ae671b2624917648b61c908d1244b98ca1",
-              "remote": "https://github.com/onevcat/Rainbow.git",
-              "version": "4.2.1",
+              "bazel_package_name": "swiftpkg_cryptoswift",
+              "commit": "f2a627b84c1ff96f21ac2fcb623ab36142dd5512",
+              "remote": "https://github.com/krzyzanowskim/CryptoSwift.git",
+              "version": "1.10.0",
               "env": {},
               "env_inherit": [],
               "cached_json_directory": "",
@@ -1453,13 +1467,13 @@
               "target_deps": {}
             }
           },
-          "swiftpkg_spectre": {
+          "swiftpkg_sourcekitten": {
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
-              "bazel_package_name": "swiftpkg_spectre",
-              "commit": "26cc5e9ae0947092c7139ef7ba612e34646086c7",
-              "remote": "https://github.com/kylef/Spectre.git",
-              "version": "0.10.1",
+              "bazel_package_name": "swiftpkg_sourcekitten",
+              "commit": "6529c17fe80dd94843a3df7ed3e6a239790d5c91",
+              "remote": "https://github.com/jpsim/SourceKitten.git",
+              "version": "0.37.3",
               "env": {},
               "env_inherit": [],
               "cached_json_directory": "",
@@ -1467,13 +1481,13 @@
               "target_deps": {}
             }
           },
-          "swiftpkg_swiftcli": {
+          "swiftpkg_swift_argument_parser": {
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
-              "bazel_package_name": "swiftpkg_swiftcli",
-              "commit": "2e949055d9797c1a6bddcda0e58dada16cc8e970",
-              "remote": "https://github.com/jakeheis/SwiftCLI.git",
-              "version": "6.0.3",
+              "bazel_package_name": "swiftpkg_swift_argument_parser",
+              "commit": "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+              "remote": "https://github.com/apple/swift-argument-parser.git",
+              "version": "1.8.2",
               "env": {},
               "env_inherit": [],
               "cached_json_directory": "",
@@ -1481,13 +1495,69 @@
               "target_deps": {}
             }
           },
-          "swiftpkg_version": {
+          "swiftpkg_swift_filename_matcher": {
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
-              "bazel_package_name": "swiftpkg_version",
-              "commit": "3043fcd2a50375db76d89ff206a612471833d1c2",
-              "remote": "https://github.com/mxcl/Version.git",
-              "version": "2.2.1",
+              "bazel_package_name": "swiftpkg_swift_filename_matcher",
+              "commit": "eef5ac0b6b3cdc64b3039b037bed2def8a1edaeb",
+              "remote": "https://github.com/ileitch/swift-filename-matcher",
+              "version": "2.0.1",
+              "env": {},
+              "env_inherit": [],
+              "cached_json_directory": "",
+              "replace_scm_with_registry": false,
+              "target_deps": {}
+            }
+          },
+          "swiftpkg_swift_syntax": {
+            "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
+            "attributes": {
+              "bazel_package_name": "swiftpkg_swift_syntax",
+              "commit": "65b02a90ad2cc213e09309faeb7f6909e0a8577a",
+              "remote": "https://github.com/swiftlang/swift-syntax.git",
+              "version": "604.0.0-prerelease-2026-01-20",
+              "env": {},
+              "env_inherit": [],
+              "cached_json_directory": "",
+              "replace_scm_with_registry": false,
+              "target_deps": {}
+            }
+          },
+          "swiftpkg_swiftytexttable": {
+            "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
+            "attributes": {
+              "bazel_package_name": "swiftpkg_swiftytexttable",
+              "commit": "c6df6cf533d120716bff38f8ff9885e1ce2a4ac3",
+              "remote": "https://github.com/scottrhoyt/SwiftyTextTable.git",
+              "version": "0.9.0",
+              "env": {},
+              "env_inherit": [],
+              "cached_json_directory": "",
+              "replace_scm_with_registry": false,
+              "target_deps": {}
+            }
+          },
+          "swiftpkg_swxmlhash": {
+            "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
+            "attributes": {
+              "bazel_package_name": "swiftpkg_swxmlhash",
+              "commit": "a853604c9e9a83ad9954c7e3d2a565273982471f",
+              "remote": "https://github.com/drmohundro/SWXMLHash.git",
+              "version": "7.0.2",
+              "env": {},
+              "env_inherit": [],
+              "cached_json_directory": "",
+              "replace_scm_with_registry": false,
+              "target_deps": {}
+            }
+          },
+          "swiftpkg_yams": {
+            "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
+            "attributes": {
+              "bazel_package_name": "swiftpkg_yams",
+              "commit": "a27b21e0c81c5bf42049b897a62aaf387e80f279",
+              "remote": "https://github.com/jpsim/Yams.git",
+              "version": "6.2.2",
               "env": {},
               "env_inherit": [],
               "cached_json_directory": "",
@@ -1499,7 +1569,8 @@
         "moduleExtensionMetadata": {
           "explicitRootModuleDirectDeps": [
             "swiftpkg_swift_hooks",
-            "swiftpkg_mint",
+            "swiftpkg_swiftlint",
+            "swiftpkg_swiftformat",
             "swiftpkg_viewinspector",
             "swift_package"
           ],

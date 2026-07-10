@@ -209,9 +209,8 @@ jobs:
       - run:
           name: Swift Lint and Format
           command: |
-            swift run --package-path xcode mint bootstrap
-            swift run --package-path xcode mint run swiftlint lint --strict ios plugins
-            swift run --package-path xcode mint run swiftformat ios plugins --lint
+            swift run --package-path xcode swiftlint lint --strict ios plugins
+            swift run --package-path xcode swiftformat ios plugins --lint
 
   test:
     executor: base

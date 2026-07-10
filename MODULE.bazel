@@ -64,8 +64,9 @@ swift_deps.from_package(
 use_repo(
     swift_deps,
     "swift_package",
-    "swiftpkg_mint",
     "swiftpkg_swift_hooks",
+    "swiftpkg_swiftformat",
+    "swiftpkg_swiftlint",
     "swiftpkg_viewinspector",
 )
 

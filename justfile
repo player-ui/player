@@ -131,16 +131,16 @@ start-ios-demo:
 
 [doc('Format all Swift files in-place')]
 format-ios:
-  swift run --package-path xcode mint run swiftlint --fix ios plugins
-  swift run --package-path xcode mint run swiftformat ios plugins
+  swift run --package-path xcode swiftlint --fix ios plugins
+  swift run --package-path xcode swiftformat ios plugins
 
 [doc('Lint all Swift files with SwiftLint')]
 swift-lint-ios:
-  swift run --package-path xcode mint run swiftlint lint --strict ios plugins
+  swift run --package-path xcode swiftlint lint --strict ios plugins
 
 [doc('Lint all Swift files with SwiftFormat')]
 swift-format-lint-ios:
-  swift run --package-path xcode mint run swiftformat ios plugins --lint
+  swift run --package-path xcode swiftformat ios plugins --lint
 
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 

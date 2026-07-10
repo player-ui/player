@@ -9,8 +9,8 @@ module.exports = {
   '*.swift': (filenames) => {
     const files = filenames.join(' ');
     return [
-      `swift run --package-path xcode mint run swiftformat ${files}`,
-      `swift run --package-path xcode mint run swiftlint --fix ${files}`,
+      `swift run --package-path xcode swiftformat ${files}`,
+      `swift run --package-path xcode swiftlint --fix ${files}`,
     ];
   },
 };

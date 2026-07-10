@@ -166,13 +166,7 @@ iOS Development requires a bit more set-up.
 
    These hooks include auto-formatting and will run for all staged files pre-commit.
 
-1. Bootstrap Swift tooling:
-
-   ```bash
-   swift run --package-path xcode mint bootstrap
-   ```
-
-   [Mint](https://github.com/yonaskolb/Mint) is pinned via SPM in `xcode/Package.swift`, so no separate install is needed. `mint bootstrap` installs the pinned versions of SwiftFormat and SwiftLint (see the `Mintfile`) used by the project. Both are needed by the pre-commit hook to auto-fix formatting.
+1. Our linters, ([SwiftLint](https://github.com/realm/SwiftLint) and [SwiftFormat](https://github.com/nicklockwood/SwiftFormat)), are pinned via SPM in `xcode/Package.swift` and run with `swift run --package-path xcode`, so no separate install is needed. Use the `just` commands below.
 
    | Command                      | Description                                  |
    | ---------------------------- | -------------------------------------------- |
