@@ -8,7 +8,8 @@ import type {
   DataModelWithParser,
   Updates,
 } from "../../data";
-import { DependencyModel, withParser } from "../../data";
+import { DependencyModel, ownedSetIn, withParser } from "../../data";
+import type { ExpressionType } from "../../expressions";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
 import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
@@ -236,7 +237,9 @@ export class Resolver {
 
       const value = clonedNode[key];
       if (typeof value === "object" && value !== null) {
-        clonedNode[key] = Array.isArray(value) ? [...value] : { ...value };
+        clonedNode[key] = Array.isArray(value)
+          ? value.slice()
+          : Object.assign({}, value);
       }
     });
 
@@ -259,16 +262,19 @@ export class Resolver {
       withParser(dependencyModel, this.options.parseBinding),
     );
 
-    let resolveOptions: Resolve.NodeResolveOptions = {
-      ...options,
-      data: {
-        ...options.data,
-        model: depModelWithParser,
+    // Object.assign (rather than spread) to avoid the heavier object-spread
+    // helper once transpiled to ES5 for the mobile runtime; behavior is the
+    // same (own enumerable props copied) but this runs on every node.
+    let resolveOptions: Resolve.NodeResolveOptions = Object.assign(
+      {},
+      options,
+      {
+        data: Object.assign({}, options.data, { model: depModelWithParser }),
+        evaluate: (exp: ExpressionType) =>
+          this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
+        node,
       },
-      evaluate: (exp) =>
-        this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
-      node,
-    };
+    );
 
     try {
       resolveOptions = this.hooks.resolveOptions.call(resolveOptions, node);
@@ -393,6 +399,18 @@ export class Resolver {
     const childDependencies = new Set<BindingInstance>();
     dependencyModel.trackSubset("children");
 
+    // Folding multiple children into `resolved` re-clones its shared ancestors
+    // once per child. For nodes with several children, track containers cloned
+    // during this fold in `owned` so each is copied once and later writes mutate
+    // the existing clone. The fresh set guarantees the hook-returned value (and
+    // any reused `previousResult.value`) is never mutated — the first write
+    // always clones. For 0-1 children there is nothing to share, so plain
+    // `setIn` avoids the WeakSet bookkeeping entirely.
+    const childList =
+      "children" in resolvedAST ? resolvedAST.children : undefined;
+    const owned =
+      childList && childList.length > 1 ? new WeakSet<object>() : undefined;
+
     if ("children" in resolvedAST) {
       const newChildren = resolvedAST.children?.map((child) => {
         const computedChildTree = this.computeTree(
@@ -415,20 +433,19 @@ export class Resolver {
         childTreeDeps.forEach((binding) => childDependencies.add(binding));
 
         if (childValue) {
+          let next = childValue;
           if (childNode.type === NodeType.MultiNode && !childNode.override) {
-            const arr = addLast(
-              dlv(resolved, child.path as any[], []),
-              childValue,
-            );
-            resolved = setIn(resolved, child.path, arr);
-          } else {
-            resolved = setIn(resolved, child.path, childValue);
+            next = addLast(dlv(resolved, child.path as any[], []), childValue);
           }
+
+          resolved = owned
+            ? ownedSetIn(resolved, child.path, next, owned)
+            : setIn(resolved, child.path, next);
         }
 
         updated = updated || childUpdated;
 
-        return { ...child, value: childNode };
+        return Object.assign({}, child, { value: childNode });
       });
 
       resolvedAST.children = newChildren;
@@ -482,14 +499,15 @@ export class Resolver {
       throw new ResolverError(err, ResolverStage.AfterResolve, node);
     }
 
+    // `addChildReadDep` above already folded every child dependency into the
+    // model's read-deps, so `getDependencies()` returns the complete set. The
+    // model is local to this call and discarded afterward, so hand off its set
+    // directly rather than copying it into a new Set per node.
     const update: NodeUpdate = {
       node: resolvedAST,
       updated,
       value: resolved,
-      dependencies: new Set([
-        ...dependencyModel.getDependencies(),
-        ...childDependencies,
-      ]),
+      dependencies: dependencyModel.getDependencies(),
     };
 
     try {
