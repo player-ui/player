@@ -83,7 +83,7 @@ class SwiftUIPlayerTests: XCTestCase {
         })
         let context = SwiftUIPlayer.Context { JSContext() }
         _ = SwiftUIPlayer(
-            flow: FlowData.COUNTER.replacing("value\"", with: "valu\""),
+            flow: FlowData.COUNTER.replacingOccurrences(of: "value\"", with: "valu\""),
             plugins: [ReferenceAssetsPlugin()],
             result: binding,
             context: context

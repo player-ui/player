@@ -17,8 +17,8 @@ import XCTest
 
 class ManagedPlayerViewModelTests: XCTestCase {
     private let flow1 = FlowData.COUNTER
-    private let flow2 = FlowData.COUNTER.replacing(
-        "counter-flow",
+    private let flow2 = FlowData.COUNTER.replacingOccurrences(
+        of: "counter-flow",
         with: "counter-flow-2"
     )
 
