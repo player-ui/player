@@ -4,4 +4,16 @@ title: "What Happens When Data Changes"
 
 import rawDiagram from '../../../mermaid/data-change-pipeline.mmd?raw';
 
+This diagram follows a single data mutation from the call that triggers it all the way to the next committed render.
+
+**Where changes come from.** Every write funnels into `dataController.set` (or `.delete`): direct API calls, asset actions via the binding parser, the `set`/`delete` expression functions, and data written by an ACTION state's `afterTransition`.
+
+**Model update.** The transaction is normalized — bindings are parsed and values are deformatted through the SchemaController's formatters — then diffed against current state so no-op writes drop out. Surviving changes pass through the middleware chain, where `ValidationMiddleware` runs `"change"`-phase validators that may block or annotate the write before `LocalModel` commits it. The model returns every affected binding: both the ones written and any computed bindings that depend on them.
+
+**Batched render.** The ViewController taps the model's `onUpdate`/`onDelete` hooks and calls `queueUpdate`. Silent updates merge into the pending set without rendering; non-silent updates are coalesced into a single `queueMicrotask`, so a burst of synchronous writes produces just one render. When the microtask drains, the accumulated changed bindings and nodes are handed to `currentView.update`.
+
+**Incremental resolve.** The Resolver walks the AST from the root and, at each node, asks the DependencyModel whether any binding that node tracks is in the changeset. Unaffected subtrees reuse their cached resolved value; affected ones re-run applicability/switch/template logic and the StringResolver, which re-reads the model and re-evaluates `@[expr]@`. The reassembled tree is emitted to the renderer, which commits the diff — and the next user input starts the loop again.
+
+Alongside the main path, validation error/warning state updates in the `"change"` phase, computed-binding expressions re-evaluate, and the ValidationController may still gate the *next* transition via `skipTransition`.
+
 <pre class="mermaid">{rawDiagram}</pre>
