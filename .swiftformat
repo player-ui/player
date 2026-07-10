@@ -8,7 +8,6 @@
 --enable blockComments
 --enable isEmpty
 --enable noGuardInTests
---enable organizeDeclarations
 --enable propertyTypes
 --enable singlePropertyPerLine
 --enable sortSwitchCases
