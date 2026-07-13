@@ -3,7 +3,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import React, { Suspense, type ComponentType } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ReactPlayer, type ReactPlayerPlugin } from "../player";
-import { Asset } from "@player-ui/player";
+import { Asset, Player } from "@player-ui/player";
 import { makeFlow } from "@player-ui/make-flow";
 
 type ErrorViewProps = Asset<"throwing"> & {
@@ -190,6 +190,26 @@ describe("ReactPlayer", () => {
 
       expect(rp.options.plugins).toContain(plugin);
     });
+  });
+
+  it("should log the initialization time on startup", () => {
+    const info = vi.fn();
+
+    const player = new Player({ plugins: [] });
+    player.logger.addHandler({
+      trace: () => {},
+      debug: () => {},
+      info,
+      warn: () => {},
+      error: () => {},
+    });
+
+    const rp = new ReactPlayer({ player });
+
+    expect(rp.player).toBe(player);
+    expect(info).toHaveBeenCalledWith(
+      expect.stringMatching(/ReactPlayer initialized in \d+ ms\./),
+    );
   });
 
   describe("Error Handling", () => {

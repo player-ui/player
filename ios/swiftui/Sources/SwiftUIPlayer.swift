@@ -218,10 +218,16 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         unloadOnDisappear: Bool = true,
         startOptions: StartOptions? = nil
     ) {
+        let startTime = Date()
         self._result = result
         self._context = ObservedObject(initialValue: context)
         self.unloadOnDisappear = unloadOnDisappear
+
         context.load(flow: flow, plugins: plugins, player: self, startOptions: startOptions)
+
+        // Log the time it took to initialize Player
+        let initTime = Int((Date().timeIntervalSince(startTime) * 1000).rounded())
+        context.logger.i("SwiftUIPlayer initialized in \(initTime) ms.")
     }
 
     /// The SwiftUI View that is this Player flow

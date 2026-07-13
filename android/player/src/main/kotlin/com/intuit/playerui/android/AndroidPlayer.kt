@@ -188,11 +188,17 @@ public class AndroidPlayer private constructor(
 
     /** Apply [AndroidPlayerPlugin]s last */
     init {
+        val startTime = System.currentTimeMillis()
+
         player.format.registerContextualSerializer(assetSerializer.conform<RenderableAsset<*>>())
 
         plugins
             .filterIsInstance<AndroidPlayerPlugin>()
             .forEach { it.apply(this) }
+
+        // Log the time it took to initialize Player
+        val initTime = System.currentTimeMillis() - startTime
+        logger.info("AndroidPlayer initialized in $initTime ms.")
     }
 
     /**

@@ -1,3 +1,16 @@
+# 1.1.0-next.1 (Thu Jul 09 2026)
+
+#### 🐛 Bug Fix
+
+- Log cold start time [#890](https://github.com/player-ui/player/pull/890) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Use `pnpm` with `husky` not `yarn` [#901](https://github.com/player-ui/player/pull/901) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 1
+
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.1.0-next.0 (Mon Jul 06 2026)
 
 ### Release Notes
