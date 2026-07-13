@@ -27,14 +27,6 @@
     "./scripts/delete-old-prerelease.js",
     "./scripts/next-changelogs.js",
     "./scripts/version-comment.js",
-    "./scripts/docs/release-docs.js",
-    [
-      "./tools/auto-plugin-spm-release",
-      {
-        "targetRepoUrl": "git@github.com:player-ui/playerui-swift-package.git",
-        "targetRepo": "player-ui/playerui-swift-package",
-        "zipPath": "./dist/PlayerUI_SPM.zip"
-      }
-    ]
+    "./scripts/docs/release-docs.js"
   ]
 }

@@ -35,9 +35,6 @@ importers:
       '@auto-it/all-contributors':
         specifier: 11.3.6
         version: 11.3.6(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3)
-      '@auto-it/core':
-        specifier: 11.3.6
-        version: 11.3.6(patch_hash=7348abdff98f4b4f40c0ae8225b3979f5ea6f44ddd650c8d6aabba63786c7571)(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3)
       '@auto-it/omit-release-notes':
         specifier: 11.3.6
         version: 11.3.6(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3)
@@ -1109,8 +1106,6 @@ importers:
       '@player-ui/player':
         specifier: workspace:^
         version: link:../../../core/player
-
-  tools/auto-plugin-spm-release: {}
 
   tools/mocks: {}
 

@@ -77,6 +77,14 @@ commands:
             npx pnpm@10.18.1 install --frozen-lockfile
             npx pnpm@10.18.1 exec auto shipit -vv --only-graduate-with-release-label
           no_output_timeout: 40m
+      - run:
+          name: iOS Publish
+          command: |
+            # Runs after auto shipit so the GitHub release (used for release
+            # notes) already exists, and so we pick up auto's version bump.
+            git pull --rebase origin $(git symbolic-ref --short HEAD)
+            bazel build --config=release //:PlayerUI_SPM
+            bazel run --config=release //:ios_publish
 
 jobs:
   setup:

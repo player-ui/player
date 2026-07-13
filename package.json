@@ -23,7 +23,6 @@
     "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/tailwind": "^6.0.2",
     "@auto-it/all-contributors": "11.3.6",
-    "@auto-it/core": "11.3.6",
     "@auto-it/omit-release-notes": "11.3.6",
     "@auto-it/upload-assets": "11.3.6",
     "@auto-it/version-file": "11.3.6",

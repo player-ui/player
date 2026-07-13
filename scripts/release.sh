@@ -24,12 +24,6 @@ readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //
 
 bazel build --config=release $PKG_NPM_LABELS
 
-# iOS Prepublish
-# Build the SPM package zip and stage it at a fixed path for the @player-ui/auto-plugin-spm-release auto plugin
-bazel build --config=release //:PlayerUI_SPM
-mkdir -p dist
-cp -f "$(bazel cquery --config=release --output=files //:PlayerUI_SPM)" dist/PlayerUI_SPM.zip
-
 # Maven Central Prepublish
 MVN_RELEASE_TYPE=snapshot
 if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then
@@ -45,8 +39,6 @@ echo "Publishing NPM Packages with release type: ${NPM_TAG} on branch: ${CURRENT
 for pkg in $PKG_NPM_LABELS ; do
   bazel run --config=release -- ${pkg}.npm-publish --access public --tag ${NPM_TAG}
 done
-
-# iOS Publish is handled by the @player-ui/auto-plugin-spm-release auto plugin
 
 # Android/JVM Publish
 echo "Publishing Maven Packages with release type: ${MVN_RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
