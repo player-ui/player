@@ -1,0 +1,50 @@
+
+sequenceDiagram
+    title Data Controller with Binding Parser
+    participant P as Player
+
+    %% the controller is responsible for orchestrating the flow of data and handling interactions between the Data model
+    participant DC as dataController
+
+
+    %% the bindingPasrser is responsible for parsing raw binding strings and creating BindingInstance Objects. These represent paths in the datamodel.
+    participant BP as BindingParser
+    Note over BP: Binding parser helps get the binding path in the DataModel. <br> It helps ensure that bindings are correctly parsed and <br> are represented as BINDINGINSTANCE objects
+
+    %% the model is reponsible for defining the structure of the data, handling the data operations(get,set,delete), and managing middleware for data processing
+    participant DM as dataModel
+   
+
+   
+
+
+    Note over P: Initial Data : 
+    Note over P: foo: { 
+    Note over P: bar: { baz:"HelloWorld" },
+    Note over P: array: [ { property: "another value}] 
+    Note over P: }
+
+    P->>DC: Request to get(foo.bar.baz)
+    %%DataController handles this request
+    DC->>BP: get('foo.bar.baz')
+    
+    Note right of BP: The DC utilizes the BindingParser to parse the binding string. 
+    Note right of BP: BindingaParser takes the raw binding string and normalizes it.
+    Note right of BP: ["foo","bar","baz] would be the normalized path
+    Note right of BP: an AST gets generated with the normalized path using parseBinding
+     Note right of BP: which the AST then gets resolved to a normalized result, creating a BindingInstance
+    BP-->>DM: the BindingParser processes the request with the BindingInstance
+    
+    Note over BP: A BindingInstance helps with data manipulation within the data model.
+    DM->>DC: returns "Hello World"
+  
+    %%sets a binding of foo.bar to 'Hello World'
+
+    
+    P->>DC: Request to Set foo.array.0.property to "New Value"
+    %% Set takes in a (transaction and options?) as its parameters
+    
+    DC->>BP: set(transaction, options)
+    Note right of DC: On a deeper level, we keep track of the transactions and updates <br> to help with debugging and logging. Once all the update is accounted <br> for, it then calls set on the dataModel.
+    BP->>DM: set([[foo.array.0.property, "New Value"]])
+    Note right of DM: { foo: bar {...}, { array:[ property: "New Value"} ] }
