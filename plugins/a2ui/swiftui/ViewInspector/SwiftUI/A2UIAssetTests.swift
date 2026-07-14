@@ -1,15 +1,17 @@
 import Foundation
-import XCTest
-import ViewInspector
-import SwiftUI
 @testable import PlayerUI
 @testable import PlayerUIA2UI
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
+import SwiftUI
+import ViewInspector
+import XCTest
 
 @MainActor
 class A2UIAssetTests: SwiftUIAssetUnitTestCase {
-    override open func plugins() -> [NativePlugin] { [A2UIPlugin()] }
+    override open func plugins() -> [NativePlugin] {
+        [A2UIPlugin()]
+    }
 
     /// Renders a `Text` asset from its post-transform data shape.
     func testTextView() throws {

@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Image` asset.
 struct A2UIImageData: AssetData {
@@ -19,7 +18,9 @@ struct A2UIImageData: AssetData {
 /// labelled placeholder showing the source URL. Gate `AsyncImage` behind `#available(iOS 15, *)`
 /// to render the actual bitmap.
 final class A2UIImageAsset: UncontrolledAsset<A2UIImageData> {
-    public override var view: AnyView { AnyView(A2UIImageAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UIImageAssetView(model: model))
+    }
 }
 
 struct A2UIImageAssetView: View {

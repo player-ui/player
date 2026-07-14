@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Column` asset.
 struct A2UIColumnData: AssetData {
@@ -14,7 +13,9 @@ struct A2UIColumnData: AssetData {
 
 /// Vertical layout container — children are arranged top-to-bottom.
 final class A2UIColumnAsset: UncontrolledAsset<A2UIColumnData> {
-    public override var view: AnyView { AnyView(A2UIColumnAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UIColumnAssetView(model: model))
+    }
 }
 
 struct A2UIColumnAssetView: View {

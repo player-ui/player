@@ -35,9 +35,6 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
 
     @ObservedObject private var context: SwiftUIPlayer.Context
 
-    /// For ViewInspector testing
-    let inspection: Inspection<Self> = .init()
-
     /// Creates a `ManagedPlayer`
     /// - parameters:
     ///    - plugins: The plugins to use for the `SwiftUIPlayer`

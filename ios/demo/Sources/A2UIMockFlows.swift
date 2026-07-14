@@ -307,3 +307,5 @@ public enum A2UIMockFlows {
     }
     """
 }
+
+// swiftlint:enable all

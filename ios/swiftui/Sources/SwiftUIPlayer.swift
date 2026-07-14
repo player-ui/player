@@ -200,6 +200,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 return
             }
 
+            // swiftlint:disable closure_parameter_position
             player.start(flow: flow, options: startOptions) { [
                 weak self,
                 weak playerValue
@@ -209,6 +210,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                     self?.result = result
                 }
             }
+            // swiftlint:enable closure_parameter_position
         }
 
         /// Unload the context. This will release the current javascript player/context and clear
@@ -247,58 +249,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             player?.context.exceptionHandler = nil
         }
 
-        /// Load the supplied flow into this context. If the currently loaded flow is supplied this
-        /// will do nothing.
-        /// If a new flow is supplied then the javascript environment is created or rebuilt around
-        /// the new flow.
         fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
-            registry.logger = logger
-            guard self.player == nil || flow != self.flow else {
-                logger.d("Reusing already loaded flow")
-                return
-            }
-
-            let context: JSContext = contextBuilder()
-
-            let allPlugins = plugins + [partialMatchPlugin]
-            guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
-                return logger.e("Failed to load player")
-            }
-
-            let hooks = SwiftUIPlayerHooks(from: playerValue)
-
-            self.player = playerValue
-            self.flow = flow
-            self.hooks = hooks
-            DispatchQueue.main.async { [weak self] in
-                self?.result = nil
-            }
-
-            for plugin in allPlugins {
-                plugin.apply(player: player)
-            }
-            registry.partialMatchRegistry = partialMatchPlugin
-
-            hooks.viewController.tap { [weak self, weak playerValue] controller in
-                guard let self, let playerValue, self.player == playerValue else { return }
-                onViewController(controller)
-            }
-
-            hooks.state.tap { [weak self] newState in
-                self?.state = newState
-            }
-
-            guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                logger.d("Empty flow, not loading")
-                return
-            }
-
-            player.start(flow: flow) { [weak self, weak playerValue] result in
-                guard let self, let playerValue, self.player == playerValue else { return }
-                DispatchQueue.main.async { [weak self] in
-                    self?.result = result
-                }
-            }
+            load(flow: flow, plugins: plugins, player: player, startOptions: nil)
         }
 
         /// Handler for when the ViewController in the core player changes

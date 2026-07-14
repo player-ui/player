@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Button` asset.
 struct A2UIButtonData: AssetData {
@@ -16,20 +15,20 @@ struct A2UIButtonData: AssetData {
 
 /// Clickable element that triggers an action.
 final class A2UIButtonAsset: UncontrolledAsset<A2UIButtonData> {
-    public override var view: AnyView { AnyView(A2UIButtonAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UIButtonAssetView(model: model))
+    }
 }
 
 struct A2UIButtonAssetView: View {
     @ObservedObject var model: AssetViewModel<A2UIButtonData>
 
     var body: some View {
-        Button(action: { _ = model.data.run?() }) {
+        Button(action: { _ = model.data.run?() }, label: {
             if let child = model.data.child?.asset {
                 child.view
-            } else {
-                EmptyView()
             }
-        }
+        })
         .accessibility(identifier: model.data.id)
     }
 }

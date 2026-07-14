@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `CheckBox` asset.
 struct A2UICheckBoxData: AssetData {
@@ -14,7 +13,9 @@ struct A2UICheckBoxData: AssetData {
 
 /// Boolean toggle control bound to the data model.
 final class A2UICheckBoxAsset: UncontrolledAsset<A2UICheckBoxData> {
-    public override var view: AnyView { AnyView(A2UICheckBoxAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UICheckBoxAssetView(model: model))
+    }
 }
 
 struct A2UICheckBoxAssetView: View {

@@ -1,14 +1,16 @@
-import SwiftUI
 import PlayerUI
-import PlayerUISwiftUI
 import PlayerUIA2UI
 import PlayerUIExpressionPlugin
+import PlayerUISwiftUI
+import SwiftUI
 
 /// A single named A2UI snapshot to exercise in the demo.
 private struct A2UIMock: Identifiable {
     let name: String
     let snapshot: String
-    var id: String { name }
+    var id: String {
+        name
+    }
 }
 
 /// A self-contained demo screen that renders the full canonical A2UI snapshot
@@ -17,7 +19,7 @@ private struct A2UIMock: Identifiable {
 struct A2UIDemoView: View {
     private let plugins: [NativePlugin] = [
         A2UIPlugin(),
-        ExpressionPlugin()
+        ExpressionPlugin(),
     ]
 
     private let mocks: [A2UIMock] = A2UIMockFlows.all.map {

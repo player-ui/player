@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// SwiftUI renderers for the A2UI v0.9.1 component catalog.
 ///
@@ -15,7 +14,7 @@ public class A2UIPlugin: JSBasePlugin, NativePlugin {
     /// Tap into `Player` hooks during player creation to register the A2UI assets.
     /// - parameters:
     ///    - player: The `HeadlessPlayer` that is applying this plugin
-    public func apply<P>(player: P) where P: HeadlessPlayer {
+    public func apply(player: some HeadlessPlayer) {
         guard let registry = player.assetRegistry as? SwiftUIRegistry else { return }
         // Asset type strings are PascalCase — they must match the adapter output exactly.
         registry.register("Row", asset: A2UIRowAsset.self)

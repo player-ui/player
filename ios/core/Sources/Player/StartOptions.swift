@@ -24,16 +24,16 @@ public struct StartOptions: Equatable, Sendable {
     }
 
     /// Convenience for the A2UI snapshot format.
-    public static let a2ui = StartOptions(format: "a2ui")
+    public static let a2ui: StartOptions = .init(format: "a2ui")
 
     /// Builds the JS options object, omitting `nil` keys. A Swift `[String: Any]`
     /// bridges to a plain JS object through JavaScriptCore when passed via
     /// `invokeMethod(_:withArguments:)`. Returns `nil` when nothing is set so the
     /// default `start(flow:)` code path stays byte-identical (no extra argument).
-    internal var jsValue: [String: Any]? {
-        var dict: [String: Any] = [:]
-        if let format = format { dict["format"] = format }
-        if let version = version { dict["version"] = version }
+    var jsValue: [String: Any]? {
+        var dict = [String: Any]()
+        if let format { dict["format"] = format }
+        if let version { dict["version"] = version }
         return dict.isEmpty ? nil : dict
     }
 }

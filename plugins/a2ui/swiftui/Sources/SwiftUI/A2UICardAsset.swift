@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Card` asset.
 struct A2UICardData: AssetData {
@@ -12,7 +11,9 @@ struct A2UICardData: AssetData {
 
 /// Container with elevation/border and padding.
 final class A2UICardAsset: UncontrolledAsset<A2UICardData> {
-    public override var view: AnyView { AnyView(A2UICardAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UICardAssetView(model: model))
+    }
 }
 
 struct A2UICardAssetView: View {

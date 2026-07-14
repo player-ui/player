@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Icon` asset.
 struct A2UIIconData: AssetData {
@@ -13,7 +12,9 @@ struct A2UIIconData: AssetData {
 
 /// Display an icon by `name`, resolved to an SF Symbol.
 final class A2UIIconAsset: UncontrolledAsset<A2UIIconData> {
-    public override var view: AnyView { AnyView(A2UIIconAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UIIconAssetView(model: model))
+    }
 }
 
 struct A2UIIconAssetView: View {

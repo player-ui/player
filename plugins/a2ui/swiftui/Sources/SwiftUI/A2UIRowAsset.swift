@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Row` asset.
 struct A2UIRowData: AssetData {
@@ -14,7 +13,9 @@ struct A2UIRowData: AssetData {
 
 /// Horizontal layout container — children are arranged left-to-right.
 final class A2UIRowAsset: UncontrolledAsset<A2UIRowData> {
-    public override var view: AnyView { AnyView(A2UIRowAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UIRowAssetView(model: model))
+    }
 }
 
 struct A2UIRowAssetView: View {

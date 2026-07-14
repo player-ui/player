@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `List` asset.
 struct A2UIListData: AssetData {
@@ -14,7 +13,9 @@ struct A2UIListData: AssetData {
 
 /// Scrollable list of items, horizontal or vertical (default).
 final class A2UIListAsset: UncontrolledAsset<A2UIListData> {
-    public override var view: AnyView { AnyView(A2UIListAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UIListAssetView(model: model))
+    }
 }
 
 struct A2UIListAssetView: View {

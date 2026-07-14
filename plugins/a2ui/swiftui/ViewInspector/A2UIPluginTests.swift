@@ -1,13 +1,13 @@
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIA2UI
 @testable import PlayerUISwiftUI
+import XCTest
 
 class A2UIPluginTests: XCTestCase {
-    func testA2UIPluginConstructs() {
-        let context = JSContext()!
+    func testA2UIPluginConstructs() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let plugin = A2UIPlugin()
         plugin.context = context

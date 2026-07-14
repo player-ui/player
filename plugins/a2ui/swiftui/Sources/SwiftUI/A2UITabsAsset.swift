@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// A single tab — title + body component.
 struct A2UITabItem: Decodable {
@@ -18,7 +17,9 @@ struct A2UITabsData: AssetData {
 
 /// Tabbed interface organizing content into switchable panels.
 final class A2UITabsAsset: UncontrolledAsset<A2UITabsData> {
-    public override var view: AnyView { AnyView(A2UITabsAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UITabsAssetView(model: model))
+    }
 }
 
 struct A2UITabsAssetView: View {

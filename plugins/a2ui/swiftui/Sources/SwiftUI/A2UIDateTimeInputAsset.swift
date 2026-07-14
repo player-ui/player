@@ -1,8 +1,7 @@
-import SwiftUI
 import Combine
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `DateTimeInput` asset.
 struct A2UIDateTimeInputData: AssetData {
@@ -22,18 +21,26 @@ class A2UIDateTimeInputViewModel: AssetViewModel<A2UIDateTimeInputData> {
         super.init(data, userInfo: userInfo)
         $data.sink { [weak self] newData in
             self?.text = newData.currentValue ?? ""
-        }.store(in: &bag)
+        }
+        .store(in: &bag)
     }
 
-    func commit() { data.set?(text) }
+    func commit() {
+        data.set?(text)
+    }
 }
 
 /// Date/time entry bound to the data model.
 ///
 /// Note: renders a free-form text field for the value rather than a native picker, to keep
 /// parity with the cross-platform string round-trip without an extra dependency.
-final class A2UIDateTimeInputAsset: ControlledAsset<A2UIDateTimeInputData, A2UIDateTimeInputViewModel> {
-    public override var view: AnyView { AnyView(A2UIDateTimeInputAssetView(model: model)) }
+final class A2UIDateTimeInputAsset: ControlledAsset<
+    A2UIDateTimeInputData,
+    A2UIDateTimeInputViewModel
+> {
+    override var view: AnyView {
+        AnyView(A2UIDateTimeInputAssetView(model: model))
+    }
 }
 
 struct A2UIDateTimeInputAssetView: View {
@@ -42,7 +49,7 @@ struct A2UIDateTimeInputAssetView: View {
     private var label: String {
         let date = model.data.enableDate ?? true
         let time = model.data.enableTime ?? false
-        if date && time { return "Date & time" }
+        if date, time { return "Date & time" }
         if time { return "Time" }
         return "Date"
     }

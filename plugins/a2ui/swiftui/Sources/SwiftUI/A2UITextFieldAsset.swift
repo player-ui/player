@@ -1,8 +1,7 @@
-import SwiftUI
 import Combine
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `TextField` asset.
 struct A2UITextFieldData: AssetData {
@@ -25,15 +24,20 @@ class A2UITextFieldViewModel: AssetViewModel<A2UITextFieldData> {
         super.init(data, userInfo: userInfo)
         $data.sink { [weak self] newData in
             self?.text = newData.currentValue ?? ""
-        }.store(in: &bag)
+        }
+        .store(in: &bag)
     }
 
-    func commit() { data.set?(text) }
+    func commit() {
+        data.set?(text)
+    }
 }
 
 /// Text input field bound to the data model.
 final class A2UITextFieldAsset: ControlledAsset<A2UITextFieldData, A2UITextFieldViewModel> {
-    public override var view: AnyView { AnyView(A2UITextFieldAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UITextFieldAssetView(model: model))
+    }
 }
 
 struct A2UITextFieldAssetView: View {

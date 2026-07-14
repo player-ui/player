@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Slider` asset.
 struct A2UISliderData: AssetData {
@@ -15,7 +14,9 @@ struct A2UISliderData: AssetData {
 
 /// Numeric range input bound to the data model.
 final class A2UISliderAsset: UncontrolledAsset<A2UISliderData> {
-    public override var view: AnyView { AnyView(A2UISliderAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UISliderAssetView(model: model))
+    }
 }
 
 struct A2UISliderAssetView: View {
@@ -24,7 +25,7 @@ struct A2UISliderAssetView: View {
     private var range: ClosedRange<Double> {
         let lower = model.data.minValue ?? 0
         let upper = model.data.maxValue ?? 100
-        return lower <= upper ? lower...upper : lower...lower
+        return lower <= upper ? lower ... upper : lower ... lower
     }
 
     private var binding: Binding<Double> {

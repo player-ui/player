@@ -1,7 +1,6 @@
-import SwiftUI
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
 /// Decoded data for the A2UI `Text` asset.
 struct A2UITextData: AssetData {
@@ -14,7 +13,9 @@ struct A2UITextData: AssetData {
 
 /// Display text content with styling guidance via `variant`.
 final class A2UITextAsset: UncontrolledAsset<A2UITextData> {
-    public override var view: AnyView { AnyView(A2UITextAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(A2UITextAssetView(model: model))
+    }
 }
 
 struct A2UITextAssetView: View {
@@ -22,13 +23,13 @@ struct A2UITextAssetView: View {
 
     private var font: Font {
         switch model.data.variant {
-        case "h1": return .largeTitle
-        case "h2": return .title
-        case "h3": return .title2
-        case "h4": return .title3
-        case "h5": return .headline
-        case "caption": return .caption
-        default: return .body
+        case "h1": .largeTitle
+        case "h2": .title
+        case "h3": .title2
+        case "h4": .title3
+        case "h5": .headline
+        case "caption": .caption
+        default: .body
         }
     }
 
