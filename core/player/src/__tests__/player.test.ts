@@ -888,9 +888,10 @@ test("prevents invalid data from being committed during action-driven backward n
   // The invalid data should NOT be committed to the main model because of the transition
   const finalValue = state.controllers.data.get("someValue");
   expect(finalValue).toBeUndefined();
-  // But it should still be in the shadow/invalid model
+  // The transition should have dropped the invalid data entirely, not just
+  // hidden it from the main model
   const shadowValue = state.controllers.data.get("someValue", {
     includeInvalid: true,
   });
-  expect(shadowValue).toBe(-1);
+  expect(shadowValue).toBeUndefined();
 });

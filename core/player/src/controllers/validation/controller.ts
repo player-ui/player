@@ -420,6 +420,7 @@ export class ValidationController implements BindingTracker {
   private viewValidationProvider?: ValidationProvider;
   private options?: SimpleValidatorContext;
   private weakBindingTracker = new Set<BindingInstance>();
+  private validationMiddleware?: ValidationMiddleware;
 
   constructor(schema: SchemaController, options?: SimpleValidatorContext) {
     this.schema = schema;
@@ -433,6 +434,55 @@ export class ValidationController implements BindingTracker {
 
   /** Return the middleware for the data-model to stop propagation of invalid data */
   public getDataMiddleware(): Array<DataModelMiddleware> {
+    const validationMiddleware = new ValidationMiddleware(
+      (binding) => {
+        if (!this.options) {
+          return;
+        }
+
+        this.updateValidationsForBinding(binding, "change", this.options);
+        const strongValidation = this.getValidationForBinding(binding);
+
+        // return validation issues directly on bindings first
+        if (strongValidation?.get()?.severity === "error") {
+          return strongValidation.get();
+        }
+
+        // if none, check to see any validations this binding may be a weak ref of and return
+        const newInvalidBindings: Set<StrongOrWeakBinding> = new Set();
+        this.validations.forEach((weakValidation, strongBinding) => {
+          if (
+            caresAboutDataChanges(
+              new Set([binding]),
+              weakValidation.weakBindings,
+            ) &&
+            weakValidation?.get()?.severity === "error"
+          ) {
+            weakValidation?.weakBindings.forEach((weakBinding) => {
+              if (weakBinding === strongBinding) {
+                newInvalidBindings.add({
+                  binding: weakBinding,
+                  isStrong: true,
+                });
+              } else {
+                newInvalidBindings.add({
+                  binding: weakBinding,
+                  isStrong: false,
+                });
+              }
+            });
+          }
+        });
+
+        if (newInvalidBindings.size > 0) {
+          return newInvalidBindings;
+        }
+      },
+      { logger: new ProxyLogger(() => this.options?.logger) },
+    );
+
+    this.validationMiddleware = validationMiddleware;
+
     return [
       {
         set: (transaction, options, next) => {
@@ -450,52 +500,7 @@ export class ValidationController implements BindingTracker {
           return next?.delete(binding, options);
         },
       },
-      new ValidationMiddleware(
-        (binding) => {
-          if (!this.options) {
-            return;
-          }
-
-          this.updateValidationsForBinding(binding, "change", this.options);
-          const strongValidation = this.getValidationForBinding(binding);
-
-          // return validation issues directly on bindings first
-          if (strongValidation?.get()?.severity === "error") {
-            return strongValidation.get();
-          }
-
-          // if none, check to see any validations this binding may be a weak ref of and return
-          const newInvalidBindings: Set<StrongOrWeakBinding> = new Set();
-          this.validations.forEach((weakValidation, strongBinding) => {
-            if (
-              caresAboutDataChanges(
-                new Set([binding]),
-                weakValidation.weakBindings,
-              ) &&
-              weakValidation?.get()?.severity === "error"
-            ) {
-              weakValidation?.weakBindings.forEach((weakBinding) => {
-                if (weakBinding === strongBinding) {
-                  newInvalidBindings.add({
-                    binding: weakBinding,
-                    isStrong: true,
-                  });
-                } else {
-                  newInvalidBindings.add({
-                    binding: weakBinding,
-                    isStrong: false,
-                  });
-                }
-              });
-            }
-          });
-
-          if (newInvalidBindings.size > 0) {
-            return newInvalidBindings;
-          }
-        },
-        { logger: new ProxyLogger(() => this.options?.logger) },
-      ),
+      validationMiddleware,
     ];
   }
 
@@ -533,10 +538,11 @@ export class ValidationController implements BindingTracker {
   public reset() {
     this.validations.clear();
     this.tracker = undefined;
+    this.validationMiddleware?.reset();
   }
 
   public onView(view: ViewInstance): void {
-    this.validations.clear();
+    this.reset();
     if (!this.options) {
       return;
     }
