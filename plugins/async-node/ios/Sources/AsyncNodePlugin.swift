@@ -25,15 +25,16 @@ public extension ReplacementNode {
     /// - Returns: A `JSValue` representing the `ReplacementNode`, or `nil` if the conversion fails.
     func toJSValue(context: JSContext) -> JSValue? {
         switch self {
-        case .encodable(let encodable):
+        case let .encodable(encodable):
             let encoder = JSONEncoder()
             do {
                 let res = try encoder.encode(encodable)
-                return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+                return context
+                    .evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
             } catch {
                 return nil
             }
-        case .concrete(let jsValue):
+        case let .concrete(jsValue):
             return jsValue
         }
     }
@@ -44,16 +45,19 @@ public extension AsyncNodeHandlerType {
     /// Converts the `AsyncNodeHandlerType` to a `JSValue` in the provided `JSContext`.
     ///
     /// - Parameter context: The `JSContext` in which the `JSValue` will be created.
-    /// - Returns: A `JSValue` representing the `AsyncNodeHandlerType`, or `nil` if the conversion fails.
+    /// - Returns: A `JSValue` representing the `AsyncNodeHandlerType`, or `nil` if the conversion
+    /// fails.
     func handlerTypeToJSValue(context: JSContext) -> JSValue? {
         switch self {
-        case .multiNode(let replacementNodes):
+        case let .multiNode(replacementNodes):
             let jsValueArray = replacementNodes.compactMap {
                 $0.toJSValue(context: context)
             }
-            return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
+            return context.objectForKeyedSubscript("Array")
+                .objectForKeyedSubscript("from")
+                .call(withArguments: [jsValueArray])
 
-        case .singleNode(let replacementNode):
+        case let .singleNode(replacementNode):
             return replacementNode.toJSValue(context: context)
 
         case .emptyNode:
@@ -62,37 +66,44 @@ public extension AsyncNodeHandlerType {
     }
 }
 
-/**
- Wraps the core AsyncNodePlugin and taps into the `onAsyncNode` hook to allow asynchronous replacement of the node object that contains `async`
- */
+/// Wraps the core AsyncNodePlugin and taps into the `onAsyncNode` hook to allow asynchronous
+/// replacement of the node object that contains `async`
 public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
     public var hooks: AsyncNodeHook?
 
-    private var asyncHookHandler: AsyncHookHandler?
-
     public var plugins: [JSBasePlugin] = []
 
-    /**
-     Constructs the AsyncNodePlugin
-     - Parameters:
-     - handler: The callback that is used to tap into the core `onAsyncNode` hook
-     exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
-     */
-    public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], asyncHookHandler: AsyncHookHandler? = nil) {
+    private var asyncHookHandler: AsyncHookHandler?
 
+    /// Constructs the AsyncNodePlugin
+    /// - Parameters:
+    /// - handler: The callback that is used to tap into the core `onAsyncNode` hook
+    /// exposed to users of the plugin allowing them to supply the replacement node used in the tap
+    /// callback
+    public convenience init(
+        plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()],
+        asyncHookHandler: AsyncHookHandler? = nil
+    ) {
         self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePlugin")
         self.asyncHookHandler = asyncHookHandler
         self.plugins = plugins
     }
 
+    override open func getUrlForFile(fileName: String) -> URL? {
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+    }
+
     override public func setup(context: JSContext) {
         super.setup(context: context)
 
-        if let pluginRef = pluginRef {
-            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"), onAsyncNodeError: Hook2(baseValue: pluginRef, name: "onAsyncNodeError"))
+        if let pluginRef {
+            hooks = AsyncNodeHook(
+                onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"),
+                onAsyncNodeError: Hook2(baseValue: pluginRef, name: "onAsyncNodeError")
+            )
         }
-        
-        if let asyncHookHandler = self.asyncHookHandler {
+
+        if let asyncHookHandler {
             hooks?.onAsyncNode.tap { node, callback in
                 let replacementNode = try await asyncHookHandler(node, callback)
                 return replacementNode.handlerTypeToJSValue(context: context) ?? JSValue()
@@ -100,21 +111,16 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         }
     }
 
-    /**
-     Retrieves the arguments for constructing this plugin, this is necessary because the arguments need to be supplied after
-     construction of the swift object, once the context has been provided
-     - returns: An array of arguments to construct the plugin
-     */
+    /// Retrieves the arguments for constructing this plugin, this is necessary because the
+    /// arguments need to be supplied after
+    /// construction of the swift object, once the context has been provided
+    /// - returns: An array of arguments to construct the plugin
     override public func getArguments() -> [Any] {
         for plugin in plugins {
-            plugin.context = self.context
+            plugin.context = context
         }
 
-        return [["plugins": plugins.map { $0.pluginRef }]]
-    }
-
-    override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        return [["plugins": plugins.map(\.pluginRef)]]
     }
 }
 
@@ -123,9 +129,8 @@ public struct AsyncNodeHook {
     public let onAsyncNodeError: Hook2<JSValue, JSValue>
 }
 
-/**
- Replacement node that the callback of this plugin expects, users can supply either a JSValue or an Encodable object that gets converted to a JSValue in the `setup`
- */
+/// Replacement node that the callback of this plugin expects, users can supply either a JSValue or
+/// an Encodable object that gets converted to a JSValue in the `setup`
 public enum ReplacementNode: Encodable {
     case concrete(JSValue)
     case encodable(Encodable)
@@ -134,20 +139,17 @@ public enum ReplacementNode: Encodable {
         var container = encoder.singleValueContainer()
 
         switch self {
-        case .encodable(let value):
+        case let .encodable(value):
             try container.encode(value)
-        case .concrete( _):
+        case .concrete:
             break
         }
     }
 }
 
 public struct AssetPlaceholderNode: Encodable {
-    public enum CodingKeys: String, CodingKey {
-        case asset
-    }
-
     var asset: Encodable
+
     public init(asset: Encodable) {
         self.asset = asset
     }
@@ -156,23 +158,29 @@ public struct AssetPlaceholderNode: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try? container.encode(asset, forKey: .asset)
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case asset
+    }
 }
 
 public struct AsyncNode: Codable, Equatable {
     var id: String
     var async: Bool = true
-    
+
     public init(id: String) {
         self.id = id
     }
 }
 
-/**
- Wraps the core AsyncNodePlugins AsyncNodePluginPlugin, which has functionality that should be applied to each AsyncNodePluginPlugin passed in
- */
+/// Wraps the core AsyncNodePlugins AsyncNodePluginPlugin, which has functionality that should be
+/// applied to each AsyncNodePluginPlugin passed in
 public class AsyncNodePluginPlugin: JSBasePlugin {
     public convenience init() {
-        self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePluginPlugin")
+        self.init(
+            fileName: "AsyncNodePlugin.native",
+            pluginName: "AsyncNodePlugin.AsyncNodePluginPlugin"
+        )
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {

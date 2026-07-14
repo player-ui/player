@@ -1,20 +1,19 @@
-import SwiftUI
 import PlayerUI
-import PlayerUILogger
-import PlayerUISwiftUI
-import PlayerUIReferenceAssets
 import PlayerUIA2UI
-
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
 import PlayerUIExpressionPlugin
 import PlayerUIExternalStatePlugin
+import PlayerUILogger
 import PlayerUIMetricsPlugin
 import PlayerUIPrintLoggerPlugin
 import PlayerUIPubSubPlugin
+import PlayerUIReferenceAssets
+import PlayerUISwiftUI
 import PlayerUISwiftUIPendingTransactionPlugin
 import PlayerUITransitionPlugin
 import PlayerUITypesProviderPlugin
+import SwiftUI
 
 @main
 struct BazelApp: App {
@@ -28,13 +27,35 @@ struct BazelApp: App {
 }
 
 struct MainView: View {
-    @State var result: Result<CompletedState, PlayerError>? = nil
+    @State var result: Result<CompletedState, PlayerError>?
+
+    var body: some View {
+        SegmentControlView(
+            plugins: plugins,
+            assetSections: MockFlows.assetSections,
+            pluginSections: MockFlows.pluginSections,
+            result: $result
+        )
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink("A2UI") { A2UIDemoView() }
+            }
+        }
+        .alert(isPresented: showAlert, content: {
+            Alert(
+                title: Text("Flow Finished"),
+                message: Text(result?.message ?? "No Result"),
+                dismissButton: .default(Text("Done"))
+            )
+        })
+    }
 
     var showAlert: Binding<Bool> {
-        Binding(get: { result != nil }) { newValue in
+        Binding(get: { result != nil }, set: { newValue in
             guard !newValue else { return }
             result = nil
-        }
+        })
     }
 
     private var plugins: [NativePlugin] {
@@ -59,40 +80,18 @@ struct MainView: View {
                     handlerFunction: { _, _, _ in
                         print("MainView External State triggered")
                     }
-                )
-            ])
+                ),
+            ]),
         ]
-    }
-
-    var body: some View {
-        SegmentControlView(
-            plugins: plugins,
-            assetSections: MockFlows.assetSections,
-            pluginSections: MockFlows.pluginSections,
-            result: $result
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink("A2UI") { A2UIDemoView() }
-            }
-        }
-        .alert(isPresented: showAlert, content: {
-            return Alert(
-                title: Text("Flow Finished"),
-                message: Text(result?.message ?? "No Result"),
-                dismissButton: .default(Text("Done"))
-            )
-        })
     }
 }
 
 extension Result where Success == CompletedState, Failure == PlayerError {
     var message: String {
         switch self {
-        case .success(let success):
+        case let .success(success):
             return success.endState?.outcome ?? "No Outcome"
-        case .failure(let failure):
+        case let .failure(failure):
             guard case let .promiseRejected(error) = failure else {
                 return failure.playerDescription
             }

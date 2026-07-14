@@ -7,10 +7,10 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIExpressionPlugin
+import XCTest
 
 class ExpressionPluginTests: XCTestCase {
     func testExpressionPluginConstructsWithoutExpressions() {
@@ -21,10 +21,15 @@ class ExpressionPluginTests: XCTestCase {
 
     func testExpressionPluginConstructsWithExpressions() {
         let expectation = XCTestExpectation(description: "custom expression called")
-        let plugin = ExpressionPlugin(expressions: ["test": {_ in expectation.fulfill() }])
+        let plugin = ExpressionPlugin(expressions: ["test": { _ in expectation.fulfill() }])
         plugin.context = JSContext()
         XCTAssertNotNil(plugin.pluginRef)
-        plugin.pluginRef?.objectForKeyedSubscript("expressions")?.invokeMethod("get", withArguments: ["test"])?.call(withArguments: [])
+        plugin.pluginRef?
+            .objectForKeyedSubscript("expressions")?
+            .invokeMethod(
+                "get",
+                withArguments: ["test"]
+            )?.call(withArguments: [])
         wait(for: [expectation], timeout: 1)
     }
 
@@ -38,7 +43,12 @@ class ExpressionPluginTests: XCTestCase {
         }])
         plugin.context = JSContext()
         XCTAssertNotNil(plugin.pluginRef)
-        plugin.pluginRef?.objectForKeyedSubscript("expressions")?.invokeMethod("get", withArguments: ["test"])?.call(withArguments: ["context", "example"])
+        plugin.pluginRef?
+            .objectForKeyedSubscript("expressions")?
+            .invokeMethod(
+                "get",
+                withArguments: ["test"]
+            )?.call(withArguments: ["context", "example"])
         wait(for: [expectation], timeout: 1)
     }
 

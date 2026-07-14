@@ -6,55 +6,49 @@
 //
 
 import Foundation
-
 import PlayerUI
 
 /// Base functionality for CheckPath
 open class BaseCheckPathPlugin: JSBasePlugin {
-    /**
-     The getParent method allows you to query up the tree and return the first parent that matches the given query if such exists.
-     In case when query is not provided, the closest parent returned.
-     ```swift
-     // return an "action" asset if an asset has the "action" asset as a parent
-     checkPathPlugin.getParentContext(id: "some-asset-id", query: "action")
-     ```
-     - parameters:
-        - id: The ID of the asset to check
-        - query: The type of the parent to check for
-     */
+    /// The getParent method allows you to query up the tree and return the first parent that
+    /// matches the given query if such exists.
+    /// In case when query is not provided, the closest parent returned.
+    /// ```swift
+    /// // return an "action" asset if an asset has the "action" asset as a parent
+    /// checkPathPlugin.getParentContext(id: "some-asset-id", query: "action")
+    /// ```
+    /// - parameters:
+    ///   - id: The ID of the asset to check
+    ///   - query: The type of the parent to check for
     public func getParentContext(id: String, query: String? = nil) -> Any? {
-        let arguments = query != nil ? [id, query!] : [id]
-        let parent = pluginRef?.invokeMethod("getParent", withArguments: arguments)?.toObject()
-        return parent
+        let arguments = query.map { [id, $0] } ?? [id]
+        return pluginRef?.invokeMethod("getParent", withArguments: arguments)?.toObject()
     }
 
-    /**
-     The getParentProp method returns the property on the parent object that the current object falls under.
-     ```swift
-     // an input with a text asset as the label,
-     // will return label for the parentProp of the text asset
-     checkPathPlugin.getParentProp(id: "some-asset-id")
-     ```
-     - parameters:
-        - id: The ID of the asset to check
-     */
+    /// The getParentProp method returns the property on the parent object that the current object
+    /// falls under.
+    /// ```swift
+    /// // an input with a text asset as the label,
+    /// // will return label for the parentProp of the text asset
+    /// checkPathPlugin.getParentProp(id: "some-asset-id")
+    /// ```
+    /// - parameters:
+    ///   - id: The ID of the asset to check
     public func getParentProp(id: String) -> String? {
-        let parentProp = pluginRef?.invokeMethod("getParentProp", withArguments: [id])?.toString()
-        return parentProp
+        pluginRef?.invokeMethod("getParentProp", withArguments: [id])?.toString()
     }
 
-    /**
-     Checks if the id has a parent that matches the query
-     ```swift
-     // check if an asset has an "action" asset as a parent
-     checkPathPlugin.hasParentContext(id: "some-asset-id", query: "action")
-     ```
-     - parameters:
-        - id: The ID of the asset to check
-        - query: The type of the parent to check for
-     */
+    /// Checks if the id has a parent that matches the query
+    /// ```swift
+    /// // check if an asset has an "action" asset as a parent
+    /// checkPathPlugin.hasParentContext(id: "some-asset-id", query: "action")
+    /// ```
+    /// - parameters:
+    ///   - id: The ID of the asset to check
+    ///   - query: The type of the parent to check for
     public func hasParentContext(id: String, query: String) -> Bool {
-        guard let exists = pluginRef?.invokeMethod("hasParentContext", withArguments: [id, query])?.toBool() else { return false }
+        guard let exists = pluginRef?.invokeMethod("hasParentContext", withArguments: [id, query])?
+            .toBool() else { return false }
         return exists
     }
 
@@ -63,13 +57,9 @@ open class BaseCheckPathPlugin: JSBasePlugin {
     }
 }
 
-/**
- A plugin that can query the asset tree for contextual information about the hierarchy
- */
+/// A plugin that can query the asset tree for contextual information about the hierarchy
 open class CheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
-    /**
-     Constructs the CheckPathPlugin
-     */
+    /// Constructs the CheckPathPlugin
     public convenience init() {
         self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
     }
