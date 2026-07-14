@@ -45,7 +45,6 @@ public abstract class JSScriptPluginWrapper(
         /**
          * Maps a native bundle source path to its sibling Hermes bytecode resource,
          * e.g. `plugins/x/core/dist/XPlugin.native.js` -> `plugins/x/core/XPlugin.native.js.hbc`.
-         * The HBC is emitted alongside (not under `dist/`) by the `emit_hbc` build rule.
          */
         private fun hbcPathFor(sourcePath: String): String =
             "${sourcePath.substringBeforeLast("/dist/")}/${sourcePath.substringAfterLast("/")}.hbc"
