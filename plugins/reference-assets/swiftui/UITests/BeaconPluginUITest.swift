@@ -2,10 +2,6 @@ import Foundation
 import XCTest
 
 class BeaconPluginUITests: BaseTestCase {
-    override func navigateToAssetCollection() {
-        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
-    }
-
     func testBeaconPluginAction() {
         openFlow("beacon action")
         XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
@@ -15,6 +11,14 @@ class BeaconPluginUITests: BaseTestCase {
         waitFor(button)
         button.tap()
 
-        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("some-data"))
+        XCTAssertTrue(app.alerts["Info"]
+            .staticTexts
+            .element(boundBy: 1)
+            .label
+            .contains("some-data"))
+    }
+
+    override func navigateToAssetCollection() {
+        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 }

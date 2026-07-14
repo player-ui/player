@@ -162,9 +162,7 @@ jobs:
             bazel build \
               --config=ci-mac \
               $(bazel query "kind('ios_unit_test|ios_ui_test', //ios/...)") \
-              $(bazel query "kind('ios_unit_test|ios_ui_test', //plugins/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
+              $(bazel query "kind('ios_unit_test|ios_ui_test', //plugins/...)")
       - run:
           name: Tests
           command: |
@@ -176,14 +174,6 @@ jobs:
               --test_timeout=1800 \
               $(bazel query "kind('ios_unit_test|ios_ui_test', //ios/...)") \
               $(bazel query "kind('ios_unit_test|ios_ui_test', //plugins/...)")
-      - run:
-          name: Lint
-          command: |
-            bazel test \
-              --config=ci-mac \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
-
       - run:
           when: always
           command: |
@@ -208,6 +198,19 @@ jobs:
 
       - store_test_results:
           path: _test_results
+
+  # We run this stage in parallel with build-ios-trunk so it doesn't slow down the build
+  lint_ios:
+    executor: ios
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run:
+          name: Swift Lint and Format
+          command: |
+            swift run --package-path xcode swiftlint lint --strict ios plugins
+            swift run --package-path xcode swiftformat ios plugins --lint
 
   test:
     executor: base
@@ -469,6 +472,24 @@ workflows:
             - build-fork
             - bazelrc_fork
 
+      - lint_ios:
+          name: lint-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - bazelrc
+
+      - lint_ios:
+          name: lint-ios-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - bazelrc_fork
+
       - maybe_release:
           filters:
             branches:
@@ -606,6 +627,10 @@ workflows:
             - build
             - test
 
+      - lint_ios:
+          requires:
+            - bazelrc
+
       - android_test:
           context:
             - Build
@@ -666,6 +691,10 @@ workflows:
             - setup
 
       - build_and_test_ios:
+          requires:
+            - bazelrc
+
+      - lint_ios:
           requires:
             - bazelrc
 

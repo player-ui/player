@@ -8,27 +8,30 @@
 
 import Foundation
 import JavaScriptCore
-import XCTest
 @testable import PlayerUI
 import PlayerUILogger
+import XCTest
 
 class JSUtilitiesTests: XCTestCase {
-    func testPolyfill() {
-        let context = JSContext()!
+    func testPolyfill() throws {
+        let context = try XCTUnwrap(JSContext())
         JSUtilities.polyfill(context)
         let expection = XCTestExpectation(description: "setTimeout called")
 
         let function: @convention(block) () -> Void = {
             expection.fulfill()
         }
-        context.objectForKeyedSubscript("setTimeout")?.call(withArguments: [JSValue(object: function, in: context) as Any, 1])
+        context.objectForKeyedSubscript("setTimeout")?.call(withArguments: [
+            JSValue(object: function, in: context) as Any,
+            1,
+        ])
         wait(for: [expection], timeout: 2)
     }
 
-    func testPromiseSucceeds() {
-        let context = JSContext()!
+    func testPromiseSucceeds() throws {
+        let context = try XCTUnwrap(JSContext())
 
-        let promise = JSUtilities.createPromise(context: context) { (resolve, _) in
+        let promise = JSUtilities.createPromise(context: context) { resolve, _ in
             resolve()
         }
 
@@ -43,10 +46,10 @@ class JSUtilitiesTests: XCTestCase {
         wait(for: [thenExpect], timeout: 1)
     }
 
-    func testPromiseFails() {
-        let context = JSContext()!
+    func testPromiseFails() throws {
+        let context = try XCTUnwrap(JSContext())
 
-        let promise = JSUtilities.createPromise(context: context) { (_, reject) in
+        let promise = JSUtilities.createPromise(context: context) { _, reject in
             reject()
         }
 
@@ -63,13 +66,16 @@ class JSUtilitiesTests: XCTestCase {
         }
 
         let catchHandler = JSValue(object: catchFn, in: context)
-        promise?.invokeMethod("then", withArguments: [thenHandler as Any])?.invokeMethod("catch", withArguments: [catchHandler as Any])
+        promise?.invokeMethod("then", withArguments: [thenHandler as Any])?.invokeMethod(
+            "catch",
+            withArguments: [catchHandler as Any]
+        )
 
         wait(for: [catchExpect], timeout: 1)
     }
 
     func testJsonData() throws {
-        let context = JSContext()!
+        let context = try XCTUnwrap(JSContext())
 
         let obj = context.evaluateScript("({a: 1})")
 
@@ -101,16 +107,18 @@ class JSUtilitiesTests: XCTestCase {
     }
 
     func testDecodeLogsTruncatedPreviewForSmallPayload() throws {
-        let context = JSContext()!
-        let value = context.evaluateScript("({id: 'test', type: 'text'})")!
+        let context = try XCTUnwrap(JSContext())
+        let value = try XCTUnwrap(context.evaluateScript("({id: 'test', type: 'text'})"))
 
         let logger = TapableLogger()
         logger.logLevel = .trace
 
         var loggedMessage: String?
-        logger.hooks.trace.tap(name: "test") { messages in
-            loggedMessage = messages.compactMap { $0 as? String }.joined()
-        }
+        logger.hooks
+            .trace
+            .tap(name: "test") { messages in
+                loggedMessage = messages.compactMap { $0 as? String }.joined()
+            }
 
         let decoder = JSONDecoder()
         decoder.setLogger(logger)
@@ -129,18 +137,20 @@ class JSUtilitiesTests: XCTestCase {
     }
 
     func testDecodeLogsTruncatedPreviewForLargePayload() throws {
-        let context = JSContext()!
+        let context = try XCTUnwrap(JSContext())
         // Generate a JSON object larger than 500 bytes
         let script = "({id: 'test', type: 'text', value: '\(String(repeating: "x", count: 600))'})"
-        let value = context.evaluateScript(script)!
+        let value = try XCTUnwrap(context.evaluateScript(script))
 
         let logger = TapableLogger()
         logger.logLevel = .trace
 
         var loggedMessage: String?
-        logger.hooks.trace.tap(name: "test") { messages in
-            loggedMessage = messages.compactMap { $0 as? String }.joined()
-        }
+        logger.hooks
+            .trace
+            .tap(name: "test") { messages in
+                loggedMessage = messages.compactMap { $0 as? String }.joined()
+            }
 
         let decoder = JSONDecoder()
         decoder.setLogger(logger)

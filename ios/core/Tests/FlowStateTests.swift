@@ -6,22 +6,25 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class FlowStateTests: XCTestCase {
     func testViewFlowState() {
         let player = HeadlessPlayerImpl(plugins: [])
 
-        player.start(flow: FlowData.COUNTER) { _ in}
+        player.start(flow: FlowData.COUNTER) { _ in }
 
-        guard let inProgress = player.state as? InProgressState else { return XCTFail("State not in progress") }
+        guard let inProgress = player.state as? InProgressState
+        else { return XCTFail("State not in progress") }
 
-        XCTAssertNotNil(inProgress.controllers?.flow.current?.currentState?.value as? NavigationFlowViewState)
-        let view = inProgress.controllers?.flow.current?.currentState?.value as? NavigationFlowViewState
+        XCTAssertNotNil(inProgress.controllers?.flow.current?.currentState?
+            .value as? NavigationFlowViewState)
+        let view = inProgress.controllers?.flow.current?.currentState?
+            .value as? NavigationFlowViewState
 
         XCTAssertEqual(view?.attributes?["test"] as? String, "value")
     }
@@ -29,11 +32,13 @@ class FlowStateTests: XCTestCase {
     func testExternalFlowState() {
         let player = HeadlessPlayerImpl(plugins: [])
 
-        player.start(flow: FlowData.externalFlow) { _ in}
+        player.start(flow: FlowData.externalFlow) { _ in }
 
-        guard let inProgress = player.state as? InProgressState else { return XCTFail("State not in progress") }
+        guard let inProgress = player.state as? InProgressState
+        else { return XCTFail("State not in progress") }
 
-        XCTAssertNotNil(inProgress.controllers?.flow.current?.currentState?.value as? NavigationFlowExternalState)
+        XCTAssertNotNil(inProgress.controllers?.flow.current?.currentState?
+            .value as? NavigationFlowExternalState)
     }
 
     func testActionFlowState() {
@@ -45,43 +50,41 @@ class FlowStateTests: XCTestCase {
             XCTAssertEqual(flow.data as? [String: Int], ["count": 0])
         }
 
-        player.hooks?.flowController.tap({ flowController in
+        player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap { oldState, _ in
                     guard
                         let old = oldState?.value as? NavigationFlowActionState,
-                        case .single(let exp) = old.exp
+                        case let .single(exp) = old.exp
                     else { return }
                     XCTAssertEqual(exp, "{{foo}}")
                     hitActionNode.fulfill()
                 }
             }
-        })
-        player.start(flow: FlowData.actionFlow) { _ in}
+        }
+        player.start(flow: FlowData.actionFlow) { _ in }
 
         wait(for: [hitActionNode], timeout: 1)
-
     }
 
     func testActionMultiExpFlowState() {
         let player = HeadlessPlayerImpl(plugins: [])
         let hitActionNode = expectation(description: "ACTION state hit")
-        player.hooks?.flowController.tap({ flowController in
+        player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap { oldState, _ in
                     guard
                         let old = oldState?.value as? NavigationFlowActionState,
-                        case .multi(let exp) = old.exp
+                        case let .multi(exp) = old.exp
                     else { return }
                     XCTAssertEqual(exp, ["{{foo}}", "{{bar}}"])
                     hitActionNode.fulfill()
                 }
             }
-        })
-        player.start(flow: FlowData.actionMultiExpFlow) { _ in}
+        }
+        player.start(flow: FlowData.actionMultiExpFlow) { _ in }
 
         wait(for: [hitActionNode], timeout: 1)
-
     }
 
     func testEndFlowState() {
@@ -89,7 +92,7 @@ class FlowStateTests: XCTestCase {
         let endStateHit = expectation(description: "Flow Ended")
         player.start(flow: FlowData.actionFlow) { result in
             switch result {
-            case .success(let completed):
+            case let .success(completed):
                 XCTAssertEqual(completed.endState?.outcome, "done")
                 XCTAssertEqual(completed.endState?.param?["someKey"] as? String, "someValue")
                 let extraKey: String? = completed.endState?.extraKey
@@ -102,31 +105,33 @@ class FlowStateTests: XCTestCase {
         }
 
         wait(for: [endStateHit], timeout: 1)
-
     }
 
-    /// Mirrors JVM FlowControllerIntegrationTest: beforeTransition, transition, and afterTransition hooks fire as expected.
+    /// Mirrors JVM FlowControllerIntegrationTest: beforeTransition, transition, and afterTransition
+    /// hooks fire as expected.
     func testFlowControllerBeforeTransitionHook() {
         let player = HeadlessPlayerImpl(plugins: [])
         var pendingTransition: (NamedState?, String)?
         var completedTransition: (NamedState?, NamedState)?
         var flowInstanceAfterTransition: Flow?
 
-        player.hooks?.flowController.tap { flowController in
-            flowController.hooks.flow.tap { flow in
-                flow.hooks.beforeTransition.tap { state, transitionValue in
-                    pendingTransition = (flow.currentState, transitionValue)
-                    return state
-                }
-                flow.hooks.transition.tap { from, to in
-                    if pendingTransition?.0?.name != from?.name { pendingTransition = nil }
-                    completedTransition = (from, to)
-                }
-                flow.hooks.afterTransition.tap { flowInstance in
-                    flowInstanceAfterTransition = flowInstance
+        player.hooks?
+            .flowController
+            .tap { flowController in
+                flowController.hooks.flow.tap { flow in
+                    flow.hooks.beforeTransition.tap { state, transitionValue in
+                        pendingTransition = (flow.currentState, transitionValue)
+                        return state
+                    }
+                    flow.hooks.transition.tap { from, to in
+                        if pendingTransition?.0?.name != from?.name { pendingTransition = nil }
+                        completedTransition = (from, to)
+                    }
+                    flow.hooks.afterTransition.tap { flowInstance in
+                        flowInstanceAfterTransition = flowInstance
+                    }
                 }
             }
-        }
 
         let inProgress = expectation(description: "in progress")
         player.hooks?.state.tap { newState in

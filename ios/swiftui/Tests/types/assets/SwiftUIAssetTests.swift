@@ -7,16 +7,16 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
-
 @testable import PlayerUI
-@testable import PlayerUISwiftUI
 @testable import PlayerUILogger
 @testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+import XCTest
 
 class SwiftUIAssetTests: XCTestCase {
-    let context: JSContext = JSContext()
+    private let context: JSContext = .init()
+
     func testBaseAssetDecoding() throws {
         let val = context.evaluateScript("({id: 'someId', type: 'someType', value: 'someValue'})")
 
@@ -37,7 +37,8 @@ class SwiftUIAssetTests: XCTestCase {
     }
 
     func testWrappedAssetDecoding() throws {
-        let val = context.evaluateScript("({asset: {id: 'someId', type: 'someType', value: 'someValue'}})")
+        let val = context
+            .evaluateScript("({asset: {id: 'someId', type: 'someType', value: 'someValue'}})")
 
         let partialMatch = PartialMatchFingerprintPlugin()
         partialMatch.context = context
@@ -71,6 +72,5 @@ class SwiftUIAssetTests: XCTestCase {
 
         XCTAssertEqual(wrapper.asset?.id, "someId")
         XCTAssertEqual(wrapper.asset?.type, "someType")
-
     }
 }

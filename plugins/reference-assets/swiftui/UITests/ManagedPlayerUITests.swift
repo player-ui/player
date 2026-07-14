@@ -2,10 +2,6 @@ import Foundation
 import XCTest
 
 class ManagedPlayerUITests: BaseTestCase {
-    override func navigateToAssetCollection() {
-        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
-    }
-
     func testSimpleFlow() {
         openFlow("Simple Flows")
         let button1 = app.buttons["first_view"].firstMatch
@@ -19,7 +15,6 @@ class ManagedPlayerUITests: BaseTestCase {
         tapAndAssertElementAppears(button2, expectedOutcome: completedText)
     }
 
-    
     func testErrorContentFlow() {
         openFlow("Error Content Flow")
 
@@ -33,7 +28,8 @@ class ManagedPlayerUITests: BaseTestCase {
         let retryButton = app.buttons["Retry"].firstMatch
         tapAndAssertElementAppears(button2, expectedOutcome: retryButton, timeout: 5)
 
-        let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
+        let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"]
+            .firstMatch
         XCTAssert(errorText.exists, "Error message did not appear")
     }
 
@@ -43,7 +39,8 @@ class ManagedPlayerUITests: BaseTestCase {
         waitFor(button1)
         button1.tap()
 
-        let errorText = app.staticTexts["PlayerUI.DecodingError.typeNotRegistered(type: \"error\")"].firstMatch
+        let errorText = app.staticTexts["PlayerUI.DecodingError.typeNotRegistered(type: \"error\")"]
+            .firstMatch
         waitFor(errorText)
 
         let resetButton = app.buttons["Reset"]
@@ -61,5 +58,9 @@ class ManagedPlayerUITests: BaseTestCase {
 
         // the same view should reload properly
         waitFor(button1)
+    }
+
+    override func navigateToAssetCollection() {
+        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 }
