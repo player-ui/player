@@ -1,12 +1,9 @@
-import SwiftUI
 import Combine
-
 import PlayerUI
 import PlayerUISwiftUI
+import SwiftUI
 
-/**
- Data Decoded by Player for `CollectionAsset`
- */
+/// Data Decoded by Player for `CollectionAsset`
 struct CollectionData: AssetData {
     /// The ID of the asset
     var id: String
@@ -18,22 +15,19 @@ struct CollectionData: AssetData {
     var values: [WrappedAsset?]
 }
 
-/**
- Wrapper class to tie `CollectionData` to a SwiftUI `View`
- */
+/// Wrapper class to tie `CollectionData` to a SwiftUI `View`
 final class CollectionAsset: UncontrolledAsset<CollectionData> {
     /// A type erased view object
-    public override var view: AnyView { AnyView(CollectionAssetView(model: model)) }
+    override var view: AnyView {
+        AnyView(CollectionAssetView(model: model))
+    }
 }
 
-/**
- View implementation for `CollectionAsset`
- */
+/// View implementation for `CollectionAsset`
 struct CollectionAssetView: View {
     /// The viewModel with decoded data, supplied by `CollectionAsset`
     @ObservedObject var model: AssetViewModel<CollectionData>
 
-    @ViewBuilder
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let asset = model.data.label?.asset {
@@ -41,8 +35,8 @@ struct CollectionAssetView: View {
                     .font(.headline)
                     .padding(.vertical, 12)
             }
-            ForEach(model.data.values.compactMap({ $0?.asset })) { asset in
-                    asset.view
+            ForEach(model.data.values.compactMap { $0?.asset }) { asset in
+                asset.view
                     .font(.body)
             }
         }

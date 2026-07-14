@@ -7,11 +7,10 @@
 //
 
 import Foundation
-import XCTest
-
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUITestUtilitiesCore
+import XCTest
 
 class JSLoggerTests: XCTestCase {
     func testJSLogger() {
@@ -44,7 +43,7 @@ class JSLoggerTests: XCTestCase {
             errorExpect.fulfill()
         }
 
-        player.start(flow: FlowData.COUNTER, completion: {_ in})
+        player.start(flow: FlowData.COUNTER, completion: { _ in })
         let state = player.state as? InProgressState
         state?.logger?.trace("Message")
         state?.logger?.debug("Message")

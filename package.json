@@ -13,7 +13,8 @@
   },
   "packageManager": "pnpm@10.18.1",
   "scripts": {
-    "fmt": "prettier --write '**/*.{ts,tsx}'"
+    "fmt": "prettier --write '**/*.{ts,tsx}'",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@astrojs/react": "^4.0.0",

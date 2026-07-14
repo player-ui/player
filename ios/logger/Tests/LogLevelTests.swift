@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import XCTest
 @testable import PlayerUILogger
+import XCTest
 
 class LogLevelTests: XCTestCase {
     func testShouldLog() {

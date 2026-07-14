@@ -8,12 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-/**
- Object for access to the controllers during a flow
- */
+/// Object for access to the controllers during a flow
 public class PlayerControllers {
-    private let rawValue: JSValue
-
     /// The DataController for the current flow
     public let data: DataController
 
@@ -29,20 +25,21 @@ public class PlayerControllers {
     /// The ErrorController for the current flow
     public let error: ErrorController
 
+    private let rawValue: JSValue
+
     public init?(from value: JSValue?) {
         guard let controllers = value else { return nil }
         rawValue = controllers
         data = DataController.createInstance(value: rawValue.objectForKeyedSubscript("data"))
         flow = FlowController.createInstance(value: rawValue.objectForKeyedSubscript("flow"))
         view = ViewController.createInstance(value: rawValue.objectForKeyedSubscript("view"))
-        expression = ExpressionEvaluator.createInstance(value: rawValue.objectForKeyedSubscript("expression"))
+        expression = ExpressionEvaluator
+            .createInstance(value: rawValue.objectForKeyedSubscript("expression"))
         error = ErrorController.createInstance(value: rawValue.objectForKeyedSubscript("error"))
     }
 }
 
-/**
- Enum with the different possible states of the player
- */
+/// Enum with the different possible states of the player
 public enum PlayerFlowStatus: String {
     /// The Flow has not been started
     case notStarted = "not-started"
@@ -57,18 +54,14 @@ public enum PlayerFlowStatus: String {
     case error
 }
 
-/**
- Common properties for all flow states
- */
+/// Common properties for all flow states
 open class BaseFlowState {
     /// The status of the state
     var status: PlayerFlowStatus
 
-    /**
-     Creates a BaseFlowState
-     - parameters:
-        - status: The status of this state
-     */
+    /// Creates a BaseFlowState
+    /// - parameters:
+    ///   - status: The status of this state
     public init(status: PlayerFlowStatus) {
         self.status = status
     }
@@ -78,16 +71,14 @@ extension BaseFlowState: CreatedFromJSValue {
     /// Typealias for CreatedFromJSValue protocol
     public typealias T = BaseFlowState
 
-    /**
-     Creates the appropriate state from the given `JSValue`
-     - parameters:
-        - value: The JSValue to construct the state from
-     */
+    /// Creates the appropriate state from the given `JSValue`
+    /// - parameters:
+    ///   - value: The JSValue to construct the state from
     public static func createInstance(value: JSValue) -> BaseFlowState {
         guard
             let rawStatus = value.objectForKeyedSubscript("status")?.toString(),
             let status = PlayerFlowStatus(rawValue: rawStatus),
-            let state = {() -> BaseFlowState? in
+            let state = { () -> BaseFlowState? in
                 switch status {
                 case .notStarted:
                     return NotStartedState.createInstance(from: value)
@@ -104,9 +95,7 @@ extension BaseFlowState: CreatedFromJSValue {
     }
 }
 
-/**
- Common properties for States that contain Player Flow Data
- */
+/// Common properties for States that contain Player Flow Data
 public protocol PlayerFlowExecutionData {
     /// The flow associated with this execution
     var flow: Flow { get }
@@ -114,9 +103,7 @@ public protocol PlayerFlowExecutionData {
 
 public typealias EndState = NavigationFlowEndState
 
-/**
- A structure that holds the data of a completed Fuego Flow
- */
+/// A structure that holds the data of a completed Fuego Flow
 public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
     /// The flow object for the completed state
     public var flow: Flow
@@ -130,17 +117,23 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
     /// Read-only controllers to allow data access after the flow has ended
     public var controllers: Controllers
 
-    public struct Controllers {
-        /// A read only instance of the Data Controller
-        public var data: ReadOnlyDataController
+    private init(
+        flow: Flow,
+        endState: NavigationFlowEndState?,
+        data: [String: Any],
+        controllers: Controllers
+    ) {
+        self.flow = flow
+        self.endState = endState
+        self.data = data
+        self.controllers = controllers
+        super.init(status: .completed)
     }
 
-    /**
-     Create an instance of `CompletedState` from a JSValue
-     - parameters:
-        -  value: The JSValue representing the CompletedState
-     - returns: A CompletedState object if the JSValue was one
-     */
+    /// Create an instance of `CompletedState` from a JSValue
+    /// - parameters:
+    ///   -  value: The JSValue representing the CompletedState
+    /// - returns: A CompletedState object if the JSValue was one
     public static func createInstance(from value: JSValue?) -> CompletedState? {
         guard
             let flow = value?.objectForKeyedSubscript("flow"),
@@ -156,42 +149,28 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
         )
     }
 
-    private init(
-        flow: Flow,
-        endState: NavigationFlowEndState?,
-        data: [String: Any],
-        controllers: Controllers
-    ) {
-        self.flow = flow
-        self.endState = endState
-        self.data = data
-        self.controllers = controllers
-        super.init(status: .completed)
+    public struct Controllers {
+        /// A read only instance of the Data Controller
+        public var data: ReadOnlyDataController
     }
 }
 
-/**
- A structure that holds the data of a Fuego Flow that hasnt been started
- */
+/// A structure that holds the data of a Fuego Flow that hasnt been started
 public class NotStartedState: BaseFlowState {
-    /**
-    Create an instance of `NotStartedState` from a JSValue
-    - parameters:
-       -  value: The JSValue representing the NotStartedState
-    - returns: A NotStartedState object if the JSValue was one
-    */
-    public static func createInstance(from value: JSValue?) -> NotStartedState? {
-        return NotStartedState()
-    }
-
     init() {
         super.init(status: .notStarted)
     }
+
+    /// Create an instance of `NotStartedState` from a JSValue
+    /// - parameters:
+    ///   -  value: The JSValue representing the NotStartedState
+    /// - returns: A NotStartedState object if the JSValue was one
+    public static func createInstance(from _: JSValue?) -> NotStartedState? {
+        NotStartedState()
+    }
 }
 
-/**
- A structure that holds the data of a Fuego Flow that is in progress
- */
+/// A structure that holds the data of a Fuego Flow that is in progress
 public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
     /// The flow object that is currently in progress
     public var flow: Flow
@@ -208,25 +187,6 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
     /// A function to force the player to a failed state
     public let fail: (PlayerError) -> Void
 
-    /**
-    Create an instance of `InProgressState` from a JSValue
-    - parameters:
-       -  value: The JSValue representing the InProgressState
-    - returns: A InProgressState object if the JSValue was one
-    */
-    public static func createInstance(from value: JSValue?) -> InProgressState? {
-        guard
-            let flow = value?.objectForKeyedSubscript("flow")
-        else { return nil }
-        return InProgressState(
-            flow: Flow.createInstance(value: flow),
-            flowResult: value.map { NavigationFlowEndState($0.objectForKeyedSubscript("flowResult")) },
-            controllers: PlayerControllers(from: value?.objectForKeyedSubscript("controllers")),
-            logger: JSLogger(from: value?.objectForKeyedSubscript("logger")),
-            fail: { value?.objectForKeyedSubscript("fail")?.call(withArguments: [value?.context.error(for: $0) as Any]) }
-        )
-    }
-
     private init(
         flow: Flow,
         flowResult: NavigationFlowEndState?,
@@ -241,11 +201,30 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
         self.fail = fail
         super.init(status: .inProgress)
     }
+
+    /// Create an instance of `InProgressState` from a JSValue
+    /// - parameters:
+    ///   -  value: The JSValue representing the InProgressState
+    /// - returns: A InProgressState object if the JSValue was one
+    public static func createInstance(from value: JSValue?) -> InProgressState? {
+        guard
+            let flow = value?.objectForKeyedSubscript("flow")
+        else { return nil }
+        return InProgressState(
+            flow: Flow.createInstance(value: flow),
+            flowResult: value
+                .map { NavigationFlowEndState($0.objectForKeyedSubscript("flowResult")) },
+            controllers: PlayerControllers(from: value?.objectForKeyedSubscript("controllers")),
+            logger: JSLogger(from: value?.objectForKeyedSubscript("logger")),
+            fail: {
+                value?.objectForKeyedSubscript("fail")?
+                    .call(withArguments: [value?.context.error(for: $0) as Any])
+            }
+        )
+    }
 }
 
-/**
-A structure that holds the data of a Fuego Flow that has errored
-*/
+/// A structure that holds the data of a Fuego Flow that has errored
 public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     /// The flow object that is currently in progress
     public var flow: Flow
@@ -253,24 +232,25 @@ public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     /// The error message
     public var error: JSValueError
 
-    /**
-    Create an instance of `ErrorState` from a JSValue
-    - parameters:
-       -  value: The JSValue representing the ErrorState
-    - returns: A ErrorState object if the JSValue was one
-    */
+    private init(flow: Flow, error: JSValueError) {
+        self.flow = flow
+        self.error = error
+        super.init(status: .error)
+    }
+
+    /// Create an instance of `ErrorState` from a JSValue
+    /// - parameters:
+    ///   -  value: The JSValue representing the ErrorState
+    /// - returns: A ErrorState object if the JSValue was one
     public static func createInstance(from value: JSValue?) -> ErrorState? {
         guard
             let flow = value?.objectForKeyedSubscript("flow"),
             let err = value?.objectForKeyedSubscript("error")
         else { return nil }
-        
-        return ErrorState(flow: Flow.createInstance(value: flow), error: JSValueError.createInstance(value: err))
-    }
 
-    private init(flow: Flow, error: JSValueError) {
-        self.flow = flow
-        self.error = error
-        super.init(status: .error)
+        return ErrorState(
+            flow: Flow.createInstance(value: flow),
+            error: JSValueError.createInstance(value: err)
+        )
     }
 }
