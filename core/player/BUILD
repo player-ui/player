@@ -12,7 +12,6 @@ js_pipeline(
     package_name = "@player-ui/player",
     build_deps = NATIVE_BUILD_DEPS,
     native_bundle = "Player",
-    emit_hbc = True,
     test_deps = [
         ":node_modules/@player-ui/make-flow",
         "//:vitest_config",

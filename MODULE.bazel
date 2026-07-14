@@ -7,9 +7,9 @@ bazel_dep(name = "rules_player")
 
 archive_override(
     module_name = "rules_player",
-    strip_prefix = "rules_player-2.6.3",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.6.3.tar.gz"],
-    integrity = "sha256-ysCpHR6qXo+McBtZ3Bx46Xobj4GR4iR+rjNA6TubDLM=",
+    strip_prefix = "rules_player-2.6.4",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.6.4.tar.gz"],
+    integrity = "sha256-wJBbNBVzoZ35sOmmM+AM+blOAWYm16f421BiI/uGN0M=",
 )
 
 bazel_dep(name = "platforms", version = "1.1.0")
@@ -37,7 +37,7 @@ node.toolchain(node_version = "22.15.1")
 sh_config_ext = use_extension("@rules_player//shell:defs.bzl", "sh_configure")
 use_repo(sh_config_ext, "local_shell_config")
 
-# Prebuilt host hermesc compiler for HBC compilation (js_pipeline emit_hbc).
+# Prebuilt host hermesc compiler for HBC compilation (js_pipeline, on by default).
 hermes_ext = use_extension("@rules_player//javascript:extensions.bzl", "hermes")
 use_repo(hermes_ext, "rn_hermesc")
 

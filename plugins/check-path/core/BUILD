@@ -12,7 +12,6 @@ js_pipeline(
     package_name = "@player-ui/check-path-plugin",
     build_deps = NATIVE_BUILD_DEPS,
     native_bundle = "CheckPathPlugin",
-    emit_hbc = True,
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],
