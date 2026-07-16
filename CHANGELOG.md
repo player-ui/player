@@ -1,3 +1,23 @@
+# 0.15.5 (Thu Jul 16 2026)
+
+### Release Notes
+
+#### Backport/904 ([#905](https://github.com/player-ui/player/pull/905))
+
+Stop invalid data from leaking into model with unrelated data sets after a forced navigation. (bnackport of #904)
+
+---
+
+#### 🐛 Bug Fix
+
+- Backport/904 [#905](https://github.com/player-ui/player/pull/905) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.4 (Tue Jun 16 2026)
 
 #### 🐛 Bug Fix
