@@ -8,6 +8,7 @@ import type { ViewController } from "..";
 import actionsFlow from "./helpers/actions.flow";
 import type { InProgressState } from "../types";
 import { ActionExpPlugin } from "./helpers/action-exp.plugin";
+import TrackBindingPlugin from "./helpers/binding.plugin";
 
 const minimal = {
   id: "minimal-player-content-response-format",
@@ -721,4 +722,176 @@ test("view trigger once when moving between views", async () => {
   await vitest.waitFor(() => {
     expect(viewTap).toHaveBeenCalledOnce();
   });
+});
+
+test("prevents invalid data from being committed during action-driven backward navigation", async () => {
+  const player = new Player({
+    plugins: [new TrackBindingPlugin()],
+  });
+
+  player.hooks.validationController.tap("test", (validationProvider) => {
+    validationProvider.hooks.createValidatorRegistry.tap("test", (registry) => {
+      registry.register("minValue", (_context, value) => {
+        if (typeof value === "number" && value < 0) {
+          return {
+            message: "Amount must be non-negative",
+            severity: "error",
+          };
+        }
+      });
+    });
+  });
+
+  const flow = {
+    id: "schema-invalid-force-navigation",
+    schema: {
+      ROOT: {
+        someValue: {
+          type: "SomeType",
+          validation: [
+            {
+              type: "minValue",
+              severity: "error",
+              trigger: "change",
+            },
+          ],
+        },
+      },
+    },
+    views: [
+      {
+        id: "input-view",
+        type: "info",
+        fields: {
+          asset: {
+            id: "input-fields",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "some-input",
+                  type: "input",
+                  binding: "someValue",
+                },
+              },
+            ],
+          },
+        },
+        actions: [
+          {
+            asset: {
+              id: "back-action",
+              type: "action",
+              value: "previous",
+              label: {
+                asset: {
+                  id: "back-label",
+                  type: "text",
+                  value: "Back",
+                },
+              },
+            },
+          },
+        ],
+      },
+      {
+        id: "result-view",
+        type: "info",
+        title: {
+          asset: {
+            id: "result-title",
+            type: "text",
+            value: "Result",
+          },
+        },
+        primaryInfo: {
+          asset: {
+            id: "result-text",
+            type: "text",
+            value: "Leaked value: {{someValue}}",
+          },
+        },
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_INPUT",
+        VIEW_INPUT: {
+          state_type: "VIEW",
+          ref: "input-view",
+          transitions: {
+            previous: "ACTION_BACK",
+          },
+        },
+        ACTION_BACK: {
+          state_type: "ACTION",
+          exp: "{{unrelated}} = 'touched'",
+          transitions: {
+            "*": "VIEW_RESULT",
+          },
+        },
+        VIEW_RESULT: {
+          state_type: "VIEW",
+          ref: "result-view",
+          transitions: {
+            "*": "END_done",
+          },
+        },
+        END_done: {
+          state_type: "END",
+          outcome: "done",
+        },
+      },
+    },
+  };
+
+  player.start(flow as any);
+
+  await vitest.waitFor(() => {
+    const state = player.getState() as InProgressState;
+    return (
+      state?.controllers?.flow?.current?.currentState?.name === "VIEW_INPUT"
+    );
+  });
+
+  let state = player.getState() as InProgressState;
+  expect(state.controllers.flow.current?.currentState?.name).toBe("VIEW_INPUT");
+
+  // Simulate entering invalid data
+  state.controllers.data.set([["someValue", -1]]);
+
+  // The invalid data should be rejected and only available in the shadow model
+  expect(state.controllers.data.get("someValue")).toBeUndefined();
+  expect(
+    state.controllers.data.get("someValue", { includeInvalid: true }),
+  ).toBe(-1);
+
+  // Ensure normal navigation is blocked
+  state.controllers.flow.current?.transition("previous");
+
+  let currentState = player.getState() as InProgressState;
+  expect(currentState?.controllers?.flow?.current?.currentState?.name).toBe(
+    "VIEW_INPUT",
+  );
+
+  // Simulate forcing back navigation (bypassing validation)
+  state.controllers.flow.current?.transition("previous", { force: true });
+
+  currentState = player.getState() as InProgressState;
+  expect(currentState?.controllers?.flow?.current?.currentState?.name).toBe(
+    "VIEW_RESULT",
+  );
+
+  state = player.getState() as InProgressState;
+
+  // The invalid data should NOT be committed to the main model because of the transition
+  const finalValue = state.controllers.data.get("someValue");
+  expect(finalValue).toBeUndefined();
+  // The transition should have dropped the invalid data entirely, not just
+  // hidden it from the main model
+  const shadowValue = state.controllers.data.get("someValue", {
+    includeInvalid: true,
+  });
+  expect(shadowValue).toBeUndefined();
 });

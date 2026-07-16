@@ -163,4 +163,9 @@ export class ValidationMiddleware implements DataModelMiddleware {
 
     return next?.delete(binding, options);
   }
+
+  /** Clears any invalid values staged in the shadow model */
+  public reset(): void {
+    this.shadowModelPaths.clear();
+  }
 }
