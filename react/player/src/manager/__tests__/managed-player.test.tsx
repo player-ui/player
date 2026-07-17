@@ -8,6 +8,7 @@ import {
   RequestTimeWebPlugin,
 } from "@player-ui/metrics-plugin";
 import { ManagedPlayer } from "../managed-player";
+import { ReactPlayer } from "../../player";
 import type { FlowManager, FallbackProps } from "../types";
 import { SimpleAssetPlugin } from "../../__tests__/helpers/simple-asset-plugin";
 import { InProgressState } from "@player-ui/player";
@@ -118,6 +119,58 @@ describe.each([
     const getRequestTime = (RequestTimeWebPlugin as any).mock.calls[0][0];
     expect(getRequestTime()).toBeDefined();
     expect(onComplete).toBeCalled();
+  });
+
+  test("forwards startOptions to player.start for each flow", async () => {
+    const startSpy = vitest.spyOn(ReactPlayer.prototype, "start");
+
+    const manager: FlowManager = {
+      next: vitest
+        .fn()
+        .mockReturnValueOnce(
+          Promise.resolve({
+            value: makeFlow({
+              id: "flow-1",
+              type: "collection",
+              values: [
+                {
+                  asset: {
+                    id: "action",
+                    type: "action",
+                    value: "Next",
+                    label: "Continue",
+                  },
+                },
+              ],
+            }),
+          }),
+        )
+        .mockReturnValue(Promise.resolve({ done: true })),
+    };
+
+    render(
+      <Suspense fallback="loading">
+        <ManagedPlayer
+          manager={manager}
+          plugins={[new SimpleAssetPlugin()]}
+          startOptions={{ format: "a2ui", version: "0.9" }}
+          onComplete={vitest.fn()}
+          onError={vitest.fn()}
+        />
+      </Suspense>,
+      { legacyRoot },
+    );
+
+    // The managed player forwards startOptions verbatim to player.start at the
+    // loaded -> running transition, independent of what the flow renders.
+    await vitest.waitFor(() =>
+      expect(startSpy).toHaveBeenCalledWith(expect.anything(), {
+        format: "a2ui",
+        version: "0.9",
+      }),
+    );
+
+    startSpy.mockRestore();
   });
 
   test("handles dummy flows", async () => {

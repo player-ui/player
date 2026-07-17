@@ -1,0 +1,7 @@
+{
+  "surfaceId": "button-basic",
+  "components": [
+    { "id": "root", "component": "Button", "child": "lbl", "variant": "primary" },
+    { "id": "lbl", "component": "Text", "text": "Click me" }
+  ]
+}

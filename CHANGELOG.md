@@ -1,3 +1,25 @@
+# 1.1.0-next.2 (Thu Jul 16 2026)
+
+### Release Notes
+
+#### Stop Leaking Invalid Data After Forced Transition ([#904](https://github.com/player-ui/player/pull/904))
+
+Stop invalid data from leaking into model with unrelated data sets after a forced navigation.
+
+---
+
+#### 🐛 Bug Fix
+
+- Stop Leaking Invalid Data After Forced Transition [#904](https://github.com/player-ui/player/pull/904) ([@KetanReddy](https://github.com/KetanReddy))
+- Automatically lint swift files in CI/CD, format on pre-commit [#854](https://github.com/player-ui/player/pull/854) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.1.0-next.1 (Thu Jul 09 2026)
 
 #### 🐛 Bug Fix

@@ -3155,8 +3155,11 @@ public final class com/intuit/playerui/core/player/HeadlessPlayer : com/intuit/p
 	public fun registerPlugin (Lcom/intuit/playerui/core/plugins/Plugin;)V
 	public fun release ()V
 	public final fun start (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/bridge/Completable;
+	public final fun start (Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
 	public final fun start (Lcom/intuit/playerui/core/bridge/Node;Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/bridge/Completable;
 	public fun start (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
+	public fun start (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
+	public static synthetic fun start$default (Lcom/intuit/playerui/core/player/HeadlessPlayer;Lcom/intuit/playerui/core/bridge/Node;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/Completable;
 }
 
 final class com/intuit/playerui/core/player/HeadlessPlayer$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
@@ -3280,8 +3283,12 @@ public abstract class com/intuit/playerui/core/player/Player : com/intuit/player
 	public abstract fun registerPlugin (Lcom/intuit/playerui/core/plugins/Plugin;)V
 	public abstract fun release ()V
 	public abstract fun start (Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
+	public abstract fun start (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
 	public final fun start (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/bridge/Completable;
+	public final fun start (Ljava/net/URL;Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/Completable;
 	public final fun start (Ljava/net/URL;Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/bridge/Completable;
+	public static synthetic fun start$default (Lcom/intuit/playerui/core/player/Player;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/Completable;
+	public static synthetic fun start$default (Lcom/intuit/playerui/core/player/Player;Ljava/net/URL;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/Completable;
 	public static synthetic fun start$default (Lcom/intuit/playerui/core/player/Player;Ljava/net/URL;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/Completable;
 }
 

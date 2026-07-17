@@ -1,0 +1,5 @@
+# A2UI's SwiftUI plugin ships no static assets of its own — the A2UI icons map to
+# SF Symbols. The `A2UIPlugin.native.js` bundle is supplied to the Bazel build via
+# `//plugins/a2ui/core:core_native_bundle` (see ../BUILD.bazel) and is injected here
+# for the SwiftPM build at publish time. This directory exists so the SwiftPM
+# `.process("Resources")` target in //:Package.swift has a stable resource root.

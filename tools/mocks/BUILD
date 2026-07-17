@@ -12,6 +12,9 @@ filegroup(
     name = "all_mocks",
     srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS] + [
         "//plugins/reference-assets/mocks:flow-manager",
+        # a2ui mocks live alongside a js_pipeline so the directory-level
+        # `mocks` target is the npm_package; the raw JSONs are at `:snapshots`.
+        "//plugins/a2ui/mocks:snapshots",
     ],
     visibility = ["//visibility:public"],
 )

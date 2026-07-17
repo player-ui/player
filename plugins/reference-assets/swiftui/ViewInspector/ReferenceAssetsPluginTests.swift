@@ -7,16 +7,16 @@
 //
 
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUITestUtilities
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
+import XCTest
 
 class SwiftUIReferenceAssetsPluginTests: XCTestCase {
-    func testReferenceAssetsPluginConstructs() {
-        let context = JSContext()!
+    func testReferenceAssetsPluginConstructs() throws {
+        let context = try XCTUnwrap(JSContext())
 
         let plugin = ReferenceAssetsPlugin()
         plugin.context = context

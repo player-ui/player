@@ -1,5 +1,10 @@
 import type React from "react";
-import type { CompletedState, Flow, InProgressState } from "@player-ui/player";
+import type {
+  CompletedState,
+  Flow,
+  InProgressState,
+  StartOptions,
+} from "@player-ui/player";
 import type { ReactPlayer, ReactPlayerOptions } from "../player";
 
 export interface FinalState {
@@ -52,6 +57,12 @@ export interface ManagedPlayerProps extends ReactPlayerOptions {
   /** A callback when a flow is started */
   onStartedFlow?: (flow: Flow) => void;
 
+  /**
+   * Options forwarded to `player.start()` for every flow in the managed session,
+   * e.g. `{ format: "a2ui" }`. Defaults to the `"player"` format.
+   */
+  startOptions?: StartOptions;
+
   /** A callback when the entire async iteration is completed */
   onComplete?: (finalState?: CompletedState) => void;
 
@@ -71,6 +82,9 @@ export type ManagedPlayerContext = {
 
   /** The config for Player */
   playerConfig: ReactPlayerOptions;
+
+  /** Options forwarded to `player.start()` for each flow (e.g. `{ format: "a2ui" }`) */
+  startOptions?: StartOptions;
 };
 
 export type ManagedPlayerState =

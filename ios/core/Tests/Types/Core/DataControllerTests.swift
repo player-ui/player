@@ -5,40 +5,13 @@
 //  Created by Koriann South with Augment on 2026-01-22.
 //
 
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+import XCTest
 
 class DataControllerTests: XCTestCase {
-    var context: JSContext!
-    var dataController: DataController!
-
-    override func setUp() {
-        super.setUp()
-        context = JSContext()!
-        context.loadCore()
-
-        // Create a DataController with initial data
-        let initialData: [String: Any] = ["user": ["name": "Alice", "age": 30], "count": 5]
-
-        // Create a BindingParser - we need a dummy get function since the DataController creates its own LocalModel
-        let getCallback: @convention(block) (JSValue) -> JSValue? = { _ in nil }
-        let parserValue = context
-            .getClassReference("Player.BindingParser", load: { $0.loadCore() })?
-            .construct(withArguments: [[
-                "get": JSValue(object: getCallback, in: context) as Any
-            ]])
-
-        let dcClass = context.getClassReference("Player.DataController", load: { $0.loadCore() })
-        let dcValue = dcClass?.construct(withArguments: [
-            initialData,
-            [
-                "pathResolver": parserValue as Any
-            ]
-        ])
-
-        dataController = dcValue.map { DataController($0) }
-    }
+    private var context: JSContext!
+    private var dataController: DataController!
 
     func testGetReturnsCorrectValue() {
         XCTAssertEqual(dataController.get(binding: "user.name") as? String, "Alice")
@@ -84,13 +57,45 @@ class DataControllerTests: XCTestCase {
         XCTAssertEqual(readOnly?.get(binding: "user.age") as? Int, 30)
     }
 
-    func testGetModelReturnsPipelinedDataModel() {
+    func testGetModelReturnsPipelinedDataModel() throws {
         let model = dataController.getModel()
 
-        let userName = model?.invokeMethod("get", withArguments: [
-            dataController.value.context.evaluateScript("new Player.BindingParser({ get: () => null }).parse('user.name')")!
+        let userName = try model?.invokeMethod("get", withArguments: [
+            XCTUnwrap(dataController.value
+                .context
+                .evaluateScript(
+                    "new Player.BindingParser({ get: () => null }).parse('user.name')"
+                )),
         ])?.toObject() as? String
 
         XCTAssertEqual(userName, "Alice")
+    }
+
+    override func setUp() {
+        super.setUp()
+        context = JSContext()!
+        context.loadCore()
+
+        // Create a DataController with initial data
+        let initialData: [String: Any] = ["user": ["name": "Alice", "age": 30], "count": 5]
+
+        // Create a BindingParser - we need a dummy get function since the DataController creates
+        // its own LocalModel
+        let getCallback: @convention(block) (JSValue) -> JSValue? = { _ in nil }
+        let parserValue = context
+            .getClassReference("Player.BindingParser", load: { $0.loadCore() })?
+            .construct(withArguments: [[
+                "get": JSValue(object: getCallback, in: context) as Any,
+            ]])
+
+        let dcClass = context.getClassReference("Player.DataController", load: { $0.loadCore() })
+        let dcValue = dcClass?.construct(withArguments: [
+            initialData,
+            [
+                "pathResolver": parserValue as Any,
+            ],
+        ])
+
+        dataController = dcValue.map { DataController($0) }
     }
 }

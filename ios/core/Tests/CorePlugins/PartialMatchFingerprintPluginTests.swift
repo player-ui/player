@@ -8,8 +8,8 @@
 
 import Foundation
 import JavaScriptCore
-import XCTest
 @testable import PlayerUI
+import XCTest
 
 class PartialMatchFingerprintPluginTests: XCTestCase {
     func testMapping() {

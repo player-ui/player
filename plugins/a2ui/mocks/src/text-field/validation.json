@@ -1,0 +1,14 @@
+{
+  "surfaceId": "text-field-validation",
+  "data": { "user": { "email": "" } },
+  "components": [
+    {
+      "id": "root",
+      "component": "TextField",
+      "label": "Email",
+      "value": { "path": "/user/email" },
+      "textFieldType": "shortText",
+      "validationRegexp": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+    }
+  ]
+}
