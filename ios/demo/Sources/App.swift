@@ -1,4 +1,5 @@
 import PlayerUI
+import PlayerUIA2UI
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
 import PlayerUIExpressionPlugin
@@ -36,6 +37,11 @@ struct MainView: View {
             result: $result
         )
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink("A2UI") { A2UIDemoView() }
+            }
+        }
         .alert(isPresented: showAlert, content: {
             Alert(
                 title: Text("Flow Finished"),

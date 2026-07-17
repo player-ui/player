@@ -17,7 +17,7 @@ public class JSUtilities {
         let setTimeout: @convention(block) (JSValue?, JSValue?) -> Void = { function, timeout in
             guard let function, let timeout = timeout?.toInt32() else { return }
             DispatchQueue
-                .global(qos: .background)
+                .global(qos: .userInitiated)
                 .asyncAfter(deadline: .now() + .milliseconds(Int(timeout))) {
                     DispatchQueue.main.async {
                         function.call(withArguments: [])

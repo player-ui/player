@@ -12,7 +12,7 @@ export class ReadOnlyDataController
     this.controller = controller;
   }
 
-  get(binding: BindingLike, options?: DataModelOptions | undefined) {
+  get(binding: BindingLike, options?: DataModelOptions | undefined): any {
     return this.controller.get(binding, options);
   }
 }

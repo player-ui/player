@@ -20,7 +20,7 @@ class BaseBeaconPluginTests: XCTestCase {
     func testBundleLoadsSymbols() throws {
         let context = try XCTUnwrap(JSContext())
 
-        let plugin = BaseBeaconPlugin<DefaultBeacon>() { _ in }
+        let plugin = BaseBeaconPlugin<DefaultBeacon> { _ in }
 
         plugin.context = context
 

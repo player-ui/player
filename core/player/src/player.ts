@@ -3,7 +3,7 @@ import deferred from "p-defer";
 import type { Flow, FlowResult } from "@player-ui/types";
 import queueMicrotask from "queue-microtask";
 
-import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import { SyncBailHook, SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
 import { TapableLogger } from "./logger";
 import type { ExpressionType } from "./expressions";
@@ -29,6 +29,8 @@ import type {
   CompletedState,
   ErrorState,
   PlayerHooks,
+  ContentMeta,
+  StartOptions,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
 
@@ -125,6 +127,7 @@ export class Player {
     onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
+    transformContent: new SyncBailHook<[unknown, ContentMeta], Flow>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -141,6 +144,13 @@ export class Player {
     this.config.plugins?.forEach((plugin) => {
       plugin.apply(this);
     });
+
+    // Default content handler: a `"player"`-format payload is already a `Flow`.
+    // Registered after plugins so a format plugin gets first claim on the bail
+    // hook; this is the fallback that lets `start()` require a `Flow` out.
+    this.hooks.transformContent.tap("player", (payload, meta) =>
+      meta.format === "player" ? (payload as Flow) : undefined,
+    );
   }
 
   /**  Returns currently registered plugins */
@@ -513,8 +523,21 @@ export class Player {
     };
   }
 
-  public async start(payload: Flow): Promise<CompletedState> {
-    const ref = Symbol(payload?.id ?? "payload");
+  public async start(
+    payload: unknown,
+    options?: StartOptions,
+  ): Promise<CompletedState> {
+    const meta: ContentMeta = {
+      format: options?.format ?? "player",
+      version: options?.version,
+    };
+    const flow = this.hooks.transformContent.call(payload, meta);
+    if (!flow) {
+      throw new Error(
+        `Player.start received content with format "${meta.format}" that no plugin transformed into a Flow.`,
+      );
+    }
+    const ref = Symbol(flow.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
     const maybeUpdateState = <T extends PlayerFlowState>(newState: T) => {
@@ -537,7 +560,7 @@ export class Player {
     });
 
     try {
-      const { state, start } = this.setupFlow(payload);
+      const { state, start } = this.setupFlow(flow);
       this.setState({
         ref,
         ...state,
@@ -564,7 +587,7 @@ export class Player {
       const errorState: ErrorState = {
         status: "error",
         ref,
-        flow: payload,
+        flow,
         error,
       };
 

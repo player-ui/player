@@ -1,6 +1,7 @@
 import type { Preview } from "@storybook/react-webpack5";
 import { PlayerDecorator } from "@player-ui/storybook";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+import { A2UIPlugin } from "@player-ui/a2ui-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin";
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
@@ -9,9 +10,11 @@ import * as dslRefComponents from "@player-ui/reference-assets-plugin-components
 // @ts-expect-error referencing the pre-built output
 import RefXLR from "@player-ui/reference-assets-plugin/dist/xlr/manifest.js";
 import "@player-ui/reference-assets-plugin-react/dist/index.css";
+import "@player-ui/a2ui-plugin-react/dist/index.css";
 
 const reactPlayerPlugins = [
   new ReferenceAssetsPlugin(),
+  new A2UIPlugin(),
   new CommonTypesPlugin(),
   new DataChangeListenerPlugin(),
   new ComputedPropertiesPlugin(),
@@ -31,6 +34,7 @@ export const parameters = {
         "Welcome",
         "React Player",
         "Reference Assets",
+        "A2UI",
         ["Docs", "Overview", "Intro"],
       ],
     },

@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --player-background: 0 0% 100%;
+    --player-foreground: 222.2 47.4% 11.2%;
+
+    --player-muted: 210 40% 96.1%;
+    --player-muted-foreground: 215.4 16.3% 46.9%;
+
+    --player-popover: 0 0% 100%;
+    --player-popover-foreground: 222.2 47.4% 11.2%;
+
+    --player-border: 214.3 31.8% 91.4%;
+    --player-input: 214.3 31.8% 91.4%;
+
+    --player-card: 0 0% 100%;
+    --player-card-foreground: 222.2 47.4% 11.2%;
+
+    --player-primary: 222.2 47.4% 11.2%;
+    --player-primary-foreground: 210 40% 98%;
+
+    --player-secondary: 210 40% 96.1%;
+    --player-secondary-foreground: 222.2 47.4% 11.2%;
+
+    --player-accent: 210 40% 96.1%;
+    --player-accent-foreground: 222.2 47.4% 11.2%;
+
+    --player-destructive: 0 100% 50%;
+    --player-destructive-foreground: 210 40% 98%;
+
+    --player-ring: 215 20.2% 65.1%;
+
+    --player-radius: 0.5rem;
+  }
+
+  .player-dark {
+    --player-background: 224 71% 4%;
+    --player-foreground: 213 31% 91%;
+
+    --player-muted: 223 47% 11%;
+    --player-muted-foreground: 215.4 16.3% 56.9%;
+
+    --player-accent: 216 34% 17%;
+    --player-accent-foreground: 210 40% 98%;
+
+    --player-popover: 224 71% 4%;
+    --player-popover-foreground: 215 20.2% 65.1%;
+
+    --player-border: 216 34% 17%;
+    --player-input: 216 34% 17%;
+
+    --player-card: 224 71% 4%;
+    --player-card-foreground: 213 31% 91%;
+
+    --player-primary: 210 40% 98%;
+    --player-primary-foreground: 222.2 47.4% 1.2%;
+
+    --player-secondary: 222.2 47.4% 11.2%;
+    --player-secondary-foreground: 210 40% 98%;
+
+    --player-destructive: 0 63% 31%;
+    --player-destructive-foreground: 210 40% 98%;
+
+    --player-ring: 216 34% 17%;
+
+    --player-radius: 0.5rem;
+  }
+}

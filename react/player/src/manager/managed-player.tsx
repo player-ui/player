@@ -7,6 +7,7 @@ import type {
   ManagerMiddleware,
   ManagedPlayerContext,
 } from "./types";
+import type { StartOptions } from "@player-ui/player";
 import { useRequestTime } from "./request-time";
 import type { ReactPlayerOptions } from "../player";
 import { ReactPlayer } from "../player";
@@ -57,6 +58,9 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
+
+    /** options forwarded to `player.start()` for each flow */
+    startOptions?: StartOptions;
   }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
@@ -64,6 +68,7 @@ class ManagedState {
         playerConfig: options.playerConfig,
         reactPlayer: new ReactPlayer(options.playerConfig),
         manager: options.manager,
+        startOptions: options.startOptions,
       },
     };
 
@@ -75,8 +80,8 @@ class ManagedState {
   /** reset starts from nothing */
   public reset(): void {
     if (this.state?.value === "error") {
-      const { playerConfig, manager } = this.state.context;
-      this.start({ playerConfig, manager });
+      const { playerConfig, manager, startOptions } = this.state.context;
+      this.start({ playerConfig, manager, startOptions });
     } else {
       throw new Error("Flow must be in error state to reset");
     }
@@ -85,7 +90,7 @@ class ManagedState {
   /** restart starts from the last result */
   public restart(): void {
     if (this.state?.value === "error") {
-      const { playerConfig, manager, prevResult, reactPlayer } =
+      const { playerConfig, manager, prevResult, reactPlayer, startOptions } =
         this.state.context;
       this.setState({
         value: "completed",
@@ -94,6 +99,7 @@ class ManagedState {
           manager,
           result: prevResult,
           reactPlayer,
+          startOptions,
         },
       });
     } else {
@@ -109,13 +115,14 @@ class ManagedState {
       }
     });
 
-    const { manager, reactPlayer, playerConfig } = state.context;
+    const { manager, reactPlayer, playerConfig, startOptions } = state.context;
 
     try {
       const nextState = await this.processState(state, {
         manager,
         reactPlayer,
         playerConfig,
+        startOptions,
       });
 
       if (nextState) {
@@ -128,6 +135,7 @@ class ManagedState {
           manager,
           reactPlayer,
           playerConfig,
+          startOptions,
           error: e as Error,
         },
       });
@@ -184,7 +192,10 @@ class ManagedState {
           ...context,
           flow: state.context.flow,
           prevResult: state.context.prevResult,
-          result: state.context.reactPlayer.start(state.context.flow),
+          result: state.context.reactPlayer.start(
+            state.context.flow,
+            state.context.startOptions,
+          ),
         },
       };
     }
@@ -224,6 +235,9 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
+
+  /** Options forwarded to `player.start()` for each flow */
+  startOptions?: StartOptions;
 }): { managedState: ManagedState; state?: ManagedPlayerState } => {
   const mounted = React.useRef(false);
   const previousManager = React.useRef(options.manager);
@@ -329,6 +343,7 @@ export const ManagedPlayer = (
       plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
       player: props.player,
     },
+    startOptions: props.startOptions,
   });
 
   const previousState = React.useRef<ManagedPlayerState | undefined>();

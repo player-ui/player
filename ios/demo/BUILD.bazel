@@ -12,6 +12,7 @@ swift_library(
         "//ios/test-utils-core:PlayerUITestUtilitiesCore",
         
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        "//plugins/a2ui/swiftui:PlayerUIA2UI",
 
         "//plugins/beacon/swiftui:PlayerUIBeaconPlugin",
         "//plugins/expression/ios:PlayerUIExpressionPlugin",

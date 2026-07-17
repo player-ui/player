@@ -31,24 +31,17 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
 
     private var handleScroll: Bool
 
-    @ObservedObject private var context: SwiftUIPlayer.Context
+    private var startOptions: StartOptions?
 
-    public var body: some View {
-        ManagedPlayer14(
-            viewModel: viewModel,
-            plugins: plugins,
-            context: context,
-            handleScroll: handleScroll,
-            fallback: fallback,
-            loading: loading
-        ).onReceive(inspection.notice) { inspection.visit(self, $0) }
-    }
+    @ObservedObject private var context: SwiftUIPlayer.Context
 
     /// Creates a `ManagedPlayer`
     /// - parameters:
     ///    - plugins: The plugins to use for the `SwiftUIPlayer`
     ///    - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
     ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - startOptions: Describes the content `format`/`version` for every flow in the session
+    ///      (defaults to `nil`, i.e. Player `Flow`s). Pass e.g. `.a2ui` for an A2UI experience.
     ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
     ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     public init(
@@ -56,6 +49,7 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         context: SwiftUIPlayer.Context = .sharedManaged,
         viewModel: ManagedPlayerViewModel,
         handleScroll: Bool = true,
+        startOptions: StartOptions? = nil,
         @ViewBuilder fallback: @escaping (ManagedPlayerErrorContext) -> Fallback,
         @ViewBuilder loading: @escaping () -> Loading
     ) {
@@ -65,6 +59,7 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         self.fallback = fallback
         self.viewModel = viewModel
         self.handleScroll = handleScroll
+        self.startOptions = startOptions
         plugins.apply(viewModel)
     }
 
@@ -84,6 +79,7 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
         flowManager: FlowManager,
         context: SwiftUIPlayer.Context = .sharedManaged,
         handleScroll: Bool = true,
+        startOptions: StartOptions? = nil,
         onComplete: @escaping (CompletedState) -> Void,
         onStartedFlow: @escaping (String) -> Void = { _ in },
         @ViewBuilder fallback: @escaping (ManagedPlayerErrorContext) -> Fallback,
@@ -98,9 +94,22 @@ public struct ManagedPlayer<Loading: View, Fallback: View>: View {
                 onStartedFlow: onStartedFlow
             ),
             handleScroll: handleScroll,
+            startOptions: startOptions,
             fallback: fallback,
             loading: loading
         )
+    }
+
+    public var body: some View {
+        ManagedPlayer14(
+            viewModel: viewModel,
+            plugins: plugins,
+            context: context,
+            handleScroll: handleScroll,
+            startOptions: startOptions,
+            fallback: fallback,
+            loading: loading
+        ).onReceive(inspection.notice) { inspection.visit(self, $0) }
     }
 }
 
@@ -112,6 +121,8 @@ struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     private var fallback: (ManagedPlayerErrorContext) -> Fallback
 
     private var handleScroll: Bool
+
+    private var startOptions: StartOptions?
 
     @StateObject private var viewModel: ManagedPlayerViewModel
 
@@ -144,6 +155,7 @@ struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     ///    - viewModel: The `ManagedPlayerViewModel` to use for fetching flows
     ///    - plugins: The plugins to use for the `SwiftUIPlayer`
     ///    - handleScroll: Whether or not the `ManagedPlayer` should wrap content in a `ScrollView`
+    ///    - startOptions: Describes the content `format`/`version` for every flow in the session
     ///    - onError: A handler for when the `SwiftUIPlayer` encounters an error
     ///    - loading: A closure providing a `View` to display while the `FlowManager` fetches flows
     init(
@@ -151,6 +163,7 @@ struct ManagedPlayer14<Loading: View, Fallback: View>: View {
         plugins: [NativePlugin],
         context: SwiftUIPlayer.Context = .sharedManaged,
         handleScroll: Bool = true,
+        startOptions: StartOptions? = nil,
         @ViewBuilder fallback: @escaping (ManagedPlayerErrorContext) -> Fallback,
         @ViewBuilder loading: @escaping () -> Loading
     ) {
@@ -160,6 +173,7 @@ struct ManagedPlayer14<Loading: View, Fallback: View>: View {
         self.loading = loading
         self.fallback = fallback
         self.handleScroll = handleScroll
+        self.startOptions = startOptions
     }
 
     func makePlayerView(flow: String) -> some View {

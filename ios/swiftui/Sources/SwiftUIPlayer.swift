@@ -67,18 +67,22 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
     ///   - flow: The JSON flow to run
     ///   - plugins: Any plugins to add to Player
     ///   - context: An optional JSContext to use for loading platform shared code
+    ///   - startOptions: Describes the content `format`/`version`. Defaults to `nil` (a Player
+    /// `Flow`).
+    ///      Pass e.g. `.a2ui` to start a non-Player content format claimed by a plugin.
     public init(
         flow: String,
         plugins: [NativePlugin],
         result: Binding<Result<CompletedState, PlayerError>?>,
         context: Context = .shared,
-        unloadOnDisappear: Bool = true
+        unloadOnDisappear: Bool = true,
+        startOptions: StartOptions? = nil
     ) {
         let startTime = Date()
         _result = result
         _context = ObservedObject(initialValue: context)
         self.unloadOnDisappear = unloadOnDisappear
-        context.load(flow: flow, plugins: plugins, player: self)
+        context.load(flow: flow, plugins: plugins, player: self, startOptions: startOptions)
 
         // Log the time it took to initialize Player
         let initTime = Int((Date().timeIntervalSince(startTime) * 1000).rounded())
@@ -145,47 +149,16 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
         }
 
-        /// Unload the context. This will release the current javascript player/context and clear
-        /// the current
-        /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
-        /// by clearing the exceptionHandler and any exported objects on the context.
-        public func unload() {
-            // ObjC property accessors (e.g. JSValue.context) return autoreleased
-            // objects. Without an explicit pool, those temporaries prevent the
-            // JSContext from deallocating until the next run-loop drain.
-            autoreleasepool {
-                if let ctx = player?.context {
-                    ctx.exceptionHandler = nil
-                    ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
-                    JSGarbageCollect(ctx.jsGlobalContextRef)
-                }
-                // Break plugin → JSContext/JSValue references
-                partialMatchPlugin.pluginRef = nil
-                partialMatchPlugin.context = nil
-                // Release the JS player instance and all hook JSValues
-                player = nil
-                hooks = nil
-                flow = nil
-                // Release InProgressState which holds PlayerControllers (JSValues)
-                state = nil
-            }
-            DispatchQueue.main.async { [weak self] in
-                self?.result = nil
-            }
-            registry.resetView()
-        }
-
-        /// Clear the exceptionHandler of the context to remove reference to the logger
-        /// should be called when ManagedPlayer gets tore down
-        public func clearExceptionHandler() {
-            player?.context.exceptionHandler = nil
-        }
-
         /// Load the supplied flow into this context. If the currently loaded flow is supplied this
         /// will do nothing.
         /// If a new flow is supplied then the javascript environment is created or rebuilt around
         /// the new flow.
-        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
+        fileprivate func load(
+            flow: String,
+            plugins: [NativePlugin],
+            player: SwiftUIPlayer,
+            startOptions: StartOptions? = nil
+        ) {
             registry.logger = logger
             guard self.player == nil || flow != self.flow else {
                 logger.d("Reusing already loaded flow")
@@ -227,12 +200,57 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 return
             }
 
-            player.start(flow: flow) { [weak self, weak playerValue] result in
+            // swiftlint:disable closure_parameter_position
+            player.start(flow: flow, options: startOptions) { [
+                weak self,
+                weak playerValue
+            ] result in
                 guard let self, let playerValue, self.player == playerValue else { return }
                 DispatchQueue.main.async { [weak self] in
                     self?.result = result
                 }
             }
+            // swiftlint:enable closure_parameter_position
+        }
+
+        /// Unload the context. This will release the current javascript player/context and clear
+        /// the current
+        /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
+        /// by clearing the exceptionHandler and any exported objects on the context.
+        public func unload() {
+            // ObjC property accessors (e.g. JSValue.context) return autoreleased
+            // objects. Without an explicit pool, those temporaries prevent the
+            // JSContext from deallocating until the next run-loop drain.
+            autoreleasepool {
+                if let ctx = player?.context {
+                    ctx.exceptionHandler = nil
+                    ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
+                    JSGarbageCollect(ctx.jsGlobalContextRef)
+                }
+                // Break plugin → JSContext/JSValue references
+                partialMatchPlugin.pluginRef = nil
+                partialMatchPlugin.context = nil
+                // Release the JS player instance and all hook JSValues
+                player = nil
+                hooks = nil
+                flow = nil
+                // Release InProgressState which holds PlayerControllers (JSValues)
+                state = nil
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.result = nil
+            }
+            registry.resetView()
+        }
+
+        /// Clear the exceptionHandler of the context to remove reference to the logger
+        /// should be called when ManagedPlayer gets tore down
+        public func clearExceptionHandler() {
+            player?.context.exceptionHandler = nil
+        }
+
+        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
+            load(flow: flow, plugins: plugins, player: player, startOptions: nil)
         }
 
         /// Handler for when the ViewController in the core player changes
