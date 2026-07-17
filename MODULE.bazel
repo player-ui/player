@@ -79,8 +79,7 @@ npm.npm_translate_lock(
     ],
     npm_package_target_name = "{dirname}",
     npmrc = "//:.npmrc",
-    pnpm_lock = "//:pnpm-lock.yaml",
-    verify_node_modules_ignored = "//:.bazelignore",
+    pnpm_lock = "//:pnpm-lock.yaml"
 )
 use_repo(npm, "npm")
 

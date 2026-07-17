@@ -1,3 +1,25 @@
+# 1.1.0-next.2 (Thu Jul 16 2026)
+
+### Release Notes
+
+#### Stop Leaking Invalid Data After Forced Transition ([#904](https://github.com/player-ui/player/pull/904))
+
+Stop invalid data from leaking into model with unrelated data sets after a forced navigation.
+
+---
+
+#### 🐛 Bug Fix
+
+- Stop Leaking Invalid Data After Forced Transition [#904](https://github.com/player-ui/player/pull/904) ([@KetanReddy](https://github.com/KetanReddy))
+- Automatically lint swift files in CI/CD, format on pre-commit [#854](https://github.com/player-ui/player/pull/854) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.1.0-next.1 (Thu Jul 09 2026)
 
 #### 🐛 Bug Fix
@@ -61,20 +83,24 @@ Full release notes are available on the doc site
 #### error controller ([#770](https://github.com/player-ui/player/pull/770))
 
 ### Error Controller
+
 Player now has a built-in ErrorController, instantiated automatically when a flow starts and accessible via controllers.error on all platforms.
 
 #### Core API
+
 captureError(error) accepts any error implementing the PlayerErrorMetadata interface (type, optional severity, optional metadata). It fires the onError bail hook, writes to errorState in the data model, and navigates via errorTransitions. Returns true if the error was handled (hook bailed or an errorTransitions route was navigated), false if the flow was failed.
 
 onError is a bail hook — returning true takes ownership of the error, preventing errorState from being written and navigation from occurring. Additional state inspection methods: getCurrentError(), getErrors(), clearErrors(), clearCurrentError().
 
 #### Error Navigation
+
 Flows can define errorTransitions at the node or flow level to route errors to dedicated error views instead of failing the flow:
 
 { "errorTransitions": { "render": "RENDER_ERROR_VIEW", "\*": "GENERIC_ERROR_VIEW" } }
 Node-level takes precedence over flow-level. The "\*" wildcard matches any unhandled type.
 
 #### Render-Time Error Capture
+
 Capture asset render errors. Each platform provides an AssetRenderError / AssetRenderException with the failing asset id and full parent path in the error message
 
 #### `ExternalStatePlugin` allows overrides ([#817](https://github.com/player-ui/player/pull/817))
@@ -130,12 +156,13 @@ The `AnyType` enum now conforms to `Sendable` protocol and is concurrency-safe. 
 case anyDictionary(data: [String: Any])
 case anyArray(data: [Any])
 
-// After  
+// After
 case anyDictionary(data: [String: AnyType])
 case anyArray(data: [AnyType])
 ```
 
 #### Migration
+
 Use `AnyType` cases directly instead of converting from/to `Any`:
 
 ```swift
@@ -143,7 +170,7 @@ Use `AnyType` cases directly instead of converting from/to `Any`:
 let anyType = AnyType.anyDictionary(data: ["key": "value"])
 let anyArray = AnyType.anyArray(data: ["key", 2])
 
-// New (Sendable-safe)  
+// New (Sendable-safe)
 let anyType = AnyType.anyDictionary(data: ["key": .string(data: "value")])
 let anyArray = AnyType.anyArray(data: [.string(data: "key"), .number(data: 2)])
 ```
@@ -245,20 +272,24 @@ Full release notes are available on the doc site
 #### error controller ([#770](https://github.com/player-ui/player/pull/770))
 
 ### Error Controller
+
 Player now has a built-in ErrorController, instantiated automatically when a flow starts and accessible via controllers.error on all platforms.
 
 #### Core API
+
 captureError(error) accepts any error implementing the PlayerErrorMetadata interface (type, optional severity, optional metadata). It fires the onError bail hook, writes to errorState in the data model, and navigates via errorTransitions. Returns true if the error was handled (hook bailed or an errorTransitions route was navigated), false if the flow was failed.
 
 onError is a bail hook — returning true takes ownership of the error, preventing errorState from being written and navigation from occurring. Additional state inspection methods: getCurrentError(), getErrors(), clearErrors(), clearCurrentError().
 
 #### Error Navigation
+
 Flows can define errorTransitions at the node or flow level to route errors to dedicated error views instead of failing the flow:
 
 { "errorTransitions": { "render": "RENDER_ERROR_VIEW", "\*": "GENERIC_ERROR_VIEW" } }
 Node-level takes precedence over flow-level. The "\*" wildcard matches any unhandled type.
 
 #### Render-Time Error Capture
+
 Capture asset render errors. Each platform provides an AssetRenderError / AssetRenderException with the failing asset id and full parent path in the error message
 
 #### `ExternalStatePlugin` allows overrides ([#817](https://github.com/player-ui/player/pull/817))
@@ -314,12 +345,13 @@ The `AnyType` enum now conforms to `Sendable` protocol and is concurrency-safe. 
 case anyDictionary(data: [String: Any])
 case anyArray(data: [Any])
 
-// After  
+// After
 case anyDictionary(data: [String: AnyType])
 case anyArray(data: [AnyType])
 ```
 
 #### Migration
+
 Use `AnyType` cases directly instead of converting from/to `Any`:
 
 ```swift
@@ -327,7 +359,7 @@ Use `AnyType` cases directly instead of converting from/to `Any`:
 let anyType = AnyType.anyDictionary(data: ["key": "value"])
 let anyArray = AnyType.anyArray(data: ["key", 2])
 
-// New (Sendable-safe)  
+// New (Sendable-safe)
 let anyType = AnyType.anyDictionary(data: ["key": .string(data: "value")])
 let anyArray = AnyType.anyArray(data: [.string(data: "key"), .number(data: 2)])
 ```
@@ -506,6 +538,7 @@ Guard against released exceptions when retrieving state since we can turn that i
 Added a defensive guard in HermesNode so property reads on a released runtime/object fail safely by throwing a PlayerRuntimeException with context instead of a fatal native NPE.
 
 Added regression tests:
+
 - A deterministic unit test for “released JSI object property read”
 - A small concurrency test that reads player.state while player.release() is happening
 
@@ -600,6 +633,7 @@ Guard against released exceptions when retrieving state since we can turn that i
 Added a defensive guard in HermesNode so property reads on a released runtime/object fail safely by throwing a PlayerRuntimeException with context instead of a fatal native NPE.
 
 Added regression tests:
+
 - A deterministic unit test for “released JSI object property read”
 - A small concurrency test that reads player.state while player.release() is happening
 
@@ -1122,13 +1156,15 @@ Minor dependency updates to address security bulletins
 #### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
 
 #### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+
 - Fix: Only call context.unload if we are in a loading state not when its in loaded state
 
 #### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
 
-All default exports have been replaced with named exports across core packages, plugins, and React components. 
+All default exports have been replaced with named exports across core packages, plugins, and React components.
 
 Affected packages:
+
 - `@player-ui/make-flow`: identify function
 - `@player-ui/partial-match-registry`: createObjectMatcher function
 - `@player-ui/player`: Logger classes and view plugins
@@ -1149,7 +1185,7 @@ Upload JS bundle size analysis to codecov
 This PR contains a few docs-related quality of life improvements, details below:
 
 - Adds a **pr-comment workflow** that supports command-triggered PR comments - including: `/canary`, `/docs`
-- Adds a **docs preview workflow** that is triggered when a collaborator adds a comment including `/docs`, similar to our `/canary` workflow. This workflow will push static docs files to https://github.com/player-ui/player-ui.github.io and publish a URL that includes PR docs changes. 
+- Adds a **docs preview workflow** that is triggered when a collaborator adds a comment including `/docs`, similar to our `/canary` workflow. This workflow will push static docs files to https://github.com/player-ui/player-ui.github.io and publish a URL that includes PR docs changes.
 - Adds a **pr-closed workflow** that will run when a PR is either closed manually or merged, which will automatically clean up the pr folder in the https://github.com/player-ui/player-ui.github.io. This workflow can be expanded on in the future if needed.
 - Adds a PR comment that includes Canary release information after the "/canary" workflow is done and a new release becomes available, making it more clear to users which version is tied to when the command was run.
 - Updated full release job to be dependent on docs build success
@@ -1217,13 +1253,15 @@ Export `com.facebook.soloader:soloader` from `hermes` artifacts
 #### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
 
 #### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+
 - Fix: Only call context.unload if we are in a loading state not when its in loaded state
 
 #### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
 
-All default exports have been replaced with named exports across core packages, plugins, and React components. 
+All default exports have been replaced with named exports across core packages, plugins, and React components.
 
 Affected packages:
+
 - `@player-ui/make-flow`: identify function
 - `@player-ui/partial-match-registry`: createObjectMatcher function
 - `@player-ui/player`: Logger classes and view plugins
@@ -1354,6 +1392,7 @@ Export `com.facebook.soloader:soloader` from `hermes` artifacts
 With the [Android 15 16 KB page size requirement](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html), Android Player is dropping support for [J2V8](https://github.com/eclipsesource/J2V8) as it fails to meet those requirements. It will no longer be a transitive dependency, requiring the desired runtime module to be declared explicitly as a dependency of the app.
 
 For example, [Hermes](https://github.com/facebook/hermes) is now the recommended runtime for Android Player use cases, and can be configured simply via including the dependency:
+
 ```kotlin
 dependencies {
     implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
@@ -1457,6 +1496,7 @@ dependencies {
 With the [Android 15 16 KB page size requirement](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html), Android Player is dropping support for [J2V8](https://github.com/eclipsesource/J2V8) as it fails to meet those requirements. It will no longer be a transitive dependency, requiring the desired runtime module to be declared explicitly as a dependency of the app.
 
 For example, [Hermes](https://github.com/facebook/hermes) is now the recommended runtime for Android Player use cases, and can be configured simply via including the dependency:
+
 ```kotlin
 dependencies {
     implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
@@ -1624,9 +1664,9 @@ Fix Issue with awaited `ASYNC_ACTION` state's expressions being fired multiple t
 
 #### Async Expression Support ([#649](https://github.com/player-ui/player/pull/649))
 
-Adds experimental support for asynchronous expressions within Player.  This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable. 
+Adds experimental support for asynchronous expressions within Player. This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable.
 
-The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await`  expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
+The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await` expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
 
 #### Fixes for manager becoming stale ([#683](https://github.com/player-ui/player/pull/683))
 
@@ -1844,9 +1884,9 @@ Fix Issue with awaited `ASYNC_ACTION` state's expressions being fired multiple t
 
 #### Async Expression Support ([#649](https://github.com/player-ui/player/pull/649))
 
-Adds experimental support for asynchronous expressions within Player.  This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable. 
+Adds experimental support for asynchronous expressions within Player. This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable.
 
-The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await`  expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
+The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await` expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
 
 ---
 
@@ -2165,6 +2205,7 @@ Update Common Expressions Plugin to export underlying functions to allow them to
 ---
 
 # 0.11.2 (Thurs May 22 2025)
+
 ### Release Notes
 
 #### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
@@ -2296,6 +2337,7 @@ fix CheckPathPlugin throws error with chained AsyncNode
 ---
 
 # 0.11.0 (Mon May 12 2025)
+
 ### Release Notes
 
 #### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
@@ -2319,11 +2361,12 @@ Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE`
 
 #### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
 
-Doc site: 
+Doc site:
+
 - Fix dark mode styling of next button on landing page demo
 - Fix missing favicon
 - Add more custom styling
-- Close #574 
+- Close #574
 - Close #493
 
 #### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
@@ -2461,7 +2504,6 @@ This logic works for both static and dynamic templates.
 
 Have consistent `AsyncNodePlugin` constructor api across all platforms allowing both tapping the handler to `onAsyncNode` hook after initializing `asyncNodePlugin` and initializing `asyncNodePlugin` with handlers
 
-
 <!--
 In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
 Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
@@ -2525,11 +2567,12 @@ Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE`
 
 #### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
 
-Doc site: 
+Doc site:
+
 - Fix dark mode styling of next button on landing page demo
 - Fix missing favicon
 - Add more custom styling
-- Close #574 
+- Close #574
 - Close #493
 
 #### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
@@ -2606,11 +2649,14 @@ Doc site:
 #### Example asset and transform for async content streaming ([#575](https://github.com/player-ui/player/pull/575))
 
 Player streaming enhancement
+
 1. Changes
-- Added new `chat-message` asset in `ReferenceAssetsPlugin` as async streaming example 
+
+- Added new `chat-message` asset in `ReferenceAssetsPlugin` as async streaming example
 - Added generic function in `AsyncNodePlugin` to generate async asset transform
+
 2. New functionality
-Instead of adding `{async: true}` in content, replace it with a special type of asset, eg. `chat-message` associated with a transform function to add asyncNode
+   Instead of adding `{async: true}` in content, replace it with a special type of asset, eg. `chat-message` associated with a transform function to add asyncNode
 
 <!--
 In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
@@ -2698,9 +2744,9 @@ If you are unable to update the current documents, please create an issue for us
 
 #### Data change listener fix ([#572](https://github.com/player-ui/player/pull/572))
 
-Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener`  and view update
+Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener` and view update
 
-#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+#### Update to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
 
 Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
 
@@ -2717,7 +2763,7 @@ Updated docs for Shared Constants Plugin to highlight the default dataPath used 
 - Expose onStart player hook for Android [#587](https://github.com/player-ui/player/pull/587) ([@mrigankmg](https://github.com/mrigankmg))
 - Revert "vector common scope" [#587](https://github.com/player-ui/player/pull/587) ([@brocollie08](https://github.com/brocollie08))
 - Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
-- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+- Update to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
 - Hermes tracker update [#580](https://github.com/player-ui/player/pull/580) ([@brocollie08](https://github.com/brocollie08))
 
 #### ⚠️ Pushed to `main`
@@ -2742,7 +2788,7 @@ Updated docs for Shared Constants Plugin to highlight the default dataPath used 
 
 #### Data change listener fix ([#572](https://github.com/player-ui/player/pull/572))
 
-Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener`  and view update
+Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener` and view update
 
 ---
 
@@ -2795,7 +2841,7 @@ Fixed an issue in `common-exprssion-plugin` where the array update via concat di
 
 ### Release Notes
 
-#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+#### Update to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
 
 Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
 
@@ -2804,7 +2850,7 @@ Updated docs for Shared Constants Plugin to highlight the default dataPath used 
 #### 🐛 Bug Fix
 
 - Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
-- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+- Update to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
 
 #### Authors: 2
 
@@ -2989,19 +3035,21 @@ Fixed instantiation of `BindingInstance`s with escaped numerical segments
 Push up new changelog before continuing release process so new version is tagged to a commit that exists
 
 ### Change Type (required)
+
 Indicate the type of change your pull request is:
 
-<!-- 
-  We use semantic versioning: https://semver.org/. Review that documentation for 
+<!--
+  We use semantic versioning: https://semver.org/. Review that documentation for
   more detailed guidelines.
 -->
+
 - [x] `patch`
 - [ ] `minor`
 - [ ] `major`
 - [ ] `N/A`
 
-
 ### Does your PR have any documentation updates?
+
 - [ ] Updated docs
 - [x] No Update needed
 - [ ] Unable to update docs
@@ -3044,15 +3092,17 @@ Docs - Add DSL docs
 
 - Update applicability docs to reflect desired patterns and behaviors
 - Fix flaky react reference asset test
-- Fix misc vitest issues when running outside of bazel (cjs environment, excluded directories) 
+- Fix misc vitest issues when running outside of bazel (cjs environment, excluded directories)
 
 ### Change Type (required)
+
 Indicate the type of change your pull request is:
 
-<!-- 
-  We use semantic versioning: https://semver.org/. Review that documentation for 
+<!--
+  We use semantic versioning: https://semver.org/. Review that documentation for
   more detailed guidelines.
 -->
+
 - [x] `patch`
 - [ ] `minor`
 - [ ] `major`
@@ -3070,8 +3120,8 @@ Indicate the type of change your pull request is:
   ```
 -->
 
-
 ### Does your PR have any documentation updates?
+
 - [x] Updated docs
 - [ ] No Update needed
 - [ ] Unable to update docs
@@ -3088,12 +3138,14 @@ If you are unable to update the current documents, please create an issue for us
 Remove dead dependencies
 
 ### Change Type (required)
+
 Indicate the type of change your pull request is:
 
-<!-- 
-  We use semantic versioning: https://semver.org/. Review that documentation for 
+<!--
+  We use semantic versioning: https://semver.org/. Review that documentation for
   more detailed guidelines.
 -->
+
 - [ ] `patch`
 - [ ] `minor`
 - [ ] `major`
@@ -3111,8 +3163,8 @@ Indicate the type of change your pull request is:
   ```
 -->
 
-
 ### Does your PR have any documentation updates?
+
 - [ ] Updated docs
 - [ ] No Update needed
 - [ ] Unable to update docs
@@ -3130,17 +3182,20 @@ If you are unable to update the current documents, please create an issue for us
 - Update page description on the landing page
 
 ### Change Type (required)
+
 Indicate the type of change your pull request is:
 
-<!-- 
-  We use semantic versioning: https://semver.org/. Review that documentation for 
+<!--
+  We use semantic versioning: https://semver.org/. Review that documentation for
   more detailed guidelines.
 -->
+
 - [ ] `patch`
 - [ ] `minor`
 - [ ] `major`
 
 ### Does your PR have any documentation updates?
+
 - [x] Updated docs
 - [ ] No Update needed
 - [ ] Unable to update docs
@@ -3159,12 +3214,14 @@ If you are unable to update the current documents, please create an issue for us
 - Fix version selector breaking on main page
 
 ### Change Type (required)
+
 Indicate the type of change your pull request is:
 
-<!-- 
-  We use semantic versioning: https://semver.org/. Review that documentation for 
+<!--
+  We use semantic versioning: https://semver.org/. Review that documentation for
   more detailed guidelines.
 -->
+
 - [x] `patch`
 - [ ] `minor`
 - [ ] `major`
@@ -3182,8 +3239,8 @@ Indicate the type of change your pull request is:
   ```
 -->
 
-
 ### Does your PR have any documentation updates?
+
 - [ ] Updated docs
 - [ ] No Update needed
 - [ ] Unable to update docs
@@ -3201,12 +3258,13 @@ Fix visibility of docs build
 
 #### ios: enhance tapable logger to handle variadic args from the JS log ([#524](https://github.com/player-ui/player/pull/524))
 
-Prefixing message with the format `[Player] [\(logLevel)]:`  moved out of the Tapable logger and moved to PrintLoggerPlugin. Any consumers using their own LoggerPlugin will need to append the logLevel if they want to print it 
+Prefixing message with the format `[Player] [\(logLevel)]:` moved out of the Tapable logger and moved to PrintLoggerPlugin. Any consumers using their own LoggerPlugin will need to append the logLevel if they want to print it
 
 Before
+
 ```swift
 public class CustomLoggingPlugin: NativePlugin {
-    
+
     public let pluginName = "CustomLoggingPlugin"
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
@@ -3218,9 +3276,10 @@ public class CustomLoggingPlugin: NativePlugin {
 ```
 
 After
+
 ```swift
 public class CustomLoggingPlugin: NativePlugin {
-    
+
     public let pluginName = "CustomLoggingPlugin"
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
@@ -3232,13 +3291,12 @@ public class CustomLoggingPlugin: NativePlugin {
     }
 ```
 
-
 ## Breaking Changes
 
 Any usage of the `player.logger.hooks` taps will have breaking changes in the callback because the calls have been changed to provide a `[Any]` type instead of `String` so it can be returned in the form of messages instead of a single message. Unless nothing is done in the callback to access the value but just to print it, there should be breaking changes
 
-
 Example:
+
 ```swift
 
 // this should be no breaking change
@@ -3363,7 +3421,7 @@ Expose the core Player [constantsController](https://github.com/player-ui/player
 
 AndroidPlayer provides top-level api and plugins access including `constantsController` with [AssetContext](https://github.com/player-ui/player/blob/bfd6a11a8d6c7138daec4724a8f08e9d9c4b370b/android/player/src/main/java/com/intuit/playerui/android/AssetContext.kt#L19-L23)
 
-Sample usage: 
+Sample usage:
 `assetContext.player.constantsController.getConstants(key, namespace)`
 
 #### Storybook Addon Fixes ([#449](https://github.com/player-ui/player/pull/449))
@@ -3375,7 +3433,7 @@ Sample usage:
 
 #### [Hermes] Android integration ([#410](https://github.com/player-ui/player/pull/410))
 
-Initial integration with the [Hermes](https://github.com/facebook/hermes) JavaScript runtime. This shows a tremendous size improvement over the existing [J2V8](https://github.com/eclipsesource/J2V8) integration of ~70% (7.6 MB -> 2.3 MB, architecture dependent). 
+Initial integration with the [Hermes](https://github.com/facebook/hermes) JavaScript runtime. This shows a tremendous size improvement over the existing [J2V8](https://github.com/eclipsesource/J2V8) integration of ~70% (7.6 MB -> 2.3 MB, architecture dependent).
 
 ### Opt-in
 
@@ -3395,7 +3453,7 @@ dependencies {
 }
 
 // Exclude J2V8 transitive dependency for all configurations in this module
-configurations { 
+configurations {
     all {
         exclude(group = "com.intuit.playerui", module = "j2v8-android")
         // Debuggable J2V8 included for canary versions
@@ -3406,7 +3464,7 @@ configurations {
 
 > [!TIP]
 > If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy.
-> 
+>
 > The `AndroidPlayer` will pick the first runtime it finds on the classpath - you can at least verify which runtime was used for the `Player` with a new log: `Player created using $runtime`. But that won't tell you for certain if the other runtimes were successfully excluded. You'll need to examine your APK, or your apps dependency tree, to tell for sure that redundant runtimes aren't unintentionally included.
 
 Most of the setup for this integration is done simply by including the right dependency (and excluding the wrong one), however, the `hermes-android` integration also relies on the [SoLoader](https://github.com/facebook/SoLoader) for loading the native libraries. All that's needed is to initialize the `SoLoader` (should be on your classpath with the `hermes-android` dependency) with an Android `Context` somewhere before you use the `AndroidPlayer`, potentially in your activities `onCreate`:
@@ -3480,8 +3538,8 @@ Use Node 20 for builds
 
 Fix migration issues in JS packages
 
-
 ### Does your PR have any documentation updates?
+
 - [ ] Updated docs
 - [x] No Update needed
 - [ ] Unable to update docs
@@ -3629,8 +3687,8 @@ Swaps the repo internals to use `bazel@6`, `rules_js`, bazel modules, `vitest` a
 
 - Update Player Tools to latest
 
-
 ### Does your PR have any documentation updates?
+
 - [ ] Updated docs
 - [x] No Update needed
 - [ ] Unable to update docs
@@ -3641,9 +3699,10 @@ Docs - Fix version selector not working and preserve route when changing version
 
 #### [Docs] Update the DSL Benefits in Schema Section ([#326](https://github.com/player-ui/player/pull/326))
 
-Docs - Update DSL Schema benefits section 
+Docs - Update DSL Schema benefits section
 
 ### Does your PR have any documentation updates?
+
 - [x] Updated docs
 - [ ] No Update needed
 - [ ] Unable to update docs
@@ -3653,6 +3712,7 @@ Docs - Update DSL Schema benefits section
 Types - Expose types/utilities around expression parsing errors
 
 ### Does your PR have any documentation updates?
+
 - [ ] Updated docs
 - [x] No Update needed
 - [ ] Unable to update docs
@@ -3766,11 +3826,11 @@ Embracing the `player-ui` namespace, the base group ID, and correlating package 
 1. Dropping `.jvm` from non-android artifacts
    - This was originally done to leave room for intermediate JS resource artifacts. This is no longer necessary due to improvements in our build process, and enables us to remove this redundancy.
 
-| Artifact | Internal | External |
-| -------- | -------- | -------- |
-| Headless Player | `com.intuit.player.jvm:core` | `com.intuit.playerui:core` |
-| Android Player | `com.intuit.player.android:player` | `com.intuit.playerui:android` |
-| Plugins | `com.intuit.player.plugins`<br/>`com.intuit.player.jvm.plugins`<br/>`com.intuit.player.android.plugins` | `com.intuit.playerui.plugins` |
+| Artifact        | Internal                                                                                                | External                      |
+| --------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Headless Player | `com.intuit.player.jvm:core`                                                                            | `com.intuit.playerui:core`    |
+| Android Player  | `com.intuit.player.android:player`                                                                      | `com.intuit.playerui:android` |
+| Plugins         | `com.intuit.player.plugins`<br/>`com.intuit.player.jvm.plugins`<br/>`com.intuit.player.android.plugins` | `com.intuit.playerui.plugins` |
 
 #### Refactor existing DSL docs. ([#288](https://github.com/player-ui/player/pull/288))
 
@@ -3895,8 +3955,6 @@ Enhance `AsyncViewStub.awaitView()` to ensure any child `AsyncViewStub`s are res
 
 #### Sync Android and JVM packages to latest ([#222](https://github.com/player-ui/player/pull/222))
 
-
-
 ---
 
 #### 🚀 Enhancement
@@ -4013,7 +4071,7 @@ Improved error messages for parse and eval failures for expressions
 
 #### 🐛 Bug Fix
 
-- Release ${GITHUB_REF##*/} [#241](https://github.com/player-ui/player/pull/241) ([@intuit-svc](https://github.com/intuit-svc))
+- Release ${GITHUB_REF##\*/} [#241](https://github.com/player-ui/player/pull/241) ([@intuit-svc](https://github.com/intuit-svc))
 - adding swiftuipendingtransactionplugin [#237](https://github.com/player-ui/player/pull/237) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
 - Add better error messaging for failed expression eval and parsing [#239](https://github.com/player-ui/player/pull/239) ([@adierkens](https://github.com/adierkens))
 
@@ -4038,12 +4096,12 @@ Pin `@moncao-editor/react` to `4.3.1`
 
 #### 🐛 Bug Fix
 
-- Release ${GITHUB_REF##*/} [#236](https://github.com/player-ui/player/pull/236) ([@intuit-svc](https://github.com/intuit-svc))
+- Release ${GITHUB_REF##\*/} [#236](https://github.com/player-ui/player/pull/236) ([@intuit-svc](https://github.com/intuit-svc))
 - build: comment out major doc deploy for now [#235](https://github.com/player-ui/player/pull/235) ([@hborawski](https://github.com/hborawski))
-- Release ${GITHUB_REF##*/} [#233](https://github.com/player-ui/player/pull/233) ([@intuit-svc](https://github.com/intuit-svc))
+- Release ${GITHUB_REF##\*/} [#233](https://github.com/player-ui/player/pull/233) ([@intuit-svc](https://github.com/intuit-svc))
 - remove version prefix from doc release path [#232](https://github.com/player-ui/player/pull/232) ([@hborawski](https://github.com/hborawski))
 - iOS: Update precompile script to source zshrc [#226](https://github.com/player-ui/player/pull/226) ([@hborawski](https://github.com/hborawski))
-- Release ${GITHUB_REF##*/} [#231](https://github.com/player-ui/player/pull/231) ([@intuit-svc](https://github.com/intuit-svc))
+- Release ${GITHUB_REF##\*/} [#231](https://github.com/player-ui/player/pull/231) ([@intuit-svc](https://github.com/intuit-svc))
 - Pin @moncao-editor/react to non `.mjs` Only Version [#230](https://github.com/player-ui/player/pull/230) ([@KetanReddy](https://github.com/KetanReddy))
 
 #### Authors: 3
@@ -4071,7 +4129,7 @@ Pin `@moncao-editor/react` to `4.3.1`
 - [iOS] fix runtime warnings for published variables in Xcode14 [#84](https://github.com/player-ui/player/pull/84) ([@hborawski](https://github.com/hborawski))
 - [iOS] make some additional properties public [#82](https://github.com/player-ui/player/pull/82) ([@hborawski](https://github.com/hborawski))
 - change platform groupid [#81](https://github.com/player-ui/player/pull/81) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
-- [iOS] add registerPlugin(_:) to HeadlessPlayer API [#79](https://github.com/player-ui/player/pull/79) ([@hborawski](https://github.com/hborawski))
+- [iOS] add registerPlugin(\_:) to HeadlessPlayer API [#79](https://github.com/player-ui/player/pull/79) ([@hborawski](https://github.com/hborawski))
 - Cleanup Android dependencies [#77](https://github.com/player-ui/player/pull/77) ([@sugarmanz](https://github.com/sugarmanz))
 
 #### 📝 Documentation

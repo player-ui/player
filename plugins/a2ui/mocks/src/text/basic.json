@@ -1,0 +1,11 @@
+{
+  "surfaceId": "text-basic",
+  "components": [
+    {
+      "id": "root",
+      "component": "Text",
+      "text": "Hello A2UI",
+      "variant": "body"
+    }
+  ]
+}

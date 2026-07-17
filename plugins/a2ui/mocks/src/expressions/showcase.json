@@ -1,0 +1,66 @@
+{
+  "surfaceId": "expressions-showcase",
+  "data": {
+    "user": { "name": "Ada", "email": "" },
+    "order": { "subtotal": 1299.5 }
+  },
+  "components": [
+    {
+      "id": "root",
+      "component": "Column",
+      "children": ["greeting", "subtotal", "total", "emailField", "linkBtn"]
+    },
+    {
+      "id": "greeting",
+      "component": "Text",
+      "variant": "h3",
+      "text": {
+        "call": "formatString",
+        "args": { "value": "Hello, ${/user/name}!" }
+      }
+    },
+    {
+      "id": "subtotal",
+      "component": "Text",
+      "text": {
+        "call": "formatString",
+        "args": {
+          "value": "Subtotal: ${/order/subtotal}"
+        }
+      }
+    },
+    {
+      "id": "total",
+      "component": "Text",
+      "text": {
+        "call": "formatCurrency",
+        "args": {
+          "value": { "path": "/order/subtotal" },
+          "currency": "USD",
+          "locale": "en-US"
+        }
+      }
+    },
+    {
+      "id": "emailField",
+      "component": "TextField",
+      "label": "Email",
+      "value": { "path": "/user/email" },
+      "textFieldType": "shortText",
+      "validationRegexp": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+    },
+    {
+      "id": "linkBtn",
+      "component": "Button",
+      "variant": "outline",
+      "child": "linkLbl",
+      "action": {
+        "functionCall": {
+          "call": "openUrl",
+          "args": { "url": "https://a2ui.org", "target": "_blank" }
+        }
+      }
+    },
+    { "id": "linkLbl", "component": "Text", "text": "Open A2UI Spec" }
+  ]
+}

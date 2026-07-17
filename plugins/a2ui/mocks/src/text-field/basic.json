@@ -1,0 +1,13 @@
+{
+  "surfaceId": "text-field-basic",
+  "data": { "user": { "name": "" } },
+  "components": [
+    {
+      "id": "root",
+      "component": "TextField",
+      "label": "Your name",
+      "value": { "path": "/user/name" },
+      "textFieldType": "shortText"
+    }
+  ]
+}

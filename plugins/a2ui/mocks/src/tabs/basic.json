@@ -1,0 +1,25 @@
+{
+  "surfaceId": "tabs-basic",
+  "components": [
+    {
+      "id": "root",
+      "component": "Tabs",
+      "tabItems": [
+        { "title": "Overview", "child": "tab1" },
+        { "title": "Details", "child": "tab2" },
+        { "title": "Reviews", "child": "tab3" }
+      ]
+    },
+    { "id": "tab1", "component": "Text", "text": "This is the overview pane." },
+    {
+      "id": "tab2",
+      "component": "Text",
+      "text": "Detailed information lives here."
+    },
+    {
+      "id": "tab3",
+      "component": "Text",
+      "text": "Customer reviews appear here."
+    }
+  ]
+}

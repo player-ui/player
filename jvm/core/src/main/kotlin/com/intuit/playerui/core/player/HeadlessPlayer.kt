@@ -193,7 +193,32 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         PlayerCompletable(Promise.reject(wrapped))
     }
 
+    override fun start(
+        flow: String,
+        format: String,
+        version: String?,
+    ): Completable<CompletedState> = try {
+        start(runtime.execute("($flow)") as Node, format, version)
+    } catch (exception: Exception) {
+        val wrapped = PlayerException("Could not load Player content", exception)
+        inProgressState?.fail(wrapped) ?: hooks.state.call(hashMapOf(), arrayOf(ErrorState.from(wrapped)))
+        PlayerCompletable(Promise.reject(wrapped))
+    }
+
     public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
+
+    /**
+     * Start a [flow] [Node] declaring its content [format] (and optional [version]). The
+     * options are forwarded to the JS `start(payload, options)` as a `{ format, version }`
+     * object so a plugin tapping `transformContent` can convert non-`"player"` content.
+     */
+    public fun start(
+        flow: Node,
+        format: String,
+        version: String? = null,
+    ): Completable<CompletedState> = PlayerCompletable(
+        player.getInvokable<Node>("start")!!.invoke(flow, mapOf("format" to format, "version" to version)),
+    )
 
     /** Start a [flow] and subscribe to the result */
     public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> = start(flow).apply {
