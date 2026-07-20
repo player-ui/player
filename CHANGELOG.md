@@ -1,3 +1,15 @@
+# 1.1.0-next.5 (Mon Jul 20 2026)
+
+#### 🐛 Bug Fix
+
+- Run ios release after auto release [#900](https://github.com/player-ui/player/pull/900) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 1
+
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.1.0-next.4 (Mon Jul 20 2026)
 
 #### 🐛 Bug Fix
