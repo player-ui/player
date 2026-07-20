@@ -78,3 +78,29 @@ Once Player is in a `ReleasedState`, it can no longer be used, as the resources 
 :::
 
 Additionally, the Android Player caches some lifecycle-sensitive constructs, which can leak if the context is backgrounded or added to the back-stack. `player.recycle()` should be invoked in these situations to prevent these leaks by clearing all cached data. `onDestroyView` is a good example of when this should be called. Invoking `recycle` will not interrupt player state or flow execution, which enables flows to persist beyond fragment or activity changes. However, this does depend on what Android context the player was configured with. To ensure the player can persist for the entire length of the app, the application context should be used.
+
+## Size Management
+
+Core JVM Player JAR size reduction
+The JVM Player include a number of bundled JS scripts that needed to be loaded into the JS engine at runtime in order to set up the JS environment. The notable improvement made here is the removal of debug Player scripts from the final Player JAR, bundling only the necessary prod scripts to start a flow.
+This can also be achieved via Android packagingOptions from consumer side without a Player update:
+
+```kotlin
+packagingOptions {
+    exclude("**/*.dev.js")
+}
+```
+
+### Excluding `.native.js` scripts
+
+With the Hermes runtime being the default for the JVM Player, the compiled `.hbc` bytecode scripts are bundled by default. If your app only targets Hermes, you don't need the plain `.native.js` scripts, since Hermes loads the precompiled `.hbc` variants. You can exclude them from your APK via Android packagingOptions to leave only the `.hbc` scripts:
+
+```kotlin
+packagingOptions {
+    exclude("**/*.native.js")
+}
+```
+
+:::caution
+Only exclude `.native.js` scripts if all your runtimes can load the `.hbc` bytecode. Runtimes other than Hermes (e.g. J2V8, GraalJS) require the `.native.js` scripts, so excluding them will break those runtimes.
+:::
