@@ -14,7 +14,7 @@ class IosVersionPlugin {
   name = "ios-version";
 
   apply(auto) {
-    auto.hooks.afterShipIt.tap(this.name, async (release) => {
+    auto.hooks.afterShipIt.tapPromise(this.name, async (release) => {
       const { newVersion, context: releaseContext } = release;
 
       if (!newVersion) {
