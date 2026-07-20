@@ -121,12 +121,12 @@ public abstract class RenderableAsset<Data>(
                         player.asyncHydrationTrackerPlugin?.trackHydration(this@RenderableAsset)
                         try {
                             rehydrate(cachedView)
-                            player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
                             cachedView
                         } catch (exception: StaleViewException) {
-                            player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
                             renewHydrationScope("recreating after stale rehydrate")
                             doRender()
+                        } finally {
+                            player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
                         }
                     }
                     else -> cachedView.also {

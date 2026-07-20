@@ -16,7 +16,11 @@ import com.intuit.playerui.utils.makeFlow
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
 /**
@@ -26,21 +30,47 @@ import kotlinx.serialization.json.Json
  */
 internal class SlowAsset(
     assetContext: AssetContext,
-) : RenderableAsset<SlowAsset.Data>(assetContext, Data.serializer()) {
+) : RenderableAsset<SlowAsset.Data>(assetContext, Data.SlowSerializer) {
     @Serializable
-    data class Data(val revision: Int = 0)
+    data class Data(val revision: Int = 0) {
+        /**
+         * Wraps the plain generated serializer, but blocks (on whatever thread calls
+         * deserialize() — Dispatchers.Default via RenderableAsset.getData()'s
+         * withContext(Dispatchers.Default) { data }, never Dispatchers.Main) when
+         * [slowInGetData] is set. Used to stall a *fresh* SlowAsset instance's first `data`
+         * access (the `data` property is `by lazy` per-instance in RenderableAsset, so a new
+         * instance's deserialization genuinely suspends here) — i.e. to hold render()'s rehydrate
+         * branch open inside `getData()`, before it ever reaches `withContext(Dispatchers.Main)`,
+         * without blocking Robolectric's single dedicated Main thread the way blocking inside
+         * hydrate() would.
+         */
+        object SlowSerializer : KSerializer<Data> {
+            private val delegate = serializer()
+            override val descriptor: SerialDescriptor get() = delegate.descriptor
+            override fun serialize(encoder: Encoder, value: Data) = delegate.serialize(encoder, value)
+            override fun deserialize(decoder: Decoder): Data {
+                if (slowInGetData) {
+                    hydrateStarted?.complete(Unit)
+                    neverCompletesLatch.await()
+                }
+                return delegate.deserialize(decoder)
+            }
+        }
+    }
 
     val currentHydrationScope get() = hydrationScope
 
     override suspend fun initView(data: Data): View {
         Log.e("SLOW_ASSET_DEBUG", "initView() ENTER revision=${data.revision}")
-        hydrateStarted?.complete(Unit)
-        try {
-            neverCompletes.await()
-            Log.e("SLOW_ASSET_DEBUG", "initView() await completed normally revision=${data.revision}")
-        } catch (e: Throwable) {
-            Log.e("SLOW_ASSET_DEBUG", "initView() await threw revision=${data.revision} exception=$e")
-            throw e
+        if (slowInInitView) {
+            hydrateStarted?.complete(Unit)
+            try {
+                neverCompletes.await()
+                Log.e("SLOW_ASSET_DEBUG", "initView() await completed normally revision=${data.revision}")
+            } catch (e: Throwable) {
+                Log.e("SLOW_ASSET_DEBUG", "initView() await threw revision=${data.revision} exception=$e")
+                throw e
+            }
         }
         Log.e("SLOW_ASSET_DEBUG", "initView() EXIT revision=${data.revision}")
         return FrameLayout(requireContext())
@@ -51,11 +81,20 @@ internal class SlowAsset(
     }
 
     companion object {
-        /** Completed by hydrate() so the test knows the coroutine has actually launched. */
+        /** Gates whether initView() suspends on neverCompletes. */
+        var slowInInitView = true
+
+        /** Gates whether Data's deserialization blocks on neverCompletesLatch (see SlowSerializer). */
+        var slowInGetData = false
+
+        /** Completed by deserialize()/initView() so the test knows the coroutine has actually launched. */
         var hydrateStarted: CompletableDeferred<Unit>? = null
 
         /** Never completed — keeps the launched coroutine suspended until its scope is cancelled. */
         var neverCompletes = CompletableDeferred<Unit>()
+
+        /** Plain blocking latch used by Data.SlowSerializer's non-suspend stall (see above). */
+        var neverCompletesLatch = java.util.concurrent.CountDownLatch(1)
 
         val sampleMap = mapOf(
             "id" to "slow-asset",
@@ -95,6 +134,12 @@ internal class SlowParentAsset(
 
     var child: AnyAsset? = null
 
+    /** A second, independent child (different asset id) inflated alongside [child]. */
+    var sibling: AnyAsset? = null
+
+    /** When true, hydrate() skips re-inflating [child] — only [sibling] is (re-)inflated. */
+    var skipChildOnNextHydrate = false
+
     override suspend fun initView(data: Data): View {
         Log.e("SLOW_PARENT_DEBUG", "initView() revision=${data.revision}")
         return LinearLayout(requireContext())
@@ -103,7 +148,8 @@ internal class SlowParentAsset(
     override fun CoroutineScope.hydrate(view: View, data: Data) {
         require(view is LinearLayout)
         Log.e("SLOW_PARENT_DEBUG", "hydrate() ENTER revision=${data.revision} scope=$this")
-        inflate(child, view)
+        if (!skipChildOnNextHydrate) inflate(child, view)
+        inflate(sibling, view)
         Log.e("SLOW_PARENT_DEBUG", "hydrate() EXIT revision=${data.revision}")
     }
 
