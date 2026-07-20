@@ -7,7 +7,8 @@
     "@player-ui/async-node-plugin": "workspace:^",
     "@player-ui/expression-plugin": "workspace:^",
     "@player-ui/meta-plugin": "workspace:^",
-    "@player-ui/types": "workspace:^"
+    "@player-ui/types": "workspace:^",
+    "@player-ui/types-provider-plugin": "workspace:^"
   },
   "devDependencies": {
     "@player-ui/asset-testing-library": "workspace:^",

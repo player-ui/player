@@ -624,6 +624,9 @@ importers:
       '@player-ui/types':
         specifier: workspace:^
         version: link:../../../core/types
+      '@player-ui/types-provider-plugin':
+        specifier: workspace:^
+        version: link:../../types-provider/core
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:^
