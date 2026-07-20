@@ -138,6 +138,7 @@ public abstract class RenderableAsset<Data>(
                 }
             }.also { player.cacheAssetView(assetContext, it) }
     } catch (exception: Throwable) {
+        if (exception is CancellationException) throw exception
         if (exception is AssetRenderException) {
             exception.assetParentPath += assetContext
             throw exception
