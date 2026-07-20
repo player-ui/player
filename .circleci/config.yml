@@ -82,7 +82,6 @@ commands:
           command: |
             # Runs after auto shipit so the GitHub release (used for release
             # notes) already exists
-            bazel build --config=release //:PlayerUI_SPM
             bazel run --config=release //:ios_publish
 
 jobs:

@@ -24,6 +24,10 @@ readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //
 
 bazel build --config=release $PKG_NPM_LABELS
 
+# iOS: compile the ios-only files for release into a zip file. We do this here to ensure the file specifications are correct / compile
+# before we release for all platforms
+bazel build --config=release //:PlayerUI_SPM
+
 # Maven Central Prepublish
 MVN_RELEASE_TYPE=snapshot
 if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then
