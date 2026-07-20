@@ -15,6 +15,6 @@ vitest_config(name = "vitest_config")
 # `npm_package` target named `mocks` from the bazel package directory name.
 filegroup(
     name = "snapshots",
-    srcs = glob(["src/**/*.json"]),
+    srcs = glob(["**/*.json"]),
     visibility = ["//visibility:public"],
 )

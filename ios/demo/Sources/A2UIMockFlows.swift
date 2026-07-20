@@ -6,7 +6,7 @@
 // JS (`@player-ui/a2ui-plugin-mocks`) and JVM/Android (`//tools/mocks:jar`) do —
 // the demo/test convention on iOS is inline strings (see `MockFlows.swift`). These
 // are faithful copies of the canonical source of truth at
-// `plugins/a2ui/mocks/src/**/*.json`; keep them in sync when the canonical set changes.
+// `plugins/a2ui/mocks/**/*.json`; keep them in sync when the canonical set changes.
 //
 public enum A2UIMockFlows {
     /// Every canonical A2UI snapshot (21), matching `plugins/a2ui/mocks/src`.
