@@ -27,6 +27,7 @@
     "./scripts/delete-old-prerelease.js",
     "./scripts/next-changelogs.js",
     "./scripts/version-comment.js",
+    "./scripts/ios-version.js",
     "./scripts/docs/release-docs.js"
   ]
 }

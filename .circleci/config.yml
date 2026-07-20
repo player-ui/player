@@ -81,9 +81,7 @@ commands:
           name: iOS Publish
           command: |
             # Runs after auto shipit so the GitHub release (used for release
-            # notes) already exists, and so we pick up auto's version bump.
-            git fetch origin "$CIRCLE_BRANCH"
-            git reset --hard "origin/$CIRCLE_BRANCH"
+            # notes) already exists
             bazel build --config=release //:PlayerUI_SPM
             bazel run --config=release //:ios_publish
 
