@@ -10,6 +10,7 @@ main_deps = main_exports + [
 
 main_resources = [
     "//plugins/external-state/core:core_native_bundle",
+    "//plugins/external-state/core:core_hbc",
 ]
 
 test_deps = [

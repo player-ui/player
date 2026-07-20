@@ -17,6 +17,7 @@ test_deps = [
 
 main_resources = [
     "//plugins/async-node/core:core_native_bundle",
+    "//plugins/async-node/core:core_hbc",
 ]
 
 kt_player_plugin(

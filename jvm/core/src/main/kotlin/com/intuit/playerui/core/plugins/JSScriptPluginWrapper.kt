@@ -15,16 +15,26 @@ public abstract class JSScriptPluginWrapper(
     public val name: String,
     protected val script: String,
     private val sourcePath: String? = null,
+    private val preCompiledScript: ByteArray? = null,
 ) : JSPluginWrapper {
     public constructor(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader) :
-        this(name, classLoader.getResource(sourcePath)!!.readText(), sourcePath)
+        this(
+            name,
+            classLoader.getResource(sourcePath)!!.readText(),
+            sourcePath,
+            classLoader.getResource(hbcPathFor(sourcePath))?.readBytes(),
+        )
 
     final override lateinit var instance: Node protected set
 
     public val isInstantiated: Boolean get() = ::instance.isInitialized
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(script, sourcePath ?: "$name.js"))
+        runtime.load(
+            ScriptContext(script, sourcePath ?: "$name.js").apply {
+                preCompiledScript = this@JSScriptPluginWrapper.preCompiledScript
+            },
+        )
         instance = runtime.buildInstance()
     }
 
@@ -32,6 +42,13 @@ public abstract class JSScriptPluginWrapper(
         ?: throw PlayerPluginException("Could not instantiate JS plugin: $name")
 
     public companion object {
+        /**
+         * Maps a native bundle source path to its sibling Hermes bytecode resource,
+         * e.g. `plugins/x/core/dist/XPlugin.native.js` -> `plugins/x/core/XPlugin.native.js.hbc`.
+         */
+        private fun hbcPathFor(sourcePath: String): String =
+            "${sourcePath.substringBeforeLast("/dist/")}/${sourcePath.substringAfterLast("/")}.hbc"
+
         /** Convenience helper to expose constructor as an anonymous builder */
         public fun from(
             name: String,

@@ -9,6 +9,7 @@ main_deps = main_exports
 
 main_resources = [
     "//plugins/expression/core:core_native_bundle",
+    "//plugins/expression/core:core_hbc",
 ]
 
 test_deps = [

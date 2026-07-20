@@ -8,6 +8,7 @@ main_deps = main_exports
 
 main_resources = [
     "//plugins/check-path/core:core_native_bundle",
+    "//plugins/check-path/core:core_hbc",
 ]
 
 test_deps = [
