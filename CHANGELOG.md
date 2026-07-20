@@ -1,3 +1,15 @@
+# 1.1.0-next.4 (Mon Jul 20 2026)
+
+#### 🐛 Bug Fix
+
+- Core Plugins HBC Precompilation [#899](https://github.com/player-ui/player/pull/899) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 1.1.0-next.2 (Thu Jul 16 2026)
 
 ### Release Notes
