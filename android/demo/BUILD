@@ -9,6 +9,7 @@ main_deps = [
     "//jvm/utils",
     "//plugins/reference-assets/android",
     "//plugins/a2ui/android:a2ui-android",
+    "//plugins/a2ui/mocks:jar",
     "//tools/mocks:jar",
 
     artifact("androidx.navigation:navigation-ui-ktx"),

@@ -22,6 +22,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.facebook.soloader.SoLoader
 import com.google.android.material.navigation.NavigationView
 import com.intuit.playerui.android.reference.demo.R
+import com.intuit.playerui.android.reference.demo.model.A2UIMock
 import com.intuit.playerui.android.reference.demo.model.AssetMock
 import com.intuit.playerui.android.reference.demo.model.StringMock
 import com.intuit.playerui.android.ui.PlayerFragment
@@ -100,21 +101,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun startFlow(mock: Mock<*>) = launchFlow(
         when (mock) {
+            is A2UIMock -> mock.getFlow(this.classLoader)
             is ClassLoaderMock -> mock.getFlow(this.classLoader)
             is AssetMock -> mock.getFlow(this.assets)
             is StringMock -> mock.getFlow("")
             else -> throw IllegalArgumentException("mock of type ${mock::class}[$mock] not supported")
         },
         mock.name,
+        // A2UI snapshots are started in the "a2ui" content format so the plugin adapts them.
+        format = if (mock is A2UIMock) "a2ui" else null,
     )
 
-    private fun launchFlow(flow: String, name: String?) {
+    private fun launchFlow(flow: String, name: String?, format: String? = null) {
         drawerLayout.closeDrawer(GravityCompat.START)
-        navController.navigate(
-            R.id.action_launch_player,
-            name?.let {
-                bundleOf("name" to name, "flow" to flow)
-            } ?: bundleOf("flow" to flow),
-        )
+        val args = bundleOf("flow" to flow)
+        name?.let { args.putString("name", it) }
+        format?.let { args.putString("format", it) }
+        navController.navigate(R.id.action_launch_player, args)
     }
 }

@@ -17,15 +17,20 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class DemoPlayerViewModel(
     manager: FlowManager,
+    format: String? = null,
 ) : PlayerViewModel(manager) {
     override val plugins = listOf(
         ReferenceAssetsPlugin(),
         // A2UI assets coexist with the reference assets (PascalCase vs lowercase type
-        // namespaces). Start an A2UI snapshot with `androidPlayer.start(snapshot, "a2ui")`.
+        // namespaces). A2UI mocks are started with the "a2ui" content format below.
         A2UIPlugin(),
         PendingTransactionPlugin(),
         AsyncHydrationTrackerPlugin(),
     )
+
+    // When set (e.g. "a2ui"), flows are started in that content format so the
+    // registered content plugin adapts them; null keeps the default Player Flow format.
+    override val contentFormat: String? = format
 
     public val isDebug = false
 
