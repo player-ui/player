@@ -1,0 +1,12 @@
+{
+  "name": "@player-ui/context-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "@player-ui/player": "workspace:^"
+  },
+  "devDependencies": {
+    "@player-ui/common-types-plugin": "workspace:^",
+    "@player-ui/reference-assets-plugin": "workspace:^"
+  }
+}

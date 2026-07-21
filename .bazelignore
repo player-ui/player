@@ -49,6 +49,7 @@ plugins/check-path/react/node_modules
 plugins/common-expressions/core/node_modules
 plugins/computed-properties/core/node_modules
 plugins/console-logger/core/node_modules
+plugins/context/core/node_modules
 plugins/data-change-listener/core/node_modules
 plugins/data-filter/core/node_modules
 plugins/expression/core/node_modules
