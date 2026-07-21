@@ -29,6 +29,15 @@ Given a snapshot like:
 
 the adapter inlines the id-linked children into nested `{ asset: ... }` wrappers, resolves `{ path: ... }` references into data bindings, synthesizes a schema (including any per-input `checks`), and emits a single `VIEW` state plus one `END` state per unique event/action outcome — producing a Flow that Player resolves and renders exactly as it would DSL- or JSON-authored content.
 
+## Version support
+
+When passing A2UI content to Player's `start` function,the version of that content should additionally be supplied to ensure the correct plugin is used to transform that content. Currently, A2UI version support is outlined below. 
+
+| A2UIVersion | Status            |
+|-------------|-------------------|
+| 0.9         | Supported         |
+| 1.0+        | Not yet supported |
+
 ## Usage
 
 <PlatformTabs>
@@ -46,7 +55,7 @@ import { A2UIPlugin } from "@player-ui/a2ui-plugin";
 
 const player = new Player({ plugins: [new A2UIPlugin()] });
 
-player.start(a2uiSnapshot, { format: "a2ui" });
+player.start(a2uiSnapshot, { format: "a2ui", version: "0.9" });
 ```
 
 `A2UIPlugin` bundles the content adapter, asset transforms, standard expression functions (`required`, `regex`, `length`, `numeric`, `email`, `formatString`, `formatNumber`, `formatCurrency`, `formatDate`, `pluralize`, `openUrl`, `and`, `or`, `not`), and their Player validation-type counterparts which is everything needed to resolve the adapted Flow.
@@ -66,7 +75,7 @@ import { A2UIPlugin } from "@player-ui/a2ui-plugin-react";
 
 const player = new ReactPlayer({ plugins: [new A2UIPlugin()] });
 
-player.start(a2uiSnapshot, { format: "a2ui" });
+player.start(a2uiSnapshot, { format: "a2ui", version: "0.9" });
 ```
 
   </Fragment>
@@ -79,6 +88,8 @@ import com.intuit.playerui.android.a2ui.A2UIPlugin
 import com.intuit.playerui.android.AndroidPlayer
 
 val player = AndroidPlayer(A2UIPlugin())
+
+player.start(snapshot, mapOf("format" to "a2ui", "version" to "0.9"))
 ```
 
   </Fragment>
@@ -97,7 +108,7 @@ struct MyApp: View {
       flow: $viewModel.flowString,
       plugins: [A2UIPlugin()],
       result: $result,
-      startOptions: .a2ui
+      startOptions: StartOptions(format: "a2ui", version: "0.9")
     )
   }
 }
@@ -108,7 +119,7 @@ struct MyApp: View {
 
 ## Prepacked A2UI Renderers
 
-Wiring up the base Player plus the A2UI plugin (and, on native platforms, the renderer catalog) is the same handful of lines on every platform. In order to make it as easy as possible to get started with Player and A2UI, we offer "prepackaged" version of player on each platform with all the necessary plugins for A2UI rendering included off the shelf. These offerings are similarly shaped to the underlying Player packages but may have a couple more properties (when required) to handle some of the underlying wiring automatically. 
+Wiring up the base Player plus the A2UI plugin (and, on native platforms, the renderer catalog) is the same handful of lines on every platform. To make it as easy as possible to get started with Player and A2UI, we offer preconfigured player packages on each platform with all the necessary plugins for A2UI rendering included.
 
 <PlatformTabs>
   <Fragment slot='react'>
@@ -135,7 +146,7 @@ implementation("com.intuit.playerui:a2ui-android:$PLAYER_VERSION")
 import com.intuit.playerui.a2ui.A2UIAndroidPlayer
 
 val player = A2UIAndroidPlayer()
-player.start(snapshot, "a2ui")
+player.start(snapshot, mapOf("format" to "a2ui", "version" to "0.9"))
 ```
 
   </Fragment>
@@ -160,7 +171,7 @@ implementation("com.intuit.playerui:a2ui:$PLAYER_VERSION")
 import com.intuit.playerui.a2ui.A2UIHeadlessPlayer
 
 val player = A2UIHeadlessPlayer()
-player.start(snapshot, "a2ui").await()
+player.start(snapshot, mapOf("format" to "a2ui", "version" to "0.9")).await()
 ```
 
 ## Validation
