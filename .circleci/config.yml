@@ -180,6 +180,18 @@ jobs:
               --test_timeout=1800 \
               $(bazel query "kind('ios_unit_test|ios_ui_test', //ios/...)") \
               $(bazel query "kind('ios_unit_test|ios_ui_test', //plugins/...)")
+      - when:
+          condition:
+            not:
+              equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Lint
+                command: |
+                  bazel test \
+                    --config=ci-mac \
+                    $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+                    $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
       - run:
           when: always
           command: |
