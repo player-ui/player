@@ -1,8 +1,7 @@
-import SwiftUI
-
 import PlayerUI
-import PlayerUISwiftUI
 import PlayerUIA2UI
+import PlayerUISwiftUI
+import SwiftUI
 
 /// A `SwiftUIPlayer` preconfigured for A2UI content — the `A2UIPlugin` (SwiftUI renderers +
 /// content adapter + asset transforms + expression functions) — and `StartOptions.a2ui` so
@@ -37,5 +36,7 @@ public struct A2UISwiftUIPlayer: View {
         )
     }
 
-    public var body: some View { player }
+    public var body: some View {
+        player
+    }
 }

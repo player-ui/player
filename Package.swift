@@ -6,7 +6,7 @@ import PackageDescription
 typealias SwiftPlugin = (name: String, path: String, resources: Bool)
 typealias SwiftUIPlugin = (name: String, path: String, dependencies: [String], resources: Bool)
 
-// Simple iOS plugins that just rely on PlayerUI and optionally JS resources
+/// Simple iOS plugins that just rely on PlayerUI and optionally JS resources
 let ios_plugins: [SwiftPlugin] = [
     (name: "AsyncNodePlugin", path: "async-node", resources: true),
     (name: "BaseBeaconPlugin", path: "beacon", resources: true),
@@ -15,20 +15,35 @@ let ios_plugins: [SwiftPlugin] = [
     (name: "ExternalStatePlugin", path: "external-state", resources: true),
     (name: "PubSubPlugin", path: "pubsub", resources: true),
     (name: "TypesProviderPlugin", path: "types-provider", resources: true),
-    (name: "PrintLoggerPlugin", path: "console-logger", resources: false)
+    (name: "PrintLoggerPlugin", path: "console-logger", resources: false),
 ]
 
-// SwiftUI Plugins
+/// SwiftUI Plugins
 let swiftui_plugins: [SwiftUIPlugin] = [
     (name: "BeaconPlugin", path: "beacon", dependencies: ["BaseBeaconPlugin"], resources: false),
     (name: "MetricsPlugin", path: "metrics", dependencies: [], resources: true),
-    (name: "SwiftUICheckPathPlugin", path: "check-path", dependencies: ["CheckPathPlugin"], resources: false),
-    (name: "ExternalStateViewModifierPlugin", path: "external-state", dependencies: ["ExternalStatePlugin"], resources: false),
-    (name: "SwiftUIPendingTransactionPlugin", path: "pending-transaction", dependencies: [], resources: false),
+    (
+        name: "SwiftUICheckPathPlugin",
+        path: "check-path",
+        dependencies: ["CheckPathPlugin"],
+        resources: false
+    ),
+    (
+        name: "ExternalStateViewModifierPlugin",
+        path: "external-state",
+        dependencies: ["ExternalStatePlugin"],
+        resources: false
+    ),
+    (
+        name: "SwiftUIPendingTransactionPlugin",
+        path: "pending-transaction",
+        dependencies: [],
+        resources: false
+    ),
     (name: "TransitionPlugin", path: "transition", dependencies: [], resources: false),
 ]
 
-// Map plugins to Target / Product entries
+/// Map plugins to Target / Product entries
 let plugins: [(Target, Product)] = ios_plugins.map {
     (
         Target.swiftPlugin(plugin: $0),
@@ -45,7 +60,7 @@ let package = Package(
     name: "PlayerUI",
     platforms: [
         .iOS(.v14),
-        .macOS(.v11)
+        .macOS(.v11),
     ],
     products: [
         .playerPackage(name: "PlayerUI"),
@@ -66,18 +81,18 @@ let package = Package(
             name: "PlayerUI",
             dependencies: [
                 .product(name: "SwiftHooks", package: "swift-hooks"),
-                .target(name: "PlayerUILogger")
+                .target(name: "PlayerUILogger"),
             ],
             path: "ios/core",
             resources: [
-                .process("Resources")
+                .process("Resources"),
             ]
         ),
         .target(
             name: "PlayerUISwiftUI",
             dependencies: [
                 .product(name: "SwiftHooks", package: "swift-hooks"),
-                .target(name: "PlayerUI")
+                .target(name: "PlayerUI"),
             ],
             path: "ios/swiftui"
         ),
@@ -94,11 +109,11 @@ let package = Package(
                 .product(name: "SwiftHooks", package: "swift-hooks"),
                 .target(name: "PlayerUI"),
                 .target(name: "PlayerUIBeaconPlugin"),
-                .target(name: "PlayerUISwiftUIPendingTransactionPlugin")
+                .target(name: "PlayerUISwiftUIPendingTransactionPlugin"),
             ],
             path: "plugins/reference-assets/swiftui",
             resources: [
-                .process("Resources")
+                .process("Resources"),
             ]
         ),
         .target(
@@ -106,11 +121,11 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftHooks", package: "swift-hooks"),
                 .target(name: "PlayerUI"),
-                .target(name: "PlayerUISwiftUI")
+                .target(name: "PlayerUISwiftUI"),
             ],
             path: "plugins/a2ui/swiftui",
             resources: [
-                .process("Resources")
+                .process("Resources"),
             ]
         ),
         .target(
@@ -118,7 +133,7 @@ let package = Package(
             dependencies: [
                 .target(name: "PlayerUI"),
                 .target(name: "PlayerUISwiftUI"),
-                .target(name: "PlayerUIA2UI")
+                .target(name: "PlayerUIA2UI"),
             ],
             path: "packages/a2ui/swiftui"
         ),
@@ -126,41 +141,42 @@ let package = Package(
             name: "PlayerUITestUtilitiesCore",
             dependencies: [
                 .target(name: "PlayerUI"),
-                .target(name: "PlayerUISwiftUI")
+                .target(name: "PlayerUISwiftUI"),
             ],
             path: "ios/test-utils-core",
             resources: [
-                .process("Resources")
+                .process("Resources"),
             ]
         ),
         .target(
             name: "PlayerUITestUtilities",
             dependencies: [
                 .target(name: "PlayerUI"),
-                .target(name: "PlayerUITestUtilitiesCore")
+                .target(name: "PlayerUITestUtilitiesCore"),
             ],
             path: "ios/test-utils",
             linkerSettings: [.linkedFramework("XCTest")]
-        )
+        ),
     ] + plugins.map(\.0)
 )
-
 
 extension Product {
     static func playerPlugin(name: String) -> Product {
         playerPackage(name: "PlayerUI\(name)")
     }
+
     static func playerPackage(name: String) -> Product {
         .library(name: name, targets: [name])
     }
 }
+
 extension Target {
     static func swiftPlugin(plugin: SwiftPlugin) -> Target {
-        let resources: [Resource] = plugin.resources ? [ .process("Resources") ] : []
+        let resources: [Resource] = plugin.resources ? [.process("Resources")] : []
         return .target(
             name: "PlayerUI\(plugin.name)",
             dependencies: [
-                .target(name: "PlayerUI")
+                .target(name: "PlayerUI"),
             ],
             path: "plugins/\(plugin.path)/ios",
             resources: resources
@@ -168,13 +184,13 @@ extension Target {
     }
 
     static func swiftuiPlugin(plugin: SwiftUIPlugin) -> Target {
-        let resources: [Resource] = plugin.resources ? [ .process("Resources") ] : []
+        let resources: [Resource] = plugin.resources ? [.process("Resources")] : []
         return .target(
             name: "PlayerUI\(plugin.name)",
             dependencies: [
                 .target(name: "PlayerUI"),
-                .target(name: "PlayerUISwiftUI")
-            ]  + plugin.dependencies.map { Dependency.target(name: "PlayerUI\($0)") },
+                .target(name: "PlayerUISwiftUI"),
+            ] + plugin.dependencies.map { Dependency.target(name: "PlayerUI\($0)") },
             path: "plugins/\(plugin.path)/swiftui",
             resources: resources
         )

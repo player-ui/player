@@ -1,9 +1,9 @@
 import Foundation
-import SwiftUI
-import XCTest
 @testable import PlayerUI
 @testable import PlayerUIA2UIPreset
 @testable import PlayerUISwiftUI
+import SwiftUI
+import XCTest
 
 class A2UISwiftUIPlayerTests: XCTestCase {
     func testPreconfiguresAllA2UIAssets() {

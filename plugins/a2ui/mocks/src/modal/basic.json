@@ -19,7 +19,16 @@
       "component": "Column",
       "children": ["title", "para"]
     },
-    { "id": "title", "component": "Text", "text": "Modal Title", "variant": "h4" },
-    { "id": "para", "component": "Text", "text": "This is the modal body content." }
+    {
+      "id": "title",
+      "component": "Text",
+      "text": "Modal Title",
+      "variant": "h4"
+    },
+    {
+      "id": "para",
+      "component": "Text",
+      "text": "This is the modal body content."
+    }
   ]
 }
