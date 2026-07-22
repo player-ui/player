@@ -15,7 +15,6 @@ import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializ
 import com.intuit.playerui.utils.makeFlow
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -32,7 +31,9 @@ internal class SlowAsset(
     assetContext: AssetContext,
 ) : RenderableAsset<SlowAsset.Data>(assetContext, Data.SlowSerializer) {
     @Serializable
-    data class Data(val revision: Int = 0) {
+    data class Data(
+        val revision: Int = 0,
+    ) {
         /**
          * Wraps the plain generated serializer, but blocks (on whatever thread calls
          * deserialize() — Dispatchers.Default via RenderableAsset.getData()'s
@@ -46,8 +47,11 @@ internal class SlowAsset(
          */
         object SlowSerializer : KSerializer<Data> {
             private val delegate = serializer()
+
             override val descriptor: SerialDescriptor get() = delegate.descriptor
+
             override fun serialize(encoder: Encoder, value: Data) = delegate.serialize(encoder, value)
+
             override fun deserialize(decoder: Decoder): Data {
                 if (slowInGetData) {
                     hydrateStarted?.complete(Unit)
@@ -102,8 +106,7 @@ internal class SlowAsset(
             "revision" to 0,
         )
 
-        fun Runtime<*>.asset(revision: Int = 0): Asset =
-            serialize(sampleMap + mapOf("revision" to revision)) as Asset
+        fun Runtime<*>.asset(revision: Int = 0): Asset = serialize(sampleMap + mapOf("revision" to revision)) as Asset
 
         val runtime = runtimeFactory.create()
         val sampleAsset = runtime.serialize(sampleMap) as Asset
@@ -128,7 +131,9 @@ internal class SlowParentAsset(
     assetContext: AssetContext,
 ) : RenderableAsset<SlowParentAsset.Data>(assetContext, Data.serializer()) {
     @Serializable
-    data class Data(val revision: Int = 0)
+    data class Data(
+        val revision: Int = 0,
+    )
 
     val currentHydrationScope get() = hydrationScope
 
