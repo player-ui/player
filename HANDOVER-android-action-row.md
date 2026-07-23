@@ -90,24 +90,24 @@ The 0.15.3 worktree needed all of the following (corporate proxy + fresh SDK):
 ### JVM Tier A sandbox note
 Before the SDK was installed, the JVM test was run without an SDK by pointing the `async-node/jvm` test at the host-only `//jvm/j2v8:j2v8-macos` runtime (the default `//jvm/testutils:with-runtimes` pulls hermes + `j2v8-all`'s android AAR → needs `aapt2`). The committed BUILD keeps the normal `with-runtimes`.
 
-## For Android team to investigate
+## For the GenUX Agent Chat Android team — investigate
 
-The reference `AndroidPlayer.onUpdate` → `expandAsset` → Compose recomposition path is **already cleared** — the on-device Tier B render test streams flattened async siblings and every action-row renders. So focus on what's GenUX-specific:
+(Owner: GenUX Agent Chat Android app.) The reference `AndroidPlayer.onUpdate` → `expandAsset` → Compose recomposition path is **already cleared** — the on-device Tier B render test streams flattened async siblings and every action-row renders. So focus on what's GenUX-specific:
 
 1. **Async callback threading (prime suspect).** The stream-complete callback must be marshaled to the main thread before it updates Player. In this repro, resolving on a background dispatcher threw `CalledFromWrongThreadException`; only main-thread updates rendered. If GenUX's callback runs off-main (even intermittently), that fits an intermittent drop/skip.
 2. **Custom GenUX asset recomposition.** The reference `text`/`action`/`collection` assets don't drop; the custom `agent-response-wrapper` / `streaming-response-action-row` Composables might — check their `key`/`remember`/`LazyList` item keys for an appended sibling under a stable parent id.
 3. **Timing race** — processor node + content node resolve close together. Core proved clean for this (two-async/turn ×4), so look at the host-side handling of the two callbacks.
 
-## Player Android adaptor — improvements this surfaced (separate from the GenUX-app fix)
+## For the Player Android (adaptor/SDK) team — suggested improvements
 
-These are for the **Player Android adaptor** (`player-ui/player`), a different owner from the GenUX app:
+(Owner: Player Android adaptor, `player-ui/player` — a different team from the GenUX app. Worth doing regardless of GenUX's root cause.)
 
 1. **Marshal async-driven view updates to the main thread** (robustness; plausibly relevant to the intermittency).
    - Proven: async resolution completing on a background thread makes the resulting view update touch Android views off-main → `CalledFromWrongThreadException`; only main-thread updates render.
    - Today the adaptor relies on every consumer to marshal their async callback. Async resolution is the *only* update path that can complete off-main, and it's unguarded.
-   - Fix: have `AndroidPlayer` dispatch async-node-driven view updates on the main thread itself, or at minimum fail fast with a clear error instead of a raw platform exception.
+   - Suggestion: have `AndroidPlayer` dispatch async-node-driven view updates on the main thread itself (e.g. post `onUpdate`/`expandAsset` through the main dispatcher), or at minimum fail fast with a clear, actionable error instead of a raw platform exception.
    - Caveat: symptom reproduced here is a *crash*; GenUX's is a *silent drop*. Strong robustness fix + plausible contributor, not a confirmed root cause.
-2. **Close the async-node Android test gap.** No existing Android test resolves an async node / exercises streaming — that render path was untested. Upstream the tiered tests added here (Robolectric decode + on-device Compose render + the demo streaming harness) so regressions are caught.
+2. **Close the async-node Android test gap.** No existing Android test resolves an async node / exercises streaming — that render path was untested. Suggestion: upstream the tiered tests added here (Robolectric decode + on-device Compose render + the demo streaming harness) so this class of regression is caught in CI.
 
 ## Why the workaround works (corroborates the above)
 
