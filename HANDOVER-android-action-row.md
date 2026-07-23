@@ -50,16 +50,32 @@ flowchart LR
   style F fill:#f88
 ```
 
-## Next step to localize within Android — Tier B (for the Android team)
+## Tier B — Android render layer (Robolectric): partial, harness-limited
 
-A Robolectric-headless render test that drives the real `AndroidPlayer.onUpdate → expandAsset → render` pipeline and asserts the action-row (a) decodes into the `RenderableAsset` tree and (b) hydrates to a rendered `View` (the missing `RENDER`). Scaffolded but **not yet runnable** — needs an Android SDK + Robolectric, and `//plugins/async-node/jvm` added to `reference-assets-android` `instrumented_test_deps`.
+Added a Robolectric render test driving the real `AndroidPlayer.onUpdate → expandAsset → render` pipeline (`StreamingActionRowRenderTest.kt`, modeled on `ChatMessageAssetTest`/`AssetTest`). Status:
 
-- Scaffold: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
-- Run (once wired): `bazel test //plugins/reference-assets/android:reference-assets-android-instrumented-test`
-- If it reproduces (asset in tree, View never hydrates) → Compose recomposition of appended flattened siblings. If it passes → the bug is in the real app host's Compose layer, not the reference renderer.
+- ✅ Toolchain fully working in-env (see "Environment setup" below). Baseline `ChatMessageAssetTest` **PASSES** headless.
+- ✅ My test **decodes correctly** — the chat-message→collection transform + async node resolve into the `RenderableAsset` tree with the Android renderers registered (an early bug where the collection was "not registered" was a wrong import: must use the **Android** `com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin`, not the core/JVM one).
+- ⚠️ **Open item:** driving an async *streaming* update and asserting the appended action-row **renders** times out under Robolectric (`awaitRendered` → "Expected view to update, but it did not"). Two reasons:
+  1. **No precedent** — there is *no existing Android test in the repo that resolves an async node*. The async-streaming drive pattern (capture the `onAsyncNode` continuation, resume it, await the re-render) is unestablished here. This absence is itself telling: the Android async-streaming render path is untested.
+  2. **Robolectric limitation** — Robolectric does not run real Compose recomposition frames, so `awaitCompleteHydration()` (waits on `R.bool.view_hydrated`) can hang for async/`SuspendableAsset` content. The render assertion is exactly the Compose-recomposition step Robolectric can't faithfully simulate.
 
-### Sandbox repro note
-The JVM test was run in an env without an Android SDK by temporarily pointing the `async-node/jvm` test at the host-only `//jvm/j2v8:j2v8-macos` runtime (the default `//jvm/testutils:with-runtimes` pulls hermes + `j2v8-all`'s android AAR → needs `aapt2`). The committed BUILD keeps the normal `with-runtimes`; use the j2v8-macos swap only when reproducing without an SDK.
+**Recommendation:** move the Tier B *render* proof to an **on-device/emulator instrumented test** or a **Compose UI test** (`createComposeRule`, assert the `testTag("action")` node appears after each streamed update) rather than Robolectric. The decode half (action-row present in the `RenderableAsset` tree) can stay Robolectric. This cleanly splits: decode (Robolectric, cheap) vs. recomposition (Compose-UI/emulator, where the bug actually is).
+
+- Scaffold + notes: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
+- Run: `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test`
+
+## Environment setup (to reproduce the Bazel/Android runs)
+
+The 0.15.3 worktree needed all of the following (corporate proxy + fresh SDK):
+
+1. Copy the git-ignored `.bazelrc.local` from the main checkout (trusts the Zscaler CA for the bazel *server* JVM).
+2. Export `JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/Users/<you>/bazel-zscaler-truststore.jks -Djavax.net.ssl.trustStorePassword=changeit` so *spawned* resolver JVMs (android build-tools maven fetch) also trust the CA.
+3. Export `ANDROID_HOME`/`ANDROID_SDK_ROOT` to the SDK.
+4. The SDK only had `platforms/android-36.1`; rules_android only accepts integer API dirs (`android-<N>`, `level.isdigit()`), so symlink `android-36 → android-36.1` under `$ANDROID_HOME/platforms`. (Cleaner: install a stable integer platform, e.g. `android-35`, via the SDK Manager.)
+
+### JVM Tier A sandbox note
+Before the SDK was installed, the JVM test was run without an SDK by pointing the `async-node/jvm` test at the host-only `//jvm/j2v8:j2v8-macos` runtime (the default `//jvm/testutils:with-runtimes` pulls hermes + `j2v8-all`'s android AAR → needs `aapt2`). The committed BUILD keeps the normal `with-runtimes`.
 
 ## For Android team to investigate
 

@@ -8,7 +8,10 @@ import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
-import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
+// IMPORTANT: the ANDROID ReferenceAssetsPlugin (registers RenderableAsset
+// factories for Collection/Text/Action), NOT the core/JVM one — otherwise the
+// collection "is not registered" and the tree fails to decode.
+import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
 import kotlinx.coroutines.test.runTest
@@ -20,8 +23,19 @@ import kotlin.coroutines.suspendCoroutine
 
 /**
  * ============================================================================
- * TIER B — ANDROID RENDER PROOF (SCAFFOLD — NOT YET RUNNABLE IN THIS SANDBOX)
+ * TIER B — ANDROID RENDER PROOF (BUILDS + RUNS; RENDER-DRIVE IS THE OPEN ITEM)
  * ============================================================================
+ *
+ * STATUS (0.15.3): compiles and runs headless (Robolectric). The chat-message
+ * transform + async node DECODE correctly into the RenderableAsset tree once
+ * the ANDROID ReferenceAssetsPlugin is used (see import note below). The OPEN
+ * item is driving an async *streaming* update and asserting the appended
+ * action-row RENDERS: `awaitRendered()` times out because (a) no existing
+ * Android test establishes the async-resolve drive pattern, and (b) Robolectric
+ * does not run real Compose recomposition frames, so hydration of async content
+ * can hang. RECOMMENDATION: keep the decode assertion here (Robolectric), move
+ * the render/recomposition assertion to a Compose-UI test (createComposeRule,
+ * assert testTag("action") appears per update) or an on-device instrumented run.
  *
  * This is the decisive Android-layer test for the GenUX Agent Chat Android
  * missing-`streaming-response-action-row` bug (Player Android/JVM 0.15.3).
@@ -129,6 +143,11 @@ public class StreamingActionRowRenderTest : AssetTest("chat-message") {
                 deferredResolve = null
 
                 resolve(messagePayload(i))
+
+                // Suspend until this update renders + fully hydrates. If the
+                // action-row is dropped in recomposition, this times out — which
+                // is itself the reproduction signal.
+                awaitRendered()
 
                 // 1) Decoded RenderableAsset tree must contain this turn's action-row.
                 var foundActionRow = false

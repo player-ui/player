@@ -14,6 +14,8 @@ main_deps = main_exports + [
 instrumented_test_deps = [
     "//android/testutils:with-runtime",
     "//tools/mocks:jar",
+    # Needed by StreamingActionRowRenderTest (async-node streaming render proof).
+    "//plugins/async-node/jvm",
 ]
 
 kt_android(
