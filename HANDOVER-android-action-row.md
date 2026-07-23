@@ -102,7 +102,7 @@ The 0.15.3 worktree needed all of the following (corporate proxy + fresh SDK):
 ### JVM Tier A sandbox note
 Before the SDK was installed, the JVM test was run without an SDK by pointing the `async-node/jvm` test at the host-only `//jvm/j2v8:j2v8-macos` runtime (the default `//jvm/testutils:with-runtimes` pulls hermes + `j2v8-all`'s android AAR → needs `aapt2`). The committed BUILD keeps the normal `with-runtimes`.
 
-## For the GenUX Agent Chat Android team — investigate
+## For the GenUX Android team — investigate
 
 (Owner: GenUX Agent Chat Android app.) The reference `AndroidPlayer.onUpdate` → `expandAsset` → Compose recomposition path is **already cleared** — the on-device Tier B render test streams flattened async siblings and every action-row renders. So focus on what's GenUX-specific:
 
@@ -134,7 +134,7 @@ Before the SDK was installed, the JVM test was run without an SDK by pointing th
 | Android decode (Robolectric) | `plugins/reference-assets/android/.../streaming/StreamingActionRowRenderTest.kt` | `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test` |
 | Android render (on-device) | `android/demo/.../streaming/StreamingActionRowComposeUITest.kt` (+ `DemoPlayerViewModel` stream handler, `mocks/streaming/streaming-action-rows.json`) | `bazel test //android/demo:android_instrumentation_test` (booted emulator) |
 
-All pass with reference assets → the Android-layer repro exists and is green; the remaining reproduction is with GenUX's own assets/host (see "For Android team to investigate").
+All pass with reference assets → the Android-layer repro exists and is green; the remaining reproduction is with GenUX's own assets/host (see "For the GenUX Android team — investigate").
 
 ## Out of scope (separate issue)
 
