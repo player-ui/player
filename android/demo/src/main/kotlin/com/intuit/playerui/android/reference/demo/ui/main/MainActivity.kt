@@ -112,7 +112,11 @@ class MainActivity : AppCompatActivity() {
         format = if (mock is A2UIMock) "a2ui" else null,
     )
 
-    private fun launchFlow(flow: String, name: String?, format: String? = null) {
+    private fun launchFlow(
+        flow: String,
+        name: String?,
+        format: String? = null,
+    ) {
         drawerLayout.closeDrawer(GravityCompat.START)
         val args = bundleOf("flow" to flow)
         name?.let { args.putString("name", it) }

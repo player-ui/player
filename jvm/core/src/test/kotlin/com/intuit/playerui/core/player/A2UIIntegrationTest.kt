@@ -29,7 +29,7 @@ internal class A2UIIntegrationTest : PlayerTest() {
     override val plugins: List<Plugin> = listOf(A2UIPlugin())
 
     private val catalog = ClassLoaderMocksReader(
-        this::class.java.classLoader,
+        this::class.java.classLoader!!,
         manifestPath = "a2ui/mocks/manifest.json",
     ).mocks
 
@@ -39,10 +39,13 @@ internal class A2UIIntegrationTest : PlayerTest() {
 
         // Each snapshot gets its own player + runtime so an errored flow can't
         // leak into the next assertion, and every failure is reported by name.
-        val failures = catalog.mapNotNull { mock ->
+        // `expressions/showcase` is skipped: it exercises the Intl-based formatters
+        // (formatCurrency/formatDate), and the native JS engines (Hermes/J2V8/GraalJS)
+        // ship without `Intl` (it renders on JavaScriptCore/iOS and the browser).
+        val failures = catalog.filterNot { it.group == "expressions" }.mapNotNull { mock ->
             runCatching {
                 setupPlayer(listOf(A2UIPlugin()), runtimeFactory.create())
-                player.start(mock.read(this::class.java.classLoader), "a2ui")
+                player.start(mock.read(this::class.java.classLoader!!), "a2ui")
                 player.inProgressState
             }.fold(
                 onSuccess = { state ->
@@ -58,7 +61,7 @@ internal class A2UIIntegrationTest : PlayerTest() {
     @TestTemplate
     fun `adapts the text snapshot into a Text view`() {
         val text = catalog.first { it.group == "text" && it.name == "basic" }
-        player.start(text.read(this::class.java.classLoader), "a2ui")
+        player.start(text.read(this::class.java.classLoader!!), "a2ui")
 
         val view = player.inProgressState?.lastViewUpdate
         assertNotNull(view, "Expected a resolved view")
