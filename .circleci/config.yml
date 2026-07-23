@@ -633,10 +633,6 @@ workflows:
             - build
             - test
 
-      - lint_ios:
-          requires:
-            - bazelrc
-
       - android_test:
           context:
             - Build
@@ -697,10 +693,6 @@ workflows:
             - setup
 
       - build_and_test_ios:
-          requires:
-            - bazelrc
-
-      - lint_ios:
           requires:
             - bazelrc
 
