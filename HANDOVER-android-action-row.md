@@ -1,6 +1,18 @@
 # Handover: intermittent action-row missing after async-node update
 
-**Player Android/JVM 0.15.3** · GenUX Agent Chat Android · owner: Android adaptor · updated 2026-07-23
+**Player Android/JVM 0.15.3** · GenUX Agent Chat Android · updated 2026-07-23
+
+## TL;DR — who fixes this
+
+| Layer | Owner | Verdict |
+|---|---|---|
+| Player core (JS + JVM) | Player core | ✅ ruled out — proven clean |
+| Reference Android render | Player Android | ✅ ruled out as cause — renders fine on device |
+| **The missing action-row** | **GenUX Agent Chat Android app** | ⬅️ **primary fix owner** (custom assets recomposition / their callback threading) |
+| Async-update main-thread marshaling + test gap | Player Android adaptor | secondary hardening (robustness, not a confirmed root cause) |
+| iOS | — | not involved (Android/JVM issue) |
+
+**Route the fix to the GenUX Agent Chat Android app team**; cc the Player Android adaptor team on the robustness suggestion. Details below.
 
 ## Symptom
 
@@ -59,7 +71,7 @@ flowchart LR
 
 `StreamingActionRowRenderTest.kt` (modeled on `ChatMessageAssetTest`/`AssetTest`) drives `AndroidPlayer.onUpdate → expandAsset` headless and confirms the **decode half is clean**: the chat-message→collection transform + async node resolve into the `RenderableAsset` tree with the Android renderers registered.
 
-- Gotcha worth keeping: the collection first came back "not registered" because of a wrong import — you must use the **Android** `com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin`, not the core/JVM `com.intuit.playerui.plugins.assets` one.
+- Gotcha for Player Android test authors: the collection first came back "not registered" because of a wrong import — the Android async-node tests must use the **Android** `com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin`, not the core/JVM `com.intuit.playerui.plugins.assets` one.
 - Robolectric proves decode only, not render: it doesn't run real Compose recomposition frames (`awaitCompleteHydration` hangs on async `SuspendableAsset` content). The **render** proof therefore lives on-device (Tier B render, below) — which passed.
 - Test: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
 - Run: `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test`
