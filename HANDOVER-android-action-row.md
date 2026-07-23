@@ -55,27 +55,21 @@ flowchart LR
   style G fill:#f88
 ```
 
-## Tier B — Android render layer (Robolectric): partial, harness-limited
+## Tier B (decode) — Android decode layer via Robolectric
 
-Added a Robolectric render test driving the real `AndroidPlayer.onUpdate → expandAsset → render` pipeline (`StreamingActionRowRenderTest.kt`, modeled on `ChatMessageAssetTest`/`AssetTest`). Status:
+`StreamingActionRowRenderTest.kt` (modeled on `ChatMessageAssetTest`/`AssetTest`) drives `AndroidPlayer.onUpdate → expandAsset` headless and confirms the **decode half is clean**: the chat-message→collection transform + async node resolve into the `RenderableAsset` tree with the Android renderers registered.
 
-- ✅ Toolchain fully working in-env (see "Environment setup" below). Baseline `ChatMessageAssetTest` **PASSES** headless.
-- ✅ My test **decodes correctly** — the chat-message→collection transform + async node resolve into the `RenderableAsset` tree with the Android renderers registered (an early bug where the collection was "not registered" was a wrong import: must use the **Android** `com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin`, not the core/JVM one).
-- ⚠️ **Open item:** driving an async *streaming* update and asserting the appended action-row **renders** times out under Robolectric (`awaitRendered` → "Expected view to update, but it did not"). Two reasons:
-  1. **No precedent** — there is *no existing Android test in the repo that resolves an async node*. The async-streaming drive pattern (capture the `onAsyncNode` continuation, resume it, await the re-render) is unestablished here. This absence is itself telling: the Android async-streaming render path is untested.
-  2. **Robolectric limitation** — Robolectric does not run real Compose recomposition frames, so `awaitCompleteHydration()` (waits on `R.bool.view_hydrated`) can hang for async/`SuspendableAsset` content. The render assertion is exactly the Compose-recomposition step Robolectric can't faithfully simulate.
+- Gotcha worth keeping: the collection first came back "not registered" because of a wrong import — you must use the **Android** `com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin`, not the core/JVM `com.intuit.playerui.plugins.assets` one.
+- Robolectric proves decode only, not render: it doesn't run real Compose recomposition frames (`awaitCompleteHydration` hangs on async `SuspendableAsset` content). The **render** proof therefore lives on-device (Tier B render, below) — which passed.
+- Test: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
+- Run: `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test`
 
-**Recommendation:** move the Tier B *render* proof to an **on-device/emulator Compose-UI test** (assert `testTag("action")` node count after each streamed update) rather than Robolectric. The decode half (action-row present in the `RenderableAsset` tree) can stay Robolectric. This cleanly splits: decode (Robolectric, cheap) vs. recomposition (Compose-UI/emulator, where the bug actually is).
-
-**Compose-UI test + enabling pieces (committed, RAN ON EMULATOR — PASS):**
+## Tier B (render) — on-device Compose-UI, PASS
 - Test: `android/demo/src/androidTest/.../streaming/StreamingActionRowComposeUITest.kt` — asserts all streamed action-rows render (`waitUntilNodeCount(hasTestTag("action"), N)`). **Passes on an android-34 arm64 emulator** (alongside the 13 other demo UI tests).
 - `DemoPlayerViewModel` includes an `AsyncNodePlugin` that **auto-streams** N accumulated `[wrapper, action-row, …]` updates via the callback **posted to `Dispatchers.Main`** (off-main resolution throws `CalledFromWrongThreadException`).
 - Mock: `android/demo/src/main/assets/mocks/streaming/streaming-action-rows.json` (flatten collection + one live async node).
 - `android/demo` `main_deps` += `//plugins/async-node/jvm`.
 - Run: `bazel test //android/demo:android_instrumentation_test` (with `ANDROID_HOME`, `ANDROID_NDK_HOME`, `JAVA_TOOL_OPTIONS` truststore, and a booted emulator). Note: on-device method names must be space-free (D8 rejects spaces in DEX'd inline-lambda class names).
-
-- Scaffold + notes: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
-- Run: `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test`
 
 ## Environment setup (to reproduce the Bazel/Android runs)
 
