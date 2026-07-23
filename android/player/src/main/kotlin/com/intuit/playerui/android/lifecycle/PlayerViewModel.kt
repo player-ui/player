@@ -68,6 +68,17 @@ public open class PlayerViewModel(
 
     protected open val config: AndroidPlayer.Config = AndroidPlayer.Config()
 
+    /**
+     * Content format forwarded to [player] for every flow this view model starts.
+     * `null` (default) is the standard Player `Flow` format; set to e.g. `"a2ui"`
+     * to run a non-Player content format recognized by a registered plugin.
+     * Mirrors iOS `ManagedPlayer`'s `startOptions`.
+     */
+    protected open val contentFormat: String? = null
+
+    /** Optional content-format version forwarded alongside [contentFormat]. */
+    protected open val contentVersion: String? = null
+
     @ExperimentalPlayerApi
     public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
         // this is unfortunate, but is essentially for ensuring view model has completely initialized
@@ -131,17 +142,21 @@ public open class PlayerViewModel(
         // Notify that a flow has started, passing back the in-memory flow that was used to start
         // Player (avoids deserializing the flow back across the JS bridge)
         _startedFlows.tryEmit(flow)
-        player.start(flow) {
-            when {
-                it.isSuccess -> player.logger.info(
-                    "Flow completed successfully!",
-                    it.getOrNull()?.endState,
-                )
-                it.isFailure -> player.logger.error(
-                    "Error in Flow!",
-                    it.exceptionOrNull(),
-                )
-            }
+        contentFormat
+            ?.let { format -> player.start(flow, format, contentVersion).onComplete(::onFlowComplete) }
+            ?: player.start(flow, ::onFlowComplete)
+    }
+
+    private fun onFlowComplete(result: Result<CompletedState>) {
+        when {
+            result.isSuccess -> player.logger.info(
+                "Flow completed successfully!",
+                result.getOrNull()?.endState,
+            )
+            result.isFailure -> player.logger.error(
+                "Error in Flow!",
+                result.exceptionOrNull(),
+            )
         }
     }
 

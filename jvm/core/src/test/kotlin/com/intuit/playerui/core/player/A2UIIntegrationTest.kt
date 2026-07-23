@@ -1,12 +1,17 @@
 package com.intuit.playerui.core.player
 
+import com.intuit.playerui.core.bridge.runtime.runtimeFactory
+import com.intuit.playerui.core.player.state.errorState
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.plugins.a2ui.A2UIPlugin
+import com.intuit.playerui.utils.mocks.ClassLoaderMocksReader
 import com.intuit.playerui.utils.test.PlayerTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestTemplate
 
 /**
@@ -14,58 +19,59 @@ import org.junit.jupiter.api.TestTemplate
  * encodes a `{ format }` options object across the bridge, the A2UI content plugin's
  * `transformContent` tap runs `adaptA2UIToFlow`, and the adapted Player flow renders.
  *
+ * The snapshots are the canonical catalog from `//plugins/a2ui/mocks:jar`, read via its
+ * dedicated manifest (`a2ui/mocks/manifest.json`) — the same source JS/iOS consume — so
+ * this stays in lockstep with the catalog rather than inlining copies.
+ *
  * Runs across every JS runtime on the classpath via [TestTemplate].
  */
 internal class A2UIIntegrationTest : PlayerTest() {
     override val plugins: List<Plugin> = listOf(A2UIPlugin())
 
-    private val textSnapshot =
-        """
-        {
-          "surfaceId": "text-basic",
-          "components": [
-            { "id": "root", "component": "Text", "text": "Hello A2UI", "variant": "body" }
-          ]
-        }
-        """.trimIndent()
+    private val catalog = ClassLoaderMocksReader(
+        this::class.java.classLoader!!,
+        manifestPath = "a2ui/mocks/manifest.json",
+    ).mocks
 
-    private val columnSnapshot =
-        """
-        {
-          "surfaceId": "column-basic",
-          "components": [
-            { "id": "root", "component": "Column", "children": ["a", "b"], "align": "start" },
-            { "id": "a", "component": "Text", "text": "First", "variant": "h3" },
-            { "id": "b", "component": "Text", "text": "Second" }
-          ]
+    @Test
+    fun `adapts and renders every canonical A2UI snapshot`() {
+        assertTrue(catalog.isNotEmpty(), "Expected A2UI mock catalog on the classpath")
+
+        // Each snapshot gets its own player + runtime so an errored flow can't
+        // leak into the next assertion, and every failure is reported by name.
+        // `expressions/showcase` is skipped: it exercises the Intl-based formatters
+        // (formatCurrency/formatDate), and the native JS engines (Hermes/J2V8/GraalJS)
+        // ship without `Intl` (it renders on JavaScriptCore/iOS and the browser).
+        val failures = catalog.filterNot { it.group == "expressions" }.mapNotNull { mock ->
+            runCatching {
+                setupPlayer(listOf(A2UIPlugin()), runtimeFactory.create())
+                player.start(mock.read(this::class.java.classLoader!!), "a2ui")
+                player.inProgressState
+            }.fold(
+                onSuccess = { state ->
+                    if (state == null) "${mock.group}/${mock.name}: ${player.errorState?.error?.message ?: player.state}" else null
+                },
+                onFailure = { error -> "${mock.group}/${mock.name} threw: ${error.message}" },
+            )
         }
-        """.trimIndent()
+
+        assertTrue(failures.isEmpty(), "A2UI snapshots that failed to adapt/render: $failures")
+    }
 
     @TestTemplate
-    fun `starts an A2UI snapshot via the a2ui format and renders the adapted Text view`() {
-        player.start(textSnapshot, "a2ui")
+    fun `adapts the text snapshot into a Text view`() {
+        val text = catalog.first { it.group == "text" && it.name == "basic" }
+        player.start(text.read(this::class.java.classLoader!!), "a2ui")
 
-        val state = player.inProgressState
-        assertNotNull(state, "Expected an in-progress state after starting an A2UI snapshot")
-
-        val view = state!!.lastViewUpdate
-        assertNotNull(view, "Expected a resolved view after the A2UI content was adapted")
+        val view = player.inProgressState?.lastViewUpdate
+        assertNotNull(view, "Expected a resolved view")
         assertEquals("Text", view!!["type"])
         assertEquals("Hello A2UI", view["text"])
     }
 
     @TestTemplate
-    fun `adapts an A2UI Column with inlined children`() {
-        player.start(columnSnapshot, "a2ui")
-
-        val view = player.inProgressState?.lastViewUpdate
-        assertNotNull(view, "Expected a resolved view")
-        assertEquals("Column", view!!["type"])
-    }
-
-    @TestTemplate
     fun `default player format still treats content as a Player Flow`() {
-        // A snapshot started without the "a2ui" format is NOT adapted — the content
+        // Content started without the "a2ui" format is NOT adapted — the content
         // plugin passes it through, proving the default entrypoint is unchanged.
         val plainFlow =
             """

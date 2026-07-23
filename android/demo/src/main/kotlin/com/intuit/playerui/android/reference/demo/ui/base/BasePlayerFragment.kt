@@ -19,8 +19,11 @@ import kotlinx.coroutines.launch
 abstract class BasePlayerFragment : PlayerFragment() {
     abstract val flow: String
 
+    /** Content format for [flow] (e.g. "a2ui"); null uses the default Player Flow format. */
+    open val format: String? get() = null
+
     override val playerViewModel by viewModels<DemoPlayerViewModel> {
-        PlayerViewModel.Factory(FlowManager(flow), ::DemoPlayerViewModel)
+        PlayerViewModel.Factory(FlowManager(flow)) { manager -> DemoPlayerViewModel(manager, format) }
     }
 
     private val currentPlayerCanvas get() = binding.playerCanvas.getChildAt(0)
