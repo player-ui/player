@@ -588,15 +588,6 @@ workflows:
           requires:
             - build-trunk
 
-      - bench_js:
-          name: js-benchmark-tests-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
-
       - build_and_deploy_docs_preview:
           name: preview-docs-trunk
           context:
