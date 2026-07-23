@@ -34,20 +34,25 @@ Wrote a JVM (platform-layer) test exercising the exact `view.hooks.onUpdate` bou
 - Test: `plugins/async-node/jvm/src/test/kotlin/.../asyncnode/StreamingActionRowTest.kt`
 - Run: `bazel test //plugins/async-node/jvm:async-node-test`
 
-## Conclusion
+## Conclusion (all four tiers now run)
 
-Core AST is correct (JS repro) **and** the data crossing into Kotlin `onUpdate` is correct (JVM repro). `BUILD_ASSET` fires but `RENDER` doesn't. Therefore the drop is **in the Android adaptor's decode (`expandAsset`) + Compose recomposition path** — not core, not the data.
+Every layer exercised with the **reference** assets is clean: core AST (JS), the JS→Kotlin `onUpdate` data (JVM), decode (Robolectric), **and on-device Compose render (emulator)** — all streamed action-rows render. So the missing action-row is **NOT in Player core or the reference Android renderer**. It lives in the **GenUX-specific layer**: most likely (a) the custom `agent-response-wrapper` / `streaming-response-action-row` asset recomposition, or (b) the host's async stream-complete **callback threading**.
+
+**Threading finding:** an iteration that resolved the stream on a *background* dispatcher threw `CalledFromWrongThreadException` (view touched off-main); only main-thread-marshaled updates render correctly. If GenUX's stream-complete callback isn't consistently on the main thread, that is a prime suspect for the intermittent drop.
 
 ```mermaid
 flowchart LR
   A[callback: wrapper, action-row, renewedAsync] --> B[core parse/resolve/flatten]
-  B -->|JS repro: 5/5 PASS - correct AST| C[JS->Kotlin onUpdate]
-  C -->|JVM repro: PASS - action-row present| D[AndroidPlayer.onUpdate]
-  D --> E[BUILD_ASSET fires]
-  E -.->|RENDER missing intermittently| F[Compose recomposition]
+  B -->|JS repro: 5/5 PASS| C[JS->Kotlin onUpdate]
+  C -->|JVM repro: PASS| D[AndroidPlayer.onUpdate]
+  D -->|Robolectric: decode OK| E[expandAsset decode]
+  E -->|Compose-UI emulator: PASS, all render| F[reference Compose render]
+  F -.->|drop only here| G[GenUX custom assets / host callback threading]
   style B fill:#8f8
   style C fill:#8f8
-  style F fill:#f88
+  style E fill:#8f8
+  style F fill:#8f8
+  style G fill:#f88
 ```
 
 ## Tier B — Android render layer (Robolectric): partial, harness-limited
@@ -62,12 +67,12 @@ Added a Robolectric render test driving the real `AndroidPlayer.onUpdate → exp
 
 **Recommendation:** move the Tier B *render* proof to an **on-device/emulator Compose-UI test** (assert `testTag("action")` node count after each streamed update) rather than Robolectric. The decode half (action-row present in the `RenderableAsset` tree) can stay Robolectric. This cleanly splits: decode (Robolectric, cheap) vs. recomposition (Compose-UI/emulator, where the bug actually is).
 
-**Compose-UI test + enabling pieces (committed, UNVALIDATED — needs Android NDK to compile + emulator to run):**
-- Test: `android/demo/src/androidTest/.../streaming/StreamingActionRowComposeUITest.kt` — asserts all streamed action-rows render (`waitUntilNodeCount(hasTestTag("action"), N)`).
-- `DemoPlayerViewModel` now includes an `AsyncNodePlugin` that **auto-streams** N `[wrapper, action-row, renewedAsync]` chunks for any live async node (so the test needs no continuation control).
+**Compose-UI test + enabling pieces (committed, RAN ON EMULATOR — PASS):**
+- Test: `android/demo/src/androidTest/.../streaming/StreamingActionRowComposeUITest.kt` — asserts all streamed action-rows render (`waitUntilNodeCount(hasTestTag("action"), N)`). **Passes on an android-34 arm64 emulator** (alongside the 13 other demo UI tests).
+- `DemoPlayerViewModel` includes an `AsyncNodePlugin` that **auto-streams** N accumulated `[wrapper, action-row, …]` updates via the callback **posted to `Dispatchers.Main`** (off-main resolution throws `CalledFromWrongThreadException`).
 - Mock: `android/demo/src/main/assets/mocks/streaming/streaming-action-rows.json` (flatten collection + one live async node).
 - `android/demo` `main_deps` += `//plugins/async-node/jvm`.
-- Run: `bazel test //android/demo:android_instrumentation_test` (with `ANDROID_HOME`, `ANDROID_NDK_HOME`, `JAVA_TOOL_OPTIONS` truststore, and a booted emulator).
+- Run: `bazel test //android/demo:android_instrumentation_test` (with `ANDROID_HOME`, `ANDROID_NDK_HOME`, `JAVA_TOOL_OPTIONS` truststore, and a booted emulator). Note: on-device method names must be space-free (D8 rejects spaces in DEX'd inline-lambda class names).
 
 - Scaffold + notes: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
 - Run: `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test`

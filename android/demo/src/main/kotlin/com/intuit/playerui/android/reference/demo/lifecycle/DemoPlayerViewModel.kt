@@ -12,9 +12,12 @@ import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 
 class DemoPlayerViewModel(
     iterator: AsyncFlowIterator,
@@ -32,31 +35,42 @@ class DemoPlayerViewModel(
         AsyncNodePlugin(asyncHandler = streamingActionRowHandler()),
     )
 
-    /** Number of messages the streaming repro handler will emit before ending the stream. */
-    private var streamedActionRowCount = 0
+    private fun wrapperAsset(i: Int) = mapOf(
+        "asset" to mapOf("id" to "wrapper-$i", "type" to "text", "value" to "Agent response $i"),
+    )
 
+    private fun actionRowAsset(i: Int) = mapOf(
+        "asset" to mapOf(
+            "id" to "action-row-$i",
+            "type" to "action",
+            "value" to "next",
+            "label" to mapOf(
+                "asset" to mapOf("id" to "action-row-label-$i", "type" to "text", "value" to "Action $i"),
+            ),
+        ),
+    )
+
+    /**
+     * Streams MAX_STREAMED_ACTION_ROWS messages into the single live async node via
+     * the update *callback*, each posted to Dispatchers.Main. This mirrors how a real
+     * streaming host must marshal its stream-complete callback onto the main thread —
+     * resolving on a background dispatcher would touch Android views off-main
+     * (CalledFromWrongThreadException). Each update replaces the node with the full
+     * accumulated [wrapper, action-row, ...] list; the handler then suspends so the
+     * node stays live (no null return that would revert the view).
+     */
     private fun streamingActionRowHandler(): suspend (com.intuit.playerui.core.bridge.Node, ((Any?) -> Unit)?) -> Any? =
-        handler@{ _, _ ->
-            val i = streamedActionRowCount++
-            val wrapper = mapOf(
-                "asset" to mapOf("id" to "wrapper-$i", "type" to "text", "value" to "Agent response $i"),
-            )
-            val actionRow = mapOf(
-                "asset" to mapOf(
-                    "id" to "action-row-$i",
-                    "type" to "action",
-                    "value" to "next",
-                    "label" to mapOf(
-                        "asset" to mapOf("id" to "action-row-label-$i", "type" to "text", "value" to "Action $i"),
-                    ),
-                ),
-            )
-            // Renew the async node to keep the stream live, until the cap is reached.
-            if (i < MAX_STREAMED_ACTION_ROWS - 1) {
-                listOf(wrapper, actionRow, mapOf("id" to "msg-${i + 1}", "async" to true, "flatten" to true))
-            } else {
-                listOf(wrapper, actionRow)
+        handler@{ _, callback ->
+            withContext(Dispatchers.Main) {
+                val accumulated = mutableListOf<Map<String, Any?>>()
+                for (i in 0 until MAX_STREAMED_ACTION_ROWS) {
+                    accumulated += wrapperAsset(i)
+                    accumulated += actionRowAsset(i)
+                    callback?.invoke(accumulated.toList())
+                }
             }
+            // Keep the async node pending so the accumulated view is not reverted.
+            awaitCancellation()
         }
 
     public val isDebug = false

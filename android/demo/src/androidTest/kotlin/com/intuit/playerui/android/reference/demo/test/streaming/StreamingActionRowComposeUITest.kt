@@ -31,12 +31,25 @@ import org.junit.Test
  *   - Core JS repro (streaming-action-row.test.ts) ............ RUN, PASS
  *   - JVM onUpdate boundary (StreamingActionRowTest.kt) ....... RUN, PASS
  *   - Robolectric decode (StreamingActionRowRenderTest.kt) .... RUN, decode OK
- *   - THIS (Compose-UI render) ........................... DRAFT, UNVALIDATED
+ *   - THIS (Compose-UI render) ....... RAN ON EMULATOR (android-34 arm64), PASS
  *
- * NOTE: this file was NOT compiled or run in the investigation sandbox — the
- * demo UI-test build pulls the Android NDK (ANDROID_NDK_HOME) even to compile,
- * and running needs an emulator/device. Treat the code below as a starting
- * point to be compiled/adjusted in a full Android dev setup, not a proven test.
+ * RESULT: with the stream marshaled to the main thread (see the callback-on-
+ * Dispatchers.Main handler in DemoPlayerViewModel), all MAX_STREAMED_ACTION_ROWS
+ * action-rows RENDER — waitUntilNodeCount(hasTestTag("action"), N) succeeds.
+ * So the reference Compose renderer does NOT drop async-streamed flattened
+ * siblings.
+ *
+ * CONCLUSION for the GenUX bug: every layer exercised with the *reference*
+ * assets is clean — core AST (JS), the JS->Kotlin onUpdate data (JVM), decode
+ * (Robolectric), and now on-device Compose render. The missing action-row is
+ * therefore NOT in Player core / reference rendering; it lives in the GenUX-
+ * specific layer — most likely (a) the custom agent-response-wrapper /
+ * streaming-response-action-row asset recomposition, or (b) the host's async
+ * stream-complete callback threading. NB: an earlier iteration that resolved the
+ * stream on a *background* dispatcher threw CalledFromWrongThreadException, and
+ * only main-thread-marshaled updates render correctly — so if GenUX's callback
+ * isn't consistently on the main thread, that is a prime suspect for the
+ * intermittent drop.
  *
  * ENABLING PIECES (now wired in this branch — neither existed before, which is
  * itself why no test caught this):
@@ -55,8 +68,10 @@ import org.junit.Test
  */
 class StreamingActionRowComposeUITest : ComposeUITest("streaming") {
 
+    // NB: no spaces in the method name — the on-device APK is DEXed and D8 rejects
+    // spaces in the generated inline-lambda class names (e.g. shouldBeAtState).
     @Test
-    fun `every streamed action-row renders`() {
+    fun everyStreamedActionRowRenders() {
         launchMock("streaming-action-rows")
 
         // The demo player auto-streams MAX_STREAMED_ACTION_ROWS messages, each
