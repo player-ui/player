@@ -1,6 +1,6 @@
 # Handover: intermittent action-row missing after async-node update
 
-**Player Android/JVM 0.15.3** · GenUX Agent Chat Android · owner: Android adaptor · 2026-07-22
+**Player Android/JVM 0.15.3** · GenUX Agent Chat Android · owner: Android adaptor · updated 2026-07-23
 
 ## Symptom
 
@@ -80,25 +80,38 @@ The 0.15.3 worktree needed all of the following (corporate proxy + fresh SDK):
 3. Export `ANDROID_HOME`/`ANDROID_SDK_ROOT` to the SDK.
 4. The SDK only had `platforms/android-36.1`; rules_android only accepts integer API dirs (`android-<N>`, `level.isdigit()`), so symlink `android-36 → android-36.1` under `$ANDROID_HOME/platforms`. (Cleaner: install a stable integer platform, e.g. `android-35`, via the SDK Manager.)
 
+### Extra for the on-device render test (Tier B render)
+5. Install `cmdline-tools` (for `sdkmanager`/`avdmanager`) if absent: download `commandlinetools-mac-*_latest.zip` and place under `$ANDROID_HOME/cmdline-tools/latest/`.
+6. `sdkmanager` is a JVM tool → also needs the `JAVA_TOOL_OPTIONS` truststore. Then:
+   `sdkmanager --licenses` and `sdkmanager --install "ndk;26.3.11579264" "platform-tools" "emulator" "system-images;android-34;google_apis;arm64-v8a"`.
+7. Export `ANDROID_NDK_HOME=$ANDROID_HOME/ndk/26.3.11579264` (rules_android_ndk reads it; no version pin in MODULE.bazel).
+8. Create + boot a headless emulator: `avdmanager create avd -n player_test -k "system-images;android-34;google_apis;arm64-v8a" -d pixel_6`, then `emulator -avd player_test -no-window -no-audio -gpu swiftshader_indirect &` and wait for `adb shell getprop sys.boot_completed` = 1.
+
 ### JVM Tier A sandbox note
 Before the SDK was installed, the JVM test was run without an SDK by pointing the `async-node/jvm` test at the host-only `//jvm/j2v8:j2v8-macos` runtime (the default `//jvm/testutils:with-runtimes` pulls hermes + `j2v8-all`'s android AAR → needs `aapt2`). The committed BUILD keeps the normal `with-runtimes`.
 
 ## For Android team to investigate
 
-1. **`AndroidPlayer.onUpdate`** — cache clear on every view update; confirm a newly appended flattened sibling isn't dropped from the rebuilt asset map.
-2. **Compose recomposition / list diffing** of flattened collection children — does an appended sibling with a stable parent collection id get keyed/recomposed? Suspect stale keys or `remember` retaining the prior child list.
-3. **Timing** — two async resolutions land close together (processor + content). Check for a race where the second update overwrites/skips the first's newly-built child.
+The reference `AndroidPlayer.onUpdate` → `expandAsset` → Compose recomposition path is **already cleared** — the on-device Tier B render test streams flattened async siblings and every action-row renders. So focus on what's GenUX-specific:
+
+1. **Async callback threading (prime suspect).** The stream-complete callback must be marshaled to the main thread before it updates Player. In this repro, resolving on a background dispatcher threw `CalledFromWrongThreadException`; only main-thread updates rendered. If GenUX's callback runs off-main (even intermittently), that fits an intermittent drop/skip.
+2. **Custom GenUX asset recomposition.** The reference `text`/`action`/`collection` assets don't drop; the custom `agent-response-wrapper` / `streaming-response-action-row` Composables might — check their `key`/`remember`/`LazyList` item keys for an appended sibling under a stable parent id.
+3. **Timing race** — processor node + content node resolve close together. Core proved clean for this (two-async/turn ×4), so look at the host-side handling of the two callbacks.
 
 ## Why the workaround works (corroborates the above)
 
 `replaceMessageContent(full content)` at `agentCompleteHandle` fixes it because a full replace forces a rebuild that the incremental Compose append sometimes skips. Reasonable to keep as mitigation while the adaptor is investigated.
 
-## Repro
+## Repro tests (all committed on branch `debug/android-action-row-repro-0.15.3`, worktree `../player-0.15.3` @ tag `0.15.3`)
 
-- Worktree pinned to tag: `../player-0.15.3` (`git describe` → `0.15.3`)
-- Test: `plugins/async-node/core/src/__tests__/streaming-action-row.test.ts`
-- Run: `node_modules/.bin/vitest run plugins/async-node/core/src/__tests__/streaming-action-row.test.ts`
-- These are the JS/core-side proofs; the missing piece is an **Android-layer** test (AndroidPlayer.onUpdate + Compose) reproducing the append.
+| Tier | Test | Run |
+|---|---|---|
+| Core JS | `plugins/async-node/core/src/__tests__/streaming-action-row.test.ts` | `node_modules/.bin/vitest run <path>` |
+| JVM `onUpdate` | `plugins/async-node/jvm/.../asyncnode/StreamingActionRowTest.kt` | `bazel test //plugins/async-node/jvm:async-node-test` |
+| Android decode (Robolectric) | `plugins/reference-assets/android/.../streaming/StreamingActionRowRenderTest.kt` | `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test` |
+| Android render (on-device) | `android/demo/.../streaming/StreamingActionRowComposeUITest.kt` (+ `DemoPlayerViewModel` stream handler, `mocks/streaming/streaming-action-rows.json`) | `bazel test //android/demo:android_instrumentation_test` (booted emulator) |
+
+All pass with reference assets → the Android-layer repro exists and is green; the remaining reproduction is with GenUX's own assets/host (see "For Android team to investigate").
 
 ## Out of scope (separate issue)
 
