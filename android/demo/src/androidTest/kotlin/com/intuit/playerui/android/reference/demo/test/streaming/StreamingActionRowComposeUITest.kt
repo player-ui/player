@@ -38,64 +38,45 @@ import org.junit.Test
  * and running needs an emulator/device. Treat the code below as a starting
  * point to be compiled/adjusted in a full Android dev setup, not a proven test.
  *
- * TWO PREREQUISITES before this can run (neither exists in the repo today —
- * which is itself why the bug was never caught by a test):
+ * ENABLING PIECES (now wired in this branch — neither existed before, which is
+ * itself why no test caught this):
  *
- * (1) The demo player has NO AsyncNodePlugin, so async nodes never resolve in
- *     the demo app. Add it to DemoPlayerViewModel.plugins with a streaming
- *     handler, e.g.:
+ * (1) DemoPlayerViewModel now includes an AsyncNodePlugin that AUTO-STREAMS a
+ *     bounded sequence of [wrapper, action-row, renewedAsync] chunks whenever a
+ *     flow contains a live async node (MAX_STREAMED_ACTION_ROWS messages). No
+ *     test-side continuation control needed — the app streams on its own.
+ * (2) Mock android/demo/src/main/assets/mocks/streaming/streaming-action-rows.json
+ *     — a flatten collection holding one live async node.
+ * (3) android/demo main_deps gains //plugins/async-node/jvm.
  *
- *         AsyncNodePlugin(
- *             asyncHandler = { _, _ ->
- *                 // return the next [wrapper, action-row, renewedAsync] chunk;
- *                 // renew the async node each time to keep the stream live.
- *             },
- *         )
- *
- *     Better for a deterministic test: a dedicated test PlayerViewModel/Activity
- *     whose handler is driven by the test (capture the continuation, resume it
- *     per message) rather than a timer.
- *
- * (2) A streaming chat mock under android/demo/src/main/assets/mocks/streaming/
- *     — a flatten collection (agent-chat-container) holding one live async node,
- *     modeled on plugins/reference-assets/mocks/chat-message/chat-message-basic.tsx.
- *
- * BUILD: once prerequisite (1) is wired, add "//plugins/async-node/jvm" to the
- * android/demo deps (for DemoPlayerViewModel) and run on an emulator/device:
- *
- *     bazel test //android/demo:demo-StreamingActionRowComposeUITest-instrumented-test
- *
- * (Compose-UI tests need a real Android runtime; this is not a Robolectric
- * local test — it belongs in the on-device instrumented UI suite, alongside
- * ActionUITest / MainActivityTest.)
+ * RUN (on an emulator/device — this is the on-device instrumented suite, not
+ * Robolectric): bazel test //android/demo:android_instrumentation_test
  * ---------------------------------------------------------------------------
  */
 class StreamingActionRowComposeUITest : ComposeUITest("streaming") {
 
     @Test
-    fun `each streamed message adds a rendered action-row`() {
-        // Requires prerequisite (2): a streaming chat mock that starts with one
-        // live async node and streams N messages of [wrapper, action-row, renewedAsync].
+    fun `every streamed action-row renders`() {
         launchMock("streaming-action-rows")
 
-        val expectedMessages = 5
+        // The demo player auto-streams MAX_STREAMED_ACTION_ROWS messages, each
+        // appending one Action asset (testTag("action")). Every one must render:
+        // a shortfall means recomposition dropped an appended flattened sibling —
+        // the reproduction (data + decode tiers already proven clean).
+        val expected = 5 // = DemoPlayerViewModel.MAX_STREAMED_ACTION_ROWS
 
-        // As each message streams in, one more Action button (testTag("action"))
-        // must become present AND stay present. waitUntil* drives real recomposition.
-        for (i in 1..expectedMessages) {
-            androidComposeRule.waitUntilNodeCount(hasTestTag("action"), i, timeoutMillis = 5_000L)
+        androidComposeRule.waitUntilNodeCount(hasTestTag("action"), expected, timeoutMillis = 10_000L)
 
-            val rendered = androidComposeRule
-                .onAllNodesWithTag("action")
-                .fetchSemanticsNodes()
-                .size
-            assertEquals(
-                "after message $i, expected $i rendered action-rows but found $rendered — " +
-                    "if the data/decode tiers pass and this stalls, the drop is Compose recomposition",
-                i,
-                rendered,
-            )
-        }
+        val rendered = androidComposeRule
+            .onAllNodesWithTag("action")
+            .fetchSemanticsNodes()
+            .size
+        assertEquals(
+            "expected $expected rendered action-rows (one per streamed message); " +
+                "a shortfall means Compose recomposition dropped an appended action-row",
+            expected,
+            rendered,
+        )
 
         player.shouldBeAtState<InProgressState>()
     }

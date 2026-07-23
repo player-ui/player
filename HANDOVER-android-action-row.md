@@ -60,7 +60,14 @@ Added a Robolectric render test driving the real `AndroidPlayer.onUpdate → exp
   1. **No precedent** — there is *no existing Android test in the repo that resolves an async node*. The async-streaming drive pattern (capture the `onAsyncNode` continuation, resume it, await the re-render) is unestablished here. This absence is itself telling: the Android async-streaming render path is untested.
   2. **Robolectric limitation** — Robolectric does not run real Compose recomposition frames, so `awaitCompleteHydration()` (waits on `R.bool.view_hydrated`) can hang for async/`SuspendableAsset` content. The render assertion is exactly the Compose-recomposition step Robolectric can't faithfully simulate.
 
-**Recommendation:** move the Tier B *render* proof to an **on-device/emulator instrumented test** or a **Compose UI test** (`createComposeRule`, assert the `testTag("action")` node appears after each streamed update) rather than Robolectric. The decode half (action-row present in the `RenderableAsset` tree) can stay Robolectric. This cleanly splits: decode (Robolectric, cheap) vs. recomposition (Compose-UI/emulator, where the bug actually is).
+**Recommendation:** move the Tier B *render* proof to an **on-device/emulator Compose-UI test** (assert `testTag("action")` node count after each streamed update) rather than Robolectric. The decode half (action-row present in the `RenderableAsset` tree) can stay Robolectric. This cleanly splits: decode (Robolectric, cheap) vs. recomposition (Compose-UI/emulator, where the bug actually is).
+
+**Compose-UI test + enabling pieces (committed, UNVALIDATED — needs Android NDK to compile + emulator to run):**
+- Test: `android/demo/src/androidTest/.../streaming/StreamingActionRowComposeUITest.kt` — asserts all streamed action-rows render (`waitUntilNodeCount(hasTestTag("action"), N)`).
+- `DemoPlayerViewModel` now includes an `AsyncNodePlugin` that **auto-streams** N `[wrapper, action-row, renewedAsync]` chunks for any live async node (so the test needs no continuation control).
+- Mock: `android/demo/src/main/assets/mocks/streaming/streaming-action-rows.json` (flatten collection + one live async node).
+- `android/demo` `main_deps` += `//plugins/async-node/jvm`.
+- Run: `bazel test //android/demo:android_instrumentation_test` (with `ANDROID_HOME`, `ANDROID_NDK_HOME`, `JAVA_TOOL_OPTIONS` truststore, and a booted emulator).
 
 - Scaffold + notes: `plugins/reference-assets/android/src/androidTest/kotlin/.../streaming/StreamingActionRowRenderTest.kt`
 - Run: `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test`

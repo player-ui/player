@@ -1,0 +1,33 @@
+{
+  "id": "streaming-action-rows-flow",
+  "views": [
+    {
+      "id": "chat",
+      "type": "collection",
+      "values": [
+        {
+          "id": "msg-0",
+          "async": true,
+          "flatten": true
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "chat",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}

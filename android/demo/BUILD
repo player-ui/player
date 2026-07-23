@@ -8,6 +8,9 @@ main_deps = [
     "//jvm/utils",
     "//plugins/reference-assets/android",
     "//plugins/common-types/jvm",
+    # Streaming action-row repro: DemoPlayerViewModel auto-streams action-rows
+    # for the streaming-action-rows mock (see StreamingActionRowComposeUITest).
+    "//plugins/async-node/jvm",
     "//tools/mocks:jar",
 
     artifact("androidx.navigation:navigation-ui-ktx"),
