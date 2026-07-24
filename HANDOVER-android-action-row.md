@@ -135,19 +135,17 @@ Before the SDK was installed, the JVM test was run without an SDK by pointing th
 
 **Already ruled out (don't re-chase):**
 - *Rendering* — `GenUXChatBodyAsset` filter/`distinctBy`/`LazyColumn` keys are clean; `AgentChatManagedPlayer` is last-state-wins. If the action row is in the resolved tree, it renders.
-- *Threading / main-thread* — your `Bail`/callback run on `viewModelScope` (main); Compose recomposes on main. (This matters for the Player adaptor generally — see below — but is not GenUX's bug.)
+- *Threading / main-thread* — your `Bail`/callback run on `viewModelScope` (main); Compose recomposes on main. And `ManagedPlayer`/`PlayerFragment` both already do view work on main, so there's nothing to marshal here — not GenUX's bug.
 - *Processor + content two-async timing* — core proved clean (two-async/turn ×4).
 
 ## For the Player Android (adaptor/SDK) team — suggested improvements
 
 (Owner: Player Android adaptor, `player-ui/player` — a different team from the GenUX app. Worth doing regardless of GenUX's root cause.)
 
-1. **Marshal async-driven view updates to the main thread** (robustness; plausibly relevant to the intermittency).
-   - Proven: async resolution completing on a background thread makes the resulting view update touch Android views off-main → `CalledFromWrongThreadException`; only main-thread updates render.
-   - The reference `PlayerFragment` *does* marshal (its `renderIntoPlayerCanvas` swaps to `Dispatchers.Main` for the attach, [PlayerFragment.kt:159-180](android/player/src/main/kotlin/com/intuit/playerui/android/ui/PlayerFragment.kt#L159-L180)), but `AndroidPlayer.onUpdate` itself does not — so any **custom host** that taps `onUpdate` directly (e.g. a Compose host) loses the guarantee. iOS avoids this by marshaling in `SwiftUIPlayer` (`Task { @MainActor }`).
-   - Suggestion: push the main-thread guarantee down into `AndroidPlayer` (dispatch async-node-driven `onUpdate`/`expandAsset` through the main dispatcher) so it doesn't depend on the host, or at minimum fail fast with a clear, actionable error instead of a raw platform exception.
-   - Caveat: symptom reproduced here is a *crash*; GenUX's is a *silent drop*. Strong robustness fix + plausible contributor, not a confirmed root cause.
-2. **Close the async-node Android test gap.** No existing Android test resolves an async node / exercises streaming — that render path was untested. Suggestion: upstream the tiered tests added here (Robolectric decode + on-device Compose render + the demo streaming harness) so this class of regression is caught in CI.
+1. **(Minor / defensive) Off-main safety on `AndroidPlayer.onUpdate`.** Both reference hosts already put view work on the main thread — `PlayerFragment.renderIntoPlayerCanvas` does `withContext(Dispatchers.Main) { view into binding.playerCanvas }` ([PlayerFragment.kt:159-180](android/player/src/main/kotlin/com/intuit/playerui/android/ui/PlayerFragment.kt#L159-L180)), and `ManagedPlayer` renders via Compose (recomposition on main). So this is **not** a real gap for anyone using either host, and it is **not GenUX's bug** (their `Bail`/callback and render are on main).
+   - The only exposure: a consumer that taps `AndroidPlayer.onUpdate` directly and touches views off-main itself (`onUpdate` runs `expandAsset`/`assetHandler` on the firing thread). The `CalledFromWrongThreadException` seen during this investigation was from a test deliberately resolving on a background dispatcher — not something the reference hosts produce.
+   - Optional hardening: have `AndroidPlayer.onUpdate` fail fast with a clear, actionable message if invoked with a view-touching handler off-main, rather than a raw platform exception. (iOS's `SwiftUIPlayer` marshals via `Task { @MainActor }` — a nice-to-match convenience, not a correctness gap here.)
+2. **Close the async-node Android test gap** (the substantive item). No existing Android test resolves an async node / exercises streaming — that path was untested. Suggestion: upstream the tiered tests added here (JVM `AsyncNodeOrderingTest` + Robolectric decode + on-device Compose render + the demo streaming harness) so this class of regression is caught in CI.
 
 ## Why the workaround works (corroborates the above)
 
