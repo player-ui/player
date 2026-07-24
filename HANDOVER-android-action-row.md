@@ -10,8 +10,7 @@
 | Reference Android render | Player Android | ✅ ruled out — renders fine on device |
 | GenUX render (`GenUXChatBodyAsset` / `AgentChatManagedPlayer`) | GenUX app | ✅ ruled out — filter/dedup/keys clean; last-state-wins render |
 | **Async-node update ordering: `Bail(fullAsset)` clobbering the action-row `callback`** | **GenUX Agent Chat Android app** | ⬅️ **root cause / primary fix owner** |
-| Async-update main-thread marshaling + test gap | Player Android adaptor | secondary hardening (not the root cause) |
-| iOS | — | not involved (Android/JVM issue) |
+| Async-node Android test gap | Player Android adaptor | secondary hardening (not the root cause) |
 
 **Route the fix to the GenUX Agent Chat Android app team** (async-node usage — see Root cause below); cc the Player Android adaptor team on the robustness suggestion.
 
@@ -67,20 +66,23 @@ Wrote a JVM (platform-layer) test exercising the exact `view.hooks.onUpdate` bou
 - Test: `plugins/async-node/jvm/src/test/kotlin/.../asyncnode/StreamingActionRowTest.kt`
 - Run: `bazel test //plugins/async-node/jvm:async-node-test`
 
-## Conclusion (all four tiers now run)
+## How each layer was cleared
 
-Every layer exercised with the **reference** assets is clean: core AST (JS), the JS→Kotlin `onUpdate` data (JVM), decode (Robolectric), **and on-device Compose render (emulator)** — all streamed action-rows render. So the missing action-row is **NOT in Player core or the reference Android renderer**. It lives in the **GenUX-specific layer**: most likely (a) the custom `agent-response-wrapper` / `streaming-response-action-row` asset recomposition, or (b) the host's async stream-complete **callback threading**.
+Every render/decode layer is clean, so the drop is **upstream of rendering** — the tree core emits last simply lacks the action row (the async-node ordering in **Root cause (final)**). Evidence per layer:
+- **Core AST (JS)** and **JS→Kotlin `onUpdate` data (JVM)** — repro tests pass; the correct tree is produced and handed across the bridge.
+- **Android decode (Robolectric)** and **reference render (on-device Compose, emulator)** — all streamed action-rows decode and render.
+- **GenUX render** — ruled out by code inspection (`GenUXChatBodyAsset` filter/dedup/keys clean; `AgentChatManagedPlayer` last-state-wins).
 
-**Threading finding:** an iteration that resolved the stream on a *background* dispatcher threw `CalledFromWrongThreadException` (view touched off-main); only main-thread-marshaled updates render correctly. If GenUX's stream-complete callback isn't consistently on the main thread, that is a prime suspect for the intermittent drop.
+So when the row is missing it was already absent from the emitted tree — because the stale `Bail(fullAsset)` was applied *after* the action-row `callback` (last-writer-wins per node).
 
 ```mermaid
 flowchart LR
-  A[callback: wrapper, action-row, renewedAsync] --> B[core parse/resolve/flatten]
-  B -->|JS repro: 5/5 PASS| C[JS->Kotlin onUpdate]
-  C -->|JVM repro: PASS| D[AndroidPlayer.onUpdate]
-  D -->|Robolectric: decode OK| E[expandAsset decode]
-  E -->|Compose-UI emulator: PASS, all render| F[reference Compose render]
-  F -.->|drop only here| G[GenUX custom assets / host callback threading]
+  A[callback: wrapper, action-row, renewedAsync] --> B[core resolve/flatten]
+  B -->|JS repro PASS| C[JS->Kotlin onUpdate]
+  C -->|JVM repro PASS| D[AndroidPlayer.onUpdate]
+  D -->|Robolectric decode OK| E[expandAsset]
+  E -->|Compose emulator PASS| F[reference + GenUX render]
+  B -.->|stale Bail(fullAsset) applied AFTER callback,\nlast-writer-wins| G[emitted tree missing action-row]
   style B fill:#8f8
   style C fill:#8f8
   style E fill:#8f8
@@ -144,12 +146,12 @@ Before the SDK was installed, the JVM test was run without an SDK by pointing th
 
 1. **(Minor / defensive) Off-main safety on `AndroidPlayer.onUpdate`.** Both reference hosts already put view work on the main thread — `PlayerFragment.renderIntoPlayerCanvas` does `withContext(Dispatchers.Main) { view into binding.playerCanvas }` ([PlayerFragment.kt:159-180](android/player/src/main/kotlin/com/intuit/playerui/android/ui/PlayerFragment.kt#L159-L180)), and `ManagedPlayer` renders via Compose (recomposition on main). So this is **not** a real gap for anyone using either host, and it is **not GenUX's bug** (their `Bail`/callback and render are on main).
    - The only exposure: a consumer that taps `AndroidPlayer.onUpdate` directly and touches views off-main itself (`onUpdate` runs `expandAsset`/`assetHandler` on the firing thread). The `CalledFromWrongThreadException` seen during this investigation was from a test deliberately resolving on a background dispatcher — not something the reference hosts produce.
-   - Optional hardening: have `AndroidPlayer.onUpdate` fail fast with a clear, actionable message if invoked with a view-touching handler off-main, rather than a raw platform exception. (iOS's `SwiftUIPlayer` marshals via `Task { @MainActor }` — a nice-to-match convenience, not a correctness gap here.)
+   - Optional hardening: have `AndroidPlayer.onUpdate` fail fast with a clear, actionable message if invoked with a view-touching handler off-main, rather than a raw platform exception.
 2. **Close the async-node Android test gap** (the substantive item). No existing Android test resolves an async node / exercises streaming — that path was untested. Suggestion: upstream the tiered tests added here (JVM `AsyncNodeOrderingTest` + Robolectric decode + on-device Compose render + the demo streaming harness) so this class of regression is caught in CI.
 
-## Why the workaround works (corroborates the above)
+## Why the workaround works (corroborates the root cause)
 
-`replaceMessageContent(full content)` at `agentCompleteHandle` fixes it because a full replace forces a rebuild that the incremental Compose append sometimes skips. Reasonable to keep as mitigation while the adaptor is investigated.
+`replaceMessageContent(full content)` at `agentCompleteHandle` fixes it because it applies the **complete content (including the action row) as a single authoritative write** — there's no separate stale `Bail(fullAsset)` left to land afterward and clobber it. That's option 1 of the fix in miniature; reasonable to keep as mitigation until the ordering fix lands.
 
 ## Repro tests (all committed on branch `debug/android-action-row-repro-0.15.3`, worktree `../player-0.15.3` @ tag `0.15.3`)
 
@@ -160,7 +162,7 @@ Before the SDK was installed, the JVM test was run without an SDK by pointing th
 | Android decode (Robolectric) | `plugins/reference-assets/android/.../streaming/StreamingActionRowRenderTest.kt` | `bazel test //plugins/reference-assets/android:reference-assets-android-StreamingActionRowRenderTest-instrumented-test` |
 | Android render (on-device) | `android/demo/.../streaming/StreamingActionRowComposeUITest.kt` (+ `DemoPlayerViewModel` stream handler, `mocks/streaming/streaming-action-rows.json`) | `bazel test //android/demo:android_instrumentation_test` (booted emulator) |
 
-All pass with reference assets → the Android-layer repro exists and is green; the remaining reproduction is with GenUX's own assets/host (see "For the GenUX Android team — investigate").
+All pass with reference assets → the Player pipeline is proven clean end-to-end; `AsyncNodeOrderingTest` additionally pins the fatal vs. safe update ordering (see "For the GenUX Android team — the fix").
 
 ## Out of scope (separate issue)
 
