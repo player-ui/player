@@ -2,12 +2,15 @@ package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.coroutines.UpdatesPlugin
 import com.intuit.playerui.plugins.coroutines.waitForUpdates
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.yield
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
@@ -138,6 +141,61 @@ internal class AsyncNodeOrderingTest : PlayerTest() {
             1,
             actionCount(afterCallback),
             "callback applied after the bail keeps the action row (GenUX's intended sequence)",
+        )
+    }
+
+    /**
+     * Taps onAsyncNode the way GenUX's fix does (GUX-7243 / commit 36e3d08b):
+     * capture the callback, push content through it, and keep the Promise **pending**
+     * (`awaitCancellation`) — no `Bail`, so there is no return-path write to race.
+     */
+    private fun setupCallbackOnlyHandler(onCallbackCaptured: (((Any?) -> Unit)) -> Unit) {
+        plugin.hooks.onAsyncNode.tap("test") { _, _, callback ->
+            if (callback != null) onCallbackCaptured(callback)
+            awaitCancellation() // keep the onAsyncNode Promise pending (callback-only)
+        }
+    }
+
+    @TestTemplate
+    fun `callback-only - later superset callback keeps the action row`() = runBlockingTest {
+        var cb: ((Any?) -> Unit)? = null
+        setupCallbackOnlyHandler { cb = it }
+
+        player.start(flattenFlow)
+        while (cb == null) yield()
+
+        // callback #1 — initial content (body only), like publishCurrentContent()
+        val afterFirst = player.waitForUpdates { cb!!.invoke(listOf(wrapper(0))) }
+        Assertions.assertEquals(0, actionCount(afterFirst), "initial content has no action row yet")
+
+        // callback #2 (~later) — full ACCUMULATED content incl. action row (a superset), issued last.
+        // Because #2 is the later + larger write, it can't be overtaken by #1 → action row survives.
+        val afterSecond = player.waitForUpdates { cb!!.invoke(listOf(wrapper(0), actionRow(0))) }
+        Assertions.assertEquals(
+            1,
+            actionCount(afterSecond),
+            "later superset callback keeps the action row — no callback-vs-callback race",
+        )
+    }
+
+    @TestTemplate
+    fun `callback-only - back-to-back callbacks coalesce to the superset`() = runBlockingTest {
+        var cb: ((Any?) -> Unit)? = null
+        setupCallbackOnlyHandler { cb = it }
+
+        player.start(flattenFlow)
+        while (cb == null) yield()
+
+        // Fire both with no gap — exercises core's queueUpdate microtask batching.
+        // The last (superset) write must win the coalesced flush.
+        player.waitForUpdates {
+            cb!!.invoke(listOf(wrapper(0)))
+            cb!!.invoke(listOf(wrapper(0), actionRow(0)))
+        }
+        Assertions.assertEquals(
+            1,
+            actionCount(player.inProgressState?.lastViewUpdate),
+            "coalesced back-to-back callbacks keep the action row",
         )
     }
 }
