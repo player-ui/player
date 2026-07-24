@@ -1,18 +1,39 @@
 # Handover: intermittent action-row missing after async-node update
 
-**Player Android/JVM 0.15.3** · GenUX Agent Chat Android · updated 2026-07-23
+**Player Android/JVM 0.15.3** · GenUX Agent Chat Android · updated 2026-07-24
 
 ## TL;DR — who fixes this
 
 | Layer | Owner | Verdict |
 |---|---|---|
 | Player core (JS + JVM) | Player core | ✅ ruled out — proven clean |
-| Reference Android render | Player Android | ✅ ruled out as cause — renders fine on device |
-| **The missing action-row** | **GenUX Agent Chat Android app** | ⬅️ **primary fix owner** (custom assets recomposition / their callback threading) |
-| Async-update main-thread marshaling + test gap | Player Android adaptor | secondary hardening (robustness, not a confirmed root cause) |
+| Reference Android render | Player Android | ✅ ruled out — renders fine on device |
+| GenUX render (`GenUXChatBodyAsset` / `AgentChatManagedPlayer`) | GenUX app | ✅ ruled out — filter/dedup/keys clean; last-state-wins render |
+| **Async-node update ordering: `Bail(fullAsset)` clobbering the action-row `callback`** | **GenUX Agent Chat Android app** | ⬅️ **root cause / primary fix owner** |
+| Async-update main-thread marshaling + test gap | Player Android adaptor | secondary hardening (not the root cause) |
 | iOS | — | not involved (Android/JVM issue) |
 
-**Route the fix to the GenUX Agent Chat Android app team**; cc the Player Android adaptor team on the robustness suggestion. Details below.
+**Route the fix to the GenUX Agent Chat Android app team** (async-node usage — see Root cause below); cc the Player Android adaptor team on the robustness suggestion.
+
+## Root cause (final)
+
+The missing action-row is an **async-node update ordering** problem in GenUX's content/handler code — **not** Player core, not the reference renderer, and not GenUX's rendering.
+
+**How it was narrowed (each ruled out with evidence):**
+- **Core** (JS + JVM): resolve/flatten + the `onUpdate` data are correct — repro tests pass.
+- **Reference Android render**: on-device Compose test renders all streamed action-rows.
+- **GenUX render**: `GenUXChatBodyAsset` keeps the action row (`streaming-response-action-row` is not in `conditionalAssetTypes`, so the `lastMessageId` filter doesn't drop it; `distinctBy`/`LazyColumn` key on a unique `id::type`). `AgentChatManagedPlayer` renders whatever `state.asset` currently is (last-state-wins). So *if the action row is in the resolved tree, it renders* — meaning when it's missing, it was already absent from the tree core emitted.
+- **Threading**: GenUX's `Bail`/callback run on `viewModelScope` (main); Compose recomposes on main. Not the gap.
+
+**The mechanism:** GenUX resolves a new message with `BailResult.Bail(messageResult.fullAsset)` and appends the action row later via the update `callback` — both write the **same node**, and core is **last-writer-wins per node** ([index.ts:293 callback vs 299 return](plugins/async-node/core/src/index.ts)). Their trace shows `Bail` is *called* ~120 ms before the callback (the safe order), but the `Bail` payload is the **whole message** — for a **long** response it's large, so marshaling it JVM→JS takes longer than that ~120 ms, and its *effect* lands **after** the small callback's. The stale `fullAsset` (no action row) becomes the last write → the emitted tree has no action row → GenUX's UI faithfully renders it → row dropped. Short responses marshal fast → `Bail` lands first → callback wins → row shows. **That is exactly why it's only long single-update responses.**
+
+Reproduced deterministically on the real runtime (Hermes + J2V8) by `AsyncNodeOrderingTest`: a `Bail` applied *after* the callback drops the action row; applied *before*, it's kept.
+
+**Fix (GenUX, content/handler side) — don't let the stale `Bail(fullAsset)` re-apply after the callback:**
+1. **Resolve once with authoritative content** — if the stream is already complete at resolve time, include the action row in `fullAsset` so there's no separate late write to race; or
+2. **Single path / buffer + serialize** — route a message's content through one mechanism (the callback), and don't apply a `Bail` snapshot once the callback has delivered newer content for that node, so the latest write always wins regardless of marshal latency.
+
+`AsyncNodeOrderingTest` encodes the fatal vs. safe orderings directly, so it doubles as the acceptance check for the fix.
 
 ## Symptom
 
@@ -102,13 +123,20 @@ The 0.15.3 worktree needed all of the following (corporate proxy + fresh SDK):
 ### JVM Tier A sandbox note
 Before the SDK was installed, the JVM test was run without an SDK by pointing the `async-node/jvm` test at the host-only `//jvm/j2v8:j2v8-macos` runtime (the default `//jvm/testutils:with-runtimes` pulls hermes + `j2v8-all`'s android AAR → needs `aapt2`). The committed BUILD keeps the normal `with-runtimes`.
 
-## For the GenUX Android team — investigate
+## For the GenUX Android team — the fix
 
-(Owner: GenUX Agent Chat Android app.) The reference `AndroidPlayer.onUpdate` → `expandAsset` → Compose recomposition path is **already cleared** — the on-device Tier B render test streams flattened async siblings and every action-row renders. So focus on what's GenUX-specific:
+(Owner: GenUX Agent Chat Android app.) Root cause is settled — see **Root cause (final)** above. The fix is in the async-node usage, not rendering or threading.
 
-1. **Main-thread rendering of streamed updates (prime suspect).** The streamed update must reach the view on the **main thread**. Key asymmetry: the main-thread hop lives in the reference **`PlayerFragment`** host — `renderIntoPlayerCanvas` builds the view (may be off-main) then does `withContext(Dispatchers.Main) { view into binding.playerCanvas }` ([PlayerFragment.kt:159-180](android/player/src/main/kotlin/com/intuit/playerui/android/ui/PlayerFragment.kt#L159-L180)). It is **not** in the lower-level `AndroidPlayer.onUpdate` ([AndroidPlayer.kt:194-214](android/player/src/main/kotlin/com/intuit/playerui/android/AndroidPlayer.kt#L194-L214)), which runs `expandAsset`/`assetHandler` on whatever thread fired. A **custom Compose host** (like GenUX's `agent-chat-container`) that taps `onUpdate` directly bypasses `PlayerFragment` and inherits no main-thread guarantee. → **If not using `PlayerFragment`, replicate its `withContext(Dispatchers.Main)` around your render/attach.** In this repro, resolving off-main threw `CalledFromWrongThreadException`; intermittent thread timing fits an intermittent drop/skip. (iOS doesn't hit this — `SwiftUIPlayer` marshals `onUpdate` via `Task { @MainActor }`, [SwiftUIPlayer.swift:161-166](ios/swiftui/Sources/SwiftUIPlayer.swift#L161-L166) — which is likely why this is Android-only.)
-2. **Custom GenUX asset recomposition.** The reference `text`/`action`/`collection` assets don't drop; the custom `agent-response-wrapper` / `streaming-response-action-row` Composables might — check their `key`/`remember`/`LazyList` item keys for an appended sibling under a stable parent id.
-3. **Timing race** — processor node + content node resolve close together. Core proved clean for this (two-async/turn ×4), so look at the host-side handling of the two callbacks.
+**Do:** stop the stale `Bail(fullAsset)` from re-applying after the action-row `callback` for the same node —
+1. **Resolve once with authoritative content** (include the action row in `fullAsset` when the stream is already complete at resolve time), or
+2. **Single path + serialize** (drive a message's content through the callback; don't apply a `Bail` snapshot once the callback has delivered newer content), so the latest write always wins regardless of `Bail` marshal latency.
+
+**Optional confirmation first:** log the *effect* order (not the call order) at your `onUpdate` — per message, whether the action-row asset is present + a timestamp, on a long response. Expect to see the action-row tree arrive, then a no-action-row (`fullAsset`) tree land last.
+
+**Already ruled out (don't re-chase):**
+- *Rendering* — `GenUXChatBodyAsset` filter/`distinctBy`/`LazyColumn` keys are clean; `AgentChatManagedPlayer` is last-state-wins. If the action row is in the resolved tree, it renders.
+- *Threading / main-thread* — your `Bail`/callback run on `viewModelScope` (main); Compose recomposes on main. (This matters for the Player adaptor generally — see below — but is not GenUX's bug.)
+- *Processor + content two-async timing* — core proved clean (two-async/turn ×4).
 
 ## For the Player Android (adaptor/SDK) team — suggested improvements
 
