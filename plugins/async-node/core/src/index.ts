@@ -19,6 +19,23 @@ export * from "./types";
 export * from "./transform";
 export * from "./createAsyncTransform";
 
+/**
+ * DEV TRACE (async-node ordering investigation): monotonic sequence so logs from
+ * the callback path and the Bail/return path can be ordered even when they land
+ * in the same tick. Enable by passing a logger whose `debug` is wired up.
+ */
+let asyncTraceSeq = 0;
+
+/** Short signature of an AST node for the async-node trace logs. */
+const summarizeAsyncNode = (n: any): string => {
+  if (n === null || n === undefined) return String(n);
+  if (n.type === NodeType.MultiNode) {
+    const kids = (n.values ?? []).map((v: any) => v?.type).join(",");
+    return `multi(${(n.values ?? []).length})[${kids}]`;
+  }
+  return `${n.type}${n.value?.id ? `#${n.value.id}` : n.id ? `#${n.id}` : ""}`;
+};
+
 /** Object type for storing data related to a single `apply` of the `AsyncNodePluginPlugin`
  * This object should be setup once per ViewInstance to keep any cached info just for that view to avoid conflicts of shared async node ids across different view states.
  */
@@ -143,6 +160,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     context: AsyncPluginContext,
     result: any,
     options: Resolve.NodeResolveOptions,
+    source = "unknown",
   ) {
     let parsedNode =
       options.parseNode && result ? options.parseNode(result) : undefined;
@@ -150,6 +168,14 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     if (parsedNode && node.onValueReceived) {
       parsedNode = node.onValueReceived(parsedNode);
     }
+
+    // DEV TRACE: which path (callback vs return/bail) is writing this node, and
+    // what it replaces. Ordering here is the "does the order hold" question.
+    options.logger?.debug(
+      `[AsyncNode:trace] apply seq=${asyncTraceSeq++} t=${Date.now()} source=${source} node=${node.id} prev=${summarizeAsyncNode(
+        context.nodeResolveCache.get(node.id),
+      )} next=${summarizeAsyncNode(parsedNode)}`,
+    );
 
     this.handleAsyncUpdate(node, context, parsedNode);
   }
@@ -203,6 +229,14 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
+        // DEV TRACE: what this node resolves to at (batched) re-resolve time —
+        // i.e. what actually gets rendered. Compare its order/content to the
+        // `apply` lines above to see whether a late write won the coalesced flush.
+        (options as any).logger?.debug(
+          `[AsyncNode:trace] resolve t=${Date.now()} node=${node.id} -> ${summarizeAsyncNode(
+            resolvedNode,
+          )}`,
+        );
         return this.resolveAsyncChildren(resolvedNode, context);
       }
 
@@ -290,13 +324,13 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const result = await this.basePlugin?.hooks.onAsyncNode.call(
         node,
         (result) => {
-          this.parseNodeAndUpdate(node, context, result, options);
+          this.parseNodeAndUpdate(node, context, result, options, "callback");
         },
       );
 
       // Stop tracking before the next update is triggered
       context.inProgressNodes.delete(node.id);
-      this.parseNodeAndUpdate(node, context, result, options);
+      this.parseNodeAndUpdate(node, context, result, options, "return/bail");
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error(String(e));
       const result = this.basePlugin?.hooks.onAsyncNodeError.call(error, node);
@@ -318,7 +352,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       // Stop tracking before the next update is triggered
       context.inProgressNodes.delete(node.id);
-      this.parseNodeAndUpdate(node, context, result, options);
+      this.parseNodeAndUpdate(node, context, result, options, "error-fallback");
     }
   }
 
