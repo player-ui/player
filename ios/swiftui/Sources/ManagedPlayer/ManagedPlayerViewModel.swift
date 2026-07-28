@@ -62,7 +62,6 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     /// fetch
     ///   - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was
     /// used to start it
-    ///   - onError: A handler for when the `SwiftUIPlayer` encounters an error
     public init(
         manager: FlowManager,
         onComplete: @escaping (CompletedState) -> Void,
@@ -112,7 +111,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     @MainActor
-    func handleResult(_ result: Result<CompletedState, PlayerError>) {
+    internal func handleResult(_ result: Result<CompletedState, PlayerError>) {
         switch result {
         case let .success(completed):
             prevResult = completed
@@ -123,7 +122,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     @MainActor
-    func next(_ state: CompletedState? = nil) async {
+    internal func next(_ state: CompletedState? = nil) async {
         loadingState = .loading
         flow = nil
 
@@ -136,7 +135,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     @MainActor
-    func handleNextFlow(_ nextFlow: String?) {
+    internal func handleNextFlow(_ nextFlow: String?) {
         if let flow = nextFlow {
             if !flow.isEmpty {
                 self.flow = flow
@@ -167,7 +166,9 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         case loaded(String)
 
         var isLoaded: Bool {
-            guard case .loaded = self else { return false }
+            guard case .loaded = self else {
+                return false
+            }
             return true
         }
 
