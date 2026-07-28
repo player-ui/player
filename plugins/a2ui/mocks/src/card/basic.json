@@ -7,7 +7,12 @@
       "component": "Column",
       "children": ["title", "para"]
     },
-    { "id": "title", "component": "Text", "text": "Card Title", "variant": "h4" },
+    {
+      "id": "title",
+      "component": "Text",
+      "text": "Card Title",
+      "variant": "h4"
+    },
     {
       "id": "para",
       "component": "Text",

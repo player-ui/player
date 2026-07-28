@@ -11,7 +11,12 @@
     { "id": "h3", "component": "Text", "text": "Heading 3", "variant": "h3" },
     { "id": "h4", "component": "Text", "text": "Heading 4", "variant": "h4" },
     { "id": "h5", "component": "Text", "text": "Heading 5", "variant": "h5" },
-    { "id": "body", "component": "Text", "text": "Body paragraph", "variant": "body" },
+    {
+      "id": "body",
+      "component": "Text",
+      "text": "Body paragraph",
+      "variant": "body"
+    },
     {
       "id": "caption",
       "component": "Text",

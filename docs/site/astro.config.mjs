@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import starlight from "@astrojs/starlight";
-import rehypeMermaid from "rehype-mermaid";
+import mermaid from "astro-mermaid";
 import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
@@ -53,6 +53,10 @@ export default defineConfig({
     react(),
     tailwind({
       applyBaseStyles: false,
+    }),
+    mermaid({
+      theme: "forest",
+      autoTheme: true,
     }),
     starlight({
       title: "Player",
@@ -117,6 +121,10 @@ export default defineConfig({
             {
               label: "Assets",
               autogenerate: { directory: "assets" },
+            },
+            {
+              label: "Architecture",
+              autogenerate: { directory: "architecture" },
             },
             {
               label: "Capabilities",
@@ -206,9 +214,6 @@ export default defineConfig({
     },
   },
   markdown: {
-    rehypePlugins: [
-      [rehypeMermaid, { strategy: "img-svg", dark: true }],
-      [rehypeLinks, { base: BASE_PREFIX }],
-    ],
+    rehypePlugins: [[rehypeLinks, { base: BASE_PREFIX }]],
   },
 });

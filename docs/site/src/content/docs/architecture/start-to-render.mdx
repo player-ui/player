@@ -1,0 +1,16 @@
+---
+title: "What Happens When You Start a Flow (core)"
+---
+import rawDiagram from '../../../mermaid/flow-start-to-render.mmd?raw';
+
+This diagram follows `player.start(flow)` from a raw payload to a rendered view.
+
+**Controller setup.** `setupFlow` first lets plugins transform the raw flow (`resolveFlowContent`), constructs the `FlowController`, then wires up the core controllers in order — BindingParser, SchemaController, ValidationController, DataController (with its ValidationMiddleware and format/deformat/default-value taps), ExpressionEvaluator, and ViewController. Each exposes a hook so plugins can tap it. The ViewController then subscribes to the flow and to the data controller's update/delete hooks.
+
+**Flow state machine.** `flowController.start()` creates a `FlowInstance`, and Player taps its transition hooks. Each `transition(value)` first checks `skipTransition` — the validation `"navigation"` phase — and if validation blocks, Player waits for the user to fix errors or dismiss warnings. Otherwise it resolves strings on the transitions, looks up the next state (falling back to `*`), pushes history, and fires the transition hooks. The next state is dispatched by type: ACTION/ASYNC_ACTION evaluate an expression and loop back to `transition`, FLOW recurses into a nested instance, END resolves the flow result, and VIEW hands off to rendering.
+
+**View pipeline.** For a VIEW state, `resolveView` lets plugins swap the view, a `ViewInstance` is created, and the view plugins are applied in a fixed order — Asset, Switch, Applicability, AssetTransform, StringResolver, Template, then MultiNode. On the first `update` the Parser builds the AST and a Resolver is created; subsequent updates reuse it. The Resolver computes the tree, and at each node the DependencyModel decides whether to reuse the cached subtree or recompute. Recomputation runs applicability/switch/template filtering, then the StringResolver (`{{bindings}}` via `model.get`, `@[expr]@` via the evaluator, plus asset transforms), then recurses into children. The final resolved tree is emitted to the renderer.
+
+Once rendered, a user action re-enters the state machine at `transition`, while a data change hands off to the [data-change pipeline](/architecture/data-change-flow).
+
+<pre class="mermaid">{rawDiagram}</pre>

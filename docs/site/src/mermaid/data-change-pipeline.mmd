@@ -1,0 +1,70 @@
+%% Player: data change pipeline
+%% Shows what happens from a dataController.set/delete call through the model
+%% middleware, validation, ViewController microtask batching, and incremental
+%% Resolver re-computation that produces the next rendered view.
+flowchart TD
+    Sources(["change sources"]) --> S1["dataController.set(transaction)"]
+    Sources --> S2["dataController.delete(binding)"]
+    Sources --> S3["asset action via<br/>BindingParser.set"]
+    Sources --> S4["expression evaluator<br/>(set / delete fns)"]
+    Sources --> S5["transition afterTransition:<br/>ACTION result writes data"]
+
+    S1 --> Normalize
+    S2 --> DeletePath
+    S3 --> S1
+    S4 --> S1
+    S5 --> S1
+
+    Normalize["Normalize transaction:<br/>parse bindings, deformat<br/>via hooks.deformat<br/>(SchemaController formatters)"]
+    Normalize --> Diff["compare old vs new<br/>dequal -> drop no-ops"]
+    Diff --> ModelSet["model.set(normalizedTx)"]
+
+    ModelSet --> MW["Middleware chain<br/>(hooks.resolveDataStages)"]
+    MW --> VMW["ValidationMiddleware:<br/>run validators<br/>updateValidationsForBinding(b, 'change')<br/>may block / annotate"]
+    VMW --> LocalModel["LocalModel writes value"]
+    LocalModel --> Dependents["return affected bindings<br/>(direct + computed dependents)"]
+
+    Dependents --> OnSet["hooks.onSet"]
+    OnSet --> HasChange{"any actual change?"}
+    HasChange -- no --> Idle(["no-op"])
+    HasChange -- yes --> OnUpdate["hooks.onUpdate(updates, options)"]
+
+    DeletePath["validate parent binding<br/>model.delete<br/>hooks.onDelete"] --> DepDel["compute dependents"]
+    DepDel --> OnUpdate
+
+    OnUpdate --> VCTap["ViewController taps onUpdate/onDelete<br/>extract changed bindings"]
+    VCTap --> Queue["queueUpdate(bindings, nodes, silent)"]
+    Queue --> Silent{"silent?"}
+    Silent -- yes --> NoRender(["skip render<br/>(merge into pending)"])
+    Silent -- no --> Scheduled{"microtask<br/>already scheduled?"}
+    Scheduled -- yes --> MergePending["merge bindings<br/>into pending set"]
+    Scheduled -- no --> Schedule["queueMicrotask(...)"]
+    MergePending --> Wait
+    Schedule --> Wait["wait microtask"]
+
+    Wait --> Drain["drain pending<br/>changedBindings + changedNodes"]
+    Drain --> VIUp["currentView.update(<br/>changedBindings, changedNodes)"]
+
+    VIUp --> RUp["Resolver.update(dataChanges, nodeChanges)"]
+    RUp --> BeforeU["beforeUpdate hook"]
+    BeforeU --> Walk["walk AST from root"]
+    Walk --> Skip{"skipResolve?<br/>DependencyModel:<br/>node tracks bindings;<br/>any in changeset?"}
+    Skip -- no deps changed --> Cached["reuse cached resolved node"]
+    Skip -- deps changed --> Recompute["beforeResolve hook<br/>(applicability / switch / template)<br/>-> resolve hook<br/>(StringResolver re-reads model.get,<br/>re-runs @[expr]@)<br/>-> recurse children<br/>-> afterResolve hook"]
+    Cached --> Combine
+    Recompute --> Combine["assembled resolved subtree"]
+    Combine --> AfterU["afterUpdate hook"]
+    AfterU --> Emit["ViewInstance.hooks.onUpdate<br/>(new tree)"]
+    Emit --> Render(["renderer commits diff"])
+
+    Render -.next user input.-> Sources
+
+    subgraph Side["side effects fired alongside"]
+        direction LR
+        SE1["validation 'change' phase<br/>updates error/warning state"]
+        SE2["expressions in computed<br/>bindings re-evaluate"]
+        SE3["ValidationController may<br/>still gate next transition<br/>via skipTransition"]
+    end
+    VMW -.-> SE1
+    LocalModel -.-> SE2
+    SE1 -.-> SE3

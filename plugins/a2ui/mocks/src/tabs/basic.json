@@ -11,7 +11,15 @@
       ]
     },
     { "id": "tab1", "component": "Text", "text": "This is the overview pane." },
-    { "id": "tab2", "component": "Text", "text": "Detailed information lives here." },
-    { "id": "tab3", "component": "Text", "text": "Customer reviews appear here." }
+    {
+      "id": "tab2",
+      "component": "Text",
+      "text": "Detailed information lives here."
+    },
+    {
+      "id": "tab3",
+      "component": "Text",
+      "text": "Customer reviews appear here."
+    }
   ]
 }
