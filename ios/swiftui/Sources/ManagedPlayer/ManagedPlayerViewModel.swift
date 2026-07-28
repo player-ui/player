@@ -111,7 +111,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     @MainActor
-    internal func handleResult(_ result: Result<CompletedState, PlayerError>) {
+    func handleResult(_ result: Result<CompletedState, PlayerError>) {
         switch result {
         case let .success(completed):
             prevResult = completed
@@ -122,7 +122,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     @MainActor
-    internal func next(_ state: CompletedState? = nil) async {
+    func next(_ state: CompletedState? = nil) async {
         loadingState = .loading
         flow = nil
 
@@ -135,7 +135,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     @MainActor
-    internal func handleNextFlow(_ nextFlow: String?) {
+    func handleNextFlow(_ nextFlow: String?) {
         if let flow = nextFlow {
             if !flow.isEmpty {
                 self.flow = flow
