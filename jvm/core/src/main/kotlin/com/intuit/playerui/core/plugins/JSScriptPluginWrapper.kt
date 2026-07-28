@@ -47,7 +47,7 @@ public abstract class JSScriptPluginWrapper(
          * e.g. `plugins/x/core/dist/XPlugin.native.js` -> `plugins/x/core/XPlugin.native.js.hbc`.
          */
         private fun hbcPathFor(sourcePath: String): String =
-            "${sourcePath.substringBeforeLast("/dist/")}/${sourcePath.substringAfterLast("/")}.hbc"
+            "${sourcePath.replace("/dist/", "/")}.hbc"
 
         /** Convenience helper to expose constructor as an anonymous builder */
         public fun from(
