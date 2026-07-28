@@ -74,7 +74,9 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
         $result.sink { [weak self] result in
             guard let result else { return }
-            self?.handleResult(result)
+            Task { @MainActor [weak self] in
+                self?.handleResult(result)
+            }
         }
         .store(in: &bag)
     }
@@ -109,6 +111,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         }
     }
 
+    @MainActor
     func handleResult(_ result: Result<CompletedState, PlayerError>) {
         switch result {
         case let .success(completed):
@@ -119,20 +122,20 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         }
     }
 
+    @MainActor
     func next(_ state: CompletedState? = nil) async {
-        Task { @MainActor in
-            self.loadingState = .loading
-            self.flow = nil
+        loadingState = .loading
+        flow = nil
 
-            do {
-                let nextFlow = try await self.manager.next(result: state)
-                self.handleNextFlow(nextFlow)
-            } catch {
-                self.loadingState = .failed(error)
-            }
+        do {
+            let nextFlow = try await manager.next(result: state)
+            handleNextFlow(nextFlow)
+        } catch {
+            loadingState = .failed(error)
         }
     }
 
+    @MainActor
     func handleNextFlow(_ nextFlow: String?) {
         if let flow = nextFlow {
             if !flow.isEmpty {
