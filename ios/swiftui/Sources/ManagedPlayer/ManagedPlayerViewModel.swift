@@ -173,11 +173,16 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.idle, .idle): true
-            case (.loading, .loading): true
-            case let (.loaded(lll), .loaded(rrr)) where lll == rrr: true
-            case let (.retry(lll), .retry(rrr)) where lll === rrr: true
-            default: false
+            case (.idle, .idle), (.loading, .loading):
+                true
+            case let (.loaded(lhsFlow), .loaded(rhsFlow)):
+                lhsFlow == rhsFlow
+            case let (.retry(lhsState), .retry(rhsState)):
+                lhsState === rhsState
+            // `.failed` is intentionally never equal: `Error` isn't `Equatable`,
+            // so every failure counts as a distinct state.
+            default:
+                false
             }
         }
     }
