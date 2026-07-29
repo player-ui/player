@@ -26,6 +26,7 @@ js_xlr_pipeline(
         ":node_modules/@player-ui/expression-plugin",
         ":node_modules/@player-ui/meta-plugin",
         ":node_modules/@player-ui/types",
+        ":node_modules/@player-ui/types-provider-plugin",
     ],
     cli = "@player-cli/cli"
 )
