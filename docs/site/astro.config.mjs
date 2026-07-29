@@ -48,6 +48,12 @@ export default defineConfig({
     "/tools/cli": resolvedPath("/capabilities/cli/"),
     "/tools/storybook": resolvedPath("/capabilities/storybook/"),
     "/assets/cross-platform/": resolvedPath("/platforms/cross-platform"),
+    "/architecture/data-change-flow": resolvedPath(
+      "/architecture/diagrams/data-change-flow/",
+    ),
+    "/architecture/start-to-render": resolvedPath(
+      "/architecture/diagrams/start-to-render/",
+    ),
   },
   integrations: [
     react(),
@@ -124,7 +130,16 @@ export default defineConfig({
             },
             {
               label: "Architecture",
-              autogenerate: { directory: "architecture" },
+              items: [
+                {
+                  label: "Diagrams",
+                  autogenerate: { directory: "architecture/diagrams" },
+                },
+                {
+                  label: "Systems",
+                  autogenerate: { directory: "architecture/systems" },
+                },
+              ],
             },
             {
               label: "Capabilities",

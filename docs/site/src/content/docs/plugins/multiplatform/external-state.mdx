@@ -7,7 +7,7 @@ import SPM from "../../../../components/SPM.astro";
 import { PackageManagers } from "starlight-package-managers";
 
 The External State Plugin is an easy way to handle `EXTERNAL` states from the navigation
-of a Player flow.
+of a Player flow. See [FlowController & FlowInstance](/architecture/systems/flow-controller) for how `EXTERNAL` states fit into the core navigation state machine.
 
 You provide an array of handlers, each specifying a `ref` to match against, an optional
 `match` object for additional properties, and a `handlerFunction` to run. When Player
