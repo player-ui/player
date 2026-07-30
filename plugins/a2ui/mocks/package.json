@@ -1,7 +1,7 @@
 {
   "name": "@player-ui/a2ui-plugin-mocks",
   "version": "0.0.0-PLACEHOLDER",
-  "main": "src/index.ts",
+  "main": "index.ts",
   "peerDependencies": {
     "@player-ui/a2ui-plugin": "workspace:^",
     "@player-ui/player": "workspace:^"
