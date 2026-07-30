@@ -707,17 +707,7 @@ describe("view", () => {
       },
     );
 
-    let updateNumber = 0;
-
     const player = new Player({ plugins: [plugin] });
-
-    player.hooks.viewController.tap("async-node-test", (vc) => {
-      vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", () => {
-          updateNumber++;
-        });
-      });
-    });
 
     player.start(basicFRFWithActions as any);
 
