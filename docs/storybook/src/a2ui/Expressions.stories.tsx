@@ -8,5 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const Showcase = createA2UIStory(
-  () => import("@player-ui/mocks/expressions/showcase.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/expressions/showcase.json"),
 );

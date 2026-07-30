@@ -36,7 +36,8 @@ npm_package(
     package = "@player-ui/mocks",
     srcs = [
         ":manifest",
-        "package.json"
+        "package.json",
+        "//plugins/a2ui/mocks:snapshots"
     ],
     tags = ["do-not-publish"],
 )

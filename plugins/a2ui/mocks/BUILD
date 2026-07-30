@@ -1,6 +1,5 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@rules_java//java:java_library.bzl", "java_library")
-load("@rules_player//javascript:defs.bzl", "js_pipeline")
-load("@rules_player//player:defs.bzl", "generate_mocks_manifest")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
@@ -12,8 +11,8 @@ vitest_config(name = "vitest_config")
 
 # Raw snapshot JSONs — the canonical source. Exposed for cross-platform
 # consumers (iOS / Android) and for the top-level //tools/mocks aggregator.
-# Named `snapshots` (not `mocks`) because `js_pipeline` below auto-creates an
-# `npm_package` target named `mocks` from the bazel package directory name.
+# Named `snapshots` (not `mocks`) since the `npm_package` below is named
+# `mocks` after the bazel package directory name.
 filegroup(
     name = "snapshots",
     srcs = glob(["**/*.json"]),
@@ -61,5 +60,18 @@ java_library(
     name = "jar",
     resource_strip_prefix = "plugins",
     resources = [":a2ui_mocks_manifest"] + glob(["*/*.json"]),
+    visibility = ["//visibility:public"],
+)
+
+# JS/TS counterpart of `:jar` — publishes `index.ts` and the raw snapshots as
+# the `@player-ui/a2ui-plugin-mocks` npm package, unbuilt, for storybook/vitest
+# consumers to import and transpile themselves.
+npm_package(
+    name = "mocks",
+    srcs = [
+        "index.ts",
+        "package.json",
+        ":catalog",
+    ],
     visibility = ["//visibility:public"],
 )

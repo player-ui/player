@@ -8,9 +8,9 @@ const meta: Meta = {
 export default meta;
 
 export const Basic = createA2UIStory(
-  () => import("@player-ui/mocks/text-field/basic.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/text-field/basic.json"),
 );
 
 export const Validation = createA2UIStory(
-  () => import("@player-ui/mocks/text-field/validation.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/text-field/validation.json"),
 );
