@@ -18,11 +18,15 @@ import androidx.transition.TransitionManager
  */
 @MainThread
 internal infix fun View?.into(root: FrameLayout) {
+    removeRoot(root)
+    this into root as ViewGroup
+}
+
+private fun View?.removeRoot(root: FrameLayout) {
     val existing = root.getChildAt(0)
     if (this != existing) {
         root.removeView(existing)
     }
-    this into root as ViewGroup
 }
 
 /**
@@ -63,6 +67,7 @@ internal fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
  */
 @MainThread
 internal infix fun View?.into(root: ViewGroup) {
+    (root as? FrameLayout)?.let { removeRoot(root) }
     if (this == null) {
         root.visibility = View.GONE
         root.removeAllViews()
