@@ -73,5 +73,6 @@ npm_package(
         "package.json",
         ":catalog",
     ],
+    tags = ["do-not-publish"],
     visibility = ["//visibility:public"],
 )
