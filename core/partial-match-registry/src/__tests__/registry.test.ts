@@ -132,3 +132,16 @@ test("logs debug message when initialSet has duplicate keys", () => {
   expect(registryWithDuplicates.get({ type: "action" })).toBe("third-value");
   expect(registryWithDuplicates.get({ type: "other" })).toBe("other-value");
 });
+
+test("regonizes keys with undefined value as different from missing keys ", () => {
+  const registry = new Registry<string>([
+    [{ type: "action", other: undefined }, "first-value"],
+    [{ type: "action" }, "second-value"], // Not a duplicate of above
+  ]);
+
+  // Verify the final value is the last one set
+  expect(registry.get({ type: "action" })).toBe("first-value");
+  expect(registry.get({ type: "action", other: "something" })).toBe(
+    "second-value",
+  );
+});
