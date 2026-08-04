@@ -33,6 +33,7 @@ import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.coroutines.subScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -297,6 +298,22 @@ public abstract class RenderableAsset<Data>(
     ) {
         val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() } ?: return
         inflateChild(asset, container, viewApply)
+    }
+
+    public fun CoroutineScope.inflate(
+        children: List<RenderableAsset<*>?>,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
+    ) {
+        launch {
+            val built = children.order().map { child ->
+                child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+            }
+            built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(it) } }
+            val views = built.map { asset -> asset?.let { async { it.render() } } }.map { it?.await() }
+            withContext(Dispatchers.Main) { views into container }
+        }
     }
 
     private fun CoroutineScope.inflateChild(
