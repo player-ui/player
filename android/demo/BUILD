@@ -42,6 +42,7 @@ kt_android(
     # Disable publishing
     group = None,
     version = None,
+    api_file = None,
 )
 
 android_binary(
