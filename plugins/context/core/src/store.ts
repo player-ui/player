@@ -151,6 +151,38 @@ export class ContextStore {
     return out;
   }
 
+  /**
+   * Return every key transitively downstream of [sourceSymbol] — direct
+   * dependents, their dependents, and so on. Ordered breadth-first so nearer
+   * dependents come first, deduped so a key reachable by several paths (a
+   * diamond) appears once, and cycle-safe.
+   *
+   * The source itself is never included — `set()` notifies it directly, so
+   * re-emitting it here would double-notify subscribers on a cyclic graph.
+   */
+  transitiveDependentsOf(sourceSymbol: symbol): ReadonlyArray<ContextKey> {
+    const visited = new Set<symbol>([sourceSymbol]);
+    const out: ContextKey[] = [];
+    const queue: symbol[] = [sourceSymbol];
+
+    while (queue.length > 0) {
+      const current = queue.shift() as symbol;
+      const set = this.dependents.get(current);
+      if (!set) continue;
+      for (const targetSymbol of set) {
+        if (visited.has(targetSymbol)) continue;
+        visited.add(targetSymbol);
+        const target = this.entries.get(targetSymbol);
+        if (target) {
+          out.push(target.key);
+        }
+        queue.push(targetSymbol);
+      }
+    }
+
+    return out;
+  }
+
   list(): ReadonlyArray<ContextEntryDescriptor> {
     const out: ContextEntryDescriptor[] = [];
     for (const entry of this.entries.values()) {

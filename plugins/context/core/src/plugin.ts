@@ -100,7 +100,9 @@ export class ContextPlugin implements PlayerPlugin {
     }
     this.notify(key, value);
 
-    const dependents = this.store.dependentsOf(key.symbol);
+    // Transitive: a chained transform (root -> mid -> top) must notify `top`
+    // when `root` changes, not just the directly-dependent `mid`.
+    const dependents = this.store.transitiveDependentsOf(key.symbol);
     for (const dep of dependents) {
       const computed = this.store.get(dep);
       this.notify(dep, computed);
