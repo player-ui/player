@@ -69,6 +69,47 @@ test("dependentsOf tracks reverse index from transform sources", () => {
   expect(deps).toHaveLength(2);
 });
 
+test("transitiveDependentsOf walks the full dependency chain breadth-first", () => {
+  const store = new ContextStore();
+  const root = defineContextKey<number>("root", "root");
+  const mid = defineContextKey<number>("mid", "mid");
+  const top = defineContextKey<number>("top", "top");
+
+  store.registerTransform(mid, { sources: [root], compute: () => 1 });
+  store.registerTransform(top, { sources: [mid], compute: () => 2 });
+
+  expect(store.dependentsOf(root.symbol).map((k) => k.symbol)).toEqual([
+    mid.symbol,
+  ]);
+  expect(
+    store.transitiveDependentsOf(root.symbol).map((k) => k.symbol),
+  ).toEqual([mid.symbol, top.symbol]);
+});
+
+test("transitiveDependentsOf dedupes diamonds and terminates on cycles", () => {
+  const store = new ContextStore();
+  const root = defineContextKey<number>("root", "root");
+  const left = defineContextKey<number>("left", "left");
+  const right = defineContextKey<number>("right", "right");
+  const top = defineContextKey<number>("top", "top");
+
+  store.registerTransform(left, { sources: [root], compute: () => 1 });
+  store.registerTransform(right, { sources: [root], compute: () => 2 });
+  store.registerTransform(top, { sources: [left, right], compute: () => 3 });
+
+  const diamond = store.transitiveDependentsOf(root.symbol);
+  expect(diamond).toHaveLength(3);
+  expect(diamond.filter((k) => k.symbol === top.symbol)).toHaveLength(1);
+
+  // introduce a cycle: top feeds back into left
+  store.registerTransform(left, { sources: [root, top], compute: () => 1 });
+  const cyclic = store.transitiveDependentsOf(root.symbol);
+  expect(new Set(cyclic.map((k) => k.symbol))).toEqual(
+    new Set([left.symbol, right.symbol, top.symbol]),
+  );
+  expect(cyclic).toHaveLength(3);
+});
+
 test("re-registering a transform updates the reverse index", () => {
   const store = new ContextStore();
   const oldSrc = defineContextKey<number>("old", "old");
