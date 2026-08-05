@@ -187,6 +187,7 @@ public final class com/intuit/playerui/utils/test/TestLogger : com/intuit/player
 }
 
 public final class com/intuit/playerui/utils/test/TestMocksKt {
+	public static final fun getCounterFlowString ()Ljava/lang/String;
 	public static final fun getMocks ()Lcom/intuit/playerui/utils/mocks/ClassLoaderMocksReader;
 	public static final fun getSimpleFlow ()Lcom/intuit/playerui/utils/test/Flow;
 	public static final fun getSimpleFlowString ()Ljava/lang/String;

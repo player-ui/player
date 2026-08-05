@@ -38,6 +38,7 @@ public class MetricsPlugin(
                     )
                 },
                 "trackRenderTime" to true,
+                "trackUpdateTime" to true,
             ),
         )
         instance = runtime.buildInstance("(new $name(handlers))")

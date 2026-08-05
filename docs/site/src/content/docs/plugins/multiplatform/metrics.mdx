@@ -44,7 +44,7 @@ If you wish to supply your own timer, simply use the `getTime` option to set the
 
 ## Measuring Render Time
 
-For extensions of this plugin that wish to track the render (and update) times of nodes, add the `trackRenderTime` flag to `options`. You must then call `metrics.renderEnd()` to denote when content is painted on the screen. This is automatically handled for the platform specific versions of this plugin.
+For extensions of this plugin that wish to track the render times of nodes, add the `trackRenderTime` flag to `options`. To additionally track the time of *updates* to an already-rendered view (e.g. streaming), also add `trackUpdateTime`. You must then call `metrics.renderEnd()` to denote when content is painted on the screen — for the first render, and for each update when `trackUpdateTime` is enabled. This is automatically handled for the platform specific versions of this plugin, subject to per-platform support (see below).
 
   </Fragment>
   <Fragment slot='react'>
@@ -69,7 +69,9 @@ const player = new ReactPlayer({
   </Fragment>
   <Fragment slot='ios'>
 
-The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. Due to current SwiftUI limitations, update time can't be tracked yet. It can be used in conjunction with a core plugin that utilizes the events, through `findPlugin`, or standalone.
+The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. It can be used in conjunction with a core plugin that utilizes the events, through `findPlugin`, or standalone.
+
+Update time is **not** tracked on iOS yet. Render completion is signaled by calling `renderEnd()` from SwiftUI's `.onAppear`, which only fires on a view's **first appearance** — there is no per-update paint callback, so an update's timing can never be completed (no `trackUpdateTime` option is exposed). Supporting it would require wiring a per-update paint signal (e.g. tapping `view.hooks.onUpdate` and calling `renderEnd()` after the update commits).
 
 <SPM product="MetricsPlugin" />
 
@@ -94,7 +96,7 @@ var body: some View {
   </Fragment>
   <Fragment slot='android'>
 
-The `JVM` Metrics plugin can track render time for views in a flow.
+The `JVM` Metrics plugin tracks render time and update time for views in a flow (both always enabled, like the web wrapper). Note that on JVM `renderEnd()` is called by the host rather than automatically, so an update timing only completes when the host calls `renderEnd()` after that update paints — which streaming integrations do; non-streaming hosts that don't will simply produce no update data (render tracking is unaffected).
 
 In build.gradle
 
