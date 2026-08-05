@@ -112,6 +112,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         XCTAssertEqual(startedFlows, [flow1, flow2])
     }
 
+    @MainActor
     func testViewModelOnStartedFlowNotCalledForEmptyFlow() {
         var startedFlows = [String]()
         let model = ManagedPlayerViewModel(
@@ -353,6 +354,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         XCTAssertNil(model.currentState)
     }
 
+    @MainActor
     func testLoadingStateFailureEmptyFlow() {
         let model = ManagedPlayerViewModel(
             manager: ConstantFlowManager([FlowData.COUNTER]),
@@ -369,6 +371,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testRetryIdleState() {
         let model = ManagedPlayerViewModel(manager: ConstantFlowManager([]), onComplete: { _ in })
         model.handleNextFlow(FlowData.COUNTER)

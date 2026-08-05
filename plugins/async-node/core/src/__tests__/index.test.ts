@@ -684,6 +684,143 @@ describe("view", () => {
     expect(view?.actions[1]).toBeUndefined();
   });
 
+  test("preserves callback-streamed content when the hook resolves with undefined", async () => {
+    // Regression: a streaming consumer pushes content through the callback while
+    // the hook is still pending, then resolves the hook with nothing. Previously
+    // the bail path re-parsed the undefined return (last-writer-wins) and
+    // reverted the streamed content back to the async placeholder.
+    let deferredResolve: ((value: any) => void) | undefined;
+    let updateContent: ((content: any) => void) | undefined;
+
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    plugin.hooks.onAsyncNode.tap(
+      "test",
+      async (_node: Node.Async, update: (content: any) => void) => {
+        updateContent = update;
+        // Resolve the hook with nothing; content is delivered via the callback.
+        return new Promise((resolve) => {
+          deferredResolve = resolve;
+        });
+      },
+    );
+
+    const player = new Player({ plugins: [plugin] });
+
+    player.start(basicFRFWithActions as any);
+
+    let view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.actions[1]).toBeUndefined();
+
+    // Wait until the hook has run and handed us the streaming callback.
+    await waitFor(() => {
+      expect(updateContent).toBeDefined();
+      expect(deferredResolve).toBeDefined();
+    });
+
+    // Stream content through the callback while the hook promise is still pending.
+    updateContent?.({
+      asset: {
+        id: "next-label-action",
+        type: "action",
+        value: "streamed value",
+      },
+    });
+
+    await waitFor(() => {
+      view = (player.getState() as InProgressState).controllers.view.currentView
+        ?.lastUpdate;
+      expect(view?.actions[1]?.asset.type).toBe("action");
+    });
+
+    // Now resolve the hook with nothing. The streamed content must survive.
+    deferredResolve?.(undefined);
+
+    await waitFor(() => {
+      view = (player.getState() as InProgressState).controllers.view.currentView
+        ?.lastUpdate;
+      expect(view?.actions[1]?.asset.type).toBe("action");
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+    expect(view?.actions[0].asset.type).toBe("action");
+    expect(view?.actions[1]?.asset.type).toBe("action");
+  });
+
+  test("callback-streamed content is not overwritten by a stale hook return value", async () => {
+    // Regression: a streaming consumer pushes content through the callback while
+    // the hook is still pending, then resolves the hook with a different (stale)
+    // value. The callback is the source of truth once used, so the bail return
+    // must not overwrite it — otherwise the streamed row is intermittently
+    // replaced by the stale content.
+    let deferredResolve: ((value: any) => void) | undefined;
+    let updateContent: ((content: any) => void) | undefined;
+
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    plugin.hooks.onAsyncNode.tap(
+      "test",
+      async (_node: Node.Async, update: (content: any) => void) => {
+        updateContent = update;
+        return new Promise((resolve) => {
+          deferredResolve = resolve;
+        });
+      },
+    );
+
+    const player = new Player({ plugins: [plugin] });
+
+    player.start(basicFRFWithActions as any);
+
+    await waitFor(() => {
+      expect(updateContent).toBeDefined();
+      expect(deferredResolve).toBeDefined();
+    });
+
+    // Stream the authoritative content through the callback.
+    updateContent?.({
+      asset: {
+        id: "streamed-action",
+        type: "action",
+        value: "streamed value",
+      },
+    });
+
+    let view: any;
+    await waitFor(() => {
+      view = (player.getState() as InProgressState).controllers.view.currentView
+        ?.lastUpdate;
+      expect(view?.actions[1]?.asset.id).toBe("streamed-action");
+    });
+
+    // Resolve the hook with a stale, non-null value. It must not win.
+    deferredResolve?.({
+      asset: {
+        id: "stale-action",
+        type: "action",
+        value: "stale value",
+      },
+    });
+
+    await waitFor(() => {
+      view = (player.getState() as InProgressState).controllers.view.currentView
+        ?.lastUpdate;
+      expect(view?.actions[1]?.asset.id).toBe("streamed-action");
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+    expect(view?.actions[1]?.asset.id).toBe("streamed-action");
+  });
+
   test("replaces async nodes with provided node", async () => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],

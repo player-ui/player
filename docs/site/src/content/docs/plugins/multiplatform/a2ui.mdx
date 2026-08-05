@@ -1,0 +1,193 @@
+---
+title: A2UI Plugin
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import SPM from "../../../../components/SPM.astro";
+import { PackageManagers } from 'starlight-package-managers'
+
+A2UI lets an agent drive Player UI directly: instead of authoring a Flow by hand, an agent emits a flat, id-linked snapshot of components (the A2UI v0.9.1 reference catalog — `Row`, `Column`, `List`, `Text`, `Image`, `Icon`, `Divider`, `Button`, `TextField`, `CheckBox`, `Slider`, `DateTimeInput`, `ChoicePicker`, `Card`, `Modal`, `Tabs`) and Player adapts it into a normal Flow.
+
+The A2UI plugin registers a content adapter that recognizes this snapshot shape and transforms it, so everything downstream (i.e schema, validation, data binding, navigation, and rendering)  runs through Player's existing pipeline unchanged. There's nothing agent-specific to learn on the rendering side; you're still just registering asset renderers like any other Player content.
+
+## What the adapter does
+
+Given a snapshot like:
+
+```json
+{
+  "surfaceId": "greeting",
+  "data": { "message": "Hello from A2UI" },
+  "components": [
+    { "id": "root", "component": "Column", "children": ["header", "body"] },
+    { "id": "header", "component": "Text", "text": "Welcome" },
+    { "id": "body", "component": "Card", "child": "content" },
+    { "id": "content", "component": "Text", "text": { "path": "/message" } }
+  ]
+}
+```
+
+the adapter inlines the id-linked children into nested `{ asset: ... }` wrappers, resolves `{ path: ... }` references into data bindings, synthesizes a schema (including any per-input `checks`), and emits a single `VIEW` state plus one `END` state per unique event/action outcome — producing a Flow that Player resolves and renders exactly as it would DSL- or JSON-authored content.
+
+## Version support
+
+When passing A2UI content to Player's `start` function,the version of that content should additionally be supplied to ensure the correct plugin is used to transform that content. Currently, A2UI version support is outlined below. 
+
+| A2UIVersion | Status            |
+|-------------|-------------------|
+| 0.9         | Supported         |
+| 1.0+        | Not yet supported |
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Install the plugin:
+
+<PackageManagers pkg="@player-ui/a2ui-plugin" />
+
+Register it, then start a flow with `format: "a2ui"` instead of a normal Flow document:
+
+```js
+import { Player } from "@player-ui/player";
+import { A2UIPlugin } from "@player-ui/a2ui-plugin";
+
+const player = new Player({ plugins: [new A2UIPlugin()] });
+
+player.start(a2uiSnapshot, { format: "a2ui", version: "0.9" });
+```
+
+`A2UIPlugin` bundles the content adapter, asset transforms, standard expression functions (`required`, `regex`, `length`, `numeric`, `email`, `formatString`, `formatNumber`, `formatCurrency`, `formatDate`, `pluralize`, `openUrl`, `and`, `or`, `not`), and their Player validation-type counterparts which is everything needed to resolve the adapted Flow.
+
+  </Fragment>
+  <Fragment slot='react'>
+
+Install the plugin:
+
+<PackageManagers pkg="@player-ui/a2ui-plugin-react" />
+
+This bundles the core `@player-ui/a2ui-plugin` and adds React renderers for the full component catalog:
+
+```tsx
+import { ReactPlayer } from "@player-ui/react";
+import { A2UIPlugin } from "@player-ui/a2ui-plugin-react";
+
+const player = new ReactPlayer({ plugins: [new A2UIPlugin()] });
+
+player.start(a2uiSnapshot, { format: "a2ui", version: "0.9" });
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+Alongside the core JS plugin (loaded as a JS bundle under the hood), add the Compose renderers for the component catalog:
+
+```kotlin
+import com.intuit.playerui.android.a2ui.A2UIPlugin
+import com.intuit.playerui.android.AndroidPlayer
+
+val player = AndroidPlayer(A2UIPlugin())
+
+player.start(snapshot, mapOf("format" to "a2ui", "version" to "0.9"))
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+Add the SwiftUI renderers for the component catalog, and start content with the `a2ui` start options:
+
+```swift
+import PlayerUI
+
+struct MyApp: View {
+  @State var result: Result<CompletedState, PlayerError>? = nil
+  @ObservedObject var viewModel: MyViewModel
+  var body: some View {
+    SwiftUIPlayer(
+      flow: $viewModel.flowString,
+      plugins: [A2UIPlugin()],
+      result: $result,
+      startOptions: StartOptions(format: "a2ui", version: "0.9")
+    )
+  }
+}
+```
+
+  </Fragment>
+</PlatformTabs>
+
+## Prepacked A2UI Renderers
+
+Wiring up the base Player plus the A2UI plugin (and, on native platforms, the renderer catalog) is the same handful of lines on every platform. To make it as easy as possible to get started with Player and A2UI, we offer preconfigured player packages on each platform with all the necessary plugins for A2UI rendering included.
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+Install:
+
+<PackageManagers pkg="@player-ui/a2ui" />
+
+```tsx
+import { A2UIReactPlayer } from "@player-ui/a2ui";
+
+const player = new A2UIReactPlayer();
+await player.start(a2uiSnapshot, { format: "a2ui", version: "0.9" });
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+```kotlin
+implementation("com.intuit.playerui:a2ui-android:$PLAYER_VERSION")
+```
+
+```kotlin
+import com.intuit.playerui.a2ui.A2UIAndroidPlayer
+
+val player = A2UIAndroidPlayer()
+player.start(snapshot, mapOf("format" to "a2ui", "version" to "0.9"))
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+<SPM product="A2UIPreset" />
+
+```swift
+A2UISwiftUIPlayer(flow: snapshot, result: $result)
+```
+
+  </Fragment>
+</PlatformTabs>
+
+### JVM (non-Android)
+
+```kotlin
+implementation("com.intuit.playerui:a2ui:$PLAYER_VERSION")
+```
+
+```kotlin
+import com.intuit.playerui.a2ui.A2UIHeadlessPlayer
+
+val player = A2UIHeadlessPlayer()
+player.start(snapshot, mapOf("format" to "a2ui", "version" to "0.9")).await()
+```
+
+## Validation
+
+Input components can carry a `checks` array describing per-binding validation:
+
+```json
+{
+  "id": "email_field",
+  "component": "TextField",
+  "text": { "path": "/user/email" },
+  "checks": [
+    { "call": "required", "message": "Email is required" },
+    { "call": "email", "message": "Must be a valid email" }
+  ]
+}
+```
+
+Supported `call` names are `required`, `regex` (`args.pattern`), `length` (`args.min`/`args.max`), `numeric` (`args.min`/`args.max`), and `email`. The adapter hoists these into a synthesized Player schema with `validation` references, so they run through Player's normal `ValidationController` with a `change` trigger. The optional `message` on a check overrides the validator's default message.

@@ -8,5 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const Basic = createA2UIStory(
-  () => import("@player-ui/mocks/date-time-input/basic.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/date-time-input/basic.json"),
 );

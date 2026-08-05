@@ -8,9 +8,9 @@ const meta: Meta = {
 export default meta;
 
 export const Basic = createA2UIStory(
-  () => import("@player-ui/mocks/button/basic.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/button/basic.json"),
 );
 
 export const WithAction = createA2UIStory(
-  () => import("@player-ui/mocks/button/with-action.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/button/with-action.json"),
 );

@@ -43,11 +43,13 @@ describe("synthesizeSchema", () => {
               type: "required",
               message: "Email is required",
               severity: "error",
+              trigger: "change",
             },
             {
               type: "email",
               message: "Must be a valid email",
               severity: "error",
+              trigger: "change",
             },
           ],
         },
@@ -126,6 +128,7 @@ describe("synthesizeSchema", () => {
           max: 50,
           message: "len",
           severity: "error",
+          trigger: "change",
         },
       ],
     );
