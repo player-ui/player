@@ -107,6 +107,93 @@ test("subscriber on transform target fires when a source updates", () => {
   expect(handler).toHaveBeenCalledWith(42, target);
 });
 
+test("subscriber on a chained transform fires when a root source updates", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const root = defineContextKey<number>("root", "Root");
+  const mid = defineContextKey<number>("mid", "Mid");
+  const top = defineContextKey<number>("top", "Top");
+
+  // root -> mid -> top
+  plugin.registerTransform(mid, {
+    sources: [root],
+    compute: (read) => (read(root) ?? 0) + 1,
+  });
+  plugin.registerTransform(top, {
+    sources: [mid],
+    compute: (read) => (read(mid) ?? 0) * 10,
+  });
+
+  const midHandler = vitest.fn();
+  const topHandler = vitest.fn();
+  plugin.subscribe(mid, midHandler);
+  plugin.subscribe(top, topHandler);
+
+  plugin.set(root, 4);
+
+  expect(midHandler).toHaveBeenCalledTimes(1);
+  expect(midHandler).toHaveBeenCalledWith(5, mid);
+  expect(topHandler).toHaveBeenCalledTimes(1);
+  expect(topHandler).toHaveBeenCalledWith(50, top);
+});
+
+test("transitive invalidation notifies each dependent exactly once in a diamond", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const root = defineContextKey<number>("root", "Root");
+  const left = defineContextKey<number>("left", "Left");
+  const right = defineContextKey<number>("right", "Right");
+  const top = defineContextKey<number>("top", "Top");
+
+  // root -> {left, right} -> top
+  plugin.registerTransform(left, {
+    sources: [root],
+    compute: (read) => (read(root) ?? 0) + 1,
+  });
+  plugin.registerTransform(right, {
+    sources: [root],
+    compute: (read) => (read(root) ?? 0) + 2,
+  });
+  plugin.registerTransform(top, {
+    sources: [left, right],
+    compute: (read) => (read(left) ?? 0) + (read(right) ?? 0),
+  });
+
+  const topHandler = vitest.fn();
+  plugin.subscribe(top, topHandler);
+
+  plugin.set(root, 10);
+
+  expect(topHandler).toHaveBeenCalledTimes(1);
+  expect(topHandler).toHaveBeenCalledWith(23, top);
+});
+
+test("transitive invalidation terminates on a cyclic dependency graph", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const root = defineContextKey<number>("root", "Root");
+  const a = defineContextKey<number>("a", "A");
+  const b = defineContextKey<number>("b", "B");
+
+  // root -> a -> b -> a (cycle in the dependency graph)
+  plugin.registerTransform(a, {
+    sources: [root, b],
+    compute: (read) => (read(root) ?? 0) + 1,
+  });
+  plugin.registerTransform(b, {
+    sources: [a],
+    compute: () => 0,
+  });
+
+  const aHandler = vitest.fn();
+  plugin.subscribe(a, aHandler);
+
+  plugin.set(root, 1);
+
+  expect(aHandler).toHaveBeenCalledTimes(1);
+  expect(aHandler).toHaveBeenCalledWith(2, a);
+});
+
 test("subscribeAll receives every literal set and every dependent invalidation", () => {
   const plugin = new ContextPlugin();
   new Player({ plugins: [plugin] });
