@@ -96,7 +96,20 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         guard let pluginRef,
               let result = pluginRef.invokeMethod("getByName", withArguments: [name]),
               !result.isUndefined, !result.isNull else { return nil }
-        return try? JSONDecoder().decode(T.self, from: result)
+        // `T` may carry `AnyType` members (view.resolved, data.model), which
+        // require an AnyTypeDecodingContext, and `WrappedFunction` members,
+        // which recover their live JSValue from the decoder's rootJS by coding
+        // path. Decoding from the JSValue satisfies both.
+        guard let object = result.toObject(),
+              // `fragmentsAllowed` so primitive entries (a bare string or
+              // number) serialize too — they are not valid top-level JSON.
+              let data = try? JSONSerialization.data(
+                withJSONObject: object,
+                options: [.fragmentsAllowed]
+              ) else { return nil }
+        return try? AnyTypeDecodingContext(rawData: data)
+            .inject(to: JSONDecoder())
+            .decode(T.self, from: result)
     }
 
     /// Returns the registered entry descriptors (description + value/transform flags).

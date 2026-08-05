@@ -51,7 +51,18 @@ public struct FrozenContextSnapshot {
     /// same typed access as live context. Returns nil if the entry was absent
     /// when the snapshot froze or fails to decode.
     public func get<T: Decodable>(name: String, as type: T.Type = T.self) -> T? {
-        guard let value = entryValues[name] else { return nil }
-        return try? JSONDecoder().decode(T.self, from: value)
+        guard let value = entryValues[name],
+              let object = value.toObject(),
+              // `fragmentsAllowed` so primitive entries (a bare string or
+              // number) serialize too — they are not valid top-level JSON.
+              let data = try? JSONSerialization.data(
+                withJSONObject: object,
+                options: [.fragmentsAllowed]
+              ) else { return nil }
+        // Mirrors `ContextPlugin.get(name:as:)`: `T` may carry `AnyType`
+        // members, which require an AnyTypeDecodingContext to decode.
+        return try? AnyTypeDecodingContext(rawData: data)
+            .inject(to: JSONDecoder())
+            .decode(T.self, from: value)
     }
 }
