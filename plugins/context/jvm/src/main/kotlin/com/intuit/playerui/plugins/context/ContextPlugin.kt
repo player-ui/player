@@ -23,11 +23,10 @@ public class ContextPlugin :
     NodeWrapper {
     override val node: Node get() = instance
 
-    private val setByName: (String, String, Any?) -> Unit by NodeSerializableFunction()
-
     /** Exposed for the inline reified [get]; not part of the public surface. */
     @PublishedApi
     internal val getByName: (String) -> Any? by NodeSerializableFunction()
+    private val setByName: (String, String, Any?) -> Unit by NodeSerializableFunction()
     private val hasByName: (String) -> Boolean by NodeSerializableFunction()
     private val subscribeByName: (String, String, (Any?, String) -> Unit) -> String by NodeSerializableFunction()
     private val subscribeAllByName: ((Any?, String?, String) -> Unit) -> String by NodeSerializableFunction()
