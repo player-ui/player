@@ -26,28 +26,12 @@ public val simpleFlow: Flow by lazy {
         .decodeFromString(Flow.serializer(), simpleFlowString)
 }
 
-public val counterFlowString: String =
-    """
-    {
-      "id": "counter-flow",
-      "views": [
-        { "id": "view-1", "type": "text", "value": "{{count}}" }
-      ],
-      "data": { "count": 0 },
-      "navigation": {
-        "BEGIN": "FLOW_1",
-        "FLOW_1": {
-          "startState": "VIEW_1",
-          "VIEW_1": {
-            "state_type": "VIEW",
-            "ref": "view-1",
-            "transitions": { "*": "END_Done" }
-          },
-          "END_Done": { "state_type": "END", "outcome": "done" }
-        }
-      }
-    }
-    """.trimIndent()
+public val ClassLoaderMocksReader.counterMock: ClassLoaderMock
+    get() = findMockByName("action-counter") ?: throw PlayerTestException("Could not find mock by name: action-counter")
+
+public val counterFlowString: String by lazy {
+    mocks.counterMock.getFlow()
+}
 
 @InternalPlayerApi
 @Serializable
