@@ -96,7 +96,7 @@ var body: some View {
   </Fragment>
   <Fragment slot='android'>
 
-The `JVM` Metrics plugin tracks render time and update time for views in a flow (both always enabled, like the web wrapper). On Android, `PlayerFragment` calls `renderEnd()` automatically once a view (or an update to it) finishes painting, so no host wiring is required. Hosts that render outside of `PlayerFragment` must call `renderEnd()` themselves after each paint.
+The `JVM` Metrics plugin tracks render time and update time for views in a flow. Both default to `true`, but can be disabled individually. On Android, `PlayerFragment` calls `renderEnd()` automatically once a view (or an update to it) finishes painting, so no host wiring is required. Hosts that render outside of `PlayerFragment` must call `renderEnd()` themselves after each paint.
 
 In build.gradle
 
@@ -113,6 +113,14 @@ val metricsPlugin = MetricsPlugin { timing, renderMetrics, flowMetrics ->
   ...
 }
 AndroidPlayer(metricsPlugin)
+```
+
+Render and update tracking can be toggled independently:
+
+```kotlin
+val metricsPlugin = MetricsPlugin(trackRenderTime = true, trackUpdateTime = false) { timing, renderMetrics, flowMetrics ->
+  ...
+}
 ```
 
   </Fragment>

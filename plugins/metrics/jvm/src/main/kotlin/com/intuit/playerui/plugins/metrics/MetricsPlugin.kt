@@ -21,8 +21,12 @@ import kotlinx.serialization.builtins.serializer
 public typealias RenderEndHandler = (Timing?, RenderMetrics?, PlayerFlowMetrics?) -> Unit
 
 public class MetricsPlugin(
+    private val trackRenderTime: Boolean,
+    private val trackUpdateTime: Boolean,
     private val handler: RenderEndHandler,
 ) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
+    public constructor(handler: RenderEndHandler) : this(true, true, handler)
+
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
@@ -39,8 +43,8 @@ public class MetricsPlugin(
             mapOf(
                 "onRenderEnd" to renderEndHandler,
                 "onUpdateEnd" to renderEndHandler,
-                "trackRenderTime" to true,
-                "trackUpdateTime" to true,
+                "trackRenderTime" to trackRenderTime,
+                "trackUpdateTime" to trackUpdateTime,
             ),
         )
         instance = runtime.buildInstance("(new $name(handlers))")
