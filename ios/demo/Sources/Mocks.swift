@@ -2,7 +2,7 @@ import Foundation
 import PlayerUITestUtilitiesCore
 
 /// Contains all the mock JSON flows
-public struct Mocks {
+struct Mocks {
     /// For asset demos
     let assetSections: [FlowLoader.FlowSection]
     /// For demoing plugins

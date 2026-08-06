@@ -1,7 +1,6 @@
 import Combine
 import Foundation
 import PlayerUI
-import PlayerUIA2UI
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
 import PlayerUIExpressionPlugin
@@ -30,23 +29,13 @@ struct BazelApp: App {
 }
 
 /// A SwiftUI View that contains different tabs for ease of UITesting (Assets, Plugins, A2UI)
-public struct MainView: View {
-    let mocks: Mocks = .init()
+struct MainView: View {
+    private let mocks: Mocks = .init()
 
-    @State var result: Result<CompletedState, PlayerError>?
-    @State var segmentationSelection: HeaderSelection = .assets
+    @State private var result: Result<CompletedState, PlayerError>?
+    @State private var segmentationSelection: HeaderSelection = .assets
 
-    @State var pubsubEventPublished = false
-    @State var pubsubEventName = ""
-    @State var pubsubEventMessage = ""
-
-    @State var beaconsRecieved = false
-    @State var beaconsInfo = ""
-
-    @State var doneFlow = false
-    @State var outcome = ""
-
-    public var body: some View {
+    var body: some View {
         VStack {
             Picker("", selection: $segmentationSelection) {
                 ForEach(HeaderSelection.allCases, id: \.self) { option in
@@ -90,11 +79,6 @@ public struct MainView: View {
         )
         .accessibility(identifier: "AssetCollection")
         .navigationBarTitle(Text("Flows"))
-        .alert(isPresented: $doneFlow, content: {
-            Alert(title: Text("FlowFinished"),
-                  message: Text("Outcome: \(outcome)"),
-                  dismissButton: .default(Text("OK")))
-        })
     }
 
     enum HeaderSelection: String, CaseIterable {
