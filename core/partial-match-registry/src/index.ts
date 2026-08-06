@@ -68,7 +68,10 @@ export class Registry<V> {
     // Find and remove any existing entry that matches this key
     // Use matcher to check for matching keys (handles deep equality)
     const existingIndex = this.store.findIndex(
-      (entry) => entry.matcher(match) && matcher(entry.key),
+      (entry) =>
+        entry.matcher.count === matcher.count &&
+        entry.matcher(match) &&
+        matcher(entry.key),
     );
     if (existingIndex !== -1) {
       this.store.splice(existingIndex, 1);
