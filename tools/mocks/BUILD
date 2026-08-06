@@ -32,7 +32,7 @@ filegroup(
 )
 filegroup(
     name = "a2ui_mocks",
-    srcs = ["//plugins/a2ui/mocks:snapshots"],
+    srcs = ["//plugins/a2ui/mocks:catalog"],
     visibility = ["//visibility:public"],
 )
 # ---- END iOS ---- #
