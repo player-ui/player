@@ -2,10 +2,10 @@ import XCTest
 
 class ChatMessageAssetUITests: BaseTestCase {
     func testChatMessage() {
-        openFlow("chat message basic")
+        openFlow("chat-message basic")
         waitFor(app.otherElements["collection-async-1"])
-        let value1 = app.staticTexts["text"].label
+        let value1 = app.staticTexts["value"].label
 
-        XCTAssertEqual(value1, "chat message")
+        XCTAssertEqual(value1, "Hello World!")
     }
 }

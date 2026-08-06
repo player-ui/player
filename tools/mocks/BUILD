@@ -7,6 +7,7 @@ PLUGIN_MOCKS = [
     "beacon",
     "external-state",
     "pubsub",
+    "pending-transaction"
 ]
 filegroup(
     name = "all_mocks",
