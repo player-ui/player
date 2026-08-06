@@ -27,16 +27,18 @@ public class MetricsPlugin(
 
     override fun apply(runtime: Runtime<*>) {
         runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+        val renderEndHandler = { timing: Node, renderMetrics: Node, flowMetrics: Node ->
+            handler.invoke(
+                timing.deserialize(Timing.serializer()),
+                renderMetrics.deserialize(RenderMetrics.serializer()),
+                flowMetrics.deserialize(PlayerFlowMetrics.serializer()),
+            )
+        }
         runtime.add(
             "handlers",
             mapOf(
-                "onRenderEnd" to renderEndHandler@{ timing: Node, renderMetrics: Node, flowMetrics: Node ->
-                    handler.invoke(
-                        timing.deserialize(Timing.serializer()),
-                        renderMetrics.deserialize(RenderMetrics.serializer()),
-                        flowMetrics.deserialize(PlayerFlowMetrics.serializer()),
-                    )
-                },
+                "onRenderEnd" to renderEndHandler,
+                "onUpdateEnd" to renderEndHandler,
                 "trackRenderTime" to true,
                 "trackUpdateTime" to true,
             ),
