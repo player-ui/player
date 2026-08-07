@@ -66,6 +66,7 @@ synthetic class com/intuit/playerui/plugins/metrics/MetricsFlow$Serializer$1 : k
 public final class com/intuit/playerui/plugins/metrics/MetricsPlugin : com/intuit/playerui/core/plugins/JSScriptPluginWrapper {
 	public field hooks Lcom/intuit/playerui/plugins/metrics/MetricsPlugin$Hooks;
 	public fun <init> (Lkotlin/jvm/functions/Function3;)V
+	public fun <init> (ZZLkotlin/jvm/functions/Function3;)V
 	public fun apply (Lcom/intuit/playerui/core/bridge/runtime/Runtime;)V
 	public final fun getHooks ()Lcom/intuit/playerui/plugins/metrics/MetricsPlugin$Hooks;
 	public final fun renderEnd ()V
@@ -97,7 +98,7 @@ synthetic class com/intuit/playerui/plugins/metrics/MetricsPlugin$Hooks$Serializ
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/plugins/metrics/MetricsPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
+final class com/intuit/playerui/plugins/metrics/MetricsPlugin$apply$renderEndHandler$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }

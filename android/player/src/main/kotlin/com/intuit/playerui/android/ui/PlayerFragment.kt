@@ -30,6 +30,7 @@ import com.intuit.playerui.android.lifecycle.fail
 import com.intuit.playerui.core.bridge.PlayerRuntimeReleasedException
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.FlowManager
+import com.intuit.playerui.plugins.metrics.metricsPlugin
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -166,6 +167,7 @@ public abstract class PlayerFragment :
 
         tracker?.hooks?.onHydrationComplete?.tap("renderIntoPlayerCanvas-timing") {
             playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
+            asset.player.metricsPlugin?.renderEnd()
         }
 
         if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
