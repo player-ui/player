@@ -36,3 +36,19 @@ filegroup(
     srcs = glob(["flow-manager/**/*.json"]),
     visibility = ["//visibility:public"],
 )
+
+# Used by iOS. Filters out just the JSON files
+filegroup(
+    name = "mocks_json",
+    srcs = [":dsl_mocks_" + mock_dir + "_compiled" for mock_dir in [
+        "action",
+        "choice",
+        "collection",
+        "image",
+        "info",
+        "input",
+        "text",
+        "chat-message",
+    ]],
+    visibility = ["//visibility:public"],
+)
