@@ -1,0 +1,51 @@
+---
+title: Real-World Consumers
+---
+
+The Extension Points and Language Support facts on the [Overview](../overview) page are easier to reason about with concrete examples. Player's DSL/LSP tooling (the `language` repo) has two production consumers of XLR: JSON validation and DSL component generation.
+
+## JSON Validation (Player LSP)
+
+The JSON language service (`@player-lang/json-language-service`) uses XLR to validate Player content as it's typed, and to power completion/hover.
+
+**A custom registry, for a real reason.** Multiple plugins can register an Asset/View XLR type under the same runtime discriminator. Two different plugins might both provide a `type: "text"` asset. `PlayerXLRRegistry extends BasicXLRRegistry` handles this: it inspects each type's `extends` generic (`Asset<"text">`) to index by the public discriminator, and when more than one type maps to the same discriminator, `get()` synthesizes an `or` node across all of them so validation checks content against any matching shape. This is the concrete case behind the "custom `XLRRegistry`" extension point. It exists because "one discriminator, one type" doesn't hold in practice.
+
+**Loading.** `XLRService` wraps an `XLRSDK` around that registry. `PlayerLanguageService.setAssetTypes()` (triggered by an LSP `player/setAssetBundles` notification from the editor client) or `setAssetTypesFromModule()` (used in tests, loading pre-built `TSManifest`s directly) load component-library XLR bundles. Both apply a default filter and transform set:
+
+```typescript
+const DEFAULT_FILTERS: Filters = { typeFilter: "Transformed" };
+const TRANSFORM_FUNCTIONS: Array<TransformFunction> = [
+  applyAssetWrapperOrSwitch, applyValueRefs, applyCommonProps, applyTemplateProperty,
+];
+```
+
+Those transforms inject authoring-time affordances into every loaded Asset/View: an `applicability`/`_comment` property on everything, primitive properties widened to also accept binding/expression strings, and a synthesized `template` property on every array. This is a real, production example of [Filters](../../concepts#filters) and [Transform Functions](../../concepts#transform-functions) at work.
+
+**Validating.** Every document edit (`onDidChangeContent`) re-runs validation. An `XLRPlugin` visitor calls `sdk.validateByName`/`validateByType` per node kind: Asset, View, Content, Navigation, Flow, and FlowState each check against their respective XLR type. Each returned `ValidationMessage` becomes an LSP `Diagnostic` (`ValidationSeverity` maps 1:1 onto LSP's `DiagnosticSeverity`), which is how a bad asset shape ends up as a red squiggle in an editor.
+
+## DSL Component Generation
+
+`@player-lang/functional-dsl-generator` is a build-time code generator: it reads an XLR `NamedType<ObjectType>` for an Asset/View and emits a fluent TypeScript "builder" class plus a factory function. Property types come straight from the XLR node shapes covered in the [AST Node Model](../ast-model) (`string`/`number`/`object`/`ref`/`or`/`array` → TS types), and `extends`-chain walking (the same mechanics the validator uses) determines which nested properties are themselves asset slots.
+
+Concretely, XLR's `TextAsset` type produces this:
+
+```typescript
+export interface TextAssetBuilderMethods {
+  withId(value: string | TaggedTemplateValue<string>): TextAssetBuilder;
+  withValue(value: string | TaggedTemplateValue<string>): TextAssetBuilder;
+}
+
+export class TextAssetBuilder extends FunctionalBuilderBase<TextAsset>
+  implements TextAssetBuilderMethods {
+  private static readonly defaults = { type: "text", id: "", value: "" };
+  withId(value) { return this.set("id", value); }
+  withValue(value) { return this.set("value", value); }
+  build(context?) { return this.buildWithDefaults(TextAssetBuilder.defaults, context); }
+}
+
+export function text(initial?: FunctionalPartial<TextAsset>): TextAssetBuilder {
+  return new TextAssetBuilder(initial);
+}
+```
+
+`text()` (and its siblings, `input()`, `collection()`, etc.) is the actual DSL authoring API developers use to construct Player content programmatically; `.build()` produces the final JSON asset. Every one of these builders is generated straight from a plugin's compiled XLR, so there's no hand-maintained, parallel set of DSL type definitions to keep in sync.

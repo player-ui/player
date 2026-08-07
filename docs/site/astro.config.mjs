@@ -157,6 +157,10 @@ export default defineConfig({
                   slug: "xlr/concepts",
                 },
                 {
+                  label: "Architecture",
+                  autogenerate: { directory: "xlr/architecture" },
+                },
+                {
                   label: "Usage",
                   autogenerate: { directory: "xlr/usage" },
                 },
