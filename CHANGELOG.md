@@ -1,3 +1,81 @@
+# 1.1.0 (Thu Aug 06 2026)
+
+### Release Notes
+
+#### Add Docs around A2UI usage ([#910](https://github.com/player-ui/player/pull/910))
+
+Add basic docs around how to use A2UI with Player
+
+#### Misc A2UI Fixes ([#909](https://github.com/player-ui/player/pull/909))
+
+Fix schema validations not firing (e.g when `required`/`regex`/`length`/`numeric`/`email` functions as Player validations)
+
+#### Remove js-benchmarking from forked PR jobs ([#917](https://github.com/player-ui/player/pull/917))
+
+Removes `js-benchmarking` job from forked PRs (they will never pass because forks don't have the require secrets).
+
+#### No ios lint on main ([#915](https://github.com/player-ui/player/pull/915))
+
+Wraps the CircleCI Lint step in a conditional block to run only when the pipeline is running on a non-main branch.
+
+#### Start Adding Architecture Diagrams ([#902](https://github.com/player-ui/player/pull/902))
+
+Add architecture diagrams to doc site for data change and render flows in player core. Raw mermaid files are available in docs/site/src/mermaid.
+
+#### Input Agnostic Player and Native A2UI Support ([#866](https://github.com/player-ui/player/pull/866))
+
+TBD
+
+#### Stop Leaking Invalid Data After Forced Transition ([#904](https://github.com/player-ui/player/pull/904))
+
+Stop invalid data from leaking into model with unrelated data sets after a forced navigation.
+
+#### Update Android/iOS Managed Players to include `onStartedFlow` callback ([#896](https://github.com/player-ui/player/pull/896))
+
+Brings the React Managed Player's onStartedFlow callback (added in #881) to iOS and Android. Consumers can now be notified when the managed player starts a flow, and receive the flow that was used to start it — without having to track it themselves. For performance, the callback hands back the in-memory flow String that was passed in, rather than reading it back out of Player (which would force a deserialization across the JS bridge).
+
+---
+
+#### 🚀 Enhancement
+
+- Input Agnostic Player and Native A2UI Support [#866](https://github.com/player-ui/player/pull/866) ([@KetanReddy](https://github.com/KetanReddy))
+- Update Android/iOS Managed Players to include `onStartedFlow` callback [#896](https://github.com/player-ui/player/pull/896) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Release main [#930](https://github.com/player-ui/player/pull/930) ([@intuit-svc](https://github.com/intuit-svc))
+- Do not discard `undefined` matches when dedupeing [#926](https://github.com/player-ui/player/pull/926) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Bump rules_player to 2.6.7, regenerate Android ABI goldens [#927](https://github.com/player-ui/player/pull/927) ([@sugarmanz](https://github.com/sugarmanz))
+- fix(async-node): preserve streamed async updates over stale hook results [#922](https://github.com/player-ui/player/pull/922) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- fix A2UI packages in storybook [#921](https://github.com/player-ui/player/pull/921) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix retain cycle and redundant task in managed player view model.next().clean [#919](https://github.com/player-ui/player/pull/919) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Update mock paths to fix flakey android build Null Pointer Exception [#911](https://github.com/player-ui/player/pull/911) ([@KetanReddy](https://github.com/KetanReddy))
+- Add Docs around A2UI usage [#910](https://github.com/player-ui/player/pull/910) ([@KetanReddy](https://github.com/KetanReddy))
+- Misc A2UI Fixes [#909](https://github.com/player-ui/player/pull/909) ([@KetanReddy](https://github.com/KetanReddy))
+- Remove js-benchmarking from forked PR jobs [#917](https://github.com/player-ui/player/pull/917) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- No ios lint on main [#915](https://github.com/player-ui/player/pull/915) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- Start Adding Architecture Diagrams [#902](https://github.com/player-ui/player/pull/902) ([@KetanReddy](https://github.com/KetanReddy))
+- Use `rules_player`  2.6.6 [#906](https://github.com/player-ui/player/pull/906) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Run ios release after auto release [#900](https://github.com/player-ui/player/pull/900) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Core Plugins HBC Precompilation [#899](https://github.com/player-ui/player/pull/899) ([@brocollie08](https://github.com/brocollie08))
+- Stop Leaking Invalid Data After Forced Transition [#904](https://github.com/player-ui/player/pull/904) ([@KetanReddy](https://github.com/KetanReddy))
+- Automatically lint swift files in CI/CD, format on pre-commit [#854](https://github.com/player-ui/player/pull/854) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Log cold start time [#890](https://github.com/player-ui/player/pull/890) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Use `pnpm` with `husky` not `yarn` [#901](https://github.com/player-ui/player/pull/901) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Use `rules_player` 2.6.2 to get ios release notes [#898](https://github.com/player-ui/player/pull/898) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 7
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Angela Villadiego ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.1.0-next.5 (Mon Jul 20 2026)
 
 #### 🐛 Bug Fix
