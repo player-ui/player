@@ -1,0 +1,47 @@
+# Devtools
+
+## Introduction
+It is essential to have developer tool extensions to ensure efficient debugging and inspection of the Player while it runs in the user's application. To make this possible, we have decided to utilize the Player's content and plugin system instead of defining a limited set of features. This approach enables users to represent their specific requirements and utilize the Player to its full potential.
+
+## Devtools Architecture
+The Devtools extension utilizes an instance of Player to take advantage of its plugin system. Plugin authors can choose which hooks to use, what information to collect, and how to interact with it.
+
+The extension and the inspected instance of Player communicate through a Messenger class that is injected into the content script. The Messenger class is an efficient, agnostic, and self-sufficient layer that enables seamless communication between instances. You can find more information about the Devtools Messenger here: https://github.com/player-ui/tools/blob/3ca98bdc70c76e290084b75c5b8f26ebb35b0dd0/devtools/messenger/README.md.
+
+The @player-tools/devtools-client package provides a ReactPlayer panel that displays the content sent by the Player dev tool plugins on the inspected Player UI instance and the navigation bar. This allows users to create plugins according to their specific needs, rather than being restricted to a pre-defined set of features. Additionally, they can combine plugins and use different sets for each Player instance. This browser extension provides users with a high degree of flexibility and customization.
+
+## Usage
+To install the dev tool extension, go to the Chrome or Firefox store and download it. After that, register the dev tool plugins into the Player instance by following the same procedure as any other plugin. You can find more information about this in the Player configuration docs.
+
+Please note that dev tools plugins can affect your application's performance. Therefore, we recommend that you only register them when working in development environments. In case you accidentally register a plugin, the browser extension has a checkbox that you can use to enable or disable it. This is an effective way to avoid running plugins unnecessarily or forcing them on production environments.
+
+```javascript
+const testingPlugins: ReactPlayerOptions["plugins"] = [
+  new BasicWevDevtoolsPlugin() as unknown as ReactPlayerPlugin,
+];
+
+const config: ReactPlayerOptions = {
+  plugins: [
+    new ReferenceAssetsPlugin() as unknown as ReactPlayerPlugin,
+    ...testingPlugins,
+  ],
+};
+```
+
+
+## Devtools Basic Plugin
+We offer a basic devtools plugin at devtools/plugins/desktop/basic. This plugin includes features that we expect from a dev tools extension and can serve as an example for creating your own.
+
+
+## Devtools Assets
+You have the freedom to generate any content for your plugin, leveraging all the hooks that Player exposes. However, if you wish to use the Player's dev tool extension, you must use the devtools-assets as assets plugin. On the other hand, if you plan to maintain your extension, you are free to use any assets plugin.
+
+
+## How To Write Your Own Devtools Plugins
+We're currently working on a template for bootstraping you dev tools plugins. Meanwhile, you can use the (basic devtools plugin)[devtools/plugins/desktop/basic] and test it locally using the (test-env)[devtools/plugins/desktop/basic].
+
+
+## Extension Downloads
+[Google Chrome](https://chromewebstore.google.com/detail/player-ui-devtools/oookcmbndmalnmacldppblmblakggabo)
+
+Firefox | Coming soon
