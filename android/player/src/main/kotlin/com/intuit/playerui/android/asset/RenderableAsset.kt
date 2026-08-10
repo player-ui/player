@@ -418,7 +418,10 @@ public abstract class RenderableAsset<Data>(
          * can fire. Idempotent — duplicate registration is a no-op.
          */
         public fun preTrackChild(child: RenderableAsset<*>) {
-            synchronized(this) { pending.add(child.assetContext.id) }
+            synchronized(this) {
+                pending.add(child.assetContext.id)
+                println("+++ $pending after adding ${child.assetContext.id}")
+            }
         }
 
         public fun trackHydration(asset: RenderableAsset<*>) {
@@ -426,6 +429,7 @@ public abstract class RenderableAsset<Data>(
             synchronized(this) {
                 fireStarted = pending.isEmpty()
                 pending.add(asset.assetContext.id)
+                println("+++ $pending after adding ${asset.assetContext.id}")
             }
             if (fireStarted) hooks.onHydrationStarted.call()
         }
@@ -437,12 +441,16 @@ public abstract class RenderableAsset<Data>(
                 // we want composable to be responsible for finishing its own render tracking
                 fireComplete = if (completedComposable || asset !is ComposableAsset<*>) {
                     val removed = pending.remove(asset.assetContext.id)
+                    println("+++ $pending after removing ${asset.assetContext.id}")
                     removed && pending.isEmpty()
                 } else {
                     false
                 }
             }
-            if (fireComplete) hooks.onHydrationComplete.call()
+            if (fireComplete) {
+                println("+++ completed")
+                hooks.onHydrationComplete.call()
+            }
         }
 
         override fun apply(androidPlayer: AndroidPlayer) {
