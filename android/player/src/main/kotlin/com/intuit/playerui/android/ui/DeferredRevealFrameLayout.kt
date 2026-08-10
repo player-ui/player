@@ -21,11 +21,10 @@ import android.widget.FrameLayout
  * cheap: it never re-posts view-root traversals, so holding it across many frames doesn't spin the
  * main thread, and it doesn't depend on OS-version-specific pre-draw-cancel behavior.
  */
-public class DeferredRevealFrameLayout @JvmOverloads constructor(
+public class DeferredRevealFrameLayout(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs) {
     public var ready: Boolean = true
         set(value) {
             if (field == value) return
