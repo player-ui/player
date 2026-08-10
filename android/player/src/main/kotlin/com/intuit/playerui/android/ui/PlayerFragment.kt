@@ -93,6 +93,22 @@ public abstract class PlayerFragment :
 
     private var renderingJob: Job? = null
 
+    /**
+     * The player canvas as a [DeferredRevealFrameLayout] (its actual type from `player_fragment.xml`).
+     * View binding types the field as its base `FrameLayout`, so cast here to reach [ready].
+     */
+    private val playerCanvas: DeferredRevealFrameLayout get() = binding.playerCanvas as DeferredRevealFrameLayout
+
+    /**
+     * Whether the canvas currently shows a rendered asset tree. Used to suppress paint only on the
+     * FIRST asset render into an empty/non-asset canvas (loading, error, done, or nothing) — there
+     * is nothing on screen to blank, so gating paint until hydration completes just avoids the
+     * initial one-by-one pop-in. On an asset→asset update the canvas already holds the (mostly
+     * cached) tree, which stays painted while changed subtrees swap in place, so suppressing would
+     * blank correct content and flicker. Reset whenever a non-asset state paints.
+     */
+    private var canvasShowingAsset: Boolean = false
+
     init {
         lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
@@ -119,6 +135,14 @@ public abstract class PlayerFragment :
 
                 // update UI for latest state
                 playerViewModel.state.collectLatest {
+                    // Non-asset states paint immediately — clear any paint suppression left by an
+                    // asset render that was superseded before it finished hydrating (which would
+                    // otherwise leave this loading/error/done view invisible), and mark that the
+                    // canvas no longer shows an asset tree so the next asset render suppresses.
+                    if (it !is Running) {
+                        playerCanvas.ready = true
+                        canvasShowingAsset = false
+                    }
                     when (it) {
                         NotStarted, Pending -> buildLoadingView() into binding.playerCanvas
                         is Running -> try {
@@ -180,9 +204,30 @@ public abstract class PlayerFragment :
                 child.transitionInto(binding.playerCanvas, transition)
             }
             asset?.run { renderInto(offscreen, context) }
+        } else if (asset != null) {
+            // Suppress paint only on the FIRST asset render into an empty/non-asset canvas: there is
+            // nothing on screen to blank, so gating paint until hydration completes avoids the
+            // initial one-by-one pop-in. On an asset→asset update the canvas already holds the
+            // (mostly cached) tree — unchanged children stay painted and changed subtrees swap in
+            // place — so suppressing would blank correct content and flicker. playerCanvas is a
+            // window-attached DeferredRevealFrameLayout, so nested ComposeViews still compose while
+            // paint is suppressed (a detached/offscreen container would never let them finish).
+            val canvas = playerCanvas
+            val hook = tracker?.hooks?.onHydrationComplete
+            if (hook != null && !canvasShowingAsset) {
+                canvas.ready = false
+                var tapId: String? = null
+                tapId = hook.tap("renderIntoPlayerCanvas-reveal") {
+                    // SyncHook taps are never auto-removed; untap so a later update's drain can't
+                    // re-fire this. Marshal to Main — the hook fires inline on an arbitrary dispatcher.
+                    tapId?.let(hook::untap)
+                    canvas.post { canvas.ready = true }
+                }
+            }
+            canvasShowingAsset = true
+            asset.run { renderInto(canvas, context) }
         } else {
-            asset?.run { renderInto(binding.playerCanvas, context) }
-                ?: run { null into binding.playerCanvas }
+            null into binding.playerCanvas
         }
     }
 
