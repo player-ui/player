@@ -71,6 +71,15 @@ public class MetricsPlugin(
                 ),
             )
 
+        public val onUpdateEnd: NodeSyncHook3<Timing, RenderMetrics, PlayerFlowMetrics>
+            by NodeSerializableField(
+                NodeSyncHook3.serializer(
+                    Timing.serializer(),
+                    RenderMetrics.serializer(),
+                    PlayerFlowMetrics.serializer(),
+                ),
+            )
+
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)
     }
 

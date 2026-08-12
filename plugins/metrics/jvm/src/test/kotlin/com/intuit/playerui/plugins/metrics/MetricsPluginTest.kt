@@ -115,20 +115,26 @@ internal class MetricsPluginTest : PlayerTest() {
     @OptIn(ExperimentalContracts::class)
     @TestTemplate
     fun `tracks view update times`() = runBlockingTest {
+        var onUpdateEndTapped = false
         var renderMetricsVal: RenderMetrics? = null
         plugin?.hooks?.onRenderEnd?.tap("test") { _, renderMetrics, _ ->
             renderMetricsVal = renderMetrics
+        }
+        plugin?.hooks?.onUpdateEnd?.tap("test") { _, _, _ ->
+            onUpdateEndTapped = true
         }
 
         player.start(counterFlowString)
         plugin?.renderEnd() // first paint
         assertNotNull(renderMetricsVal)
         assertTrue(renderMetricsVal!!.updates.isEmpty())
+        assertFalse(onUpdateEndTapped)
 
         // Change the bound value on the SAME view (no navigation) to drive an update
         player.inProgressState!!.evaluate(listOf("{{count}} = {{count}} + 1"))
         plugin?.renderEnd() // close the update timing
 
+        assertTrue(onUpdateEndTapped)
         assertEquals(1, renderMetricsVal!!.updates.size)
     }
 }

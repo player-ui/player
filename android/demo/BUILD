@@ -7,6 +7,7 @@ load("//android:defs.bzl", "kt_android")
 main_deps = [
     "//jvm/hermes:hermes-android",
     "//jvm/utils",
+    "//plugins/metrics/jvm",
     "//plugins/reference-assets/android",
     "//plugins/a2ui/android:a2ui-android",
     "//plugins/a2ui/mocks:jar",
