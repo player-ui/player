@@ -304,6 +304,7 @@ public abstract class RenderableAsset<Data>(
         children: List<RenderableAsset<*>?>,
         container: ViewGroup,
         @StyleRes vararg styles: Style?,
+        viewApply: ((View) -> Unit)? = null,
         order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
     ) {
         launch {
@@ -311,7 +312,7 @@ public abstract class RenderableAsset<Data>(
                 child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
             }
             built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(it) } }
-            val views = built.map { asset -> asset?.let { async { it.render() } } }.map { it?.await() }
+            val views = built.map { asset -> asset?.let { async { it.render() } } }.map { deferredView -> deferredView?.await()?.also { viewApply?.invoke(it) } }
             withContext(Dispatchers.Main) { views into container }
         }
     }
