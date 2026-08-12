@@ -82,6 +82,7 @@ public final class com/intuit/playerui/plugins/metrics/MetricsPlugin$Hooks : com
 	public final fun getOnFlowBegin ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public final fun getOnFlowEnd ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook1;
 	public final fun getOnRenderEnd ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook3;
+	public final fun getOnUpdateEnd ()Lcom/intuit/playerui/core/bridge/hooks/NodeSyncHook3;
 }
 
 public final class com/intuit/playerui/plugins/metrics/MetricsPlugin$Hooks$Companion {

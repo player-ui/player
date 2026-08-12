@@ -18,18 +18,20 @@ class PlayerFragmentMetricsTest : ComposeUITest() {
     fun rendersEndFiresOnViewTransition() {
         launchMock("long-multi-view")
 
-        waitForViewInRoot(withSubstring("It was the best of times")).check(matches(isDisplayed()))
-
-        var renderEndCount = 0
+        var onRenderEndTapped = false
         player.metricsPlugin?.hooks?.onRenderEnd?.tap("test") { _, _, _ ->
-            renderEndCount++
+            onRenderEndTapped = true
         }
 
+        waitForViewInRoot(withSubstring("It was the best of times")).check(matches(isDisplayed()))
+        assertTrue(onRenderEndTapped)
+
+        onRenderEndTapped = false
         androidComposeRule.onNodeWithTag("action").performClick()
         waitForViewInRoot(withText("Can you see me?"))
             .check(matches(isDisplayed()))
 
-        assertTrue("renderEnd should fire when transitioning to the next view", renderEndCount >= 1)
+        assertTrue(onRenderEndTapped)
     }
 
     @Test
