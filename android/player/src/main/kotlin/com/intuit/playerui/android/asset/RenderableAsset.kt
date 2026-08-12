@@ -312,7 +312,11 @@ public abstract class RenderableAsset<Data>(
                 child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
             }
             built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(it) } }
-            val views = built.map { asset -> asset?.let { async { it.render() } } }.map { deferredView -> deferredView?.await()?.also { viewApply?.invoke(it) } }
+            val views = built
+                .map { asset -> asset?.let { async { it.render() } } }
+                .map { deferredView ->
+                    deferredView?.await()?.also { view -> viewApply?.invoke(view) }
+                }
             withContext(Dispatchers.Main) { views into container }
         }
     }
