@@ -133,9 +133,11 @@ capitalize(getFavoriteColor())
 
 This also works with expression templates.
 
+For how bindings are parsed and resolved at runtime, see [BindingParser](/architecture/systems/binding-parser).
+
 ## Expressions
 
-Expressions are callable functions that allow for dynamic behavior of Player and it's views.
+Expressions are callable functions that allow for dynamic behavior of Player and it's views. For the runtime engine that parses and evaluates them, see [ExpressionEvaluator](/architecture/systems/expression-evaluator).
 
 These functions can be used in `ACTION`/`ASYNC_ACTION` nodes in the navigation section, calculated values in a property of an asset, or anywhere else expressions are valid.
 

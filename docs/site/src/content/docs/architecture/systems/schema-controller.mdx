@@ -1,0 +1,45 @@
+---
+title: "SchemaController"
+description: "The central hub for data types, formatters, and validation metadata derived from a Flow's authored schema."
+---
+
+*The Schema is the central hub for all data invariants, and metaData associated with the data-model itself. Outside of the types defined in the JSON payload, it doesn't manage or keep any state. It simply serves as an orchestrator for other modules to interface w/ the schema.*
+
+Despite that role, `SchemaController` lives in `schema/`, not `controllers/` — a naming quirk worth calling out, since it plays the same per-flow orchestrator role as `DataController`, `ValidationController`, and friends.
+
+## Key Files
+
+- `core/player/src/schema/schema.ts` — `SchemaController` class and the `parse()` function that expands an authored schema
+- `core/player/src/schema/types.ts` — `FormatDefinition`, `FormatOptions`, `FormatType`
+
+## Construction
+
+```ts
+constructor(schema?: SchemaType.Schema)
+```
+
+`SchemaController` is constructed once per `player.start(flow)` call from `userFlow.schema`, before the `DataController` or `ValidationController` (both of which depend on it). See [Start to Render](/architecture/diagrams/start-to-render) for exactly where it's wired up. Player calls `this.hooks.schema.call(schema)` right after construction so plugins can register data types and formatters via `addDataTypes`/`addFormatters`.
+
+## Expanding the Schema
+
+The authored `schema` block is a graph of named nodes (`ROOT` plus any referenced types). The module-level `parse()` function walks that graph breadth-first and flattens it into a `Map<string, DataType>` keyed by dotted path (arrays get a trailing `[]` segment, records get `{}`) — this becomes `schema.schema`, the controller's read-only lookup table. It throws if it detects a cycle, since a self-referencing schema would recurse forever.
+
+## Binding Lookups
+
+- **`getType(binding)`** — normalizes a `BindingInstance` (numeric array indices become `[]`, matching how `parse()` recorded them) and looks up the flattened map, then runs the result through the `resolveTypeForBinding` hook.
+- **`getApparentType(binding)`** — calls `getType`, then merges in the base type definition registered via `addDataTypes` (if the schema type references one via `type`), concatenating `validation` arrays from both. This is the "effective" type authors think of when they add `validation`, `format`, or `default`.
+- **`getValidationsForBinding(binding)`** — reads `getApparentType(binding)?.validation`, filling in defaults (`severity: "error"`, `trigger: "change"`) for any validation reference that omits them. This is the method that makes `SchemaController` implement the `ValidationProvider` interface that [ValidationController](/architecture/systems/validation-controller) consumes as one of its two validation sources (schema-level, alongside cross-field/view validations).
+- **`getFormatter(binding)`** — resolves the apparent type's `format` reference against the formatters registered via `addFormatters`, returning `{ format, deformat }` functions (or `undefined` if none is registered). [DataController](/architecture/systems/data-controller) calls this from its `format`/`deformat` hook taps.
+
+## Hooks / Extension Points
+
+| Hook | Type | Gives you | Use it when… |
+| --- | --- | --- | --- |
+| `resolveTypeForBinding` | `SyncWaterfallHook<[SchemaType.DataTypes \| undefined, BindingInstance]>` | The schema type looked up for a binding (possibly `undefined`), plus the binding itself | You want to override or synthesize a type for bindings that aren't explicitly in the authored schema |
+
+## Relationship to Other Subsystems
+
+- [Schema (content reference)](/content/schema) and [Schema (authoring guide)](/authoring/schema) cover what you *author* in the `schema` block; this page covers what runs it at runtime
+- [Data Formatting and Deformatting](/guides/formatting) — the guide for the formatter references `getFormatter` resolves
+- [ValidationController](/architecture/systems/validation-controller) — consumes `SchemaController` as a `ValidationProvider` for schema-level validations
+- [DataController](/architecture/systems/data-controller) — uses `SchemaController`'s formatters for its `format`/`deformat` hooks and its `default` values for `resolveDefaultValue`
