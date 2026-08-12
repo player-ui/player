@@ -6,6 +6,10 @@ import { PackageManagers } from 'starlight-package-managers';
 
 The [Player Language Service (LSP)](../../capabilities/lsp) provides a powerful validation system that can be extended with custom validation rules. This guide will walk you through creating custom validation plugins to enforce project-specific rules and best practices in your Player content.
 
+:::note[A different system from runtime validation]
+LSP validation runs statically over authored content in an editor/build context. It's a separate system from the [ValidationController](/architecture/systems/validation-controller), which validates live user data against schema and cross-field rules at runtime while a flow is executing.
+:::
+
 ## Understanding the Validation Hook
 
 The LSP exposes a `validate` hook that runs during document validation. This hook provides access to:

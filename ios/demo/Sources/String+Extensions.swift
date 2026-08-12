@@ -7,7 +7,10 @@
 
 import Foundation
 
-/// mocks for managed player flows
+/// mocks for managed player flows. Generally, we should not store flows in Swift files---instead
+/// put them in appropriate shared mock folders. HOWEVER these flows are used directly in a
+/// way that would make that annoying, so these were left here when ios migrated to using the
+/// same shared mocks as everybody else.
 extension String {
     static let externalStateFlow = """
     {
@@ -362,6 +365,65 @@ extension String {
                           }
                         }
         """
+
+    static let endStateReproFlow: String = """
+    {
+      "id": "end-state-repro-flow-1",
+      "views": [
+        {
+          "id": "view-1",
+          "type": "collection",
+          "label": {
+            "asset": {
+              "id": "title",
+              "type": "text",
+              "value": "Flow 1 - Click End to complete this flow"
+            }
+          },
+          "values": [
+            {
+              "asset": {
+                "id": "action-end",
+                "type": "action",
+                "value": "End",
+                "label": {
+                  "asset": {
+                    "id": "action-end-label",
+                    "type": "text",
+                    "value": "End Flow 1 (loads Flow 2 next)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "ACTION_1",
+          "ACTION_1": {
+            "state_type": "ACTION",
+            "exp": "{{foo}} = 1",
+            "transitions": {
+              "*": "VIEW_1"
+            }
+          },
+          "VIEW_1": {
+            "state_type": "VIEW",
+            "ref": "view-1",
+            "transitions": {
+              "End": "END_Done"
+            }
+          },
+          "END_Done": {
+            "state_type": "END",
+            "outcome": "done"
+          }
+        }
+      }
+    }
+    """
 
     static let secondFlowAction: String =
         """

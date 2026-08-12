@@ -34,7 +34,7 @@ public struct PluginsAndPlayerCollection: View {
             Section {
                 NavigationLink("Reuse already loaded flow") {
                     FlowManagerView(
-                        flowSequence: [MockFlows.endStateReproFlow, MockFlows.endStateReproFlow],
+                        flowSequence: [.endStateReproFlow, .endStateReproFlow],
                         navTitle: "Reuse already loaded flow"
                     )
                     .padding(padding)

@@ -50,8 +50,24 @@ const sdk = new XLRSDK();
 sdk.loadDefinitionsFromModule(require("@player-ui/reference-assets-plugin").path);
 ```
 
-- If you want to filter any of the types that are being loaded, you can supply a `Filters` object as the *second* arguments
-- If you want to apply any transform functions to the modules that you load, you can supply a list of `TransformFunction` as the *third* argument
+Both functions also accept an optional `Filters` object (second argument) and a list of `TransformFunction`s (third argument), covered below.
+
+### Filtering
+
+Both loading functions accept a `Filters` object as their second argument to exclude plugins/capabilities/types you don't want loaded:
+
+```typescript
+const sdk = new XLRSDK();
+sdk.loadDefinitionsFromDisk('./common/static_xlrs/core', {
+  typeFilter: /^Internal/,
+});
+```
+
+See [Filters](../../concepts#filters) for the full shape, and importantly, the caution about how matches are treated as exclusions rather than selections.
+
+### Registering Persistent Transforms
+
+Beyond passing one-off transforms to a single load call, `addTransformFunction(name, fn)` registers a transform that runs on every future load until removed with `removeTransformFunction(name)`. See [Transform Functions](../../concepts#transform-functions) for the mechanism and an example.
 
 ## Usage
 
@@ -70,9 +86,37 @@ if(sdk.hasType("InputAsset")){
 }
 ```
 
+`getType` also accepts a second `options` argument:
+
+```typescript
+interface GetTypeOptions {
+  getRawType?: boolean;
+  optimize?: boolean;
+}
+```
+
+- `getRawType: true` returns the type exactly as it was registered, with `extends` left unresolved.
+- Otherwise, `extends` chains are always merged into the type before it's returned.
+- `optimize` additionally resolves conditional types, computes the effective type of unions/intersections, resolves `ref` nodes, and fills in remaining generics with their defaults.
+
+:::caution
+Omitting `options` entirely is **not** the same as passing `{}`. Because of a default parameter internal to the SDK, calling `getType(id)` with no options behaves the same as `getType(id, {optimize: true})`, returning the fully resolved type. If you only want `extends` merged and nothing else, you have to explicitly pass `{optimize: false}`.
+:::
+
+### Listing & Inspecting Types
+
+`listTypes(filters?)` returns every currently-loaded type (optionally narrowed with a [`Filters`](../../concepts#filters) object), and `getTypeInfo(id)` returns where a given type came from:
+
+```typescript
+const sdk = new XLRSDK();
+sdk.listTypes({ capabilityFilter: /Internal/ }); // every loaded type except the Internal capability
+
+sdk.getTypeInfo("InputAsset"); // { plugin: "...", capability: "Assets" } | undefined
+```
+
 ### Type Validation
 
-To validate if some JSON content matches the expected type, you can use the `validateType` function. You will need to supply a `Node` from the `jsonc-parser` library. 
+To validate if some JSON content matches the expected type, you can use the `validateByName` function. You will need to supply a `Node` from the `jsonc-parser` library. 
 
 ```typescript
 import { parseTree } from 'jsonc-parser';
@@ -92,7 +136,10 @@ const mockAsset = parseTree(`
           "value": "{{input.label}}"
         }
       }
+    }
     `);
 
-return sdk.validate('InputAsset', mockAsset)
+return sdk.validateByName('InputAsset', mockAsset)
 ```
+
+If you already have a `NodeType` in hand rather than a registered type name, for example one produced by a transform, use the sibling `validateByType(type, rootNode)` instead.

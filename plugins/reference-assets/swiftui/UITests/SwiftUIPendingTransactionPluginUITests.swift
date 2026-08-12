@@ -39,6 +39,6 @@ class SwiftUIPendingTransactionPluginUITests: BaseTestCase {
     }
 
     override func navigateToAssetCollection() {
-        app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
+        app.otherElements.buttons["Plugin Demos"].firstMatch.tap()
     }
 }
