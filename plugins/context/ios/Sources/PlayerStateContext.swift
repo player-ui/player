@@ -1,8 +1,8 @@
 import Foundation
 
 #if SWIFT_PACKAGE
-import PlayerUI
-import PlayerUISwiftUI
+    import PlayerUI
+    import PlayerUISwiftUI
 #endif
 
 /// Typed view of the aggregated `player.state` context entry. Read it with
