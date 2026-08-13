@@ -1,11 +1,11 @@
 import Foundation
-import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+@testable import PlayerUIContextPlugin
+@testable import PlayerUIInternalTestUtilities
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilitiesCore
-@testable import PlayerUIInternalTestUtilities
-@testable import PlayerUIContextPlugin
+import XCTest
 
 class ContextPluginTests: XCTestCase {
     func testSetAndGetRoundTrip() {
@@ -37,7 +37,7 @@ class ContextPluginTests: XCTestCase {
         let expectation = XCTestExpectation(description: "subscriber called")
         _ = plugin.subscribe(name: "counter", description: "A counter") { value, name in
             XCTAssertEqual(name, "counter")
-            if case .string(let s) = value {
+            if case let .string(s) = value {
                 XCTAssertEqual(s, "tick")
                 expectation.fulfill()
             } else {
@@ -101,7 +101,7 @@ class ContextPluginTests: XCTestCase {
         let token = plugin.subscribe(name: "k", description: "K", handler: { _, _ in
             callCount += 1
         })
-        guard let token = token else { return XCTFail("expected a subscription token") }
+        guard let token else { return XCTFail("expected a subscription token") }
 
         plugin.set(name: "k", description: "K", value: .string(data: "one"))
         plugin.unsubscribe(token: token)
@@ -142,7 +142,8 @@ class ContextPluginTests: XCTestCase {
         XCTAssertTrue(state.validation.byBinding.isEmpty)
 
         // Actions are scoped to their constructs and bridged as callables.
-        guard let transition = state.flow.transition else { return XCTFail("expected a flow.transition action") }
+        guard let transition = state.flow.transition
+        else { return XCTFail("expected a flow.transition action") }
         guard let set = state.data.set else { return XCTFail("expected a data.set action") }
 
         // The scoped data.set action drives the real data model; reading the
@@ -176,7 +177,7 @@ class ContextPluginTests: XCTestCase {
 
         plugin.set(name: "flag", description: "A flag", value: .bool(data: true))
 
-        let descriptions = plugin.list().map { $0.description }
+        let descriptions = plugin.list().map(\.description)
         XCTAssertTrue(descriptions.contains("A flag"))
         guard let flag = plugin.list().first(where: { $0.description == "A flag" }) else {
             return XCTFail("expected the flag descriptor")
@@ -190,7 +191,9 @@ class ContextPluginTests: XCTestCase {
 
         let populated = XCTestExpectation(description: "player.state has actions")
         _ = context.subscribe(name: "player.state", description: "state") { _, _ in
-            if context.get(name: "player.state", as: PlayerStateContext.self)?.flow.transition != nil {
+            if context.get(name: "player.state", as: PlayerStateContext.self)?
+                .flow
+                .transition != nil {
                 populated.fulfill()
             }
         }
@@ -221,7 +224,9 @@ class ContextPluginTests: XCTestCase {
 
         let populated = XCTestExpectation(description: "player.state has actions")
         _ = context.subscribe(name: "player.state", description: "state") { _, _ in
-            if context.get(name: "player.state", as: PlayerStateContext.self)?.flow.transition != nil {
+            if context.get(name: "player.state", as: PlayerStateContext.self)?
+                .flow
+                .transition != nil {
                 populated.fulfill()
             }
         }
@@ -235,11 +240,13 @@ class ContextPluginTests: XCTestCase {
 
         // The frozen player.state retains its scoped actions, but they are
         // tombstoned — present yet poisoned: invoking one raises a JS error.
-        guard let frozen = context.history().last?
+        guard let frozen = context.history()
+            .last?
             .get(name: "player.state", as: PlayerStateContext.self) else {
             return XCTFail("expected a frozen PlayerStateContext")
         }
-        guard let transition = frozen.flow.transition, let jsContext = transition.rawValue?.context else {
+        guard let transition = frozen.flow.transition,
+              let jsContext = transition.rawValue?.context else {
             return XCTFail("expected a tombstoned transition action")
         }
 

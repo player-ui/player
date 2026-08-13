@@ -2,7 +2,7 @@ import Foundation
 import JavaScriptCore
 
 #if SWIFT_PACKAGE
-import PlayerUI
+    import PlayerUI
 #endif
 
 /// A frozen snapshot of the context store captured when a flow ends.
@@ -29,12 +29,12 @@ public struct FrozenContextSnapshot {
               let entriesValue = snapshot.objectForKeyedSubscript("entries"),
               let entriesArray = entriesValue.toArray() else { return nil }
 
-        self.flowId = snapshot.objectForKeyedSubscript("flowId")?.toString()
-        self.endedAt = snapshot.objectForKeyedSubscript("endedAt")?.toDouble() ?? 0
+        flowId = snapshot.objectForKeyedSubscript("flowId")?.toString()
+        endedAt = snapshot.objectForKeyedSubscript("endedAt")?.toDouble() ?? 0
 
-        var entries: [FrozenContextEntry] = []
-        var values: [String: JSValue] = [:]
-        for index in 0..<entriesArray.count {
+        var entries = [FrozenContextEntry]()
+        var values = [String: JSValue]()
+        for index in 0 ..< entriesArray.count {
             guard let entry = entriesValue.objectAtIndexedSubscript(index) else { continue }
             let name = entry.objectForKeyedSubscript("name")?.toString()
             let description = entry.objectForKeyedSubscript("description")?.toString() ?? ""
@@ -44,20 +44,20 @@ public struct FrozenContextSnapshot {
             }
         }
         self.entries = entries
-        self.entryValues = values
+        entryValues = values
     }
 
     /// Read a frozen entry by `name`, decoded into a `Decodable` type `T` — the
     /// same typed access as live context. Returns nil if the entry was absent
     /// when the snapshot froze or fails to decode.
-    public func get<T: Decodable>(name: String, as type: T.Type = T.self) -> T? {
+    public func get<T: Decodable>(name: String, as _: T.Type = T.self) -> T? {
         guard let value = entryValues[name],
               let object = value.toObject(),
               // `fragmentsAllowed` so primitive entries (a bare string or
               // number) serialize too — they are not valid top-level JSON.
               let data = try? JSONSerialization.data(
-                withJSONObject: object,
-                options: [.fragmentsAllowed]
+                  withJSONObject: object,
+                  options: [.fragmentsAllowed]
               ) else { return nil }
         // Mirrors `ContextPlugin.get(name:as:)`: `T` may carry `AnyType`
         // members, which require an AnyTypeDecodingContext to decode.
