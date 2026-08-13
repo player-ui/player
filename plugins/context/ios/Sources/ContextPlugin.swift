@@ -2,13 +2,11 @@ import Foundation
 import JavaScriptCore
 
 #if SWIFT_PACKAGE
-import PlayerUI
+    import PlayerUI
 #endif
 
-/**
- A plugin that maintains a per-flow store of context entries keyed by string
- name and exposes a subscribe/get/set API for native consumers.
- */
+/// A plugin that maintains a per-flow store of context entries keyed by string
+/// name and exposes a subscribe/get/set API for native consumers.
 public class ContextPlugin: JSBasePlugin, NativePlugin {
     public convenience init() {
         self.init(fileName: "ContextPlugin.native", pluginName: "ContextPlugin.ContextPlugin")
@@ -16,14 +14,14 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
 
     override open func getUrlForFile(fileName: String) -> URL? {
         #if SWIFT_PACKAGE
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+            ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: ContextPlugin.self),
-            pathComponent: "PlayerUI_ContextPlugin.bundle"
-        )
+            ResourceUtilities.urlForFile(
+                name: fileName,
+                ext: "js",
+                bundle: Bundle(for: ContextPlugin.self),
+                pathComponent: "PlayerUI_ContextPlugin.bundle"
+            )
         #endif
     }
 
@@ -38,14 +36,16 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// Read the current value for the entry identified by `name`, or nil if unset.
     public func get(name: String) -> AnyType? {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("getByName", withArguments: [name]) else { return nil }
+              let result = pluginRef.invokeMethod("getByName", withArguments: [name])
+        else { return nil }
         return decode(result)
     }
 
     /// Returns true if the entry identified by `name` has a value or transform.
     public func has(name: String) -> Bool {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("hasByName", withArguments: [name]) else { return false }
+              let result = pluginRef.invokeMethod("hasByName", withArguments: [name])
+        else { return false }
         return result.toBool()
     }
 
@@ -63,7 +63,10 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
             handler(self?.decode(value), name)
         }
         let jsCallback = JSValue(object: callback, in: pluginRef.context) as Any
-        let token = pluginRef.invokeMethod("subscribeByName", withArguments: [name, description, jsCallback])
+        let token = pluginRef.invokeMethod(
+            "subscribeByName",
+            withArguments: [name, description, jsCallback]
+        )
         return token?.toString()
     }
 
@@ -74,9 +77,10 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         handler: @escaping (AnyType?, String?, String) -> Void
     ) -> String? {
         guard let pluginRef else { return nil }
-        let callback: @convention(block) (JSValue?, JSValue?, JSValue?) -> Void = { [weak self] value, name, description in
-            handler(self?.decode(value), name?.toString(), description?.toString() ?? "")
-        }
+        let callback: @convention(block) (JSValue?, JSValue?, JSValue?)
+            -> Void = { [weak self] value, name, description in
+                handler(self?.decode(value), name?.toString(), description?.toString() ?? "")
+            }
         let jsCallback = JSValue(object: callback, in: pluginRef.context) as Any
         let token = pluginRef.invokeMethod("subscribeAllByName", withArguments: [jsCallback])
         return token?.toString()
@@ -92,7 +96,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// `WrappedFunction` members for function-valued fields, so a caller does
     /// `get(name:)?.flow.transition?("Next")`. Returns nil if the entry is
     /// unset or fails to decode.
-    public func get<T: Decodable>(name: String, as type: T.Type = T.self) -> T? {
+    public func get<T: Decodable>(name: String, as _: T.Type = T.self) -> T? {
         guard let pluginRef,
               let result = pluginRef.invokeMethod("getByName", withArguments: [name]),
               !result.isUndefined, !result.isNull else { return nil }
@@ -104,8 +108,8 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
               // `fragmentsAllowed` so primitive entries (a bare string or
               // number) serialize too — they are not valid top-level JSON.
               let data = try? JSONSerialization.data(
-                withJSONObject: object,
-                options: [.fragmentsAllowed]
+                  withJSONObject: object,
+                  options: [.fragmentsAllowed]
               ) else { return nil }
         return try? AnyTypeDecodingContext(rawData: data)
             .inject(to: JSONDecoder())
@@ -126,7 +130,8 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
               let result = pluginRef.invokeMethod("history", withArguments: []),
               !result.isUndefined, !result.isNull,
               let count = result.toArray()?.count else { return [] }
-        return (0..<count).compactMap { FrozenContextSnapshot(result.objectAtIndexedSubscript($0)) }
+        return (0 ..< count)
+            .compactMap { FrozenContextSnapshot(result.objectAtIndexedSubscript($0)) }
     }
 
     private func encode(_ value: AnyType?, in context: JSContext) -> Any? {
@@ -152,8 +157,8 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         guard let object = value.toObject(),
               let data = try? JSONSerialization.data(withJSONObject: object),
               let decoded = try? AnyTypeDecodingContext(rawData: data)
-                  .inject(to: JSONDecoder())
-                  .decode(AnyType.self, from: data) else { return nil }
+              .inject(to: JSONDecoder())
+              .decode(AnyType.self, from: data) else { return nil }
         return decoded
     }
 }
