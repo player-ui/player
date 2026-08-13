@@ -322,6 +322,33 @@ public abstract class RenderableAsset<Data>(
         }
     }
 
+    @Deprecated("Use inflate without callback instead, this may get removed without additional warning.", level = DeprecationLevel.WARNING)
+    public fun CoroutineScope.inflateViewCallback(
+        children: List<RenderableAsset<*>?>,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        callback: ((List<View?>) -> Unit),
+        viewApply: ((View, Int) -> Unit)? = null,
+        order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
+    ) {
+        // Build + register every child synchronously (before launching), so they are tracked under this
+        // parent before the parent's own renderingComplete can fire — [order] only permutes render order,
+        // never which children exist, so it is safe to reorder inside the coroutine after registration.
+        val built = children.map { child ->
+            child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+        }
+        built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(this@RenderableAsset, it) } }
+        launch {
+            val ordered = built.order()
+            val views = ordered
+                .map { asset -> asset?.let { async { it.render() } } }
+                .mapIndexed { index, deferredView ->
+                    deferredView?.await()?.also { view -> viewApply?.invoke(view, index) }
+                }
+            withContext(Dispatchers.Main) { callback.invoke(views) }
+        }
+    }
+
     private fun CoroutineScope.inflateChild(
         child: RenderableAsset<*>?,
         container: ViewGroup,
