@@ -301,6 +301,19 @@ public abstract class RenderableAsset<Data>(
         inflateChild(asset, container, viewApply)
     }
 
+    @Deprecated("Use inflate without callback instead, this may get removed without additional warning.", level = DeprecationLevel.WARNING)
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        callback: ((View?) -> Unit),
+        @StyleRes vararg styles: Style?,
+        tag: String,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() }
+        inflateChild(asset, container, viewApply, callback)
+    }
+
     public fun CoroutineScope.inflate(
         children: List<RenderableAsset<*>?>,
         container: ViewGroup,
@@ -325,7 +338,6 @@ public abstract class RenderableAsset<Data>(
     @Deprecated("Use inflate without callback instead, this may get removed without additional warning.", level = DeprecationLevel.WARNING)
     public fun CoroutineScope.inflateViewCallback(
         children: List<RenderableAsset<*>?>,
-        container: ViewGroup,
         @StyleRes vararg styles: Style?,
         callback: ((List<View?>) -> Unit),
         viewApply: ((View, Int) -> Unit)? = null,
@@ -337,7 +349,7 @@ public abstract class RenderableAsset<Data>(
         val built = children.map { child ->
             child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
         }
-        built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(this@RenderableAsset, it) } }
+        built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(this@RenderableAsset) } }
         launch {
             val ordered = built.order()
             val views = ordered
@@ -353,12 +365,15 @@ public abstract class RenderableAsset<Data>(
         child: RenderableAsset<*>?,
         container: ViewGroup,
         viewApply: ((View) -> Unit)? = null,
+        callback: ((View?) -> Unit)? = null,
     ) {
         child?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(it) }
         launch {
             val view = child?.render()
             view?.let { viewApply?.invoke(it) }
-            withContext(Dispatchers.Main) { view into container }
+            withContext(Dispatchers.Main) {
+                callback?.invoke(view) ?: (view into container)
+            }
         }
     }
 
