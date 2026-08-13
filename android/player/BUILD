@@ -25,6 +25,7 @@ main_deps = main_exports + [
     "//plugins/beacon/jvm",
     "//plugins/pubsub/jvm",
     "//plugins/coroutines/jvm",
+    "//plugins/metrics/jvm",
 
     artifact("androidx.constraintlayout:constraintlayout"),
     artifact("androidx.lifecycle:lifecycle-viewmodel-ktx"),
