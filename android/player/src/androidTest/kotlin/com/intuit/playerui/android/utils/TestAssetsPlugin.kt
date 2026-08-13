@@ -16,5 +16,7 @@ internal object TestAssetsPlugin : AndroidPlayerPlugin {
             ::OtherSimpleAsset,
         )
         androidPlayer.registerAsset("broken", ::BrokenAsset)
+        androidPlayer.registerAsset("slow", ::SlowAsset)
+        androidPlayer.registerAsset("slow-parent", ::SlowParentAsset)
     }
 }
