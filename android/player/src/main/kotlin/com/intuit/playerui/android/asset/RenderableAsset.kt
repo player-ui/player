@@ -35,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Contextual
@@ -141,6 +142,9 @@ public abstract class RenderableAsset<Data>(
     // ── Concrete render implementation ────────────────────────────────────────
 
     internal suspend fun render(): View = try {
+        val isRoot = currentCoroutineContext()[SubtreeCompletion] == null
+        val tracker = if (isRoot) player.asyncHydrationTrackerPlugin else null
+        tracker?.hooks?.onHydrationStarted?.call()
         cachedAssetView
             .let { (cachedAssetContext, cachedView) ->
                 requireContext()
@@ -169,7 +173,10 @@ public abstract class RenderableAsset<Data>(
                     }
                     else -> cachedView
                 }
-            }.also { player.cacheAssetView(assetContext, it) }
+            }.also {
+                player.cacheAssetView(assetContext, it)
+                tracker?.hooks?.onHydrationComplete?.call()
+            }
     } catch (exception: Throwable) {
         if (exception is CancellationException) throw exception
         if (exception is AssetRenderException) {
@@ -233,12 +240,17 @@ public abstract class RenderableAsset<Data>(
         view ?: return
         renewHydrationScope("rehydrating ${asset.id}")
         val completion = subtreeCompletion
+        val tracker = player.asyncHydrationTrackerPlugin
+        tracker?.hooks?.onHydrationStarted?.call()
         hydrationScope.launch {
             try {
                 rehydrate(view)
                 completion?.selfHydrateDone()
+                completion?.await()
             } catch (exception: StaleViewException) {
                 player.inProgressState?.fail("stale child while trying to rehydrate: ${exception.assetContext.id}")
+            } finally {
+                tracker?.hooks?.onHydrationComplete?.call()
             }
         }
     }
@@ -417,13 +429,10 @@ public abstract class RenderableAsset<Data>(
         val asset = assetContext
             .withContext(player.hooks.context.call(context))
             .build()
-        val tracker = player.asyncHydrationTrackerPlugin
         launch {
-            tracker?.hooks?.onHydrationStarted?.call()
             try {
                 val view = asset.render()
                 withContext(Dispatchers.Main) { view into container }
-                tracker?.hooks?.onHydrationComplete?.call()
             } catch (_: CancellationException) {
             } catch (exception: AssetRenderException) {
                 player.inProgressState?.fail(exception)
