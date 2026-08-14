@@ -26,7 +26,7 @@ class Info(
     override fun CoroutineScope.hydrate(view: View, data: Data) {
         inflate(data.title, view.findViewById(R.id.info_title), Text.Styles.Title)
         inflate(data.primaryInfo, view.findViewById(R.id.info_primary_info))
-        data.actions.filterNotNull().forEach { inflate(it, view.findViewById(R.id.info_actions)) }
+        inflate(data.actions, view.findViewById(R.id.info_actions))
         inflate(data.footer, view.findViewById(R.id.info_footer))
     }
 }
