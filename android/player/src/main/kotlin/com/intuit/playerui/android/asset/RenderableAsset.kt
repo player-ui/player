@@ -11,7 +11,6 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.build
-import com.intuit.playerui.android.compose.ComposableAsset
 import com.intuit.playerui.android.extensions.Style
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
@@ -31,6 +30,7 @@ import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.coroutines.subScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -46,6 +46,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 
@@ -101,6 +103,41 @@ public abstract class RenderableAsset<Data>(
     /** Hydrate [View] with data from [asset]. Runs on [Dispatchers.Main]; [this] scope is the [hydrationScope] for launching child renders. */
     public abstract fun CoroutineScope.hydrate(view: View, data: Data)
 
+    internal class SubtreeCompletion : AbstractCoroutineContextElement(Key) {
+        companion object Key : CoroutineContext.Key<SubtreeCompletion>
+
+        private val lock = Any()
+        private var pending = 0
+        private var selfDone = false
+        private var fired = false
+        private val done = CompletableDeferred<Unit>()
+
+        suspend fun await(): Unit = done.await()
+
+        fun expectChild() = synchronized(lock) { pending++ }
+
+        fun childDone() {
+            if (completes { pending-- }) done.complete(Unit)
+        }
+
+        fun selfHydrateDone() {
+            if (completes { selfDone = true }) done.complete(Unit)
+        }
+
+        private inline fun completes(mutate: () -> Unit): Boolean = synchronized(lock) {
+            mutate()
+            if (!fired && selfDone && pending == 0) {
+                fired = true
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private val subtreeCompletion: SubtreeCompletion? get() =
+        _hydrationScope?.coroutineContext?.get(SubtreeCompletion)
+
     // ── Concrete render implementation ────────────────────────────────────────
 
     internal suspend fun render(): View = try {
@@ -119,23 +156,18 @@ public abstract class RenderableAsset<Data>(
                     }
                     !cachedAssetContext.asset.nativeReferenceEquals(asset) -> {
                         renewHydrationScope("rehydrating ${asset.id}")
-                        player.asyncHydrationTrackerPlugin?.trackHydration(this@RenderableAsset)
+                        val completion = subtreeCompletion
                         try {
                             rehydrate(cachedView)
+                            completion?.selfHydrateDone()
+                            completion?.await()
                             cachedView
-                        } catch (exception: StaleViewException) {
+                        } catch (_: StaleViewException) {
                             renewHydrationScope("recreating after stale rehydrate")
                             doRender()
-                        } finally {
-                            player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
                         }
                     }
-                    else -> cachedView.also {
-                        player.asyncHydrationTrackerPlugin?.let { tracker ->
-                            tracker.trackHydration(this@RenderableAsset)
-                            tracker.renderingComplete(this@RenderableAsset)
-                        }
-                    }
+                    else -> cachedView
                 }
             }.also { player.cacheAssetView(assetContext, it) }
     } catch (exception: Throwable) {
@@ -148,7 +180,7 @@ public abstract class RenderableAsset<Data>(
     }
 
     private suspend fun doRender(): View {
-        player.asyncHydrationTrackerPlugin?.trackHydration(this)
+        val completion = subtreeCompletion
         return try {
             val (data, view) = withContext(Dispatchers.Default) {
                 val data = getData()
@@ -157,6 +189,8 @@ public abstract class RenderableAsset<Data>(
             withContext(Dispatchers.Main) {
                 hydrationScope.hydrate(view, data)
             }
+            completion?.selfHydrateDone()
+            completion?.await()
             view
         } catch (exception: Throwable) {
             if (exception is CancellationException) throw exception
@@ -166,8 +200,6 @@ public abstract class RenderableAsset<Data>(
                 throw exception
             }
             throw AssetRenderException(assetContext, "Failed to render asset", exception)
-        } finally {
-            player.asyncHydrationTrackerPlugin?.renderingComplete(this)
         }
     }
 
@@ -186,7 +218,7 @@ public abstract class RenderableAsset<Data>(
 
     internal fun renewHydrationScope(message: String): CoroutineScope {
         _hydrationScope?.cancel(message)
-        _hydrationScope = player.subScope()
+        _hydrationScope = player.subScope(SubtreeCompletion())
         return hydrationScope
     }
 
@@ -200,14 +232,13 @@ public abstract class RenderableAsset<Data>(
     public fun rehydrate(): Unit = cachedAssetView.let { (_, view) ->
         view ?: return
         renewHydrationScope("rehydrating ${asset.id}")
-        player.asyncHydrationTrackerPlugin?.trackHydration(this)
+        val completion = subtreeCompletion
         hydrationScope.launch {
             try {
                 rehydrate(view)
+                completion?.selfHydrateDone()
             } catch (exception: StaleViewException) {
                 player.inProgressState?.fail("stale child while trying to rehydrate: ${exception.assetContext.id}")
-            } finally {
-                player.asyncHydrationTrackerPlugin?.renderingComplete(this@RenderableAsset)
             }
         }
     }
@@ -321,17 +352,20 @@ public abstract class RenderableAsset<Data>(
         viewApply: ((View, Int) -> Unit)? = null,
         order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
     ) {
+        val completion = coroutineContext[SubtreeCompletion]
+        val built = children.map { child ->
+            child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+        }
+        built.forEach { asset -> asset?.let { completion?.expectChild() } }
         launch {
-            val built = children.order().map { child ->
-                child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
-            }
-            built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(it) } }
-            val views = built
+            val ordered = built.order()
+            val views = ordered
                 .map { asset -> asset?.let { async { it.render() } } }
                 .mapIndexed { index, deferredView ->
                     deferredView?.await()?.also { view -> viewApply?.invoke(view, index) }
                 }
             withContext(Dispatchers.Main) { views into container }
+            built.forEach { asset -> asset?.let { completion?.childDone() } }
         }
     }
 
@@ -343,13 +377,11 @@ public abstract class RenderableAsset<Data>(
         viewApply: ((View, Int) -> Unit)? = null,
         order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
     ) {
-        // Build + register every child synchronously (before launching), so they are tracked under this
-        // parent before the parent's own renderingComplete can fire — [order] only permutes render order,
-        // never which children exist, so it is safe to reorder inside the coroutine after registration.
+        val completion = coroutineContext[SubtreeCompletion]
         val built = children.map { child ->
             child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
         }
-        built.forEach { asset -> asset?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(this@RenderableAsset) } }
+        built.forEach { asset -> asset?.let { completion?.expectChild() } }
         launch {
             val ordered = built.order()
             val views = ordered
@@ -358,6 +390,7 @@ public abstract class RenderableAsset<Data>(
                     deferredView?.await()?.also { view -> viewApply?.invoke(view, index) }
                 }
             withContext(Dispatchers.Main) { callback.invoke(views) }
+            built.forEach { asset -> asset?.let { completion?.childDone() } }
         }
     }
 
@@ -367,13 +400,15 @@ public abstract class RenderableAsset<Data>(
         viewApply: ((View) -> Unit)? = null,
         callback: ((View?) -> Unit)? = null,
     ) {
-        child?.let { player.asyncHydrationTrackerPlugin?.preTrackChild(it) }
+        val completion = if (child != null) coroutineContext[SubtreeCompletion] else null
+        completion?.expectChild()
         launch {
             val view = child?.render()
             view?.let { viewApply?.invoke(it) }
             withContext(Dispatchers.Main) {
                 callback?.invoke(view) ?: (view into container)
             }
+            completion?.childDone()
         }
     }
 
@@ -382,10 +417,13 @@ public abstract class RenderableAsset<Data>(
         val asset = assetContext
             .withContext(player.hooks.context.call(context))
             .build()
+        val tracker = player.asyncHydrationTrackerPlugin
         launch {
+            tracker?.hooks?.onHydrationStarted?.call()
             try {
                 val view = asset.render()
                 withContext(Dispatchers.Main) { view into container }
+                tracker?.hooks?.onHydrationComplete?.call()
             } catch (_: CancellationException) {
             } catch (exception: AssetRenderException) {
                 player.inProgressState?.fail(exception)
@@ -454,64 +492,12 @@ public abstract class RenderableAsset<Data>(
 
     // ── Async hydration tracking ──────────────────────────────────────────────
 
+    // TODO: is this still needed
     @ExperimentalPlayerApi
     public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
-        private val pending = mutableSetOf<String>()
-
         public val hooks: Hooks = Hooks()
 
-        /**
-         * Called synchronously inside the parent's hydrate() before a child coroutine is launched,
-         * so the child's id is registered as pending before the parent's own completion bookkeeping
-         * can fire. Idempotent — duplicate registration is a no-op.
-         */
-        public fun preTrackChild(child: RenderableAsset<*>) {
-            synchronized(this) {
-                pending.add(child.assetContext.id)
-                println("+++ $pending after adding ${child.assetContext.id}")
-            }
-        }
-
-        public fun trackHydration(asset: RenderableAsset<*>) {
-            val fireStarted: Boolean
-            synchronized(this) {
-                fireStarted = pending.isEmpty()
-                pending.add(asset.assetContext.id)
-                println("+++ $pending after adding ${asset.assetContext.id}")
-            }
-            if (fireStarted) hooks.onHydrationStarted.call()
-        }
-
-        public fun renderingComplete(asset: RenderableAsset<*>, completedComposable: Boolean = false) {
-            val fireComplete: Boolean
-            synchronized(this) {
-                // completeComposable check is necessary because doRender's finally fires before composable composes
-                // we want composable to be responsible for finishing its own render tracking
-                fireComplete = if (completedComposable || asset !is ComposableAsset<*>) {
-                    val removed = pending.remove(asset.assetContext.id)
-                    println("+++ $pending after removing ${asset.assetContext.id}")
-                    removed && pending.isEmpty()
-                } else {
-                    false
-                }
-            }
-            if (fireComplete) {
-                println("+++ completed")
-                hooks.onHydrationComplete.call()
-            }
-        }
-
-        override fun apply(androidPlayer: AndroidPlayer) {
-            androidPlayer.hooks.viewController.tap { viewController ->
-                viewController?.hooks?.view?.tap { view ->
-                    view?.hooks?.onUpdate?.interceptCall { _, _ ->
-                        synchronized(this@AsyncHydrationTrackerPlugin) {
-                            pending.clear()
-                        }
-                    }
-                }
-            }
-        }
+        override fun apply(androidPlayer: AndroidPlayer) {}
 
         public class Hooks {
             public class OnHydrationStartedHook : SyncHook<(HookContext) -> Unit>() {

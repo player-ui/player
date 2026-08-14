@@ -4,7 +4,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-    <com.intuit.playerui.android.ui.DeferredRevealFrameLayout
+    <FrameLayout
             android:id="@+id/player_canvas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
