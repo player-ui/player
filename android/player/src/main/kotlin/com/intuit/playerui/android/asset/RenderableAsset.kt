@@ -102,7 +102,7 @@ public abstract class RenderableAsset<Data>(
     public abstract suspend fun initView(data: Data): View
 
     /** Hydrate [View] with data from [asset]. Runs on [Dispatchers.Main]; [this] scope is the [hydrationScope] for launching child renders. */
-    public abstract fun CoroutineScope.hydrate(view: View, data: Data)
+    public abstract suspend fun CoroutineScope.hydrate(view: View, data: Data)
 
     internal class SubtreeCompletion : AbstractCoroutineContextElement(Key) {
         companion object Key : CoroutineContext.Key<SubtreeCompletion>
