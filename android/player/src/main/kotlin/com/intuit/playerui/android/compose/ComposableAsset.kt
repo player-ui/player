@@ -46,7 +46,7 @@ public abstract class ComposableAsset<Data>(
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
         require(view is ComposeView)
         view.setContent {
             compose(data = data)

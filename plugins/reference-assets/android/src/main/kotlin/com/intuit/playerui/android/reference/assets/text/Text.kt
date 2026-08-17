@@ -60,7 +60,7 @@ class Text(
         }
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
         when (view) {
             is TextView -> view.text = buildSpannedString {
                 data.ref?.let {
