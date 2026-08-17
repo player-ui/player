@@ -133,7 +133,7 @@ internal class ContextCapturingAsset(
         return TextView(requireContext())
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Node) = Unit
+    override suspend fun CoroutineScope.hydrate(view: View, data: Node) = Unit
 
     companion object {
         var lastCapturedContext: Context? = null
