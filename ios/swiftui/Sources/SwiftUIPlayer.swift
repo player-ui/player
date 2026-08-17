@@ -143,8 +143,12 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         public init(contextBuilder: @escaping () -> JSContext = { JSContext() }) {
             self.contextBuilder = contextBuilder
             registryWatch = registry.objectWillChange.sink { [weak self] in
-                DispatchQueue.main.async {
+                if Thread.isMainThread {
                     self?.objectWillChange.send()
+                } else {
+                    DispatchQueue.main.async {
+                        self?.objectWillChange.send()
+                    }
                 }
             }
         }
