@@ -249,10 +249,6 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             player?.context.exceptionHandler = nil
         }
 
-        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
-            load(flow: flow, plugins: plugins, player: player, startOptions: nil)
-        }
-
         /// Handler for when the ViewController in the core player changes
         /// - parameters:
         ///   - viewController: The new ViewController instance
