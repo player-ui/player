@@ -192,7 +192,9 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
 
             hooks.state.tap { [weak self] newState in
-                self?.state = newState
+                DispatchQueue.main.async {
+                    self?.state = newState
+                }
             }
 
             guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
