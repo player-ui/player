@@ -113,15 +113,15 @@ public abstract class RenderableAsset<Data>(
         private var fired = false
         private val done = CompletableDeferred<Unit>()
 
-        suspend fun await(): Unit = done.await()
+        internal suspend fun await(): Unit = done.await()
 
-        fun expectChild() = synchronized(lock) { pending++ }
+        internal fun expectChild() = synchronized(lock) { pending++ }
 
-        fun childDone() {
+        internal fun childDone() {
             if (completes { pending-- }) done.complete(Unit)
         }
 
-        fun selfHydrateDone() {
+        internal fun selfHydrateDone() {
             if (completes { selfDone = true }) done.complete(Unit)
         }
 
