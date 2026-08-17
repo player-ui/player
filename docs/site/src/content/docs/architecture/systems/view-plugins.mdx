@@ -1,0 +1,68 @@
+---
+title: "The Core View Plugins"
+description: "The built-in view plugins (asset, switch, applicability, transform, string-resolver, template, multi-node) and the fixed order they run in."
+---
+
+Every view is processed by seven built-in `ViewPlugin`s, applied in a fixed order by `ViewController.createViewPlugins()` (`core/player/src/controllers/view/controller.ts:235`):
+
+**Asset → Switch → Applicability → AssetTransform → StringResolver → Template → MultiNode**
+
+Order matters because most of these plugins tap the same [Parser/Resolver waterfall hooks](/architecture/systems/view-parser-resolver) — `parseNode`/`onCreateASTNode` at parse time, `beforeResolve`/`resolve`/`afterResolve` at resolve time — and each plugin's tap runs on whatever the previous one produced:
+
+- **Switch before Applicability**: a dynamic switch's chosen case can itself be an `applicability`-wrapped node, so Switch has to pick the case *before* Applicability gets a chance to evaluate (and possibly prune) it.
+- **Applicability before AssetTransform and Template**: pruning an inapplicable node early means the (potentially expensive) asset transform and template-expansion logic never runs on content that's about to be discarded.
+- **Template before MultiNode's parse-time array detection**: a `template` array needs to be recognized and expanded into a `MultiNode` of concrete values by `TemplatePlugin` itself; `MultiNodePlugin` only turns *other* plain arrays into `MultiNode`s, so it has to see template arrays already converted.
+
+`AssetPlugin` and `MultiNodePlugin` only tap parser hooks; `StringResolverPlugin` only taps the resolver's `resolve` hook; the rest tap both parser and resolver hooks.
+
+## Key Files
+
+All seven live under `core/player/src/view/plugins/`, re-exported from `core/player/src/view/plugins/index.ts`.
+
+### AssetPlugin
+
+`core/player/src/view/plugins/asset.ts:11` — *"A view plugin to resolve assets"*. Taps `parser.hooks.parseNode`: whenever a child object is keyed `asset` (e.g. `{ asset: { type: "text", ... } }`), it parses that object as a `Node.Asset` and returns it as a path-tagged child. This is what lets arbitrary container properties hold a nested asset.
+
+### SwitchPlugin
+
+`core/player/src/view/plugins/switch.ts:14` — *"A view plugin to resolve switches"*. Taps `parser.hooks.parseNode` to recognize `staticSwitch`/`dynamicSwitch` content and build a `Node.Switch` AST node (its `cases` array of `{ case, value }`). If the switch is **not** dynamic, it's resolved immediately at parse time via `onCreateASTNode`. If it **is** dynamic, `resolver.hooks.beforeResolve` re-evaluates each case's expression on every update and replaces the `Switch` node with the first matching case's value (or `EMPTY_NODE`).
+
+### ApplicabilityPlugin
+
+`core/player/src/view/plugins/applicability.ts:14` — *"A view plugin to remove inapplicable assets from the tree"*. Taps `parser.hooks.parseNode` to wrap any object carrying an `applicability` property into a `Node.Applicability` node (`{ expression, value }`). Taps `resolver.hooks.beforeResolve` to evaluate that expression on every update: falsy evaluates to `null` (removing the node and its whole subtree from the resolved output), truthy unwraps to the inner `value` node.
+
+### AssetTransformCorePlugin
+
+`core/player/src/view/plugins/asset-transform.ts:23` — *"A plugin to register custom transforms on certain asset types. This allows users to embed stateful data into transforms."* Taps only `view.hooks.resolver` (no parser hooks). For every `Asset`/`View` node it looks up a matching transform in the `TransformRegistry` (`core/player/src/controllers/view/types.ts`, a partial-match registry keyed by asset shape) and, if found, runs the transform's `beforeResolve`/`resolve` steps around the node — each backed by a `LocalStateStore` (`core/player/src/controllers/view/store.ts:19`) keyed to that node, so transform state persists across re-resolves like a React hook. It also taps `skipResolve` (to force re-resolution of a node whose transform state changed) and `afterUpdate` (to clear the "last updated" tracking used by `skipResolve`). This is the engine behind the consumer-facing [asset-transform](/plugins/core/asset-transform) plugin and the [Transforms](/assets/transforms) concept.
+
+### StringResolverPlugin
+
+`core/player/src/view/plugins/string-resolver.ts:114` — *"A plugin that resolves all string references for each node"*. Taps only `resolver.hooks.resolve`. For every `Value`/`Asset`/`View` node it walks the node's `value` and replaces any string containing `{{binding}}` or `@[expression]@` syntax, skipping properties flagged via `node.plugins.stringResolver.propertiesToSkip` (or `["exp"]` by default, so expression bodies aren't themselves treated as strings to resolve). See [The String Resolver](/architecture/systems/string-resolver) for the actual replacement logic — this page only covers *when* it runs in the plugin order.
+
+### TemplatePlugin
+
+`core/player/src/view/plugins/template.ts:39` — *"A view plugin to resolve/manage templates"*. Taps `parser.hooks.parseNode` to recognize `template`-keyed arrays and build a `Node.Template` AST node per entry (`data` binding, `template` shape, `depth`, `placement`). If **not** dynamic, `onCreateASTNode` expands it immediately by iterating the bound data array, substituting `_index_`-style placeholders (extensible via its own `resolveTemplateSubstitutions` hook) into the template JSON, and re-parsing each item into a `Node.MultiNode`; a second `onCreateASTNode` tap sorts `prepend`/`append`-placed children relative to statically-authored siblings. If dynamic, `resolver.hooks.beforeResolve` re-expands the template into a fresh `MultiNode` on every update. `apply()` also calls `view.setTemplatePlugin(this)`, registering itself so `ViewInstance.hooks.templatePlugin` can expose it elsewhere.
+
+### MultiNodePlugin
+
+`core/player/src/view/plugins/multi-node.ts:12` — *"A view plugin to resolve multi nodes"*. Taps only `parser.hooks.parseNode`: any plain JS array encountered while parsing (that isn't a `template` array) becomes a `Node.MultiNode` wrapping the parsed children. It sets `override: true` unless the array is the *static* sibling of a `template` array at the same key (`hasTemplateValues`) — `override` tells the Resolver whether the `MultiNode`'s resolved values should replace or append to whatever's already at that path.
+
+## Hooks / Extension Points
+
+Hook definitions live on [The View Parser & Resolver](/architecture/systems/view-parser-resolver) page; this table just maps each plugin to which hooks it taps.
+
+| Plugin | Parser hooks | Resolver hooks | Own hooks |
+| --- | --- | --- | --- |
+| AssetPlugin | `parseNode` | — | — |
+| SwitchPlugin | `parseNode`, `onCreateASTNode` | `beforeResolve` | — |
+| ApplicabilityPlugin | `parseNode` | `beforeResolve` | — |
+| AssetTransformCorePlugin | — | `beforeResolve`, `afterResolve`, `skipResolve`, `afterUpdate` | — |
+| StringResolverPlugin | — | `resolve` | — |
+| TemplatePlugin | `parseNode`, `onCreateASTNode` | `beforeResolve` | `resolveTemplateSubstitutions` |
+| MultiNodePlugin | `parseNode` | — | — |
+
+## Relationship to Other Subsystems
+
+- [The View Parser & Resolver](/architecture/systems/view-parser-resolver) — defines every hook these plugins tap.
+- [ViewController & ViewInstance](/architecture/systems/view-controller) — constructs these seven plugins (in this fixed order) and applies each to a `ViewInstance` before it's first resolved.
+- [Transforms](/assets/transforms) and [Asset Transform plugin](/plugins/core/asset-transform) — the consumer-facing documentation for what `AssetTransformCorePlugin` implements internally.

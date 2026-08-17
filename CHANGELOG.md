@@ -1,3 +1,33 @@
+# 1.1.1-next.0 (Thu Aug 13 2026)
+
+### Release Notes
+
+#### XLR Docs ([#924](https://github.com/player-ui/player/pull/924))
+
+Enhance XLR docs to document architecture and usage
+
+#### first pass at core player docs ([#920](https://github.com/player-ui/player/pull/920))
+
+Added docs for core player systems
+
+---
+
+#### 🐛 Bug Fix
+
+- Set trackUpdateTime in Android MetricPlugin [#928](https://github.com/player-ui/player/pull/928) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- XLR Docs [#924](https://github.com/player-ui/player/pull/924) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS uses the same shared mocks as other platforms [#929](https://github.com/player-ui/player/pull/929) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Use Normal Executor For Docs Build As They Are Timing Out Frequently [#931](https://github.com/player-ui/player/pull/931) ([@KetanReddy](https://github.com/KetanReddy))
+- first pass at core player docs [#920](https://github.com/player-ui/player/pull/920) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- Chloe ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.1.0 (Thu Aug 06 2026)
 
 ### Release Notes

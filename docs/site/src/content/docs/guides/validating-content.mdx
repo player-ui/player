@@ -6,6 +6,10 @@ import { PackageManagers } from 'starlight-package-managers'
 
 As described in the [validation](../../xlr/usage/sdk#type-validation) section of the XLR usage guide, XLRs can be used to validate if authored Player content is semantically valid. While this doesn't guarantee that the content will actually run, as the validator is just a semantic check, it does allow common issues to be found before content is published. As the underlying validation architecture is built around XLRs allowing it to work for any Player integration that publishes XLRs. In order to minimize the complexity of orchestrating the various XLR/CLI/Plugin pieces for content author, the following guide outlines how to setup the pieces to allow for validation. 
 
+:::note[A different system from runtime validation]
+This is a static, build/edit-time check of authored content shape via XLRs — it runs before content is published. It's a separate system from the [ValidationController](/architecture/systems/validation-controller), which validates live user data against schema and cross-field rules while a flow is running.
+:::
+
 ## Step 1: Export XLRs
 
 The first step to setting up validation is exporting the XLRs for the Assets in the integration. Follow the guide in the [export](../../xlr/usage/export) section.

@@ -33,6 +33,8 @@ Simply stated:
 
 In cases where the data-type may change between the user and the data-model (think epoch to a formatted time, or integers to a comma number) you'll likely want to specify both, though either, both, or neither is also valid.
 
+At runtime, formatters are looked up through the [SchemaController](/architecture/systems/schema-controller) and applied via the `format`/`deformat` hooks on the [DataController](/architecture/systems/data-controller).
+
 ## Using Formatted Data
 
 In order to get or set formatted values from the model, add `formatted: true` to the options of the data-model method. This is most often through the use of a [transform](/plugins/core/asset-transform).

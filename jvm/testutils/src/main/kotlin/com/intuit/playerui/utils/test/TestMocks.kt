@@ -26,6 +26,13 @@ public val simpleFlow: Flow by lazy {
         .decodeFromString(Flow.serializer(), simpleFlowString)
 }
 
+public val ClassLoaderMocksReader.counterMock: ClassLoaderMock
+    get() = findMockByName("action-counter") ?: throw PlayerTestException("Could not find mock by name: action-counter")
+
+public val counterFlowString: String by lazy {
+    mocks.counterMock.getFlow()
+}
+
 @InternalPlayerApi
 @Serializable
 public data class Flow(

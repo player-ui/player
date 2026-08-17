@@ -1,0 +1,379 @@
+---
+title: AST Node Model
+---
+
+A full field-level reference for the XLR AST: every node type in the `NodeType` union, its shape, and a real compiled example. For the conceptual "what is a Node/Named Type and why" explanation, see [XLR Definitions](../../concepts).
+
+## Common Building Blocks
+
+Every node shares a couple of building blocks before you get to its type-specific fields.
+
+### The `type` discriminant
+
+```typescript
+interface TypeNode<Name = string> {
+  type: Name;
+}
+```
+
+Every node type below is `TypeNode<"some-string">` combined with other pieces. The `type` field is how the SDK and any code walking the tree knows which shape it's looking at.
+
+### `Const` and `Enum`
+
+Most of the primitive-like nodes (see below) also mix in `CommonTypeInfo`, which adds an optional literal-value constraint and an optional list of allowed values:
+
+```typescript
+interface Const<T> {
+  const?: T;
+}
+interface Enum<T> {
+  enum?: Array<T>;
+}
+type CommonTypeInfo<T> = Const<T> & Enum<T>;
+```
+
+`const` is how a discriminated union member gets pinned to one exact value. Here's a real example, a `TextAsset`'s `type` property compiled from `type: "text"`:
+
+```json
+{
+  "type": "string",
+  "const": "text"
+}
+```
+
+`enum` works the same way but with a list of allowed values instead of one, for TypeScript enums or unions of literals collapsed into a single node.
+
+### Annotations
+
+Nearly every node also carries this common metadata, sourced from the type's declaration and JSDoc comment:
+
+| Field | Source |
+|---|---|
+| `name` | The name used to reference this type |
+| `title` | The dotted path to this node within its Named Type (e.g. `ActionAsset.metaData.beacon`) |
+| `description` | The JSDoc comment body |
+| `examples` | JSDoc `@example` |
+| `default` | JSDoc `@default` |
+| `see` | JSDoc `@see` |
+| `comment` | The raw TypeScript comment |
+| `meta` | A custom `@meta key:value` JSDoc tag, parsed into a `Record<string, string>` |
+
+## NodeType union
+
+Every node's `type` field is one of the following. Each is documented in its own section below.
+
+| `type` | Represents |
+|---|---|
+| `string`, `number`, `boolean` | TypeScript primitives |
+| `any`, `unknown`, `undefined`, `null`, `never`, `void` | TypeScript's other built-in types |
+| `object` | An interface/type literal |
+| `array` | `Array<T>` |
+| `tuple` | Tuple types, e.g. `[string, number]` |
+| `record` | `Record<K, V>` |
+| `and` | Intersection types (`A & B`) |
+| `or` | Union types (`A \| B`) |
+| `ref` | A reference to another Named Type |
+| `function` | Function signatures |
+| `conditional` | TypeScript conditional types (`A extends B ? C : D`) |
+| `template` | Template literal types |
+
+## Primitive Types
+
+`any`, `unknown`, `undefined`, `null`, `never`, `void`, `string`, `number`, and `boolean` all share the same shape: a `type` discriminant, `CommonTypeInfo` for an optional `const`/`enum`, and `Annotations`.
+
+```typescript
+type StringType = TypeNode<"string"> & CommonTypeInfo<string> & Annotations;
+type NumberType = TypeNode<"number"> & CommonTypeInfo<number> & Annotations;
+type BooleanType = TypeNode<"boolean"> & CommonTypeInfo<boolean> & Annotations;
+type AnyType = TypeNode<"any"> & CommonTypeInfo<any> & Annotations;
+type UnknownType = TypeNode<"unknown"> & CommonTypeInfo<unknown> & Annotations;
+type UndefinedType = TypeNode<"undefined"> & CommonTypeInfo<undefined> & Annotations;
+type NullType = TypeNode<"null"> & CommonTypeInfo<null> & Annotations;
+type NeverType = TypeNode<"never"> & CommonTypeInfo<never> & Annotations;
+type VoidType = TypeNode<"void"> & CommonTypeInfo<void> & Annotations;
+```
+
+`string`, `number`, and `boolean` are the only three that show up with a `const`/`enum` constraint in practice, since those are the types TypeScript allows literal values on. `never` is worth calling out separately: it's how XLR represents "this property must never be set here," seen for example on a state type where a property is only valid for one variant of a discriminated union (see [Conditional](#conditional) below for a real case).
+
+## Object
+
+```typescript
+interface ObjectProperty {
+  required: boolean;
+  node: NodeType;
+}
+interface ObjectNode {
+  type: "object";
+  properties: {
+    [name: string]: ObjectProperty;
+  };
+  extends?: RefType;
+  additionalProperties: false | NodeType;
+}
+type ObjectType = ObjectNode & CommonTypeInfo<object> & Annotations;
+```
+
+`properties` maps each property name to its type and whether it's required. `extends` points at a Custom Primitive this object extends (resolved and merged in at read time, see [Transform Functions](../../concepts#transform-functions)). `additionalProperties` is `false` for a closed shape, or a `NodeType` describing what's allowed for any unlisted keys, most commonly `{ type: "unknown" }`.
+
+See [XLR Definitions](../../concepts#anatomy-of-a-node) for a full worked example (a real compiled `Asset<T>` node).
+
+## Array
+
+```typescript
+interface ArrayNode {
+  type: "array";
+  elementType: NodeType;
+}
+type ArrayType<T = unknown> = ArrayNode & CommonTypeInfo<Array<T>> & Annotations;
+```
+
+`elementType` is the shape of each item in the array. Here's a real, trimmed example, the `validation` property on Player's `Schema.ArrayType`:
+
+```json
+{
+  "type": "array",
+  "elementType": {
+    "type": "object",
+    "properties": {
+      "type": { "required": true, "node": { "type": "string" } },
+      "message": { "required": false, "node": { "type": "string" } }
+    },
+    "additionalProperties": { "type": "unknown" },
+    "title": "Reference",
+    "description": "A reference to a validation object"
+  }
+}
+```
+
+## Tuple
+
+```typescript
+interface TupleMember {
+  name?: string;
+  type: NodeType;
+  optional?: boolean;
+}
+interface TupleNode {
+  type: "tuple";
+  elementTypes: Array<TupleMember>;
+  minItems: number;
+  additionalItems: false | NodeType;
+}
+type TupleType<T extends unknown[] = unknown[]> = TupleNode & CommonTypeInfo<T> & Annotations;
+```
+
+Tuples show up most often as function parameter lists. Here's a real, trimmed example, compiled from the `findPropertyIndex` expression's parameters (`[Array<any> | Binding, string | undefined, any]`):
+
+```json
+{
+  "type": "tuple",
+  "elementTypes": [
+    { "name": "bindingOrModel", "type": { "type": "ref", "ref": "Binding" }, "optional": false },
+    { "name": "propToCheck", "type": { "type": "string" }, "optional": false },
+    { "name": "valueToCheck", "type": { "type": "any" }, "optional": false }
+  ],
+  "minItems": 3,
+  "additionalItems": false
+}
+```
+
+## Record
+
+```typescript
+type RecordType = TypeNode<"record"> &
+  Annotations & {
+    keyType: NodeType;
+    valueType: NodeType;
+  };
+```
+
+A real, complete example, Player's `DataModel` type (`Record<any, unknown>`):
+
+```json
+{
+  "source": "src/index.ts",
+  "name": "DataModel",
+  "type": "record",
+  "keyType": { "type": "any" },
+  "valueType": { "type": "unknown" },
+  "title": "DataModel",
+  "description": "The data-model is the location that all user data is stored"
+}
+```
+
+## And / Or
+
+```typescript
+type AndType = TypeNode<"and"> & Annotations & { and: NodeType[] };
+type OrType = TypeNode<"or"> & Annotations & { or: NodeType[] };
+```
+
+`and` is TypeScript's `&` (intersection): the resolved shape has every property from every entry. `or` is `|` (union): content is valid if it matches any one entry.
+
+A real `or` example, the `case` property of a `SwitchCase` (`Expression | true`):
+
+```json
+{
+  "type": "or",
+  "or": [
+    { "type": "ref", "ref": "Expression" },
+    { "type": "boolean", "const": true }
+  ]
+}
+```
+
+A real `and` example, simplified from Player's `View<T>` type, which intersects the generic asset type `T` with an extra `validation` property:
+
+```json
+{
+  "type": "and",
+  "and": [
+    { "type": "ref", "ref": "T" },
+    {
+      "type": "object",
+      "properties": {
+        "validation": {
+          "required": false,
+          "node": {
+            "type": "array",
+            "elementType": { "type": "object", "properties": {}, "additionalProperties": false }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}
+```
+
+## Ref
+
+```typescript
+interface RefNode {
+  type: "ref";
+  ref: string;
+  genericArguments?: Array<NodeType>;
+  property?: string;
+}
+type RefType = RefNode & Annotations;
+```
+
+`ref` points at another Named Type by name. `genericArguments` fills in that type's generics when it's resolved (position preserved), and `property` optionally drills into one property of the referenced type once it's resolved, rather than the whole thing.
+
+See [Named Types](#named-types) below and [XLR Definitions](../../concepts#named-types) for how `ref` relates to Custom Primitives.
+
+## Function
+
+```typescript
+type FunctionTypeParameters = {
+  name: string;
+  type: NodeType;
+  optional?: true;
+  default?: NodeType;
+};
+type FunctionType = TypeNode<"function"> &
+  Annotations & {
+    parameters: Array<FunctionTypeParameters>;
+    returnType?: NodeType;
+  };
+```
+
+`returnType` is optional. A real example, the `set` method on a transformed `InputAsset` (`set: (newValue: string | undefined) => void`):
+
+```json
+{
+  "type": "function",
+  "parameters": [
+    {
+      "name": "newValue",
+      "type": {
+        "type": "or",
+        "or": [
+          { "type": "string" },
+          { "type": "undefined" }
+        ]
+      }
+    }
+  ],
+  "description": "A function to commit the new value to the data-model"
+}
+```
+
+## Conditional
+
+```typescript
+interface ConditionalNode {
+  type: "conditional";
+  check: {
+    left: NodeType;
+    right: NodeType;
+  };
+  value: {
+    true: NodeType;
+    false: NodeType;
+  };
+}
+type ConditionalType = ConditionalNode & Annotations;
+```
+
+Mirrors a TypeScript conditional type (`Check extends Right ? True : False`), evaluated with `computeExtends` when a type is resolved (see the [`optimize` option](../../usage/sdk#type-recall)). A real example, Player's `NavigationBaseState`, restricting the `exp` property to only exist on `ACTION`/`ASYNC_ACTION` states and forbidding it (`never`) everywhere else:
+
+```json
+{
+  "type": "conditional",
+  "check": {
+    "left": { "type": "ref", "ref": "T" },
+    "right": {
+      "type": "or",
+      "or": [
+        { "type": "string", "const": "ACTION" },
+        { "type": "string", "const": "ASYNC_ACTION" }
+      ]
+    }
+  },
+  "value": {
+    "true": { "type": "ref", "ref": "Expression" },
+    "false": { "type": "never" }
+  }
+}
+```
+
+## Template Literal
+
+```typescript
+type TemplateLiteralType = TypeNode<"template"> &
+  Annotations & {
+    format: string;
+  };
+```
+
+`format` is a string version of the regex used to validate content against the template. A real, complete example, Player's `BindingRef` type (matching the `{{binding.path}}` syntax):
+
+```json
+{
+  "source": "src/index.ts",
+  "name": "BindingRef",
+  "type": "template",
+  "format": "{{.*}}",
+  "title": "BindingRef"
+}
+```
+
+## Named Types
+
+```typescript
+type NamedType<T extends NodeType = NodeType> = T & {
+  name: string;
+  source: string;
+};
+
+type NamedTypeWithGenerics<T extends NodeType = NodeType> = NamedType<T> & {
+  genericTokens: Array<{
+    symbol: string;
+    constraints?: NodeType;
+    default?: NodeType;
+  }>;
+};
+```
+
+Any of the node types above can be promoted to a Named Type by attaching a `name` and the `source` file it came from, which is what happens for every top-level exported interface/type. See [Named Types](../../concepts#named-types) for what these represent and how Custom Primitives interact with them.

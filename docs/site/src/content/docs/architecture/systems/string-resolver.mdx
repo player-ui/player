@@ -1,0 +1,38 @@
+---
+title: "StringResolver"
+description: "How Player resolves {{binding}} references and @[expression]@ blocks embedded in strings."
+---
+
+A small, standalone module of plain functions (no class, no hooks) that recursively walks a value and replaces `{{binding.path}}` references and `@[ expression ]@` blocks with their resolved values.
+
+## Key Files
+
+- `core/player/src/string-resolver/index.ts` — the entire module
+
+## What It Does
+
+The module exports four functions:
+
+- `resolveDataRefs(val, options)` — the main entry point. Recursively walks *any* value — string, object, or array — via an internal `traverseObject`, resolving refs in every string it finds and leaving everything else untouched.
+- `resolveDataRefsInString(val, options)` — resolves both expressions and `{{binding}}` references within a single string.
+- `resolveExpressionsInString(val, options)` — finds `@[ ... ]@` blocks and replaces each with the result of `options.evaluate(...)`.
+- `findNextExp(str)` — finds the start/end offsets of the next `{{ ... }}` reference in a string.
+
+`options.model` is a `DataModelWithParser` (or `false` to skip binding resolution) and `options.evaluate` is an expression-evaluation function (or `false` to skip expression resolution) — both are supplied by the caller, not owned by this module.
+
+## Balanced-Brace Handling
+
+Bindings can themselves be nested, e.g. `{{foo.{{bar}}.baz}}`, so a naive "find the first `}}`" would break. `findNextExp` instead scans forward counting opens and closes: every time it sees another `{{` before the next `}}`, it increments a counter instead of stopping, and only returns once the counter unwinds back to zero. This lets the resolver correctly find the *matching* closing `}}` for the opening one it started at, even with nested references in between.
+
+## Type-Preserving Short-Circuit
+
+If a string is *entirely* a single reference — nothing before or after it — the resolved value keeps its original type instead of being stringified. Both `resolveExpressionsInString` and `resolveDataRefsInString` check for this explicitly: when the match spans the whole input string and the resolved value isn't itself a string, they return that value directly rather than splicing it into a string.
+
+For example, given `count: 42` in the data model, the string `"{{count}}"` resolves to the number `42`, not the string `"42"`. But `"Count: {{count}}"` resolves to the string `"Count: 42"`, since the reference isn't the entire string. The same rule applies to `@[ expr ]@` blocks.
+
+This module has no plugin hooks — it's a set of plain functions invoked directly by `StringResolverPlugin` during view resolution, not a tapable class.
+
+## Relationship to Other Subsystems
+
+- [View Plugins](/architecture/systems/view-plugins) — see its `StringResolverPlugin` subsection; that plugin (`core/player/src/view/plugins/string-resolver.ts`) is the main caller of `resolveDataRefs` during node resolution, and is also referenced in the "incremental resolve" step of [What Happens When Data Changes](/architecture/diagrams/data-change-flow).
+- [Data & Expressions](/content/data-expressions) — the authoring-level explanation of `{{}}` and `@[]@` syntax; this page covers how those references are resolved at runtime.

@@ -1,0 +1,91 @@
+---
+title: "FlowController & FlowInstance"
+description: "The state machine that drives navigation through a Flow's VIEW/ACTION/FLOW/END transitions."
+---
+
+`FlowController` (`core/player/src/controllers/flow/controller.ts:12`) is *"a manager for the navigation section of a Content blob"*. `FlowInstance` (`core/player/src/controllers/flow/flow.ts:78`) is *"the Content navigation state machine"* itself — a single running instance walking a Flow's nodes from its `startState` to an `END`.
+
+These two are covered on one page because `FlowController` is literally a factory for `FlowInstance`s: its private `run(startState)` method does `const flow = new FlowInstance(startState, startFlow, { logger: this.log })` (`controller.ts:72`), pushes it onto a nav stack, and fires its `flow` hook with the new instance. A page on `FlowInstance` alone would mostly be "see `FlowController`."
+
+## Key Files
+
+- `core/player/src/controllers/flow/controller.ts` — the `FlowController` class
+- `core/player/src/controllers/flow/flow.ts` — the `FlowInstance` class and its `FlowInstanceHooks` interface
+
+`FlowController` is constructed in `player.ts`'s `setupFlow`, and its instance starts the whole run — see [Start to Render](/architecture/diagrams/start-to-render) for the full walk-through of a `transition()` call reaching a rendered view.
+
+## A Genuine Construction-Order Quirk
+
+`FlowController` is the *first* core controller built in `setupFlow` (`const flowController = new FlowController(userFlow.navigation, { logger: this.logger })`), before `BindingParser`, `SchemaController`, `ValidationController`, `DataController`, or `ExpressionEvaluator` exist. But `BindingParser` needs a `get`/`set` (from `DataController`) and an `evaluate` (from `ExpressionEvaluator`) at construction time — and those controllers, in turn, end up needing `flowController`/`pathResolver`.
+
+Player breaks this cycle with pre-declared, not-yet-assigned bindings:
+
+```ts
+// eslint-disable-next-line prefer-const
+let expressionEvaluator: ExpressionEvaluator;
+// eslint-disable-next-line prefer-const
+let dataController: DataController;
+
+const pathResolver = new BindingParser({
+  get: (binding) => dataController.get(binding),
+  set: (transaction) => dataController.set(transaction),
+  evaluate: (expression) => expressionEvaluator.evaluate(expression),
+});
+```
+
+`pathResolver`'s callbacks close over `dataController`/`expressionEvaluator` by reference, so it's safe to construct `BindingParser` before either exists — as long as nothing invokes `get`/`set`/`evaluate` before the `let`s are assigned later in the same function. `viewController` gets the same treatment (`let viewController: ViewController;`) since flow hooks tapped early need to reference it once it exists. This ordering is why `FlowController` — which has no dependencies on any other controller — goes first.
+
+## Node-Type Dispatch
+
+`FlowInstance.transition()` looks up the next named state and, once `currentState` is set, `player.ts` dispatches on `state_type` from taps on `afterTransition`/`beforeTransition`/`skipTransition`. Briefly:
+
+| `state_type` | What happens |
+| --- | --- |
+| `VIEW` | Hands off to the [ViewController](/architecture/systems/view-controller) for rendering; `skipTransition` can block leaving it if validation fails. |
+| `ACTION` | `expressionEvaluator.evaluate(exp)` runs synchronously, and the result is used as the next transition value. |
+| `ASYNC_ACTION` | `expressionEvaluator.evaluateAsync(exp)` runs; if `await` is set, Player waits for the promise before transitioning with the resolved value. |
+| `FLOW` | `FlowController.run()` recurses into a nested `FlowInstance` for the referenced sub-flow, and transitions using its outcome once it reaches `END`. |
+| `EXTERNAL` | No built-in handling in core — left for a plugin (see [External State](/plugins/multiplatform/external-state)) to observe and drive the next transition. |
+| `END` | Terminal; `FlowInstance.hooks.onEnd` fires (if `flow.onEnd` is set) and the flow's promise resolves with the end state. |
+
+This is intentionally brief — see [Start to Render](/architecture/diagrams/start-to-render) for the complete step-by-step transition walk-through (`skipTransition` → `beforeTransition` → transition lookup → `resolveTransitionNode` → dispatch).
+
+## Hooks / Extension Points
+
+### `FlowController.hooks`
+
+| Hook | Type | Gives you | Use it when… |
+| --- | --- | --- | --- |
+| `hooks.flow` | `SyncHook<[FlowInstance]>` | The `FlowInstance` just created for a (sub-)flow | You want to tap into every flow instance's own hooks (the standard "tap a controller hook to reach a deeper hook surface" pattern) |
+
+### `FlowInstance.hooks`
+
+| Hook | Type | Gives you | Use it when… |
+| --- | --- | --- | --- |
+| `hooks.beforeStart` | `SyncBailHook<[NavigationFlow], NavigationFlow>` | The flow definition before `start()` processes it | You want to rewrite the flow's nodes before the state machine begins |
+| `hooks.onStart` | `SyncHook<[any]>` | The flow's `onStart` value | You want to react when a flow with an `onStart` node begins |
+| `hooks.onEnd` | `SyncHook<[any]>` | The flow's `onEnd` value | You want to react when the flow reaches its `END` state and has an `onEnd` node |
+| `hooks.skipTransition` | `SyncBailHook<[NamedState \| undefined], boolean \| undefined>` | The current named state, before a transition | You want to veto a transition (e.g. validation blocking navigation away from a `VIEW`) |
+| `hooks.beforeTransition` | `SyncWaterfallHook<[VIEW\|ACTION\|ASYNC_ACTION\|FLOW\|EXTERNAL state, string]>` | The current state node and the transition value requested | You want to rewrite the node (e.g. resolve string/data references in its `transitions`) before the next state is looked up |
+| `hooks.resolveTransitionNode` | `SyncWaterfallHook<[NavigationFlowState]>` | The looked-up next state, before it becomes `currentState` | You want to rewrite the next node (e.g. resolve `ref`/`param` string references) |
+| `hooks.transition` | `SyncHook<[NamedState \| undefined, NamedState]>` | The previous and new named state | You want to observe every state change (e.g. reset validation, commit a shadow data model) |
+| `hooks.afterTransition` | `SyncHook<[FlowInstance]>` | The `FlowInstance` itself, after `currentState` has settled | You want to act on the new state after the fact (this is where core dispatches `ACTION`/`ASYNC_ACTION`) |
+
+Both hook sets are reached the same way as in the [Plugins](/plugins/) guide's nested-hooks example:
+
+```ts
+player.hooks.flowController.tap(this.name, (flowController) => {
+  flowController.hooks.flow.tap(this.name, (flow) => {
+    flow.hooks.transition.tap(this.name, (from, to) => {
+      player.logger.debug("Transition %s -> %s", from?.name, to.name);
+    });
+  });
+});
+```
+
+## Relationship to Other Subsystems
+
+- [Navigation](/content/navigation) — the authoring-level reference for state types (`VIEW`/`ACTION`/`ASYNC_ACTION`/`END`/`EXTERNAL`/`FLOW`), transitions, and `onStart`/`onEnd`; this page is the runtime-class counterpart.
+- [External State](/plugins/multiplatform/external-state) — the standard way `EXTERNAL` states get handled, since core doesn't drive them itself.
+- [Plugin Implementation](/guides/plugin-implementation) — a worked example tapping `flowController.hooks.flow` down to `flow.hooks.transition` to commit a shadow data model on specific view transitions.
+- [Error Handling](/content/error-handling) — `ErrorController` is a sibling controller (also constructed per-run) that isn't covered on this page; it manages `errorTransitions` and the protected `errorState` binding.
