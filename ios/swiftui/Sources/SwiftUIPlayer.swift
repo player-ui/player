@@ -202,7 +202,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
 
             hooks.state.tap { [weak self] newState in
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self?.state = newState
                 }
             }
