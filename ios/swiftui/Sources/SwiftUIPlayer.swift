@@ -143,10 +143,16 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         public init(contextBuilder: @escaping () -> JSContext = { JSContext() }) {
             self.contextBuilder = contextBuilder
             registryWatch = registry.objectWillChange.sink { [weak self] in
+                // Send synchronously when already on main, so the signal fires on the same
+                // runloop tick as the mutation instead of a tick late via an unconditional hop.
                 if Thread.isMainThread {
-                    self?.objectWillChange.send()
+                    // added MainActor.assumeIsolated (main-actor isolation) for future, when this
+                    // module adopts Swift 6 strict concurrency checking.
+                    MainActor.assumeIsolated {
+                        self?.objectWillChange.send()
+                    }
                 } else {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         self?.objectWillChange.send()
                     }
                 }
