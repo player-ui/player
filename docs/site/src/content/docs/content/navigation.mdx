@@ -6,7 +6,7 @@ import Image from "../../../components/Image.astro";
 import simpleFlowImage from "../../../assets/simple-flow.png";
 import { Badge } from '@astrojs/starlight/components';
 
-The `navigation` section of the content describes the path the user goes through as they progress. In simple terms, this can be thought of as a set of finite state machines, and the user progresses through each state until they hit a `DONE` node.
+The `navigation` section of the content describes the path the user goes through as they progress. In simple terms, this can be thought of as a set of finite state machines, and the user progresses through each state until they hit a `DONE` node. For the runtime classes that drive this state machine, see [FlowController & FlowInstance](/architecture/systems/flow-controller).
 
 The navigation object contains a `BEGIN` property that contains a reference to a flow to start Player with. Once an end state is reached for that flow, Player will end its processing and return that outcome.
 

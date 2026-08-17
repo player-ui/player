@@ -8,7 +8,7 @@ import CoreOnly from "../../../../components/CoreOnly.astro";
 <CoreOnly/>
 
 This plugin allows users to specify a path in the data-model (binding) as a computed property in the schema.
-Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown.
+Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown. See [DataController](/architecture/systems/data-controller) and [ExpressionEvaluator](/architecture/systems/expression-evaluator) for the underlying read/evaluate machinery this plugin hooks into.
 
 ## Usage
 

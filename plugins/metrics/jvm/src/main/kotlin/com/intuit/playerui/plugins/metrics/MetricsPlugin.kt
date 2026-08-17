@@ -21,23 +21,30 @@ import kotlinx.serialization.builtins.serializer
 public typealias RenderEndHandler = (Timing?, RenderMetrics?, PlayerFlowMetrics?) -> Unit
 
 public class MetricsPlugin(
+    private val trackRenderTime: Boolean,
+    private val trackUpdateTime: Boolean,
     private val handler: RenderEndHandler,
 ) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
+    public constructor(handler: RenderEndHandler) : this(true, true, handler)
+
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
         runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+        val renderEndHandler = { timing: Node, renderMetrics: Node, flowMetrics: Node ->
+            handler.invoke(
+                timing.deserialize(Timing.serializer()),
+                renderMetrics.deserialize(RenderMetrics.serializer()),
+                flowMetrics.deserialize(PlayerFlowMetrics.serializer()),
+            )
+        }
         runtime.add(
             "handlers",
             mapOf(
-                "onRenderEnd" to renderEndHandler@{ timing: Node, renderMetrics: Node, flowMetrics: Node ->
-                    handler.invoke(
-                        timing.deserialize(Timing.serializer()),
-                        renderMetrics.deserialize(RenderMetrics.serializer()),
-                        flowMetrics.deserialize(PlayerFlowMetrics.serializer()),
-                    )
-                },
-                "trackRenderTime" to true,
+                "onRenderEnd" to renderEndHandler,
+                "onUpdateEnd" to renderEndHandler,
+                "trackRenderTime" to trackRenderTime,
+                "trackUpdateTime" to trackUpdateTime,
             ),
         )
         instance = runtime.buildInstance("(new $name(handlers))")
@@ -56,6 +63,15 @@ public class MetricsPlugin(
             by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowMetrics.serializer()))
 
         public val onRenderEnd: NodeSyncHook3<Timing, RenderMetrics, PlayerFlowMetrics>
+            by NodeSerializableField(
+                NodeSyncHook3.serializer(
+                    Timing.serializer(),
+                    RenderMetrics.serializer(),
+                    PlayerFlowMetrics.serializer(),
+                ),
+            )
+
+        public val onUpdateEnd: NodeSyncHook3<Timing, RenderMetrics, PlayerFlowMetrics>
             by NodeSerializableField(
                 NodeSyncHook3.serializer(
                     Timing.serializer(),

@@ -10,6 +10,7 @@ import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.state.PlayerFlowState
+import com.intuit.playerui.plugins.metrics.MetricsPlugin
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,7 @@ class DemoPlayerViewModel(
         A2UIPlugin(),
         PendingTransactionPlugin(),
         AsyncHydrationTrackerPlugin(),
+        MetricsPlugin { _, _, _ -> },
     )
 
     // When set (e.g. "a2ui"), flows are started in that content format so the

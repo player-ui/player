@@ -8,21 +8,165 @@ When talking about anything its helpful to make sure everyone is on the same pag
 
 When we talk about a Capability, we are essentially talking about what it provides to Player. Most, if not all, capabilities are provided by Plugins. Capabilities are described in the manifest file in the `xlr` folder of a distribution. The manifest file, provided as both a `.json` and a `.js` file for static or dynamic use, contains the mapping of capabilities to a list of the XLRs.
 
+A `Capability` is just a name plus the list of types it provides:
+
+```typescript
+interface Capability {
+  name: string;
+  provides: Array<string>;
+}
+```
+
+The `manifest.json` (static form) ties a plugin's name to its capabilities:
+
+```typescript
+interface Manifest {
+  pluginName: string;
+  capabilities?: Map<string, Array<string>>;
+  customPrimitives?: Array<string>;
+}
+```
+
+The `manifest.js` (dynamic form, `TSManifest`) is the in-memory equivalent. Instead of a capability mapping to a list of type *names*, it maps directly to the `NamedType` objects themselves, so nothing needs to be read from disk after the module is imported:
+
+```typescript
+interface TSManifest {
+  pluginName: string;
+  capabilities: {
+    [capability: string]: Array<NamedType>;
+  };
+}
+```
+
+This is the difference the [SDK](../usage/sdk) is referring to when it distinguishes loading "from disk" (reads `manifest.json` and one `.json` file per type) versus "from a module" (imports a `TSManifest` directly, no filesystem access involved).
+
 ## XLR Objects
 
 XLRs contain all of the information about a TypeScript type or interface. For an interface it will have the information on what parameters it has, the types of those parameters, and if those parameters are optional. For a type, it will similarly describe the properties/types that compose it. There is no distinction in XLR on whether the XLR came from a type or an interface as everything is just represented by a Node.
 
 ### XLR Nodes
 
-XLR nodes are similar to TypeScripts internal AST nodes but a bit simpler. Almost every type/language feature you would use in TypeScript has an equivalent XLR node type. The definitions for these types are available in the `@xlr-lib/xlr` [package](https://github.com/player-ui/tools/tree/main/xlr/types).
+XLR nodes are similar to TypeScripts internal AST nodes but a bit simpler. Almost every type/language feature you would use in TypeScript has an equivalent XLR node type. The definitions for these types are available in the `@xlr-lib/xlr` [package](https://github.com/player-ui/xlr/tree/main/types/javascript).
+
+#### Anatomy of a Node
+
+Every node has a `type` discriminant identifying what kind of node it is: `string`, `object`, `ref`, `or`, `conditional`, and so on, one per TypeScript language feature XLR supports. See [AST Node Model](../architecture/ast-model) for the full list.
+
+Most nodes also carry a common set of `Annotations` sourced from the type's declaration and JSDoc comment, including a `name`, a `description` (the JSDoc body), and a `title`. Full field list is on the [AST Node Model](../architecture/ast-model) page too.
+
+:::note
+`title` is a dotted path rather than the property name alone. For example, `ActionAsset.metaData.beacon` identifies exactly where a node lives within its parent type, which is useful when you're looking at a deeply nested node in isolation.
+:::
+
+The two shapes you'll work with most as a plugin author are `ObjectNode` and `RefNode`:
+
+```typescript
+interface ObjectNode {
+  type: "object";
+  properties: {
+    [name: string]: { required: boolean; node: NodeType };
+  };
+  /** A custom primitive that this object extends, resolved when used */
+  extends?: RefType;
+  /** false, or the type allowed for any additional/unlisted properties */
+  additionalProperties: false | NodeType;
+}
+
+interface RefNode {
+  type: "ref";
+  ref: string;
+  /** Fills in a generic when the reference is resolved; position preserved */
+  genericArguments?: Array<NodeType>;
+  /** Optional property to access on the referenced type once resolved */
+  property?: string;
+}
+```
+
+Here's a real, compiled example: the generic `Asset<T>` type from Player's own core, as it's actually stored on disk.
+
+```json
+{
+  "source": "src/index.ts",
+  "name": "Asset",
+  "type": "object",
+  "properties": {
+    "id": {
+      "required": true,
+      "node": {
+        "type": "string",
+        "title": "Asset.id",
+        "description": "Each asset requires a unique id per view"
+      }
+    },
+    "type": {
+      "required": true,
+      "node": {
+        "type": "ref",
+        "ref": "T",
+        "title": "Asset.type",
+        "description": "The asset type determines the semantics of how a user interacts with a page"
+      }
+    }
+  },
+  "additionalProperties": {
+    "type": "unknown"
+  },
+  "title": "Asset",
+  "description": "An asset is the smallest unit of user interaction in a player view",
+  "genericTokens": [
+    {
+      "symbol": "T",
+      "constraints": { "type": "string" },
+      "default": { "type": "string" }
+    }
+  ]
+}
+```
+
+Notice the `genericTokens` array. This is how an unresolved generic (`T`) shows up on a Named Type before it's been filled in with a concrete value like `"action"` or `"text"`.
 
 ### Named Types
 
 Named Types represent a top level interface/type and can be _any_ XLR Node. Named types are generated from interfaces/types that are exported from a source file or plugin. It should be noted that when generating a Named Type, all referenced types are also serialized and included in place in the Named Type and _not_ exported separately. That is unless The type is listed as a _Custom Primitive_. A reason to do this would be if that type definition changes based on use case or platform. For example, in the Player ecosystem `Asset` is considered a Custom Primitive because depending on the context, we might need to swap it out with a different type.
 
-# XLR SDK
+A Named Type is just any Node plus a `name` and the `source` file it came from. The `"source": "src/index.ts"` field in the `Asset` example above is exactly this:
 
-The XLR SDK is used to abstract away the more tedious interactions XLRs like loading them from their package, managing them when they're loaded, and validating content against them. The SDK does include an simple object store so that it can be used out of the box, however if your use case requires some different logic it can be extended quite easily. In fact, [we do that in the Player LSP](https://github.com/player-ui/tools/blob/main/language/json-language-service/src/xlr/registry.ts).
+```typescript
+type NamedType<T extends NodeType = NodeType> = T & {
+  name: string;
+  source: string;
+};
+```
+
+When a Named Type still has unresolved generics (like `Asset<T>` above), it's technically a `NamedTypeWithGenerics`: the same shape plus a `genericTokens` array describing each generic symbol, its constraints, and its default.
+
+Beyond `Asset`, other types that are treated as Custom Primitives in the Player ecosystem include `Binding`, `Expression`, `AssetWrapper`, and `Schema.DataType`. Each has a concrete shape that depends on context (which schema is in scope, which platform is rendering, etc.) rather than being fixed at compile time.
+
+:::note[Why Custom Primitives exist]
+Custom Primitives are a deliberate escape hatch from the "inline everything" default, reserved for types whose shape is genuinely contextual or platform-dependent. Inlining is still the right choice for anything with a single, fixed shape.
+:::
+
+## XLR SDK
+
+The XLR SDK is used to abstract away the more tedious interactions XLRs like loading them from their package, managing them when they're loaded, and validating content against them. The SDK does include an simple object store so that it can be used out of the box, however if your use case requires some different logic it can be extended quite easily. In fact, [we do that in the Player LSP](https://github.com/player-ui/language/blob/main/lsp/json-language-service/src/xlr/registry.ts). See [Filters](#filters) below for how to narrow down what the SDK loads, and [Using XLRs](../usage/sdk) for the full method reference.
+
+## Filters
+
+When loading or listing types, the SDK accepts a `Filters` object to narrow things down:
+
+```typescript
+interface Filters {
+  pluginFilter?: string | RegExp;
+  capabilityFilter?: string | RegExp;
+  typeFilter?: string | RegExp;
+}
+```
+
+:::caution
+A **positive match excludes** the matched item, which is easy to misread as "select." A `typeFilter: "Transformed"` omits types named `Transformed`.
+:::
+
+`pluginFilter` only applies when listing already-loaded types (`listTypes`). `loadDefinitionsFromDisk`/`loadDefinitionsFromModule` don't accept it, since the plugin being loaded is already fixed at that point.
 
 ## Transform Functions
 
@@ -57,3 +201,7 @@ const transformFunction: TransformFunction = (input, capability) => {
   return input;
 };
 ```
+
+Transforms registered with `addTransformFunction` apply to every load from then on. They compose with any one-off transforms passed as the third argument to a specific `loadDefinitionsFromDisk`/`loadDefinitionsFromModule` call.
+
+Internally, the SDK uses this same node-walking mechanism to resolve `extends`, `and`, `conditional`, and `ref` nodes when a type is retrieved with `getType(..., {optimize: true})`. It relies on its own transform machinery for this.

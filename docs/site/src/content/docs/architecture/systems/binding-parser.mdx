@@ -1,0 +1,71 @@
+---
+title: "BindingParser"
+description: "How Player parses and caches binding paths like foo.bar[baz=1] into the data model."
+---
+
+`BindingParser` is *"a parser for creating bindings from a string"* — it turns the strings authors write (`foo.bar`, `foo.bar[baz=1]`, `{{some.nested}}`) into `BindingInstance` objects the rest of Player can use to read and write the data model.
+
+## Key Files
+
+- `core/player/src/binding/index.ts` — the `BindingParser` class
+- `core/player/src/binding/binding.ts` — the `BindingInstance` class
+- `core/player/src/binding/resolver.ts` — `resolveBindingAST`, walks a parsed AST into a normalized path
+- `core/player/src/binding/utils.ts` — helpers (`isBinding`, `getBindingSegments`, etc.)
+- `core/player/src/binding-grammar/` — the low-level grammar/parser (`ast.ts` for node types, `custom/index.ts` for the hand-written parser implementation)
+
+## Binding Path Syntax
+
+A binding path is a dot-separated list of segments, where each segment can also carry bracketed query/index syntax:
+
+| Syntax | Meaning |
+| --- | --- |
+| `foo.bar.baz` | plain nested path |
+| `foo['bar']["baz"]` | bracket-notation, equivalent to the above |
+| `foo.arr[2]` | numeric index into an array |
+| `foo.arr[key=1]` | query segment — find the entry in `foo.arr` where `key === 1` |
+| `foo.{{other.binding}}.baz` | a nested binding whose *value* becomes a path segment |
+
+The query and nested-binding forms are handled by the grammar; see [Data & Expressions](/content/data-expressions) for the authoring-level explanation of this syntax — this page covers how it's parsed at runtime.
+
+## Parsing and Caching
+
+`BindingParser.parse(rawBinding)` accepts a string or an array of segments and returns a `BindingInstance`. It short-circuits if the input is already a `BindingInstance`.
+
+Internally there are two caches, both keyed off the module's own private state (`core/player/src/binding/index.ts`):
+
+- `parseCache: Record<string, ParserResult>` — caches the raw AST produced by the grammar parser, keyed by the original string.
+- `cache: Record<string, BindingInstance>` — caches the final, normalized `BindingInstance`, keyed by the normalized path string.
+
+There's also a fast path that skips the grammar entirely: if a path has none of the special binding characters (`BINDING_BRACKETS_REGEX`, e.g. `[`, `]`, `{`, `}`, quotes) and looks like a simple dotted path (`LAZY_BINDING_REGEX`), `normalizePath` just does `path.split(".")` rather than invoking the parser — as long as the `skipOptimization` hook doesn't veto it (see below).
+
+Because of these caches, re-parsing the same binding string repeatedly (which happens constantly — every resolver pass, every `{{binding}}` in a view) is cheap after the first parse. The resulting `BindingInstance` also freezes its internal segment array (`Object.freeze(this.split)`), so it's safe to treat as an immutable value and share across the codebase — that's part of why caching and reusing instances by normalized string is safe.
+
+### The Grammar Is Swappable
+
+The actual parsing logic lives in `core/player/src/binding-grammar/`, not in `BindingParser` itself. `binding/index.ts` imports it as:
+
+```ts
+import {
+  // We can swap this with whichever parser we want to use
+  parseCustom as parseBinding,
+} from "../binding-grammar";
+```
+
+`binding-grammar/custom/index.ts` is a small hand-rolled character-by-character parser (no parser-generator dependency) that produces the AST types defined in `binding-grammar/ast.ts` (`PathNode`, `QueryNode`, `ValueNode`, `ExpressionNode`, `ConcatenatedNode`). `binding/resolver.ts`'s `resolveBindingAST` then walks that AST — resolving nested paths and backtick expressions via the caller-supplied `getValue`/`evaluate` callbacks — into a flat, normalized `Array<string | number>` path.
+
+## Hooks / Extension Points
+
+| Hook | Type | Gives you | Use it when… |
+| --- | --- | --- | --- |
+| `hooks.skipOptimization` | `SyncBailHook<[string], boolean>` | A chance to veto the "simple dotted path" fast path for a given raw path string | You need every path (even simple-looking ones) to go through full grammar parsing/resolution |
+| `hooks.beforeResolveNode` | `SyncWaterfallHook<[AnyNode, BeforeResolveNodeContext]>` | The AST node about to be resolved, plus the in-progress normalized path/options context | You want to transform or intercept an AST node (e.g. a `Query` or `Expression` segment) before it's resolved into a concrete path segment |
+
+Both hooks are exposed on `player.hooks.bindingParser` — see the [Plugins](/plugins/) hook table for how plugins reach the shared instance.
+
+## Relationship to Other Subsystems
+
+`BindingParser` is a shared, low-level leaf dependency with no dependencies of its own on other controllers. One instance is created per `player.start()` run and threaded through the rest of the system — see [Start to Render](/architecture/diagrams/start-to-render) for where it's constructed.
+
+- [DataController](/architecture/systems/data-controller) — every `get`/`set`/`delete` call accepts a raw binding string or array and parses it through this shared `BindingParser` instance before touching the data model.
+- [StringResolver](/architecture/systems/string-resolver) — when resolving `{{binding}}` references embedded in view strings, the underlying model `.get()` call parses the extracted binding text through this same parser.
+- [Data & Expressions](/content/data-expressions) — the authoring-level syntax guide for bindings; that page covers the syntax you author, this page covers how it's parsed at runtime.

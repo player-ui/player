@@ -3,6 +3,7 @@ package com.intuit.playerui.plugins.metrics
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.counterFlowString
 import com.intuit.playerui.utils.test.runBlockingTest
 import com.intuit.playerui.utils.test.simpleFlowString
 import io.mockk.Called
@@ -109,6 +110,32 @@ internal class MetricsPluginTest : PlayerTest() {
         assertNotNull(timingVal)
         assertNotNull(renderMetricsVal)
         assertNotNull(playerFlowMetricsVal)
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    @TestTemplate
+    fun `tracks view update times`() = runBlockingTest {
+        var onUpdateEndTapped = false
+        var renderMetricsVal: RenderMetrics? = null
+        plugin?.hooks?.onRenderEnd?.tap("test") { _, renderMetrics, _ ->
+            renderMetricsVal = renderMetrics
+        }
+        plugin?.hooks?.onUpdateEnd?.tap("test") { _, _, _ ->
+            onUpdateEndTapped = true
+        }
+
+        player.start(counterFlowString)
+        plugin?.renderEnd() // first paint
+        assertNotNull(renderMetricsVal)
+        assertTrue(renderMetricsVal!!.updates.isEmpty())
+        assertFalse(onUpdateEndTapped)
+
+        // Change the bound value on the SAME view (no navigation) to drive an update
+        player.inProgressState!!.evaluate(listOf("{{count}} = {{count}} + 1"))
+        plugin?.renderEnd() // close the update timing
+
+        assertTrue(onUpdateEndTapped)
+        assertEquals(1, renderMetricsVal!!.updates.size)
     }
 }
 
