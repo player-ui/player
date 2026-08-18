@@ -4,7 +4,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
-import androidx.test.platform.app.InstrumentationRegistry
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAtState
@@ -15,7 +14,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class InputTest : AssetTest("input") {
-    private fun runOnMain(block: () -> Unit) = InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
+    private fun FormattedEditText.type(text: String) {
+        requestFocus()
+        setText(text)
+        clearFocus()
+        blockUntilRendered()
+    }
 
     @Test
     fun basic() {
@@ -25,23 +29,20 @@ class InputTest : AssetTest("input") {
             ?: throw AssertionError("current view is null")
         val inputField = currentView?.findViewById<FormattedEditText>(R.id.input_field) ?: throw AssertionError("current view is null")
 
-        // Drain the main looper so the label TextView is attached before we index into it.
-        runOnMain { }
-
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("This is an input", text.toString())
         }
 
-        runOnMain {
-            inputField.requestFocus()
-            inputField.setText("text")
+        inputField.apply {
+            requestFocus()
+            setText("text")
         }
 
         player.shouldBeAtState<InProgressState> {
             assertEquals(null, dataModel.get("foo.bar"))
         }
 
-        runOnMain { inputField.clearFocus() }
+        inputField.clearFocus()
 
         player.shouldBeAtState<InProgressState> {
             assertEquals("text", dataModel.get("foo.bar"))
@@ -58,9 +59,6 @@ class InputTest : AssetTest("input") {
         val inputNoteContainer = view.findViewById<FrameLayout>(R.id.input_note_container)
         val inputField = view.findViewById<FormattedEditText>(R.id.input_field)
 
-        // Drain the main looper so the label/note TextViews are attached before we index into them.
-        runOnMain { }
-
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("Input with validation and formatting", text.toString())
         }
@@ -69,11 +67,13 @@ class InputTest : AssetTest("input") {
             assertEquals("It expects a positive integer", text.toString())
         }
 
-        runOnMain {
-            inputField.requestFocus()
-            inputField.setText("30")
-            inputField.clearFocus()
+        inputField.type("t")
+
+        player.shouldBeAtState<InProgressState> {
+            assertEquals(null, dataModel.get("foo.bar"))
         }
+
+        inputField.type("30")
 
         player.shouldBeAtState<InProgressState> {
             assertEquals(30, dataModel.get("foo.bar"))
