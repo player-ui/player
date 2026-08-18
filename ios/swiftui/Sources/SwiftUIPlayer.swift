@@ -204,7 +204,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             hooks.state.tap { [weak self, weak playerValue] newState in
                 Task { @MainActor [weak self] in
                     guard let self, let playerValue, self.player == playerValue else { return }
-                    self.state = newState
+                    state = newState
                 }
             }
 
