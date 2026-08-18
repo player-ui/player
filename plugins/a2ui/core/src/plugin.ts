@@ -8,6 +8,7 @@ import {
   A2UIContentPlugin,
   A2UIExpressionsPlugin,
   A2UITransformPlugin,
+  A2UIValidationPlugin,
 } from "./plugins";
 
 /**
@@ -23,6 +24,7 @@ export class A2UIPlugin implements PlayerPlugin {
     new A2UIContentPlugin(),
     new A2UITransformPlugin(),
     new A2UIExpressionsPlugin(),
+    new A2UIValidationPlugin(),
   ]);
 
   apply(player: Player): void {

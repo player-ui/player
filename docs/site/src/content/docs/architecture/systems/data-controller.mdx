@@ -1,0 +1,94 @@
+---
+title: "DataController"
+description: "The orchestrator for player data — the main runtime API for reading, writing, formatting, and validating the data model."
+---
+
+*The orchestrator for player data.*
+
+`DataController` is the main runtime API that every other subsystem — expressions, the view resolver, plugins — goes through to read or write data. It doesn't store data itself; it wraps a pipelined model, layers hooks around every operation, and composes whatever middleware (validation, error-handling) was supplied when it was constructed.
+
+## Key Files
+
+- `core/player/src/controllers/data/controller.ts` — `DataController` class
+- `core/player/src/controllers/data/utils.ts` — `ReadOnlyDataController`
+- `core/player/src/data/model.ts` — `PipelinedDataModel`, `LocalModel`, `DataModelMiddleware`, `DataPipeline` types it builds on
+
+## Construction
+
+```ts
+constructor(
+  model: Record<any, unknown> | undefined,
+  options: {
+    pathResolver: BindingParser;
+    middleware?: Array<DataModelMiddleware>;
+    logger?: Logger;
+  },
+)
+```
+
+`DataController` is created once per `player.start(flow)` call, seeded with the flow's `data` block and a `BindingParser`. See [Start to Render](/architecture/diagrams/start-to-render) for where it fits in the overall startup sequence. In practice, Player constructs it with the `ValidationController`'s middleware (`validationController.getDataMiddleware()`) and an error-controller middleware already in the `middleware` array, so validation and error handling are wired in before the first read or write happens.
+
+Internally, `DataController` lazily builds a `PipelinedDataModel` the first time `getModel()` is called, made up of a base `LocalModel` (the raw in-memory store) plus whatever middleware was supplied — see [Data Model](/architecture/systems/data-model) for how that pipeline itself works. `DataController`'s job is everything layered *on top* of that pipeline:
+
+- Parsing raw string/array bindings into `BindingInstance`s via the `pathResolver` before every operation.
+- Diffing old vs. new values (via `dequal`) so no-op writes don't fire update hooks.
+- Resolving default values when a `get` returns `undefined`.
+- Formatting/deformatting values around the pipeline.
+- Firing `onSet`/`onGet`/`onUpdate`/`onDelete` hooks so other subsystems (notably the `ViewController`) can react.
+
+## Format / Deformat Lifecycle
+
+`set`/`get` accept a `formatted` option: setting with `formatted: true` runs the value through `hooks.deformat` before it hits the pipeline; getting with `formatted: true` runs the stored value through `hooks.format` on the way out (and `formatted: false` explicitly deformats a value that's already in the model). Player itself taps both hooks once at startup to delegate to the `SchemaController`'s registered formatters:
+
+```ts
+dataController.hooks.format.tap("player", (value, binding) => {
+  const formatter = schema.getFormatter(binding);
+  return formatter ? formatter.format(value) : value;
+});
+```
+
+See [Data Formatting and Deformatting](/guides/formatting) for the full authoring-level explanation of format references and custom format types.
+
+## Default Value Resolution
+
+When `get` resolves to `undefined` (and the caller didn't pass `ignoreDefaultValue`), `DataController` calls the `resolveDefaultValue` hook, passing the resolved `BindingInstance`. Player taps this once at startup to fall back to the type's `default` from the schema:
+
+```ts
+dataController.hooks.resolveDefaultValue.tap(
+  "player",
+  (binding) => schema.getApparentType(binding)?.default,
+);
+```
+
+## Serialize
+
+`serialize()` returns `hooks.serialize.call(this.get(""))` — it reads the entire model from the root binding and runs the result through the `serialize` waterfall hook before returning it. This gives plugins a chance to redact or reshape the output (for example, the `data-filter` plugin taps this hook to strip particular paths out of the serialized model).
+
+## Hooks / Extension Points
+
+All of the following are tapable hooks defined on `dataController.hooks` (verified against `controller.ts`); nothing in this list is a plain method:
+
+| Hook | Type | Gives you | Use it when… |
+| --- | --- | --- | --- |
+| `resolve` | `SyncWaterfallHook` | Declared on the class, but not called or tapped anywhere in `core/player` today — note that `ExpressionEvaluator` and the view `Resolver` each have their own, unrelated `hooks.resolve` of the same name; don't confuse the two | Probably not — treat as reserved/unused for now |
+| `resolveDataStages` | `SyncWaterfallHook<[DataPipeline]>` | The middleware array before it's frozen into the pipeline | You need to insert/remove/reorder middleware (see the [plugin implementation guide](/guides/plugin-implementation) for a worked example) |
+| `resolveDefaultValue` | `SyncBailHook<[BindingInstance], any>` | A chance to supply a default when a `get` resolves to `undefined` | You want schema- or convention-based defaults |
+| `onDelete` | `SyncHook<[BindingInstance]>` | Notification after a `delete` completes | You need to react to removed bindings |
+| `onSet` | `SyncHook<[BatchSetTransaction]>` | The raw, normalized transaction passed to `set` | You want to observe every write attempt, including no-ops |
+| `onGet` | `SyncHook<[any, any]>` | The binding and resolved value for every `get` | You want to observe reads |
+| `onUpdate` | `SyncHook<[Updates, DataModelOptions \| undefined]>` | The actual set of changed bindings (no-ops filtered out) | You want to react only to real changes — this is what `ViewController` taps to trigger re-render |
+| `format` | `SyncWaterfallHook<[any, BindingInstance]>` | A chance to convert a stored value into its user-facing representation | You're wiring up formatters (see [Data Formatting and Deformatting](/guides/formatting)) |
+| `deformat` | `SyncWaterfallHook<[any, BindingInstance]>` | The inverse of `format` | Converting a user-facing value back to its stored representation |
+| `serialize` | `SyncWaterfallHook<[any]>` | The full model snapshot before `serialize()` returns it | You want to redact or reshape exported data |
+
+## `ReadOnlyDataController`
+
+`makeReadOnly()` returns a `ReadOnlyDataController` (`core/player/src/controllers/data/utils.ts`) — *a wrapper for the Data Controller Class that prevents writes*. It implements only `get`, delegating straight to the underlying controller. `player.hooks.state` exposes exactly this read-only variant once a flow reaches the `completed` state, so plugins can inspect final data without being able to mutate it.
+
+## Relationship to Other Subsystems
+
+- [Data Model](/architecture/systems/data-model) — the `PipelinedDataModel`/`LocalModel`/middleware machinery `DataController` wraps
+- [ValidationController](/architecture/systems/validation-controller) — supplies its data middleware via `getDataMiddleware()`, which is injected into `DataController`'s constructor
+- [SchemaController](/architecture/systems/schema-controller) — supplies the formatters used by the `format`/`deformat` hooks and the default values used by `resolveDefaultValue`
+- [Data Formatting and Deformatting](/guides/formatting) — full guide on formatter references and custom format types
+- [Plugin Implementation](/guides/plugin-implementation) — a worked example tapping `dataController.hooks.resolveDataStages` to conditionally insert middleware

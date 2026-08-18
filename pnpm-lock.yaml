@@ -546,6 +546,9 @@ importers:
       '@player-ui/a2ui-plugin':
         specifier: workspace:^
         version: link:../../plugins/a2ui/core
+      '@player-ui/a2ui-plugin-mocks':
+        specifier: workspace:^
+        version: link:../../plugins/a2ui/mocks
       '@player-ui/a2ui-plugin-react':
         specifier: workspace:^
         version: link:../../plugins/a2ui/react
@@ -624,6 +627,9 @@ importers:
       '@player-ui/types':
         specifier: workspace:^
         version: link:../../../core/types
+      '@player-ui/types-provider-plugin':
+        specifier: workspace:^
+        version: link:../../types-provider/core
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:^

@@ -315,16 +315,33 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     options: Resolve.NodeResolveOptions,
   ) {
     try {
+      // Track whether the callback pushed content while the hook was pending;
+      // if so it wins over the bail return (avoids the last-writer-wins race
+      // that intermittently dropped streamed rows).
+      let deliveredViaCallback = false;
+
       const result = await this.basePlugin?.hooks.onAsyncNode.call(
         node,
-        (result) => {
-          this.parseNodeAndUpdate(node, context, result, options.parseNode);
+        (streamedResult) => {
+          deliveredViaCallback = true;
+          this.parseNodeAndUpdate(
+            node,
+            context,
+            streamedResult,
+            options.parseNode,
+          );
         },
       );
 
       // Stop tracking before the next update is triggered
       context.inProgressNodes.delete(node.id);
-      this.parseNodeAndUpdate(node, context, result, options.parseNode);
+
+      // Once the callback has delivered content it is the source of truth, so a
+      // stale/empty bail return must not clobber it. Skip unless no callback ran
+      // (!deliveredViaCallback) and the return carries content (result != null).
+      if (!deliveredViaCallback && result != null) {
+        this.parseNodeAndUpdate(node, context, result, options.parseNode);
+      }
     } catch (e: unknown) {
       const cause = e instanceof Error ? e : new Error(String(e));
       const playerState = this.basePlugin?.getPlayerInstance()?.getState();

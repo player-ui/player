@@ -35,6 +35,10 @@ If you are writing a Player Plugin, you'll first need to have your plugin extend
 - Views
 - Expressions
 - Data Types
+- Formatters
+- Validators
+
+All six generics default to `void`, so you only need to fill in the ones your plugin actually provides. A plugin that only exports Assets doesn't need to touch the remaining five.
 
 For example, you can see how its done below in the [core reference assets plugin](https://github.com/player-ui/player/blob/main/plugins/reference-assets/core/src/plugin.ts)
 
@@ -69,3 +73,11 @@ Otherwise, if you are not using Bazel then run the following command as part of 
 ```shell
 player xlr compile -m plugin <other options>
 ```
+
+:::tip
+`xlr_mode` on `js_xlr_pipeline` maps 1:1 to the `-m` flag on `player xlr compile`. The Bazel and non-Bazel paths are just different ways of invoking the same CLI.
+:::
+
+## Reverse Direction: Generating TypeScript from XLRs
+
+The conversion also works backwards. `@xlr-lib/xlr-converters` exports `exportTypesToTypeScript(typesToExport, importMap)`, which takes a list of XLR `NamedType`s and generates a TypeScript `.d.ts` file body from them. This is useful for tooling that only has XLR JSON to work with (no original source) but still needs TypeScript types, for example generating types for a cross-platform consumer. See [Architecture](../../architecture/overview) for where this fits into the broader package layout.

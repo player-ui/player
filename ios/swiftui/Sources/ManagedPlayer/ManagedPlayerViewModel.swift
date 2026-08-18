@@ -62,7 +62,6 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     /// fetch
     ///   - onStartedFlow: A handler for when a flow is started, passed the flow `String` that was
     /// used to start it
-    ///   - onError: A handler for when the `SwiftUIPlayer` encounters an error
     public init(
         manager: FlowManager,
         onComplete: @escaping (CompletedState) -> Void,
@@ -74,7 +73,9 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
         $result.sink { [weak self] result in
             guard let result else { return }
-            self?.handleResult(result)
+            Task { @MainActor [weak self] in
+                self?.handleResult(result)
+            }
         }
         .store(in: &bag)
     }
@@ -109,6 +110,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         }
     }
 
+    @MainActor
     func handleResult(_ result: Result<CompletedState, PlayerError>) {
         switch result {
         case let .success(completed):
@@ -119,20 +121,20 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         }
     }
 
+    @MainActor
     func next(_ state: CompletedState? = nil) async {
-        Task { @MainActor in
-            self.loadingState = .loading
-            self.flow = nil
+        loadingState = .loading
+        flow = nil
 
-            do {
-                let nextFlow = try await self.manager.next(result: state)
-                self.handleNextFlow(nextFlow)
-            } catch {
-                self.loadingState = .failed(error)
-            }
+        do {
+            let nextFlow = try await manager.next(result: state)
+            handleNextFlow(nextFlow)
+        } catch {
+            loadingState = .failed(error)
         }
     }
 
+    @MainActor
     func handleNextFlow(_ nextFlow: String?) {
         if let flow = nextFlow {
             if !flow.isEmpty {
@@ -164,17 +166,24 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         case loaded(String)
 
         var isLoaded: Bool {
-            guard case .loaded = self else { return false }
+            guard case .loaded = self else {
+                return false
+            }
             return true
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.idle, .idle): true
-            case (.loading, .loading): true
-            case let (.loaded(lll), .loaded(rrr)) where lll == rrr: true
-            case let (.retry(lll), .retry(rrr)) where lll === rrr: true
-            default: false
+            case (.idle, .idle), (.loading, .loading):
+                true
+            case let (.loaded(lhsFlow), .loaded(rhsFlow)):
+                lhsFlow == rhsFlow
+            case let (.retry(lhsState), .retry(rhsState)):
+                lhsState === rhsState
+            // `.failed` is intentionally never equal: `Error` isn't `Equatable`,
+            // so every failure counts as a distinct state.
+            default:
+                false
             }
         }
     }

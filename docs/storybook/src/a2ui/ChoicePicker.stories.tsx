@@ -8,9 +8,9 @@ const meta: Meta = {
 export default meta;
 
 export const SingleSelect = createA2UIStory(
-  () => import("@player-ui/mocks/choice-picker/single-select.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/choice-picker/single-select.json"),
 );
 
 export const MultiSelect = createA2UIStory(
-  () => import("@player-ui/mocks/choice-picker/multi-select.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/choice-picker/multi-select.json"),
 );

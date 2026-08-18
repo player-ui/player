@@ -1,5 +1,6 @@
+import Combine
+import Foundation
 import PlayerUI
-import PlayerUIA2UI
 import PlayerUIBaseBeaconPlugin
 import PlayerUIBeaconPlugin
 import PlayerUIExpressionPlugin
@@ -11,6 +12,7 @@ import PlayerUIPubSubPlugin
 import PlayerUIReferenceAssets
 import PlayerUISwiftUI
 import PlayerUISwiftUIPendingTransactionPlugin
+import PlayerUITestUtilitiesCore
 import PlayerUITransitionPlugin
 import PlayerUITypesProviderPlugin
 import SwiftUI
@@ -26,22 +28,33 @@ struct BazelApp: App {
     }
 }
 
+/// A SwiftUI View that contains different tabs for ease of UITesting (Assets, Plugins, A2UI)
 struct MainView: View {
-    @State var result: Result<CompletedState, PlayerError>?
+    private let mocks: Mocks = .init()
+
+    @State private var result: Result<CompletedState, PlayerError>?
+    @State private var segmentationSelection: HeaderSelection = .assets
 
     var body: some View {
-        SegmentControlView(
-            plugins: plugins,
-            assetSections: MockFlows.assetSections,
-            pluginSections: MockFlows.pluginSections,
-            result: $result
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink("A2UI") { A2UIDemoView() }
+        VStack {
+            Picker("", selection: $segmentationSelection) {
+                ForEach(HeaderSelection.allCases, id: \.self) { option in
+                    Text(option.rawValue)
+                }
+            }.pickerStyle(SegmentedPickerStyle())
+
+            Spacer()
+
+            switch segmentationSelection {
+            case .assets:
+                assetDemos
+            case .plugins:
+                PluginsAndPlayerCollection(plugins: .defaults, sections: mocks.pluginsSections)
+            case .a2ui:
+                A2UIDemoView(sections: mocks.a2uiSections)
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
         .alert(isPresented: showAlert, content: {
             Alert(
                 title: Text("Flow Finished"),
@@ -58,32 +71,48 @@ struct MainView: View {
         })
     }
 
-    private var plugins: [NativePlugin] {
-        [
-            PrintLoggerPlugin(level: .trace),
-            ReferenceAssetsPlugin(),
-            ExpressionPlugin(),
-            MetricsPlugin { timing, render, flow in
-                print(timing as Any)
-                print(render as Any)
-                print(flow as Any)
-            },
-            RequestTimePlugin { 5 },
-            PubSubPlugin([]),
-            TypesProviderPlugin(types: [], validators: [], formats: []),
-            TransitionPlugin(popTransition: .pop),
-            BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-            SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
-            ExternalStatePlugin(handlers: [
-                ExternalStateHandler(
-                    ref: "test-1",
-                    handlerFunction: { _, _, _ in
-                        print("MainView External State triggered")
-                    }
-                ),
-            ]),
-        ]
+    var assetDemos: some View {
+        AssetCollection(
+            plugins: .defaults,
+            sections: mocks.assetSections,
+            result: $result
+        )
+        .accessibility(identifier: "AssetCollection")
+        .navigationBarTitle(Text("Flows"))
     }
+
+    enum HeaderSelection: String, CaseIterable {
+        case assets = "Asset Demos"
+        case plugins = "Plugin Demos"
+        case a2ui = "A2UI Asset Demos"
+    }
+}
+
+extension [NativePlugin] {
+    static let defaults: [NativePlugin] = [
+        PrintLoggerPlugin(level: .trace),
+        ReferenceAssetsPlugin(),
+        ExpressionPlugin(),
+        MetricsPlugin { timing, render, flow in
+            print(timing as Any)
+            print(render as Any)
+            print(flow as Any)
+        },
+        RequestTimePlugin { 5 },
+        PubSubPlugin([]),
+        TypesProviderPlugin(types: [], validators: [], formats: []),
+        TransitionPlugin(popTransition: .pop),
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
+        ExternalStatePlugin(handlers: [
+            ExternalStateHandler(
+                ref: "test-1",
+                handlerFunction: { _, _, _ in
+                    print("MainView External State triggered")
+                }
+            ),
+        ]),
+    ]
 }
 
 extension Result where Success == CompletedState, Failure == PlayerError {

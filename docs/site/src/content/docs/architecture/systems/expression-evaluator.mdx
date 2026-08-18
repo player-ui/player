@@ -1,0 +1,69 @@
+---
+title: "ExpressionEvaluator"
+description: "How Player parses and evaluates its custom expression language against the data model."
+---
+
+`ExpressionEvaluator` (`core/player/src/expressions/evaluator.ts:259`) is *"the expression evaluator [...] responsible for parsing and executing anything in the custom expression language"* — every `@[...]@` block in content, every `onStart`/`onEnd`/action `exp`, and every computed schema value ultimately runs through this class.
+
+## Key Files
+
+- `core/player/src/expressions/evaluator.ts` — the `ExpressionEvaluator` class, plus the default binary/unary operator tables (`DEFAULT_BINARY_OPERATORS`, `DEFAULT_UNARY_OPERATORS`)
+- `core/player/src/expressions/parser.ts` — `parseExpression`, a hand-written [JSEP](https://ericsmekens.github.io/jsep/)-based parser that turns an expression string into an `ExpressionNode` AST
+- `core/player/src/expressions/evaluator-functions.ts` — the built-in named expression-function library
+- `core/player/src/expressions/async.ts` — `isPromiseLike`/`isAwaitable`/`collateAwaitable`/`makeAwaitable`, the machinery behind `evaluateAsync`
+- `core/player/src/expressions/types.ts` — `ExpressionContext`, `ExpressionHandler`, `BinaryOperator`/`UnaryOperator` types
+
+A single `ExpressionEvaluator` is constructed per `player.start()` run — see [Start to Render](/architecture/diagrams/start-to-render) for where it sits relative to the other controllers. In `player.ts`'s `setupFlow`, it's constructed as:
+
+```ts
+expressionEvaluator = new ExpressionEvaluator({
+  model: dataController,
+  logger: this.logger,
+});
+```
+
+## The Model Is a DataController
+
+The constructor takes an `ExpressionEvaluatorOptions` object whose `model` field is typed as `DataModelWithParser` — and `player.ts` passes it the same `dataController` instance (a `DataController`) used everywhere else in the run. This is literally why expressions can read and write data bindings: the built-in `getDataVal`/`setDataVal`/`deleteDataVal` handlers just call `context.model.get(...)`, `context.model.set(...)`, and `context.model.delete(...)` against that shared model. There's no separate "expression data layer" — it's the same [DataController](/architecture/systems/data-controller) instance the rest of Player uses.
+
+## Parsing and Caching
+
+`parseExpression(expr, { strict })` walks the string character-by-character (JSEP-style, no parser-generator dependency) and returns an `ExpressionNode` AST. By default parsing is strict (throws on malformed expressions unless `strict: false` is passed).
+
+The evaluator caches compiled ASTs in a private `expressionsCache: Map<string, ExpressionNode>`, keyed by the raw expression string (after stripping a surrounding `@[...]@` wrapper if present). Since the same expression string is often re-evaluated across renders, this avoids re-parsing on every call. `evaluator.reset()` clears this cache — Player calls it after every flow transition (see the `afterTransition` tap in `player.ts`'s `setupFlow`).
+
+## Operators and Functions
+
+Three separate tables live on `evaluator.operators`, and are all extensible at runtime:
+
+| Table | Defined in | Examples |
+| --- | --- | --- |
+| `operators.binary` | `DEFAULT_BINARY_OPERATORS` in `evaluator.ts` | `+`, `-`, `==`, `&&`, `\|\|`, `+=` |
+| `operators.unary` | `DEFAULT_UNARY_OPERATORS` in `evaluator.ts` | `-`, `+`, `!` |
+| `operators.expressions` | `evaluator-functions.ts` | `getDataVal`, `setDataVal`, `deleteDataVal`, `conditional`, `await` (registered as an alias for `waitFor`) |
+
+Comparison operators and `!` are wrapped so they stay correct even when an operand is a pending promise (see Async Evaluation below), and `&&`/`||` short-circuit without forcing evaluation of the side that isn't needed.
+
+Plugins extend all three tables through public methods on the evaluator: `addExpressionFunction(name, handler)`, `addBinaryOperator(op, handler)`, and `addUnaryOperator(op, handler)`. The [Expression Plugin](/plugins/core/expression) is the standard consumer-facing way to register new named functions — it calls `addExpressionFunction` for each entry in the map you give it. [Computed Properties](/plugins/core/computed-properties) is a different kind of consumer: it doesn't add functions, it uses the evaluator's `evaluate` to re-run a schema-declared `Expression` value every time its binding is read.
+
+## Async Evaluation
+
+`evaluateAsync(expr, options)` is marked `@experimental` in source. It sets `async: true` on the evaluation options and threads that flag through every hook call. Whether a given operator or handler actually returns a `Promise` depends on whether its operands are "awaitable" — `async.ts` defines `isPromiseLike` (a defensive check that also accepts non-native promises exposing `then`/`catch`/`finally`) and `isAwaitable` (an `isPromiseLike` value additionally tagged with Player's private `AwaitableSymbol`, produced by `makeAwaitable`/`collateAwaitable`). Binary/unary operators, the `&&`/`||` short-circuit logic, and ternary/`conditional` branching all check `isAwaitable` before deciding whether to return synchronously or chain a `.awaitableThen(...)`.
+
+## Hooks / Extension Points
+
+| Hook | Type | Gives you | Use it when… |
+| --- | --- | --- | --- |
+| `hooks.resolve` | `SyncWaterfallHook<[any, ExpressionNode, HookOptions]>` | The in-progress resolved value for an AST node, plus the node and options | You want to override or post-process how a specific node type resolves to a value |
+| `hooks.resolveOptions` | `SyncWaterfallHook<[HookOptions]>` | The `HookOptions` that will be passed into `resolve` calls | You need to inject additional context (e.g. extra fields on `ExpressionContext`) before evaluation starts |
+| `hooks.beforeEvaluate` | `SyncWaterfallHook<[ExpressionType, HookOptions]>` | The expression about to be evaluated | You want to rewrite or substitute an expression before it's parsed/run |
+| `hooks.onError` | `SyncBailHook<[Error], true>` | The error thrown during parsing or execution | You want to handle/suppress an expression error instead of letting it throw (return `true` to stop propagation) |
+
+These are exposed on `player.hooks.expressionEvaluator` — see the [Plugins](/plugins/) hook table for how plugins reach the shared instance.
+
+## Relationship to Other Subsystems
+
+- [Data & Expressions](/content/data-expressions) — the authoring-level guide to `@[...]@` expression syntax; this page covers the runtime engine that executes it.
+- [Expression Plugin](/plugins/core/expression) — the standard way to register custom named expression functions via `addExpressionFunction`.
+- [Computed Properties](/plugins/core/computed-properties) — uses `evaluate` to back schema-declared computed bindings.
+- [DataController](/architecture/systems/data-controller) — the `model` the evaluator reads and writes through.

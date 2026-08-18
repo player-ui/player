@@ -4,9 +4,9 @@ import XCTest
 class InfoAssetUITests: BaseTestCase {
     func testInfoBasic() {
         openFlow("info basic")
-        waitFor(app.buttons["next-action"])
+        waitFor(app.buttons["info-view-actions-0"])
 
-        tap(app.buttons["next-action"])
+        tap(app.buttons["info-view-actions-0"])
 
         XCTAssertTrue(app.alerts["Flow Finished"].exists)
 
@@ -14,6 +14,6 @@ class InfoAssetUITests: BaseTestCase {
             .staticTexts
             .element(boundBy: 1)
             .label
-            .contains("done"))
+            .contains("DONE"))
     }
 }

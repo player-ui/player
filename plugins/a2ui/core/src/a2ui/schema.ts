@@ -120,6 +120,7 @@ function translateCheck(
   const ref: Validation.Reference = {
     type,
     severity: "error",
+    trigger: "change",
   };
   if (check.message) ref.message = check.message;
 
@@ -129,7 +130,7 @@ function translateCheck(
   if (check.call === "regex" && check.args?.pattern) {
     ref.regex = unwrapLiteral(check.args.pattern);
   }
-  if (check.call === "length") {
+  if (check.call === "length" || check.call === "numeric") {
     if (check.args?.min !== undefined) ref.min = unwrapLiteral(check.args.min);
     if (check.args?.max !== undefined) ref.max = unwrapLiteral(check.args.max);
   }

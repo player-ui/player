@@ -8,9 +8,9 @@ const meta: Meta = {
 export default meta;
 
 export const Basic = createA2UIStory(
-  () => import("@player-ui/mocks/text/basic.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/text/basic.json"),
 );
 
 export const Variants = createA2UIStory(
-  () => import("@player-ui/mocks/text/variants.json"),
+  () => import("@player-ui/a2ui-plugin-mocks/text/variants.json"),
 );

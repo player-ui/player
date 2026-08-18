@@ -1,0 +1,77 @@
+---
+title: "ViewController & ViewInstance"
+description: "How Player resolves the active view for the current navigation state and wires it up with its plugins."
+---
+
+`ViewController` is *"a controller to manage updating/switching views"* (`core/player/src/controllers/view/controller.ts:56`). It watches the flow's navigation state and the data model, and mints a `ViewInstance` — *"a stateful view instance from an content"* (`core/player/src/view/view.ts:87`) — for whichever view is currently active.
+
+## Key Files
+
+- `core/player/src/controllers/view/controller.ts` — `ViewController`
+- `core/player/src/controllers/view/store.ts` — `LocalStateStore` (`core/player/src/controllers/view/store.ts:19`), used by `AssetTransformCorePlugin` to persist per-node transform state
+- `core/player/src/controllers/view/types.ts` — `TransformRegistry`, `TransformFunctions`, `BeforeTransformFunction`
+- `core/player/src/view/view.ts` — `ViewInstance`, `CrossfieldProvider`, and the `ViewPlugin` interface
+
+`ViewController` is constructed during `player.start()`'s controller wiring alongside the other core controllers — see [Start to Render](/architecture/diagrams/start-to-render) for where it sits in that sequence. Its constructor immediately taps `flowController.hooks.flow` (to hear about `VIEW` navigation states) and `dataController.hooks.onUpdate`/`onDelete` (to know when to re-render).
+
+## Why ViewController and ViewInstance are one page
+
+`ViewController` is the long-lived manager: one instance per `player.start()` run, holding the map of authored views and the seven [view plugins](/architecture/systems/view-plugins). `ViewInstance` is the short-lived, per-view object it mints — literally `const view = new ViewInstance(source, this.viewOptions)` inside `ViewController.onView()` (`core/player/src/controllers/view/controller.ts:219`), replaced every time navigation lands on a new `VIEW` state. This is the same "manager mints instance" pattern used by `FlowController`/`FlowInstance` (see [Flow Controller](/architecture/systems/flow-controller)) — the two classes are only meaningful together.
+
+## Resolving the active view
+
+`ViewController`'s constructor taps `flowController.hooks.flow`, and on that `FlowInstance`'s `hooks.transition`, checks `newState.value.state_type === "VIEW"` — if so, it calls `onView(newState.value)`; otherwise it clears `currentView`.
+
+`onView(state: NavigationFlowViewState)`:
+
+1. Looks up the view for `state.ref` in the view map (`getViewForRef`) — falling back to resolving `{{data}}` references embedded in view ids, for content that names views dynamically.
+2. Calls the `resolveView` hook with that lookup result, the raw ref, and the navigation state, giving plugins a chance to swap in a different view entirely (or throw if nothing resolves).
+3. Constructs `new ViewInstance(source, this.viewOptions)` and assigns it to `currentView`.
+4. Applies the seven [view plugins](/architecture/systems/view-plugins) to it (`applyViewPlugins`) — each plugin's `apply(view)` taps `view.hooks.parser`/`view.hooks.resolver` to install itself before anything resolves.
+5. Calls the `view` hook with the new instance, so other plugins can attach their own listeners before the first resolve.
+6. Calls `updateView()` to trigger the first resolve.
+
+## ViewInstance: parser + resolver + plugins, lazily wired
+
+`ViewInstance` doesn't build its `Parser`/`Resolver` in its constructor — it defers until the first `update(changes?, nodeChanges?)` call, when `rootNode` is still `undefined`:
+
+- Constructs a `CrossfieldProvider` (implements `ValidationProvider`) from the view's `validation` array — grouping each `x-field` validation reference by the `BindingInstance` it targets (defaulting `trigger: "navigation"`, `severity: "error"`), so `getValidationsForBinding` can answer "what cross-field validations apply to this binding" in constant time. See [Validation Controller](/architecture/systems/validation-controller) for how this feeds into the rest of validation.
+- Fires `hooks.templatePlugin` with the registered `TemplatePlugin` (warning if none was set — `TemplatePlugin.apply()` calls `view.setTemplatePlugin(this)` during plugin application).
+- Creates a `Parser`, fires `hooks.parser` with it (this is what each view plugin's `apply()` taps into), and calls `parser.parseView(initialView)` to build the root AST node.
+- Creates a `Resolver` from that root node, fires `hooks.resolver` with it, then calls `resolver.update(changes, nodeChanges)`.
+
+Every subsequent `update()` call skips straight to `resolver.update(...)`, reusing the same `Parser`/`Resolver`. If the resolved result is referentially unchanged, `hooks.onUpdate` doesn't fire again. `updateAsync` is a deprecated shim kept for compatibility — new code should use `ViewController.updateViewAST` instead.
+
+## Batched re-rendering
+
+`ViewController` doesn't call `currentView.update()` directly from its data-model taps. Both `dataController.hooks.onUpdate`/`onDelete` and the public `updateViewAST(nodes)` API route through a shared `queueUpdate` helper: pending bindings/nodes are merged into `this.pendingUpdate`, and — unless the update is `silent` — a single `queueMicrotask` is scheduled to flush them via `updateView()`. This is the same batching mechanism narrated in [What Happens When Data Changes](/architecture/diagrams/data-change-flow); this page won't repeat it. If `currentView.update()` throws, `ViewController` captures the error via `ErrorController` and re-queues a *silent* update with the same bindings/nodes, so a later successful update still picks up whatever didn't get applied.
+
+`optimizeUpdates` (default `true`) is an escape hatch: when `false`, every data change synchronously calls `updateView()` instead of batching through `queueUpdate`.
+
+## Hooks / Extension Points
+
+### ViewController (`viewController.hooks`)
+
+| Hook | Type | Fires when |
+| --- | --- | --- |
+| `resolveView` | `SyncWaterfallHook<[View \| undefined, string, NavigationFlowViewState]>` | Before a `ViewInstance` is constructed for a navigation `VIEW` state — lets plugins substitute a different view |
+| `view` | `SyncHook<[ViewInstance]>` | Right after a new `ViewInstance` has its view plugins applied, before the first resolve |
+
+### ViewInstance (`view.hooks`)
+
+| Hook | Type | Fires when |
+| --- | --- | --- |
+| `parser` | `SyncHook<[Parser]>` | Once, when the `Parser` is created on first `update()` — this is how view plugins tap parser hooks |
+| `resolver` | `SyncHook<[Resolver]>` | Once, when the `Resolver` is created on first `update()` — this is how view plugins tap resolver hooks |
+| `templatePlugin` | `SyncHook<[TemplatePlugin]>` | On first `update()`, with whichever `TemplatePlugin` registered itself via `setTemplatePlugin` |
+| `onUpdate` | `SyncHook<[View]>` | After every `update()` call that produces a new resolved value |
+
+## Relationship to Other Subsystems
+
+- [Plugin Implementation](/guides/plugin-implementation) — walks through intercepting `resolveView` (via `vc.hooks.resolveView.intercept`) to read view-state attributes before a view is resolved.
+- [Writing a Plugin](/guides/writing-plugins) — shows tapping `vc.hooks.view` to modify a `ViewInstance` before it resolves.
+- [The Core View Plugins](/architecture/systems/view-plugins) — the seven plugins applied to every `ViewInstance`, and why their order is fixed.
+- [The View Parser & Resolver](/architecture/systems/view-parser-resolver) — the `Parser`/`Resolver` pair each `ViewInstance` creates and exposes via its `parser`/`resolver` hooks.
+- [Validation Controller](/architecture/systems/validation-controller) — consumes the `CrossfieldProvider` built into each `ViewInstance` for `x-field` cross-binding validations.
+- [Flow Controller](/architecture/systems/flow-controller) — the transition hook `ViewController` taps to know when to mint a new `ViewInstance`.
+- [What Happens When Data Changes](/architecture/diagrams/data-change-flow) — the full narration of the `queueUpdate`/microtask batching mechanism this page only summarizes.

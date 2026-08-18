@@ -4,6 +4,7 @@ import android.app.Application
 import android.view.Menu
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.intuit.playerui.android.reference.demo.model.A2UIMock
 import com.intuit.playerui.android.reference.demo.model.AssetMock
 import com.intuit.playerui.android.reference.demo.model.StringMock
 import com.intuit.playerui.utils.mocks.ClassLoaderMocksReader
@@ -18,7 +19,7 @@ class MainViewModel(
     private val context: Application,
 ) : AndroidViewModel(context) {
     val mocks: List<Mock<out Any?>> by lazy {
-        readMocksFromClasspath() + readMocksFromAssets()
+        readMocksFromClasspath() + readA2UIMocksFromClasspath() + readMocksFromAssets()
     }
 
     val defaultMock by lazy {
@@ -37,6 +38,12 @@ class MainViewModel(
     }
 
     private fun readMocksFromClasspath() = ClassLoaderMocksReader(MainViewModel::class.java.classLoader!!).mocks
+
+    /** A2UI snapshots come from their own manifest (see `//plugins/a2ui/mocks:jar`). */
+    private fun readA2UIMocksFromClasspath() = ClassLoaderMocksReader(
+        MainViewModel::class.java.classLoader!!,
+        manifestPath = "a2ui/mocks/manifest.json",
+    ).mocks.map { A2UIMock(it.group, it.name, it.path) }
 
     private fun readMocksFromAssets(path: String = "mocks"): List<Mock<*>> = context.assets
         .list(path)

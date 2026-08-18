@@ -356,7 +356,7 @@ jobs:
             ./scripts/docs/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
   build_docs:
-    executor: benchmarks
+    executor: base
     steps:
       - attach_workspace:
           at: ~/player

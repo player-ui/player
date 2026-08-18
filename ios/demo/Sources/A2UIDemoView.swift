@@ -2,35 +2,30 @@ import PlayerUI
 import PlayerUIA2UI
 import PlayerUIExpressionPlugin
 import PlayerUISwiftUI
+import PlayerUITestUtilitiesCore
 import SwiftUI
 
-/// A single named A2UI snapshot to exercise in the demo.
-private struct A2UIMock: Identifiable {
-    let name: String
-    let snapshot: String
-    var id: String {
-        name
-    }
-}
-
-/// A self-contained demo screen that renders the full canonical A2UI snapshot
-/// catalog (`A2UIMockFlows.all`) through the `A2UIPlugin`, starting each flow with
-/// `StartOptions.a2ui`.
+/// A self-contained demo screen that renders the full A2UI snapshot catalog
 struct A2UIDemoView: View {
     private let plugins: [NativePlugin] = [
         A2UIPlugin(),
         ExpressionPlugin(),
     ]
-
-    private let mocks: [A2UIMock] = A2UIMockFlows.all.map {
-        A2UIMock(name: $0.name, snapshot: $0.snapshot)
-    }
+    let sections: [FlowLoader.FlowSection]
 
     var body: some View {
-        List(mocks) { mock in
-            NavigationLink(mock.name) {
-                A2UIFlowView(snapshot: mock.snapshot, plugins: plugins)
-                    .navigationTitle(mock.name)
+        List {
+            ForEach(sections, id: \.title) { section in
+                Section {
+                    ForEach(section.flows, id: \.name) { flow in
+                        NavigationLink(flow.name) {
+                            A2UIFlowView(snapshot: flow.flow, plugins: plugins)
+                                .navigationTitle(flow.name)
+                        }
+                    }
+                } header: {
+                    Text(section.title)
+                }
             }
         }
         .navigationTitle("A2UI")

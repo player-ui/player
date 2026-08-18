@@ -1,9 +1,11 @@
 load("@rules_player//ios:defs.bzl", "swift_library")
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
+load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
 
 swift_library(
     name = "PlayerUIDemoSources",
     srcs = glob(["Sources/**/*.swift"]),
+    data = [":AssetMocks", ":PluginMocks", ":A2UIMocks"],
     deps = [
         "//ios/core:PlayerUI",
         "//ios/swiftui:PlayerUISwiftUI",
@@ -44,4 +46,24 @@ filegroup(
     name = "InfoPlist",
     srcs = ["Resources/Info.plist"],
     visibility = ["//visibility:public"],
+)
+
+# Mock targets that are used in the demo app. They are separated into 3 bundles so we can easily map a bundle to a page of examples
+apple_resource_bundle(
+    name = "AssetMocks",
+    structured_resources = [
+        "//tools/mocks:asset_mocks"
+    ]
+)
+apple_resource_bundle(
+    name = "PluginMocks",
+    structured_resources = [
+        "//tools/mocks:plugin_mocks"
+    ]
+)
+apple_resource_bundle(
+    name = "A2UIMocks",
+    structured_resources = [
+        "//tools/mocks:a2ui_mocks"
+    ]
 )

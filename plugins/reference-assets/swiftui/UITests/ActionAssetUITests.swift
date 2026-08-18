@@ -3,12 +3,12 @@ import XCTest
 class ActionAssetUITests: BaseTestCase {
     func testActionCounter() {
         openFlow("action counter")
-        waitFor(app.buttons["action"])
+        waitFor(app.buttons["root"])
 
-        waitAndTap(app.buttons["action"])
-        waitFor(app.buttons["action"])
+        waitAndTap(app.buttons["root"])
+        waitFor(app.buttons["root"])
 
-        let buttonText = app.buttons["action"].label
+        let buttonText = app.buttons["root"].label
 
         XCTAssertEqual(buttonText, "Clicked 1 times")
     }
