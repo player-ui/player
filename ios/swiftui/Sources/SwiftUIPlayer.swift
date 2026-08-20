@@ -143,8 +143,18 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         public init(contextBuilder: @escaping () -> JSContext = { JSContext() }) {
             self.contextBuilder = contextBuilder
             registryWatch = registry.objectWillChange.sink { [weak self] in
-                DispatchQueue.main.async {
-                    self?.objectWillChange.send()
+                // Send synchronously when already on main, so the signal fires on the same
+                // runloop tick as the mutation instead of a tick late via an unconditional hop.
+                if Thread.isMainThread {
+                    // added MainActor.assumeIsolated (main-actor isolation) for future, when this
+                    // module adopts Swift 6 strict concurrency checking.
+                    MainActor.assumeIsolated {
+                        self?.objectWillChange.send()
+                    }
+                } else {
+                    Task { @MainActor in
+                        self?.objectWillChange.send()
+                    }
                 }
             }
         }
@@ -191,8 +201,11 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 onViewController(controller)
             }
 
-            hooks.state.tap { [weak self] newState in
-                self?.state = newState
+            hooks.state.tap { [weak self, weak playerValue] newState in
+                Task { @MainActor [weak self] in
+                    guard let self, let playerValue, self.player == playerValue else { return }
+                    state = newState
+                }
             }
 
             guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -247,10 +260,6 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         /// should be called when ManagedPlayer gets tore down
         public func clearExceptionHandler() {
             player?.context.exceptionHandler = nil
-        }
-
-        fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
-            load(flow: flow, plugins: plugins, player: player, startOptions: nil)
         }
 
         /// Handler for when the ViewController in the core player changes
