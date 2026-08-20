@@ -1966,7 +1966,7 @@ synthetic class com/intuit/playerui/core/bridge/serialization/serializers/NodeSe
 
 public final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction {
 	public static final field Companion Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$Companion;
-	public synthetic fun <init> (Lkotlin/jvm/functions/Function0;Lkotlinx/serialization/DeserializationStrategy;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getValue (Ljava/lang/Object;Lkotlin/reflect/KProperty;)Lcom/intuit/playerui/core/bridge/Invokable;
 }
 
@@ -1978,15 +1978,41 @@ public final class com/intuit/playerui/core/bridge/serialization/serializers/Nod
 }
 
 public final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$Companion {
+	public final fun invoke (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
 	public final fun invoke (Lkotlin/jvm/functions/Function0;Lkotlinx/serialization/DeserializationStrategy;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
+	public static synthetic fun invoke$default (Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$Companion;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
 	public static synthetic fun invoke$default (Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$Companion;Lkotlin/jvm/functions/Function0;Lkotlinx/serialization/DeserializationStrategy;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
 }
 
+final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$Companion$invoke$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunctionKt {
+	public static final fun NodeSerializableFunction (Lcom/intuit/playerui/core/bridge/NodeWrapper;Lkotlin/jvm/functions/Function0;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;Lkotlin/jvm/functions/Function2;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
+	public static final fun NodeSerializableFunction (Lcom/intuit/playerui/core/bridge/NodeWrapper;Lkotlinx/serialization/DeserializationStrategy;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;Lkotlin/jvm/functions/Function2;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
+	public static synthetic fun NodeSerializableFunction$default (Lcom/intuit/playerui/core/bridge/NodeWrapper;Lkotlin/jvm/functions/Function0;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
+	public static synthetic fun NodeSerializableFunction$default (Lcom/intuit/playerui/core/bridge/NodeWrapper;Lkotlinx/serialization/DeserializationStrategy;Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction$CacheStrategy;Ljava/lang/String;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lcom/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunction;
 }
 
 synthetic class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunctionKt$NodeSerializableFunction$1 : kotlin/jvm/internal/PropertyReference0Impl {
 	public fun get ()Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunctionKt$NodeSerializableFunction$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+synthetic class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunctionKt$NodeSerializableFunction$3 : kotlin/jvm/internal/PropertyReference0Impl {
+	public fun get ()Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializableFunctionKt$NodeSerializableFunction$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/bridge/serialization/serializers/NodeSerializer : kotlinx/serialization/KSerializer {
@@ -2112,6 +2138,30 @@ synthetic class com/intuit/playerui/core/constants/ConstantsController$Serialize
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/constants/ConstantsController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/constants/ConstantsController$special$$inlined$NodeSerializableFunction$default$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/constants/ConstantsController$special$$inlined$NodeSerializableFunction$default$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/constants/ConstantsController$special$$inlined$NodeSerializableFunction$default$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public final class com/intuit/playerui/core/data/BindingKt {
 }
 
@@ -2133,6 +2183,12 @@ synthetic class com/intuit/playerui/core/data/DataController$Serializer$1 : kotl
 	public static final field INSTANCE Lcom/intuit/playerui/core/data/DataController$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/data/DataController;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/data/DataController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/data/DataControllerKt {
@@ -2160,6 +2216,18 @@ synthetic class com/intuit/playerui/core/data/DataModelWithParser$Serializer$1 :
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/data/DataModelWithParser$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/data/DataModelWithParser$special$$inlined$NodeSerializableFunction$default$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public final class com/intuit/playerui/core/data/DataModelWithParserKt {
 	public static final fun get (Lcom/intuit/playerui/core/data/DataModelWithParser;)Ljava/util/Map;
 	public static final fun set (Lcom/intuit/playerui/core/data/DataModelWithParser;[Lkotlin/Pair;)V
@@ -2183,6 +2251,12 @@ final class com/intuit/playerui/core/data/ReadOnlyDataController$Serializer$1 : 
 	public static final field INSTANCE Lcom/intuit/playerui/core/data/ReadOnlyDataController$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/data/ReadOnlyDataController;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/data/ReadOnlyDataController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/data/ReadOnlyDataControllerKt {
@@ -2232,6 +2306,36 @@ synthetic class com/intuit/playerui/core/error/ErrorController$Serializer$1 : ko
 	public static final field INSTANCE Lcom/intuit/playerui/core/error/ErrorController$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/error/ErrorController;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$special$$inlined$NodeSerializableFunction$default$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$special$$inlined$NodeSerializableFunction$default$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$special$$inlined$NodeSerializableFunction$default$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/error/ErrorController$special$$inlined$NodeSerializableFunction$default$5 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/error/ErrorSeverity : java/lang/Enum {
@@ -2400,6 +2504,12 @@ synthetic class com/intuit/playerui/core/expressions/ExpressionController$Serial
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/expressions/ExpressionController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public abstract interface class com/intuit/playerui/core/expressions/ExpressionEvaluator {
 	public abstract fun evaluate (Ljava/util/List;)Ljava/lang/Object;
 }
@@ -2510,6 +2620,12 @@ synthetic class com/intuit/playerui/core/flow/FlowController$Serializer$1 : kotl
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/flow/FlowController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public final class com/intuit/playerui/core/flow/FlowException : com/intuit/playerui/core/player/PlayerException {
 }
 
@@ -2561,6 +2677,12 @@ synthetic class com/intuit/playerui/core/flow/FlowInstance$Serializer$1 : kotlin
 	public static final field INSTANCE Lcom/intuit/playerui/core/flow/FlowInstance$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/flow/FlowInstance;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/flow/FlowInstance$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/flow/FlowResult : com/intuit/playerui/core/bridge/NodeWrapper {
@@ -3034,6 +3156,36 @@ final class com/intuit/playerui/core/logger/TapableLogger$info$3 : kotlin/corout
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/logger/TapableLogger$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/logger/TapableLogger$special$$inlined$NodeSerializableFunction$default$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/logger/TapableLogger$special$$inlined$NodeSerializableFunction$default$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/logger/TapableLogger$special$$inlined$NodeSerializableFunction$default$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/logger/TapableLogger$special$$inlined$NodeSerializableFunction$default$5 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 final class com/intuit/playerui/core/logger/TapableLogger$trace$3 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -3202,6 +3354,12 @@ final class com/intuit/playerui/core/player/HeadlessPlayer$runtime$1$1$1 : kotli
 public final class com/intuit/playerui/core/player/HeadlessPlayer$runtime$1$invoke$$inlined$CoroutineExceptionHandler$1 : kotlin/coroutines/AbstractCoroutineContextElement, kotlinx/coroutines/CoroutineExceptionHandler {
 	public fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler$Key;Lcom/intuit/playerui/core/player/HeadlessPlayer;)V
 	public fun handleException (Lkotlin/coroutines/CoroutineContext;Ljava/lang/Throwable;)V
+}
+
+public final class com/intuit/playerui/core/player/HeadlessPlayer$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/player/JSPlayerConfig {
@@ -3551,6 +3709,12 @@ synthetic class com/intuit/playerui/core/player/state/InProgressState$Serializer
 	public static final field INSTANCE Lcom/intuit/playerui/core/player/state/InProgressState$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/player/state/InProgressState;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/player/state/InProgressState$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/player/state/NamedState : com/intuit/playerui/core/bridge/NodeWrapper {
@@ -3906,6 +4070,18 @@ synthetic class com/intuit/playerui/core/validation/BindingInstance$Serializer$1
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/validation/BindingInstance$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
+public final class com/intuit/playerui/core/validation/BindingInstance$special$$inlined$NodeSerializableFunction$default$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public final class com/intuit/playerui/core/validation/ErrorValidationResponse : com/intuit/playerui/core/validation/ValidationResponse {
 	public static final field Companion Lcom/intuit/playerui/core/validation/ErrorValidationResponse$Companion;
 	public fun <init> (Lcom/intuit/playerui/core/bridge/Node;)V
@@ -3946,6 +4122,12 @@ synthetic class com/intuit/playerui/core/validation/Validation$Serializer$1 : ko
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/core/validation/Validation$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
+}
+
 public final class com/intuit/playerui/core/validation/ValidationController : com/intuit/playerui/core/bridge/NodeWrapper {
 	public static final field Companion Lcom/intuit/playerui/core/validation/ValidationController$Companion;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
@@ -3964,6 +4146,12 @@ synthetic class com/intuit/playerui/core/validation/ValidationController$Seriali
 	public static final field INSTANCE Lcom/intuit/playerui/core/validation/ValidationController$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/validation/ValidationController;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/validation/ValidationController$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/validation/ValidationInfo {
@@ -4055,6 +4243,12 @@ synthetic class com/intuit/playerui/core/validation/WarningValidationResponse$Se
 	public static final field INSTANCE Lcom/intuit/playerui/core/validation/WarningValidationResponse$Serializer$1;
 	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/validation/WarningValidationResponse;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/intuit/playerui/core/validation/WarningValidationResponse$special$$inlined$NodeSerializableFunction$default$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public fun <init> (Lcom/intuit/playerui/core/bridge/NodeWrapper;)V
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/DeserializationStrategy;
 }
 
 public final class com/intuit/playerui/core/view/View : com/intuit/playerui/core/bridge/NodeWrapper {
