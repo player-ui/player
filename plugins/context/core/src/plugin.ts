@@ -50,6 +50,8 @@ export class ContextPlugin implements PlayerPlugin {
   >();
   private globalSubs = new Map<SubscriptionToken, ContextGlobalSubscriber>();
   private tokenIndex = new Map<SubscriptionToken, symbol | undefined>();
+  /** Last value notify() fired with, per key — dedupes redundant publishes. */
+  private lastNotified = new Map<symbol, unknown>();
   private currentFlowId: string | undefined;
 
   constructor() {
@@ -66,6 +68,7 @@ export class ContextPlugin implements PlayerPlugin {
       this.perKeySubs = existing.perKeySubs;
       this.globalSubs = existing.globalSubs;
       this.tokenIndex = existing.tokenIndex;
+      this.lastNotified = existing.lastNotified;
       return;
     }
 
@@ -98,15 +101,7 @@ export class ContextPlugin implements PlayerPlugin {
     if (isFirstSighting) {
       this.hooks.onRegister.call(key);
     }
-    this.notify(key, value);
-
-    // Transitive: a chained transform (root -> mid -> top) must notify `top`
-    // when `root` changes, not just the directly-dependent `mid`.
-    const dependents = this.store.transitiveDependentsOf(key.symbol);
-    for (const dep of dependents) {
-      const computed = this.store.get(dep);
-      this.notify(dep, computed);
-    }
+    this.notifyIfChanged(key, value);
   }
 
   get<Value>(key: ContextKey<Value>): Value | undefined {
@@ -236,6 +231,41 @@ export class ContextPlugin implements PlayerPlugin {
     return defineContextKey<unknown>(name, description ?? name);
   }
 
+  /**
+   * Notify subscribers of `key` with `value`, unless it's `Object.is`-equal
+   * to the value the last notification for this key carried. Then cascade to
+   * every transitive dependent (a chained transform root -> mid -> top must
+   * notify `top` when `root` changes, not just the directly-dependent `mid`),
+   * applying the same unchanged-value guard to each. `transitiveDependentsOf`
+   * already flattens the full downstream closure in one deduped, cycle-safe
+   * pass, so this walks it directly rather than recursing back through this
+   * method (which would re-walk the graph from each dependent and, on a
+   * diamond, notify a shared descendant more than once).
+   */
+  private notifyIfChanged<Value>(
+    key: ContextKey<Value>,
+    value: Value | undefined,
+  ) {
+    this.publishIfChanged(key, value);
+
+    for (const dep of this.store.transitiveDependentsOf(key.symbol)) {
+      this.publishIfChanged(dep, this.store.get(dep));
+    }
+  }
+
+  private publishIfChanged<Value>(
+    key: ContextKey<Value>,
+    value: Value | undefined,
+  ) {
+    const hasNotified = this.lastNotified.has(key.symbol);
+    const unchanged =
+      hasNotified && Object.is(this.lastNotified.get(key.symbol), value);
+    this.lastNotified.set(key.symbol, value);
+    if (!unchanged) {
+      this.notify(key, value);
+    }
+  }
+
   private notify<Value>(key: ContextKey<Value>, value: Value | undefined) {
     this.hooks.onSet.call(key, value);
     const bucket = this.perKeySubs.get(key.symbol);
@@ -251,6 +281,7 @@ export class ContextPlugin implements PlayerPlugin {
 
   private rotateStore() {
     this.store = new ContextStore();
+    this.lastNotified.clear();
     for (const { key, transform } of this.transforms.values()) {
       this.store.registerTransform(key, transform);
     }
