@@ -89,6 +89,56 @@ test("per-key subscriber fires on direct set", () => {
   expect(handler).toHaveBeenNthCalledWith(2, 2, key);
 });
 
+test("setting a literal to the same value again does not re-notify subscribers", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const key = defineContextKey<number>("c", "Counter");
+  const handler = vitest.fn();
+
+  plugin.subscribe(key, handler);
+  plugin.set(key, 1);
+  plugin.set(key, 1);
+  plugin.set(key, 2);
+
+  expect(handler).toHaveBeenCalledTimes(2);
+  expect(handler).toHaveBeenNthCalledWith(1, 1, key);
+  expect(handler).toHaveBeenNthCalledWith(2, 2, key);
+});
+
+test("setting a literal to a new but deep-equal object still notifies (Object.is, not dequal)", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const key = defineContextKey<{ n: number }>("obj", "Object");
+  const handler = vitest.fn();
+
+  plugin.subscribe(key, handler);
+  plugin.set(key, { n: 1 });
+  plugin.set(key, { n: 1 });
+
+  expect(handler).toHaveBeenCalledTimes(2);
+});
+
+test("a transform recompute that yields an unchanged value does not re-notify dependents", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const src = defineContextKey<number>("src", "Source");
+  const target = defineContextKey<number>("target", "Target");
+
+  plugin.registerTransform(target, {
+    sources: [src],
+    // Clamped: any src >= 10 computes to the same value.
+    compute: (read) => Math.min(read(src) ?? 0, 10),
+  });
+  const handler = vitest.fn();
+  plugin.subscribe(target, handler);
+
+  plugin.set(src, 10);
+  plugin.set(src, 20);
+
+  expect(handler).toHaveBeenCalledTimes(1);
+  expect(handler).toHaveBeenCalledWith(10, target);
+});
+
 test("subscriber on transform target fires when a source updates", () => {
   const plugin = new ContextPlugin();
   new Player({ plugins: [plugin] });
@@ -270,6 +320,23 @@ test("flow end freezes the store, pushes to history, then rotates", () => {
 
   expect(plugin.has(key)).toBe(false);
   expect(plugin.get(key)).toBeUndefined();
+});
+
+test("flow rotation resets notify-dedup state, so a repeated value re-notifies in the new flow", () => {
+  const plugin = new ContextPlugin();
+  const player = new Player({ plugins: [plugin] });
+  const key = defineContextKey<string>("phase", "Phase");
+  const handler = vitest.fn();
+  plugin.subscribe(key, handler);
+
+  player.start(minimalFlow as any);
+  plugin.set(key, "active");
+  player.hooks.onEnd.call();
+
+  player.start(minimalFlow as any);
+  plugin.set(key, "active");
+
+  expect(handler).toHaveBeenCalledTimes(2);
 });
 
 test("transforms and subscribers persist across flow rotation", () => {
