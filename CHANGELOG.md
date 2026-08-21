@@ -1,3 +1,15 @@
+# 0.15.7 (Fri Aug 21 2026)
+
+#### 🐛 Bug Fix
+
+- Bump Rules to 2.6.6 [#939](https://github.com/player-ui/player/pull/939) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.6 (Fri Aug 21 2026)
 
 ### Release Notes
