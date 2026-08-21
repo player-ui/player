@@ -9,7 +9,7 @@ androidx-test = "1.3.0"
 compose = "1.2.0"
 graalvm = "21.2.0"
 jmh = "1.21"
-kotlin = "1.7.10"
+kotlin = "1.8.22" # Should match Kotlin compiler pulled from rules_kotlin
 kotlinx-coroutines = "1.6.0"
 kotlinx-serialization = "1.3.0"
 
