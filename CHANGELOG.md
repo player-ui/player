@@ -1,3 +1,24 @@
+# 0.15.6 (Fri Aug 21 2026)
+
+### Release Notes
+
+#### Backport: Fix template placement when inserting into an array ([#936](https://github.com/player-ui/player/pull/936))
+
+Backport #935
+
+---
+
+#### 🐛 Bug Fix
+
+- Backport: Fix template placement when inserting into an array [#936](https://github.com/player-ui/player/pull/936) ([@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 0.15.5 (Thu Jul 16 2026)
 
 ### Release Notes
