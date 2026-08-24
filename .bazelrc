@@ -65,9 +65,6 @@ common:ci-base --remote_build_event_upload=minimal
 common:ci-base --nolegacy_important_outputs
 # Bazel 9 drops the executor's path by default. Add path so we have all the Android CI paths for testing.
 test:ci-base --test_env=PATH
-# Re-run failing tests up to 3 times on CI before marking them failed, to absorb flaky tests.
-test:ci-base --flaky_test_attempts=3
-coverage:ci-base --flaky_test_attempts=3
 # Only show progress every 60 seconds on CI.
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
 # but not so often that we produce a long log file that requires a lot of scrolling.
@@ -79,6 +76,9 @@ common:ci --config=ci-base --local_resources=cpu=8 --local_resources=memory=1500
 
 # Circle m4pro.medium 6 cores 28gb ram (?)
 common:ci-mac --config=ci-base --local_resources=cpu=4 --local_resources=memory=26000
+# Re-run failing iOS tests up to 3 times on CI before marking them failed, to absorb flaky tests.
+test:ci-mac --flaky_test_attempts=3
+coverage:ci-mac --flaky_test_attempts=3
 
 # For bench tests we are using a large resource_class which has 4 cpu cores and 8GB RAM
 common:ci-benchmark --config=ci-base --local_resources=cpu=4 --local_resources=memory=8000
