@@ -1,3 +1,23 @@
+# 0.16.0 (Tue Aug 25 2026)
+
+### Release Notes
+
+#### Backport: ContextPlugin for version-0 ([#937](https://github.com/player-ui/player/pull/937))
+
+Adds `ContextPlugin` (`@player-ui/context-plugin`) to the `version-0` release line: a shared, per-flow key/value store with derived-value transforms and a subscription API for external consumers/devtools, plus `StateContextPlugin` for mirroring core Player runtime state (flow id/state, view id/resolved view, data model, status, validation) into it. Includes a notify-dedup fix so subscribers aren't re-notified when a published value is `Object.is`-unchanged.
+
+---
+
+#### 🚀 Enhancement
+
+- Backport: ContextPlugin for version-0 [#937](https://github.com/player-ui/player/pull/937) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.15.7 (Fri Aug 21 2026)
 
 #### 🐛 Bug Fix
