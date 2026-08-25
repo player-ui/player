@@ -116,6 +116,15 @@ test("StateContextPlugin reuses an existing ContextPlugin", () => {
   expect(player.findPlugin<ContextPlugin>(ContextPluginSymbol)).toBe(ctx);
 });
 
+test("status is not-started immediately, before any flow starts", () => {
+  const ctx = new ContextPlugin();
+  const state = new StateContextPlugin();
+  new Player({ plugins: [ctx, state] });
+
+  expect(ctx.get(playerStatusContextKey)).toBe("not-started");
+  expect(ctx.get(playerStateContextKey)!.status).toBe("not-started");
+});
+
 test("publishes flow id, view id, view, data, status on flow start", () => {
   const ctx = new ContextPlugin();
   const state = new StateContextPlugin();

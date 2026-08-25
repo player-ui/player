@@ -110,6 +110,16 @@ class ContextPluginTests: XCTestCase {
         XCTAssertEqual(callCount, 1)
     }
 
+    func testStatusIsNotStartedImmediatelyBeforeAnyFlowStarts() {
+        let context = ContextPlugin()
+        _ = HeadlessPlayerImpl(plugins: [context, StateContextPlugin()])
+
+        XCTAssertEqual(
+            context.get(name: "player.state", as: PlayerStateContext.self)?.status,
+            "not-started"
+        )
+    }
+
     func testReadsPlayerStateContextWithScopedActions() {
         let context = ContextPlugin()
         let player = HeadlessPlayerImpl(plugins: [context, StateContextPlugin()])

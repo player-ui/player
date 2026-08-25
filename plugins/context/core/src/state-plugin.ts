@@ -97,7 +97,8 @@ export const transitionActionKey: ContextKey<TransitionAction> =
  * is bound to the live controller and is absent until a flow is in-progress.
  */
 export type PlayerStateContext = {
-  status?: string;
+  /** Always present — "not-started" before a flow has ever started. */
+  status: string;
   /** Absent until a flow has started. */
   flow?: {
     id?: string;
@@ -187,6 +188,11 @@ export class StateContextPlugin implements PlayerPlugin {
     ctx.register(setDataActionKey);
     ctx.register(transitionActionKey);
 
+    // Player's own state is synchronously "not-started" from construction —
+    // seed it eagerly so `status` is always present, unlike the other
+    // sources, which only populate once a flow actually starts.
+    ctx.set(playerStatusContextKey, player.getState().status);
+
     ctx.registerTransform(playerStateContextKey, {
       sources: [
         flowIdContextKey,
@@ -209,7 +215,9 @@ export class StateContextPlugin implements PlayerPlugin {
         const setData = read(setDataActionKey);
 
         return {
-          status: read(playerStatusContextKey),
+          // Always present — seeded eagerly above and kept live by the
+          // `player.hooks.state` tap below.
+          status: read(playerStatusContextKey) ?? "not-started",
           flow:
             flowId !== undefined ||
             flowState !== undefined ||

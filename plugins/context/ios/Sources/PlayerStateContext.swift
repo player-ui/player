@@ -8,7 +8,8 @@ import PlayerUISwiftUI
 /// Actions are scoped to the construct they operate on — `flow.transition` and
 /// `data.set` — and are nil until a flow is in-progress.
 public struct PlayerStateContext: Decodable {
-    public let status: String?
+    /// Always present — "not-started" before a flow has ever started.
+    public let status: String
     /// Absent until a flow has started.
     public let flow: Flow?
     /// Absent until a view has resolved.
