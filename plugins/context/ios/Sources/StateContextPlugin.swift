@@ -1,9 +1,6 @@
 import Foundation
 import JavaScriptCore
-
-#if SWIFT_PACKAGE
-    import PlayerUI
-#endif
+import PlayerUI
 
 /// Wrapper around the JS `StateContextPlugin`. Registering it mirrors Player
 /// runtime state into the `ContextPlugin` store and publishes the aggregated
@@ -11,7 +8,7 @@ import JavaScriptCore
 ///
 /// ```swift
 /// contextPlugin.get(name: "player.state", as: PlayerStateContext.self)?
-///    .flow.transition?()
+///    .flow?.transition?()
 /// ```
 ///
 /// Auto-registers a `ContextPlugin` on the JS side if one isn't already present.
@@ -21,15 +18,6 @@ public class StateContextPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
-            ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-            ResourceUtilities.urlForFile(
-                name: fileName,
-                ext: "js",
-                bundle: Bundle(for: StateContextPlugin.self),
-                pathComponent: "PlayerUI_ContextPlugin.bundle"
-            )
-        #endif
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
     }
 }

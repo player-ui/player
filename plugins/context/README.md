@@ -25,11 +25,11 @@ The package ships two plugins:
 
 ## Installation
 
-| Platform | Dependency |
-| --- | --- |
-| Core / JS | `@player-ui/context-plugin` |
+| Platform      | Dependency                                     |
+| ------------- | ---------------------------------------------- |
+| Core / JS     | `@player-ui/context-plugin`                    |
 | JVM / Android | `com.intuit.playerui.plugins:context:$VERSION` |
-| iOS | the `PlayerUIContextPlugin` target |
+| iOS           | the `PlayerUIContextPlugin` target             |
 
 ---
 
@@ -128,17 +128,17 @@ new Player({ plugins: [ctx, new StateContextPlugin()] });
 
 It publishes these standard keys (each also importable):
 
-| Key | Description |
-| --- | --- |
-| `flowIdContextKey` | `player.flow.id` — running flow id |
-| `flowStateContextKey` | `player.flow.state` — current FSM state |
-| `viewIdContextKey` | `player.view.id` — resolved view id |
-| `viewContextKey` | `player.view` — resolved view object |
-| `dataContextKey` | `player.data` — data model tree |
-| `playerStatusContextKey` | `player.status` — not-started / in-progress / completed / error |
-| `validationContextKey` | `player.validation` — active validations per binding + `canTransition` |
-| `setDataActionKey` | `player.data.set` — callable that sets a binding |
-| `transitionActionKey` | `player.flow.transition` — callable that transitions the flow |
+| Key                      | Description                                                            |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `flowIdContextKey`       | `player.flow.id` — running flow id                                     |
+| `flowStateContextKey`    | `player.flow.state` — current FSM state                                |
+| `viewIdContextKey`       | `player.view.id` — resolved view id                                    |
+| `viewContextKey`         | `player.view` — resolved view object                                   |
+| `dataContextKey`         | `player.data` — data model tree                                        |
+| `playerStatusContextKey` | `player.status` — not-started / in-progress / completed / error        |
+| `validationContextKey`   | `player.validation` — active validations per binding + `canTransition` |
+| `setDataActionKey`       | `player.data.set` — callable that sets a binding                       |
+| `transitionActionKey`    | `player.flow.transition` — callable that transitions the flow          |
 
 ### Aggregated `player.state`
 
@@ -151,16 +151,16 @@ controllers, so they are absent until a flow is in-progress.
 const state = ctx.get(playerStateContextKey)!;
 
 state.status; // "in-progress"
-state.flow.state; // current FSM state name
-state.data.model; // serialized data model
+state.flow?.state; // current FSM state name
+state.data?.model; // serialized data model
 
 // Validation state for the running view, keyed by binding:
-state.validation.canTransition; // false if a blocking validation is active
-state.validation.byBinding["data.name"]; // [{ severity, message, displayTarget?, blocking? }]
+state.validation?.canTransition; // false if a blocking validation is active
+state.validation?.byBinding["data.name"]; // [{ severity, message, displayTarget?, blocking? }]
 
 // Drive the running Player through the scoped actions:
-state.data.set?.("name", "Grace");
-state.flow.transition?.("Next");
+state.data?.set?.("name", "Grace");
+state.flow?.transition?.("Next");
 ```
 
 > **Validation requires binding tracking.** `player.validation` mirrors the
@@ -211,8 +211,8 @@ player.start(flow: flow) { _ in }
 
 // `get<T>` decodes into a Decodable type; WrappedFunction members are callable.
 let state = context.get(name: "player.state", as: PlayerStateContext.self)
-state?.data.set?("name", "Grace")
-state?.flow.transition?("Next")
+state?.data?.set?("name", "Grace")
+state?.flow?.transition?("Next")
 
 // Introspection / history — read a frozen entry by name, typed
 context.list() // [ContextEntryDescriptor]

@@ -13,10 +13,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 public data class PlayerStateContext(
     val status: String? = null,
-    val flow: Flow = Flow(),
-    val view: View = View(),
-    val data: Data = Data(),
-    val validation: Validation = Validation(),
+    /** Absent until a flow has started. */
+    val flow: Flow? = null,
+    /** Absent until a view has resolved. */
+    val view: View? = null,
+    /** Absent until a data controller is bound. */
+    val data: Data? = null,
+    /** Absent until a validation controller is bound. */
+    val validation: Validation? = null,
 ) {
     @Serializable
     public data class Flow(

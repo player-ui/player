@@ -130,30 +130,30 @@ internal class StateContextPluginTest : PlayerTest() {
 
         val state = plugin.get<PlayerStateContext>("player.state")!!
         state.status `should be equal to` "in-progress"
-        state.flow.id `should be equal to` "flow-multi"
-        state.flow.state `should be equal to` "VIEW_1"
+        state.flow!!.id `should be equal to` "flow-multi"
+        state.flow!!.state `should be equal to` "VIEW_1"
 
         // Validation state deserializes across the bridge. With no binding
         // tracking (no rendering layer in this headless flow) it is empty and
         // transitionable.
-        state.validation.canTransition `should be equal to` true
-        state.validation.byBinding.isEmpty() `should be equal to` true
+        state.validation!!.canTransition `should be equal to` true
+        state.validation!!.byBinding.isEmpty() `should be equal to` true
 
         // Actions are scoped to their constructs and bridged as callables.
-        state.flow.transition.`should not be null`()
-        state.data.set.`should not be null`()
+        state.flow!!.transition.`should not be null`()
+        state.data!!.set.`should not be null`()
 
         // The scoped data.set action drives the real data model; reading the
         // context back reflects the write.
-        state.data.set!!("foo.bar", "baz")
-        val model = plugin.get<PlayerStateContext>("player.state")!!.data.model as Map<*, *>
+        state.data!!.set!!("foo.bar", "baz")
+        val model = plugin.get<PlayerStateContext>("player.state")!!.data!!.model as Map<*, *>
         (model["foo"] as Map<*, *>)["bar"] `should be equal to` "baz"
 
         // The scoped flow.transition action advances the flow to the next
         // (non-terminal) view — observable synchronously through the live
         // context, before any flow-end store rotation.
-        state.flow.transition!!("Next")
-        plugin.get<PlayerStateContext>("player.state")!!.flow.state `should be equal to` "VIEW_2"
+        state.flow!!.transition!!("Next")
+        plugin.get<PlayerStateContext>("player.state")!!.flow!!.state `should be equal to` "VIEW_2"
     }
 
     @TestTemplate
@@ -163,7 +163,7 @@ internal class StateContextPluginTest : PlayerTest() {
         val done = CountDownLatch(1)
         player.start(multiViewFlow) { done.countDown() }
 
-        plugin.get<PlayerStateContext>("player.state")!!.flow.transition!!("Done")
+        plugin.get<PlayerStateContext>("player.state")!!.flow!!.transition!!("Done")
         done.await(5, TimeUnit.SECONDS) shouldBe true
 
         val snapshot = plugin.history().last()
@@ -178,15 +178,15 @@ internal class StateContextPluginTest : PlayerTest() {
     fun `frozen snapshot actions are tombstoned and throw when invoked`() {
         val done = CountDownLatch(1)
         player.start(multiViewFlow) { done.countDown() }
-        plugin.get<PlayerStateContext>("player.state")!!.flow.transition!!("Done")
+        plugin.get<PlayerStateContext>("player.state")!!.flow!!.transition!!("Done")
         done.await(5, TimeUnit.SECONDS) shouldBe true
 
         // The frozen player.state aggregate retains its scoped actions, but they
         // are tombstoned — the action is still present (non-null) yet invoking
         // it throws because the flow it was bound to has ended.
         val frozenState = plugin.history().last().get<PlayerStateContext>("player.state")!!
-        frozenState.flow.transition.`should not be null`()
-        assertFailsWith<Exception> { frozenState.flow.transition!!("Next") }
+        frozenState.flow!!.transition.`should not be null`()
+        assertFailsWith<Exception> { frozenState.flow!!.transition!!("Next") }
     }
 
     private companion object {

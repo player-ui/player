@@ -117,7 +117,7 @@ class ContextPluginTests: XCTestCase {
         // Wait until the aggregate has populated (data controller bound).
         let populated = XCTestExpectation(description: "player.state has actions")
         _ = context.subscribe(name: "player.state", description: "state") { _, _ in
-            if context.get(name: "player.state", as: PlayerStateContext.self)?.data.set != nil {
+            if context.get(name: "player.state", as: PlayerStateContext.self)?.data?.set != nil {
                 populated.fulfill()
             }
         }
@@ -134,22 +134,22 @@ class ContextPluginTests: XCTestCase {
             return XCTFail("expected a decoded PlayerStateContext")
         }
         XCTAssertEqual(state.status, "in-progress")
-        XCTAssertEqual(state.flow.id, "counter-flow")
+        XCTAssertEqual(state.flow?.id, "counter-flow")
 
         // Validation state deserializes across the bridge. With no binding
         // tracking in this headless flow it is empty and transitionable.
-        XCTAssertTrue(state.validation.canTransition)
-        XCTAssertTrue(state.validation.byBinding.isEmpty)
+        XCTAssertTrue(state.validation?.canTransition ?? false)
+        XCTAssertTrue(state.validation?.byBinding.isEmpty ?? false)
 
         // Actions are scoped to their constructs and bridged as callables.
-        guard let transition = state.flow.transition
+        guard let transition = state.flow?.transition
         else { return XCTFail("expected a flow.transition action") }
-        guard let set = state.data.set else { return XCTFail("expected a data.set action") }
+        guard let set = state.data?.set else { return XCTFail("expected a data.set action") }
 
         // The scoped data.set action drives the real data model; reading the
         // aggregate back reflects the write through data.model.
         set("count", 5)
-        let model = context.get(name: "player.state", as: PlayerStateContext.self)?.data.model
+        let model = context.get(name: "player.state", as: PlayerStateContext.self)?.data?.model
         guard case let .numberDictionary(data)? = model else {
             return XCTFail("expected a numeric data model, got \(String(describing: model))")
         }
@@ -192,7 +192,7 @@ class ContextPluginTests: XCTestCase {
         let populated = XCTestExpectation(description: "player.state has actions")
         _ = context.subscribe(name: "player.state", description: "state") { _, _ in
             if context.get(name: "player.state", as: PlayerStateContext.self)?
-                .flow
+                .flow?
                 .transition != nil {
                 populated.fulfill()
             }
@@ -204,7 +204,7 @@ class ContextPluginTests: XCTestCase {
         }
         wait(for: [populated], timeout: 5)
 
-        context.get(name: "player.state", as: PlayerStateContext.self)?.flow.transition?("Next")
+        context.get(name: "player.state", as: PlayerStateContext.self)?.flow?.transition?("Next")
         wait(for: [completed], timeout: 5)
 
         // Flow end freezes the store into a history snapshot capturing the
@@ -225,7 +225,7 @@ class ContextPluginTests: XCTestCase {
         let populated = XCTestExpectation(description: "player.state has actions")
         _ = context.subscribe(name: "player.state", description: "state") { _, _ in
             if context.get(name: "player.state", as: PlayerStateContext.self)?
-                .flow
+                .flow?
                 .transition != nil {
                 populated.fulfill()
             }
@@ -235,7 +235,7 @@ class ContextPluginTests: XCTestCase {
             if case .success = result { completed.fulfill() }
         }
         wait(for: [populated], timeout: 5)
-        context.get(name: "player.state", as: PlayerStateContext.self)?.flow.transition?("Next")
+        context.get(name: "player.state", as: PlayerStateContext.self)?.flow?.transition?("Next")
         wait(for: [completed], timeout: 5)
 
         // The frozen player.state retains its scoped actions, but they are
@@ -245,7 +245,7 @@ class ContextPluginTests: XCTestCase {
             .get(name: "player.state", as: PlayerStateContext.self) else {
             return XCTFail("expected a frozen PlayerStateContext")
         }
-        guard let transition = frozen.flow.transition,
+        guard let transition = frozen.flow?.transition,
               let jsContext = transition.rawValue?.context else {
             return XCTFail("expected a tombstoned transition action")
         }
