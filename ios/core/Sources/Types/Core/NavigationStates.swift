@@ -139,7 +139,7 @@ public class NavigationFlowAsyncActionState: NavigationFlowTransitionableState {
     }
 
     public var await: Bool {
-        rawValue.objectForKeyedSubscript(CoreJSKeys.await_).toBool()
+        rawValue.objectForKeyedSubscript(CoreJSKeys.isAwait).toBool()
     }
 
     public enum Expression {

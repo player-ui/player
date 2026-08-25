@@ -26,7 +26,7 @@ enum CoreJSKeys {
     static let attributes = "attributes"
     static let outcome = "outcome"
     static let param = "param"
-    static let await_ = "await"
+    static let isAwait = "await"
     static let status = "status"
     static let flowResult = "flowResult"
     static let logger = "logger"
