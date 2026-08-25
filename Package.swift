@@ -14,6 +14,7 @@ let ios_plugins: [SwiftPlugin] = [
     (name: "CommonExpressionsPlugin", path: "common-expressions", resources: true),
     (name: "CommonTypesPlugin", path: "common-types", resources: true),
     (name: "ComputedPropertiesPlugin", path: "computed-properties", resources: true),
+    (name: "ContextPlugin", path: "context", resources: true),
     (name: "ExpressionPlugin", path: "expression", resources: true),
     (name: "ExternalActionPlugin", path: "external-action", resources: true),
     (name: "PubSubPlugin", path: "pubsub", resources: true),
