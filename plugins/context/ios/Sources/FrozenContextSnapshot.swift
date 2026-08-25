@@ -1,9 +1,16 @@
 import Foundation
 import JavaScriptCore
+import PlayerUI
 
-#if SWIFT_PACKAGE
-    import PlayerUI
-#endif
+/// Keys read off the JS-side frozen snapshot object.
+private enum JSKey {
+    static let entries = "entries"
+    static let flowId = "flowId"
+    static let endedAt = "endedAt"
+    static let name = "name"
+    static let description = "description"
+    static let value = "value"
+}
 
 /// A frozen snapshot of the context store captured when a flow ends.
 ///
@@ -26,20 +33,20 @@ public struct FrozenContextSnapshot {
 
     init?(_ snapshot: JSValue?) {
         guard let snapshot, !snapshot.isUndefined, !snapshot.isNull,
-              let entriesValue = snapshot.objectForKeyedSubscript("entries"),
+              let entriesValue = snapshot.objectForKeyedSubscript(JSKey.entries),
               let entriesArray = entriesValue.toArray() else { return nil }
 
-        flowId = snapshot.objectForKeyedSubscript("flowId")?.toString()
-        endedAt = snapshot.objectForKeyedSubscript("endedAt")?.toDouble() ?? 0
+        flowId = snapshot.objectForKeyedSubscript(JSKey.flowId)?.toString()
+        endedAt = snapshot.objectForKeyedSubscript(JSKey.endedAt)?.toDouble() ?? 0
 
         var entries = [FrozenContextEntry]()
         var values = [String: JSValue]()
         for index in 0 ..< entriesArray.count {
             guard let entry = entriesValue.objectAtIndexedSubscript(index) else { continue }
-            let name = entry.objectForKeyedSubscript("name")?.toString()
-            let description = entry.objectForKeyedSubscript("description")?.toString() ?? ""
+            let name = entry.objectForKeyedSubscript(JSKey.name)?.toString()
+            let description = entry.objectForKeyedSubscript(JSKey.description)?.toString() ?? ""
             entries.append(FrozenContextEntry(name: name, description: description))
-            if let name, let value = entry.objectForKeyedSubscript("value") {
+            if let name, let value = entry.objectForKeyedSubscript(JSKey.value) {
                 values[name] = value
             }
         }

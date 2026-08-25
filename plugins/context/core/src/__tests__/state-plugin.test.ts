@@ -186,8 +186,8 @@ test("aggregate playerStateContextKey composes every published source", () => {
     data: { model: { name: "Ada" } },
   });
   // Actions are scoped to the construct they operate on.
-  expect(typeof snapshot!.flow.transition).toBe("function");
-  expect(typeof snapshot!.data.set).toBe("function");
+  expect(typeof snapshot!.flow!.transition).toBe("function");
+  expect(typeof snapshot!.data!.set).toBe("function");
 });
 
 test("aggregate player.state exposes invokable actions scoped to their constructs", () => {
@@ -197,19 +197,21 @@ test("aggregate player.state exposes invokable actions scoped to their construct
 
   player.start(multiViewFlow as any);
   const before = ctx.get(playerStateContextKey)!;
-  expect(before.flow.state).toBe("VIEW_1");
+  expect(before.flow!.state).toBe("VIEW_1");
 
   // The scoped flow.transition action advances the running flow.
-  before.flow.transition!("Next");
+  before.flow!.transition!("Next");
   expect(ctx.get(flowStateContextKey)).toBe("VIEW_2");
 
   // The scoped data.set action drives the data model; reading the aggregate
   // back reflects the write through data.model.
-  ctx.get(playerStateContextKey)!.data.set!("name", "Grace");
-  expect(ctx.get(playerStateContextKey)!.data.model).toEqual({ name: "Grace" });
+  ctx.get(playerStateContextKey)!.data!.set!("name", "Grace");
+  expect(ctx.get(playerStateContextKey)!.data!.model).toEqual({
+    name: "Grace",
+  });
 
   // Transitioning again drives the flow to its terminal END state.
-  ctx.get(playerStateContextKey)!.flow.transition!("Next");
+  ctx.get(playerStateContextKey)!.flow!.transition!("Next");
   expect(ctx.get(flowStateContextKey)).toBe("END_Done");
 });
 
@@ -319,7 +321,7 @@ test("validation context reflects a failing binding and blocks transition", asyn
   });
 
   // The aggregate surfaces it too.
-  expect(ctx.get(playerStateContextKey)!.validation.canTransition).toBe(false);
+  expect(ctx.get(playerStateContextKey)!.validation!.canTransition).toBe(false);
 
   // Fixing the value clears the validation and re-enables transition.
   dataController.set([["data.name", "Ada"]]);

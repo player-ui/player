@@ -1,9 +1,18 @@
 import Foundation
 import JavaScriptCore
+import PlayerUI
 
-#if SWIFT_PACKAGE
-    import PlayerUI
-#endif
+/// Names of the JS-side `ContextPlugin.native` methods invoked over the bridge.
+private enum JSMethod {
+    static let setByName = "setByName"
+    static let getByName = "getByName"
+    static let hasByName = "hasByName"
+    static let subscribeByName = "subscribeByName"
+    static let subscribeAllByName = "subscribeAllByName"
+    static let unsubscribe = "unsubscribe"
+    static let list = "list"
+    static let history = "history"
+}
 
 /// A plugin that maintains a per-flow store of context entries keyed by string
 /// name and exposes a subscribe/get/set API for native consumers.
@@ -13,16 +22,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
-            ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-            ResourceUtilities.urlForFile(
-                name: fileName,
-                ext: "js",
-                bundle: Bundle(for: ContextPlugin.self),
-                pathComponent: "PlayerUI_ContextPlugin.bundle"
-            )
-        #endif
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
     }
 
     /// Store `value` under the context entry identified by `name`, registering
@@ -30,13 +30,16 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     public func set(name: String, description: String, value: AnyType?) {
         guard let pluginRef else { return }
         let jsValue = encode(value, in: pluginRef.context)
-        pluginRef.invokeMethod("setByName", withArguments: [name, description, jsValue as Any])
+        pluginRef.invokeMethod(
+            JSMethod.setByName,
+            withArguments: [name, description, jsValue as Any]
+        )
     }
 
     /// Read the current value for the entry identified by `name`, or nil if unset.
     public func get(name: String) -> AnyType? {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("getByName", withArguments: [name])
+              let result = pluginRef.invokeMethod(JSMethod.getByName, withArguments: [name])
         else { return nil }
         return decode(result)
     }
@@ -44,7 +47,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// Returns true if the entry identified by `name` has a value or transform.
     public func has(name: String) -> Bool {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("hasByName", withArguments: [name])
+              let result = pluginRef.invokeMethod(JSMethod.hasByName, withArguments: [name])
         else { return false }
         return result.toBool()
     }
@@ -64,7 +67,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
         }
         let jsCallback = JSValue(object: callback, in: pluginRef.context) as Any
         let token = pluginRef.invokeMethod(
-            "subscribeByName",
+            JSMethod.subscribeByName,
             withArguments: [name, description, jsCallback]
         )
         return token?.toString()
@@ -82,23 +85,27 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
                 handler(self?.decode(value), name?.toString(), description?.toString() ?? "")
             }
         let jsCallback = JSValue(object: callback, in: pluginRef.context) as Any
-        let token = pluginRef.invokeMethod("subscribeAllByName", withArguments: [jsCallback])
+        let token = pluginRef.invokeMethod(JSMethod.subscribeAllByName, withArguments: [jsCallback])
         return token?.toString()
     }
 
     /// Cancel the subscription registered with `token`.
     public func unsubscribe(token: String) {
-        pluginRef?.invokeMethod("unsubscribe", withArguments: [token])
+        pluginRef?.invokeMethod(JSMethod.unsubscribe, withArguments: [token])
     }
 
     /// Read the entry identified by `name`, decoded into a `Decodable` type
     /// `T` — the same typed access as the JVM `get<T>(name)`. `T` may carry
     /// `WrappedFunction` members for function-valued fields, so a caller does
-    /// `get(name:)?.flow.transition?("Next")`. Returns nil if the entry is
-    /// unset or fails to decode.
-    public func get<T: Decodable>(name: String, as _: T.Type = T.self) -> T? {
+    /// `get(name: "player.state", as: PlayerStateContext.self)?.flow?.transition?("Next")`.
+    /// Returns nil if the entry is unset or fails to decode.
+    ///
+    /// - Note: `as` has no default — one would make this call ambiguous with
+    ///   the non-generic `get(name:)` above, since both would then be
+    ///   callable with just a `name:` argument.
+    public func get<T: Decodable>(name: String, as _: T.Type) -> T? {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("getByName", withArguments: [name]),
+              let result = pluginRef.invokeMethod(JSMethod.getByName, withArguments: [name]),
               !result.isUndefined, !result.isNull else { return nil }
         // `T` may carry `AnyType` members (view.resolved, data.model), which
         // require an AnyTypeDecodingContext, and `WrappedFunction` members,
@@ -119,7 +126,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// Returns the registered entry descriptors (description + value/transform flags).
     public func list() -> [ContextEntryDescriptor] {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("list", withArguments: []),
+              let result = pluginRef.invokeMethod(JSMethod.list, withArguments: []),
               !result.isUndefined, !result.isNull else { return [] }
         return (try? JSONDecoder().decode([ContextEntryDescriptor].self, from: result)) ?? []
     }
@@ -127,7 +134,7 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     /// Returns the stack of frozen snapshots from prior flows.
     public func history() -> [FrozenContextSnapshot] {
         guard let pluginRef,
-              let result = pluginRef.invokeMethod("history", withArguments: []),
+              let result = pluginRef.invokeMethod(JSMethod.history, withArguments: []),
               !result.isUndefined, !result.isNull,
               let count = result.toArray()?.count else { return [] }
         return (0 ..< count)
@@ -137,8 +144,13 @@ public class ContextPlugin: JSBasePlugin, NativePlugin {
     private func encode(_ value: AnyType?, in context: JSContext) -> Any? {
         guard let value,
               let data = try? JSONEncoder().encode(value),
-              let dataString = String(data: data, encoding: .utf8) else { return nil }
-        return context.evaluateScript("(\(dataString))")
+              // `fragmentsAllowed` so primitive entries (a bare string or
+              // number) deserialize too — they are not valid top-level JSON.
+              let object = try? JSONSerialization.jsonObject(
+                  with: data,
+                  options: [.fragmentsAllowed]
+              ) else { return nil }
+        return JSValue(object: object, in: context)
     }
 
     private func decode(_ value: JSValue?) -> AnyType? {

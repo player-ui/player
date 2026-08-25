@@ -1,9 +1,6 @@
 import Foundation
-
-#if SWIFT_PACKAGE
-    import PlayerUI
-    import PlayerUISwiftUI
-#endif
+import PlayerUI
+import PlayerUISwiftUI
 
 /// Typed view of the aggregated `player.state` context entry. Read it with
 /// `contextPlugin.get(name: "player.state", as: PlayerStateContext.self)`.
@@ -12,10 +9,14 @@ import Foundation
 /// `data.set` — and are nil until a flow is in-progress.
 public struct PlayerStateContext: Decodable {
     public let status: String?
-    public let flow: Flow
-    public let view: View
-    public let data: Data
-    public let validation: Validation
+    /// Absent until a flow has started.
+    public let flow: Flow?
+    /// Absent until a view has resolved.
+    public let view: View?
+    /// Absent until a data controller is bound.
+    public let data: Data?
+    /// Absent until a validation controller is bound.
+    public let validation: Validation?
 
     public struct Flow: Decodable {
         public let id: String?

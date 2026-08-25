@@ -98,24 +98,28 @@ export const transitionActionKey: ContextKey<TransitionAction> =
  */
 export type PlayerStateContext = {
   status?: string;
-  flow: {
+  /** Absent until a flow has started. */
+  flow?: {
     id?: string;
     state?: string;
     /** Transition the running flow (e.g. 'Next'). */
     transition?: TransitionAction;
   };
-  view: {
+  /** Absent until a view has resolved. */
+  view?: {
     id?: string;
     resolved?: unknown;
   };
-  data: {
+  /** Absent until a data controller is bound. */
+  data?: {
     /** Full data model tree for the running flow. */
     model?: unknown;
     /** Set a value in the data model at the given binding. */
     set?: SetDataAction;
   };
-  /** Validation state for the running view, keyed by binding. */
-  validation: ValidationContext;
+  /** Validation state for the running view, keyed by binding. Absent until a
+   * validation controller is bound. */
+  validation?: ValidationContext;
 };
 
 /**
@@ -195,26 +199,34 @@ export class StateContextPlugin implements PlayerPlugin {
         setDataActionKey,
         transitionActionKey,
       ],
-      compute: (read) => ({
-        status: read(playerStatusContextKey),
-        flow: {
-          id: read(flowIdContextKey),
-          state: read(flowStateContextKey),
-          transition: read(transitionActionKey),
-        },
-        view: {
-          id: read(viewIdContextKey),
-          resolved: read(viewContextKey),
-        },
-        data: {
-          model: read(dataContextKey),
-          set: read(setDataActionKey),
-        },
-        validation: read(validationContextKey) ?? {
-          canTransition: true,
-          byBinding: {},
-        },
-      }),
+      compute: (read) => {
+        const flowId = read(flowIdContextKey);
+        const flowState = read(flowStateContextKey);
+        const transition = read(transitionActionKey);
+        const viewId = read(viewIdContextKey);
+        const viewResolved = read(viewContextKey);
+        const dataModel = read(dataContextKey);
+        const setData = read(setDataActionKey);
+
+        return {
+          status: read(playerStatusContextKey),
+          flow:
+            flowId !== undefined ||
+            flowState !== undefined ||
+            transition !== undefined
+              ? { id: flowId, state: flowState, transition }
+              : undefined,
+          view:
+            viewId !== undefined || viewResolved !== undefined
+              ? { id: viewId, resolved: viewResolved }
+              : undefined,
+          data:
+            dataModel !== undefined || setData !== undefined
+              ? { model: dataModel, set: setData }
+              : undefined,
+          validation: read(validationContextKey),
+        };
+      },
     });
 
     player.hooks.onStart.tap(this.name, (flow) => {
