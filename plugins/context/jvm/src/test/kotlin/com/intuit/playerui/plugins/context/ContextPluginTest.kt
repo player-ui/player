@@ -125,6 +125,11 @@ internal class StateContextPluginTest : PlayerTest() {
     private val plugin get() = player.contextPlugin!!
 
     @TestTemplate
+    fun `status is not-started immediately, before any flow starts`() {
+        plugin.get<PlayerStateContext>("player.state")!!.status `should be equal to` "not-started"
+    }
+
+    @TestTemplate
     fun `player state context is readable and its scoped actions are callable`() {
         player.start(multiViewFlow)
 

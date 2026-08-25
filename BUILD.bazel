@@ -165,6 +165,10 @@ assemble_pod(
         # Console Logger (PrintLoggerPlugin)
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPlugin_Sources": "plugins/console-logger/ios/",
 
+        # Context
+        "//plugins/context/ios:PlayerUIContextPlugin_Sources": "plugins/context/ios/",
+        "//plugins/context/core:core_native_bundle": "plugins/context/ios/Resources/",
+
         # Expression
         "//plugins/expression/ios:PlayerUIExpressionPlugin_Sources": "plugins/expression/ios/",
         "//plugins/expression/core:core_native_bundle": "plugins/expression/ios/Resources/",

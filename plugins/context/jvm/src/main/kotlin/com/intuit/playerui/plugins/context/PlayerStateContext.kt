@@ -12,7 +12,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 public data class PlayerStateContext(
-    val status: String? = null,
+    /** Always present — "not-started" before a flow has ever started. */
+    val status: String,
     /** Absent until a flow has started. */
     val flow: Flow? = null,
     /** Absent until a view has resolved. */

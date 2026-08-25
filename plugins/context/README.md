@@ -116,11 +116,7 @@ auto-registers a `ContextPlugin` if one isn't already present.
 
 ```ts
 import { Player } from "@player-ui/player";
-import {
-  ContextPlugin,
-  StateContextPlugin,
-  playerStateContextKey,
-} from "@player-ui/context-plugin";
+import { ContextPlugin, StateContextPlugin } from "@player-ui/context-plugin";
 
 const ctx = new ContextPlugin();
 new Player({ plugins: [ctx, new StateContextPlugin()] });
@@ -131,7 +127,7 @@ It publishes these standard keys (each also importable):
 | Key                      | Description                                                            |
 | ------------------------ | ---------------------------------------------------------------------- |
 | `flowIdContextKey`       | `player.flow.id` — running flow id                                     |
-| `flowStateContextKey`    | `player.flow.state` — current FSM state                                |
+| `flowStateContextKey`    | `player.flow.state` — current FSM (finite state machine) state         |
 | `viewIdContextKey`       | `player.view.id` — resolved view id                                    |
 | `viewContextKey`         | `player.view` — resolved view object                                   |
 | `dataContextKey`         | `player.data` — data model tree                                        |
@@ -142,16 +138,20 @@ It publishes these standard keys (each also importable):
 
 ### Aggregated `player.state`
 
-`playerStateContextKey` is a transform that rolls everything up into one
-`PlayerStateContext`. Actions are scoped to the construct they operate on:
-`transition` under `flow`, `set` under `data`. Actions are bound to the live
-controllers, so they are absent until a flow is in-progress.
+`playerStateContextKey` is a separate, importable key — not one of the
+standard keys in the table above — backed by a transform that rolls
+everything up into one `PlayerStateContext`. Actions are scoped to the
+construct they operate on: `transition` under `flow`, `set` under `data`.
+Actions are bound to the live controllers, so they are absent until a flow is
+in-progress.
 
 ```ts
+import { playerStateContextKey } from "@player-ui/context-plugin";
+
 const state = ctx.get(playerStateContextKey)!;
 
-state.status; // "in-progress"
-state.flow?.state; // current FSM state name
+state.status; // "not-started" | "in-progress" | "completed" | "error"
+state.flow?.state; // current FSM (finite state machine) state name
 state.data?.model; // serialized data model
 
 // Validation state for the running view, keyed by binding:
