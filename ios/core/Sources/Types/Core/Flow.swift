@@ -18,17 +18,17 @@ public class Flow: CreatedFromJSValue {
 
     /// The ID of this flow
     public var id: String? {
-        value.objectForKeyedSubscript("id")?.toString()
+        value.objectForKeyedSubscript(CoreJSKeys.id)?.toString()
     }
 
     /// The original data associated with this flow
     public var data: [String: Any]? {
-        value.objectForKeyedSubscript("data")?.toObject() as? [String: Any]
+        value.objectForKeyedSubscript(CoreJSKeys.data)?.toObject() as? [String: Any]
     }
 
     /// The name of this flow
     public var currentState: NamedState? {
-        value.objectForKeyedSubscript("currentState").map { NamedState($0) }
+        value.objectForKeyedSubscript(CoreJSKeys.currentState).map { NamedState($0) }
     }
 
     /// Construct a Flow from a JSValue
@@ -82,9 +82,9 @@ public struct NamedState: CreatedFromJSValue {
     public let value: NavigationBaseState?
 
     init(_ value: JSValue) {
-        name = value.objectForKeyedSubscript("name").toString()
+        name = value.objectForKeyedSubscript(CoreJSKeys.name).toString()
         self.value = NavigationBaseState
-            .createInstance(value: value.objectForKeyedSubscript("value"))
+            .createInstance(value: value.objectForKeyedSubscript(CoreJSKeys.value))
     }
 
     public static func createInstance(value: JSValue) -> NamedState {

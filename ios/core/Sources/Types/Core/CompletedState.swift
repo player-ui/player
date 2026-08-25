@@ -30,12 +30,16 @@ public class PlayerControllers {
     public init?(from value: JSValue?) {
         guard let controllers = value else { return nil }
         rawValue = controllers
-        data = DataController.createInstance(value: rawValue.objectForKeyedSubscript("data"))
-        flow = FlowController.createInstance(value: rawValue.objectForKeyedSubscript("flow"))
-        view = ViewController.createInstance(value: rawValue.objectForKeyedSubscript("view"))
+        data = DataController
+            .createInstance(value: rawValue.objectForKeyedSubscript(CoreJSKeys.data))
+        flow = FlowController
+            .createInstance(value: rawValue.objectForKeyedSubscript(CoreJSKeys.flow))
+        view = ViewController
+            .createInstance(value: rawValue.objectForKeyedSubscript(CoreJSKeys.view))
         expression = ExpressionEvaluator
-            .createInstance(value: rawValue.objectForKeyedSubscript("expression"))
-        error = ErrorController.createInstance(value: rawValue.objectForKeyedSubscript("error"))
+            .createInstance(value: rawValue.objectForKeyedSubscript(CoreJSKeys.expression))
+        error = ErrorController
+            .createInstance(value: rawValue.objectForKeyedSubscript(CoreJSKeys.error))
     }
 }
 
@@ -76,7 +80,7 @@ extension BaseFlowState: CreatedFromJSValue {
     ///   - value: The JSValue to construct the state from
     public static func createInstance(value: JSValue) -> BaseFlowState {
         guard
-            let rawStatus = value.objectForKeyedSubscript("status")?.toString(),
+            let rawStatus = value.objectForKeyedSubscript(CoreJSKeys.status)?.toString(),
             let status = PlayerFlowStatus(rawValue: rawStatus),
             let state = { () -> BaseFlowState? in
                 switch status {
@@ -136,15 +140,17 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
     /// - returns: A CompletedState object if the JSValue was one
     public static func createInstance(from value: JSValue?) -> CompletedState? {
         guard
-            let flow = value?.objectForKeyedSubscript("flow"),
-            let controllersJSValue = value?.objectForKeyedSubscript("controllers"),
-            let dataControllerJSValue = controllersJSValue.objectForKeyedSubscript("data")
+            let flow = value?.objectForKeyedSubscript(CoreJSKeys.flow),
+            let controllersJSValue = value?.objectForKeyedSubscript(CoreJSKeys.controllers),
+            let dataControllerJSValue = controllersJSValue.objectForKeyedSubscript(CoreJSKeys.data)
         else { return nil }
 
         return CompletedState(
             flow: Flow.createInstance(value: flow),
-            endState: value.map { NavigationFlowEndState($0.objectForKeyedSubscript("endState")) },
-            data: value?.objectForKeyedSubscript("data")?.toObject() as? [String: Any] ?? [:],
+            endState: value
+                .map { NavigationFlowEndState($0.objectForKeyedSubscript(CoreJSKeys.endState)) },
+            data: value?.objectForKeyedSubscript(CoreJSKeys.data)?
+                .toObject() as? [String: Any] ?? [:],
             controllers: Controllers(data: .createInstance(value: dataControllerJSValue))
         )
     }
@@ -208,16 +214,18 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
     /// - returns: A InProgressState object if the JSValue was one
     public static func createInstance(from value: JSValue?) -> InProgressState? {
         guard
-            let flow = value?.objectForKeyedSubscript("flow")
+            let flow = value?.objectForKeyedSubscript(CoreJSKeys.flow)
         else { return nil }
         return InProgressState(
             flow: Flow.createInstance(value: flow),
             flowResult: value
-                .map { NavigationFlowEndState($0.objectForKeyedSubscript("flowResult")) },
-            controllers: PlayerControllers(from: value?.objectForKeyedSubscript("controllers")),
-            logger: JSLogger(from: value?.objectForKeyedSubscript("logger")),
+                .map { NavigationFlowEndState($0.objectForKeyedSubscript(CoreJSKeys.flowResult)) },
+            controllers: PlayerControllers(
+                from: value?.objectForKeyedSubscript(CoreJSKeys.controllers)
+            ),
+            logger: JSLogger(from: value?.objectForKeyedSubscript(CoreJSKeys.logger)),
             fail: {
-                value?.objectForKeyedSubscript("fail")?
+                value?.objectForKeyedSubscript(CoreJSKeys.fail)?
                     .call(withArguments: [value?.context.error(for: $0) as Any])
             }
         )
@@ -244,8 +252,8 @@ public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     /// - returns: A ErrorState object if the JSValue was one
     public static func createInstance(from value: JSValue?) -> ErrorState? {
         guard
-            let flow = value?.objectForKeyedSubscript("flow"),
-            let err = value?.objectForKeyedSubscript("error")
+            let flow = value?.objectForKeyedSubscript(CoreJSKeys.flow),
+            let err = value?.objectForKeyedSubscript(CoreJSKeys.error)
         else { return nil }
 
         return ErrorState(
