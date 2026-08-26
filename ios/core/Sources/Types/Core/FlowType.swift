@@ -17,12 +17,12 @@ public class FlowType: CreatedFromJSValue {
 
     /// The ID of this flow
     public var id: String? {
-        value.objectForKeyedSubscript("id")?.toString()
+        value.objectForKeyedSubscript(CoreJSKeys.id)?.toString()
     }
 
     /// The original data associated with this flow
     public var data: [String: Any]? {
-        value.objectForKeyedSubscript("data")?.toObject() as? [String: Any]
+        value.objectForKeyedSubscript(CoreJSKeys.data)?.toObject() as? [String: Any]
     }
 
     /// Construct a Flow from a JSValue

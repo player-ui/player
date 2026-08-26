@@ -19,8 +19,8 @@ public class PlayerView: CreatedFromJSValue {
     /// Gets the ID for this view
     public var id: String {
         value
-            .objectForKeyedSubscript("initialView")?
-            .objectForKeyedSubscript("id")?
+            .objectForKeyedSubscript(CoreJSKeys.initialView)?
+            .objectForKeyedSubscript(CoreJSKeys.id)?
             .toString() ?? "something went really wrong and this view has no id"
     }
 
