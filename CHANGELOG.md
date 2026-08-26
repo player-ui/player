@@ -1,3 +1,15 @@
+# 1.2.0-next.3 (Wed Aug 26 2026)
+
+#### 🐛 Bug Fix
+
+- Re-run flaky tests up to 3 times on CI (iOS only) [#940](https://github.com/player-ui/player/pull/940) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
 # 1.2.0-next.2 (Wed Aug 26 2026)
 
 #### 🐛 Bug Fix
