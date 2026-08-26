@@ -1,3 +1,15 @@
+# 1.2.0-next.2 (Wed Aug 26 2026)
+
+#### 🐛 Bug Fix
+
+- Extract JS bridging keys into CoreJSKeys enum [#941](https://github.com/player-ui/player/pull/941) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+#### Authors: 1
+
+- Angela Villadiego ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+---
+
 # 1.1.1-next.0 (Thu Aug 13 2026)
 
 ### Release Notes
