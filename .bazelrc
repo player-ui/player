@@ -76,6 +76,9 @@ common:ci --config=ci-base --local_resources=cpu=8 --local_resources=memory=1500
 
 # Circle m4pro.medium 6 cores 28gb ram (?)
 common:ci-mac --config=ci-base --local_resources=cpu=4 --local_resources=memory=26000
+# Re-run failing iOS tests up to 3 times on CI before marking them failed, to absorb flaky tests.
+test:ci-mac --flaky_test_attempts=3
+coverage:ci-mac --flaky_test_attempts=3
 
 # For bench tests we are using a large resource_class which has 4 cpu cores and 8GB RAM
 common:ci-benchmark --config=ci-base --local_resources=cpu=4 --local_resources=memory=8000
