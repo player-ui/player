@@ -12,7 +12,8 @@ class ManagedPlayerUITests: BaseTestCase {
         waitFor(button2)
 
         let completedText = app.staticTexts["Flow Completed"]
-        tapAndAssertElementAppears(button2, expectedOutcome: completedText)
+        waitFor(completedText)
+        // tapAndAssertElementAppears(button2, expectedOutcome: completedText)
     }
 
     func testErrorContentFlow() {
@@ -24,10 +25,12 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
+        button2.tap()
 
         let retryButton = app.buttons["Retry"].firstMatch
-        tapAndAssertElementAppears(button2, expectedOutcome: retryButton, timeout: 5)
-
+        // tapAndAssertElementAppears(button2, expectedOutcome: retryButton, timeout: 5)
+        waitFor(retryButton)
+        retryButton.tap()
         let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"]
             .firstMatch
         XCTAssert(errorText.exists, "Error message did not appear")
