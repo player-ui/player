@@ -41,6 +41,10 @@ public struct ExternalStateHandler {
 public class ExternalStatePlugin: JSBasePlugin, NativePlugin {
     public static let bundle: Bundle = .module
 
+    /// The name used to identify this plugin to Player's JS runtime, shared by both
+    /// `ExternalStatePlugin` (ios) and `ExternalStateViewModifierPlugin` (swiftui)
+    public static let externalStatePluginName = "ExternalStatePlugin.ExternalStatePlugin"
+
     private var handlers: [ExternalStateHandler]
 
     /// Construct a plugin to handle external states. Every match/key must include a `ref`.
@@ -50,7 +54,7 @@ public class ExternalStatePlugin: JSBasePlugin, NativePlugin {
         self.handlers = handlers
         super.init(
             fileName: "ExternalStatePlugin.native",
-            pluginName: "ExternalStatePlugin.ExternalStatePlugin"
+            pluginName: ExternalStatePlugin.externalStatePluginName
         )
     }
 
