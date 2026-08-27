@@ -9,7 +9,7 @@ public class SwiftUICheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
     /// Constructs the SwiftUICheckPathPlugin
     public convenience init() {
         self.init(
-            fileName: "CheckPathPlugin.native",
+            fileName: BaseCheckPathPlugin.checkPathFileName,
             pluginName: BaseCheckPathPlugin.checkPathPluginName
         )
     }

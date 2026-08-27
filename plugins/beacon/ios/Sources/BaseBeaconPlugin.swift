@@ -54,6 +54,14 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         "BeaconPlugin.BeaconPlugin"
     }
 
+    /// The bundled JS file name for this plugin, shared by both
+    /// `BaseBeaconPlugin` (ios) and `BeaconPlugin` (swiftui)
+    /// - Note: computed rather than a stored property because static stored properties
+    ///   aren't supported on generic types
+    public static var beaconFileName: String {
+        "BeaconPlugin.native"
+    }
+
     public var hooks: BeaconPluginHooks?
     /// The callback to call when a beacon is fired from the plugin
     public var callback: ((BeaconStruct) -> Void)?
@@ -67,7 +75,7 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     /// - onBeacon: A callback to receive beacon events
     public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
         self.init(
-            fileName: "BeaconPlugin.native",
+            fileName: BaseBeaconPlugin.beaconFileName,
             pluginName: BaseBeaconPlugin.beaconPluginName
         )
         callback = onBeacon

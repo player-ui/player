@@ -51,7 +51,7 @@ open class ExternalStateViewModifierPlugin<ModifierType: ExternalStateViewModifi
     public init(handlers: [ExternalStateViewModifierHandler]) {
         self.handlers = handlers
         super.init(
-            fileName: "ExternalStatePlugin.native",
+            fileName: ExternalStatePlugin.externalStateFileName,
             pluginName: ExternalStatePlugin.externalStatePluginName
         )
     }

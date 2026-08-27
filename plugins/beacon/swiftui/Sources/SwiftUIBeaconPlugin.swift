@@ -20,9 +20,9 @@ open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>
     /// - onBeacon: A callback to receive beacon events
     public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
         self.init(
-            fileName: "BeaconPlugin.native",
             // `BeaconStruct` must be specified explicitly here since it can't be inferred
             // from `Self` the way it can inside `BaseBeaconPlugin`'s own initializer
+            fileName: BaseBeaconPlugin<BeaconStruct>.beaconFileName,
             pluginName: BaseBeaconPlugin<BeaconStruct>.beaconPluginName
         )
         callback = onBeacon
