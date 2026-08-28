@@ -31,6 +31,8 @@ xcodeproj(
 
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPluginTests",
 
+        "//plugins/context/ios:PlayerUIContextPluginTests",
+
         "//plugins/expression/ios:PlayerUIExpressionPluginTests",
 
         "//plugins/external-state/ios:PlayerUIExternalStatePluginTests",

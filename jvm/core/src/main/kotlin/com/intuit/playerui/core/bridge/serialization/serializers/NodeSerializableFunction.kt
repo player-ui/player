@@ -4,15 +4,16 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.serialization.format.RuntimeSerializationException
 import com.intuit.playerui.core.bridge.serialization.format.serializer
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.DeserializationStrategy
 import kotlin.reflect.KProperty
 
 /** Delegate for automatic deserialization of [Node] values */
-internal class NodeSerializableFunction<R> private constructor(
-    private val provider: () -> Node,
-    private val serializer: DeserializationStrategy<R>,
+public class NodeSerializableFunction<R> private constructor(
+    private val nodeProvider: () -> Node,
+    private val serializerProvider: () -> DeserializationStrategy<R>,
     internal val strategy: CacheStrategy,
     private val name: String?,
 ) {
@@ -22,15 +23,16 @@ internal class NodeSerializableFunction<R> private constructor(
         Full,
     }
 
-    /** Cache of container [Node] that will reset the [value] cache if out-of-date with the [provider] */
-    private var cache: Node = provider()
+    /** Cache of container [Node] that resets the [value] cache when out-of-date with the [nodeProvider] */
+    private val cache: Node
         get() {
-            val provided = provider()
-            field = provided
+            val provided = nodeProvider()
+            serializer = serializerProvider()
             value = null
-
-            return field
+            return provided
         }
+
+    private lateinit var serializer: DeserializationStrategy<R>
 
     /** Cache of the [T] value, along with the backing [Node] for objects */
     private var value: Invokable<R>? = null
@@ -43,41 +45,73 @@ internal class NodeSerializableFunction<R> private constructor(
 
         val key = name ?: property.name
 
-        // will reset cache and value if mismatch
+        // will reset cache and value
         val node = cache
+        val function = node.getInvokable(key, serializer)
+            ?: throw RuntimeSerializationException("No function named '$key' on $this")
 
-        // else get and deserialize the value
-        return node.getInvokable(key, serializer)!!
+        return function.also { value = it }
     }
 
     public companion object {
         /** Smart constructor responsible for determining the correct [CacheStrategy] and [defaultValue] from the [serializer], if either are not provided */
         @ExperimentalPlayerApi
         public operator fun <R> invoke(
-            provider: () -> Node,
+            nodeProvider: () -> Node,
+            serializerProvider: () -> DeserializationStrategy<R>,
+            strategy: CacheStrategy? = null,
+            name: String? = null,
+        ): NodeSerializableFunction<R> = NodeSerializableFunction(
+            nodeProvider,
+            serializerProvider,
+            strategy ?: CacheStrategy.Full,
+            name,
+        )
+
+        /** Smart constructor responsible for determining the correct [CacheStrategy] and [defaultValue] from the [serializer], if either are not provided */
+        @ExperimentalPlayerApi
+        public operator fun <R> invoke(
+            nodeProvider: () -> Node,
             serializer: DeserializationStrategy<R>,
             strategy: CacheStrategy? = null,
             name: String? = null,
         ): NodeSerializableFunction<R> = NodeSerializableFunction(
-            provider,
-            serializer,
+            nodeProvider,
+            { serializer },
             strategy ?: CacheStrategy.Full,
             name,
         )
     }
 }
 
+/**
+ * Delegate a member function of this [NodeWrapper]'s node, deserializing its
+ * return value with the given [serializer].
+ */
 @ExperimentalPlayerApi
-internal fun <R> NodeWrapper.NodeSerializableFunction(
+public fun <R> NodeWrapper.NodeSerializableFunction(
     serializer: DeserializationStrategy<R>,
     strategy: NodeSerializableFunction.CacheStrategy? = null,
     name: String? = null,
     defaultValue: (Node.(String) -> Invokable<R>)? = null,
-): NodeSerializableFunction<R> = NodeSerializableFunction(::node, serializer, strategy, name)
+): NodeSerializableFunction<R> = NodeSerializableFunction(::node, { serializer }, strategy, name)
 
+/**
+ * Delegate a member function of this [NodeWrapper]'s node, deserializing its
+ * return value with the given [serializer].
+ */
 @ExperimentalPlayerApi
-internal inline fun <reified R> NodeWrapper.NodeSerializableFunction(
+public fun <R> NodeWrapper.NodeSerializableFunction(
+    serializerProvider: () -> DeserializationStrategy<R>,
+    strategy: NodeSerializableFunction.CacheStrategy? = null,
+    name: String? = null,
+    defaultValue: (Node.(String) -> Invokable<R>)? = null,
+): NodeSerializableFunction<R> = NodeSerializableFunction(::node, serializerProvider, strategy, name)
+
+/** Reified convenience that infers the return-type serializer from [R] */
+@ExperimentalPlayerApi
+public inline fun <reified R> NodeWrapper.NodeSerializableFunction(
     strategy: NodeSerializableFunction.CacheStrategy? = null,
     name: String? = null,
     noinline defaultValue: (Node.(String) -> Invokable<R>)? = null,
-): NodeSerializableFunction<R> = NodeSerializableFunction(node.format.serializer<R>(), strategy, name, defaultValue)
+): NodeSerializableFunction<R> = NodeSerializableFunction({ node.format.serializer<R>() }, strategy, name, defaultValue)

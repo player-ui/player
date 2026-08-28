@@ -18,7 +18,7 @@ public class ViewController: CreatedFromJSValue {
 
     /// The current view being managed by the View Controller
     public var currentView: PlayerView? {
-        guard let view = value.objectForKeyedSubscript("currentView") else { return nil }
+        guard let view = value.objectForKeyedSubscript(CoreJSKeys.currentView) else { return nil }
         return PlayerView(view)
     }
 

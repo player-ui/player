@@ -18,7 +18,7 @@ public class FlowController: CreatedFromJSValue {
 
     /// The current flow for this controller
     public var current: Flow? {
-        value.objectForKeyedSubscript("current").map { Flow($0) }
+        value.objectForKeyedSubscript(CoreJSKeys.current).map { Flow($0) }
     }
 
     /// Construct a FlowController from a JSValue
@@ -33,7 +33,8 @@ public class FlowController: CreatedFromJSValue {
     /// - parameters:
     ///   - action: The action to use for transitioning
     public func transition(with action: String) throws {
-        try value.objectForKeyedSubscript("transition").callWithErrorHandling(args: [action])
+        try value.objectForKeyedSubscript(CoreJSKeys.transition)
+            .callWithErrorHandling(args: [action])
     }
 
     /// Creates an instance from a JSValue, used for generic construction
