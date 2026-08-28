@@ -35,7 +35,7 @@ internal class ThrowingAsset(
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) = throw Exception("Throwing during render")
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) = throw Exception("Throwing during render")
 
     companion object {
         val sampleMap = mapOf(

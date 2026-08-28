@@ -182,9 +182,10 @@ public abstract class PlayerFragment :
                 child.transitionInto(binding.playerCanvas, transition)
             }
             asset?.run { renderInto(offscreen, context) }
+        } else if (asset != null) {
+            asset.run { renderInto(binding.playerCanvas, context) }
         } else {
-            asset?.run { renderInto(binding.playerCanvas, context) }
-                ?: run { null into binding.playerCanvas }
+            null into binding.playerCanvas
         }
     }
 
