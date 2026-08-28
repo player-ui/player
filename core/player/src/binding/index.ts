@@ -30,6 +30,12 @@ const DEFAULT_OPTIONS: BindingParserOptions = {
   },
 };
 
+/**
+ * Shared empty-overrides reference so the (overwhelmingly common) no-override
+ * `parse` call can reuse `parserOptions` directly instead of spreading.
+ */
+const EMPTY_OVERRIDES: Partial<BindingParserOptions> = {};
+
 type BeforeResolveNodeContext = Required<NormalizedResult> &
   ResolveBindingASTOptions;
 
@@ -109,18 +115,18 @@ export class BindingParser {
 
   public parse(
     rawBinding: BindingLike,
-    overrides: Partial<BindingParserOptions> = {},
+    overrides: Partial<BindingParserOptions> = EMPTY_OVERRIDES,
   ): BindingInstance {
     if (isBinding(rawBinding)) {
       return rawBinding;
     }
 
-    const options = {
-      ...this.parserOptions,
-      ...overrides,
-    };
+    const options =
+      overrides === EMPTY_OVERRIDES
+        ? this.parserOptions
+        : { ...this.parserOptions, ...overrides };
 
-    let updates: Record<string, any> = {};
+    const updates: Record<string, any> = {};
 
     const joined = Array.isArray(rawBinding)
       ? rawBinding.join(".")
@@ -155,10 +161,11 @@ export class BindingParser {
         const normalized = this.normalizePath(String(path), normalizeConfig);
 
         if (normalized.updates) {
-          updates = {
-            ...updates,
-            ...normalized.updates,
-          };
+          const nestedUpdates = normalized.updates;
+          const nestedKeys = Object.keys(nestedUpdates);
+          for (let i = 0; i < nestedKeys.length; i++) {
+            updates[nestedKeys[i]] = nestedUpdates[nestedKeys[i]];
+          }
         }
 
         const joinedNormalizedPath = normalized.path.join(".");
@@ -174,10 +181,11 @@ export class BindingParser {
     const normalized = this.normalizePath(joined, normalizeConfig);
 
     if (normalized.updates) {
-      updates = {
-        ...updates,
-        ...normalized.updates,
-      };
+      const topUpdates = normalized.updates;
+      const topKeys = Object.keys(topUpdates);
+      for (let i = 0; i < topKeys.length; i++) {
+        updates[topKeys[i]] = topUpdates[topKeys[i]];
+      }
     }
 
     const updateKeys = Object.keys(updates);

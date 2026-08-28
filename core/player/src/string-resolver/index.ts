@@ -1,9 +1,11 @@
-import { setIn } from "timm";
 import type { Expression } from "@player-ui/types";
 import type { DataModelWithParser } from "../data";
 
 const DOUBLE_OPEN_CURLY = "{{";
 const DOUBLE_CLOSE_CURLY = "}}";
+
+/** Matches the next `@[ ... ]@` expression. Hoisted to avoid re-allocating per call. */
+const EXPRESSION_REGEX = /@\[.*?\]@/;
 
 export interface Options {
   /**
@@ -85,17 +87,17 @@ export function resolveExpressionsInString(
     return val;
   }
 
-  const expMatch = /@\[.*?\]@/;
   let newVal = val;
-  let match = newVal.match(expMatch);
+  let match = newVal.match(EXPRESSION_REGEX);
 
   while (match !== null) {
     const expStrWithBrackets = match[0];
-    const matchStart = newVal.indexOf(expStrWithBrackets);
+    const matchStart = match.index ?? newVal.indexOf(expStrWithBrackets);
 
-    const expString = expStrWithBrackets.substr(
-      "@[".length,
-      expStrWithBrackets.length - "@[".length - "]@".length,
+    // Strip the surrounding `@[` and `]@` to get the expression
+    const expString = expStrWithBrackets.slice(
+      2,
+      expStrWithBrackets.length - 2,
     );
     const expValue = evaluate(expString);
 
@@ -109,11 +111,10 @@ export function resolveExpressionsInString(
     }
 
     newVal =
-      newVal.substr(0, matchStart) +
+      newVal.slice(0, matchStart) +
       expValue +
-      newVal.substr(matchStart + expStrWithBrackets.length);
-    // remove the surrounding @[]@ to get the expression
-    match = newVal.match(expMatch);
+      newVal.slice(matchStart + expStrWithBrackets.length);
+    match = newVal.match(EXPRESSION_REGEX);
   }
 
   return newVal;
@@ -162,7 +163,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
     }
 
     workingString =
-      workingString.substr(0, start) + evaledVal + workingString.substr(end);
+      workingString.slice(0, start) + evaledVal + workingString.slice(end);
   }
 
   return workingString;
@@ -179,19 +180,28 @@ function traverseObject<T>(val: T, options: Options): T {
       if (!val) return val;
       // TODO: Do we care refs in keys?
       const keys = Object.keys(val);
-      let newVal = val;
 
-      if (keys.length > 0) {
-        keys.forEach((key) => {
-          newVal = setIn(
-            newVal as any,
-            [key],
-            traverseObject((val as any)[key], options),
-          ) as any;
-        });
+      // Keep the same reference if nothing changes (preserving the previous
+      // immutability contract). Clone once, lazily, the first time a child
+      // actually resolves to a new value -- instead of cloning per key.
+      let out: any = val;
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const original = (val as any)[key];
+        const resolved = traverseObject(original, options);
+
+        if (resolved !== original) {
+          if (out === val) {
+            out = Array.isArray(val)
+              ? (val as any).slice()
+              : Object.assign({}, val);
+          }
+          out[key] = resolved;
+        }
       }
 
-      return newVal;
+      return out;
     }
 
     default:
