@@ -1,3 +1,15 @@
+# 1.2.0-next.4 (Mon Aug 31 2026)
+
+#### 🐛 Bug Fix
+
+- Consolidate duplicated pluginName string literals into shared constants [#944](https://github.com/player-ui/player/pull/944) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+#### Authors: 1
+
+- Angela Villadiego ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+---
+
 # 1.2.0-next.3 (Wed Aug 26 2026)
 
 #### 🐛 Bug Fix
