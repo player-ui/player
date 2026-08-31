@@ -10,6 +10,14 @@ import PlayerUI
 
 /// Base functionality for CheckPath
 open class BaseCheckPathPlugin: JSBasePlugin {
+    /// The name used to identify this plugin to Player's JS runtime, shared by both
+    /// `CheckPathPlugin` (ios) and `SwiftUICheckPathPlugin` (swiftui)
+    public static let checkPathPluginName = "CheckPathPlugin.CheckPathPlugin"
+
+    /// The bundled JS file name for this plugin, shared by both
+    /// `CheckPathPlugin` (ios) and `SwiftUICheckPathPlugin` (swiftui)
+    public static let checkPathFileName = "CheckPathPlugin.native"
+
     /// The getParent method allows you to query up the tree and return the first parent that
     /// matches the given query if such exists.
     /// In case when query is not provided, the closest parent returned.
@@ -61,6 +69,9 @@ open class BaseCheckPathPlugin: JSBasePlugin {
 open class CheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
     /// Constructs the CheckPathPlugin
     public convenience init() {
-        self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
+        self.init(
+            fileName: BaseCheckPathPlugin.checkPathFileName,
+            pluginName: BaseCheckPathPlugin.checkPathPluginName
+        )
     }
 }

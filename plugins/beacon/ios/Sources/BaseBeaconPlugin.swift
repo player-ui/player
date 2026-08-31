@@ -46,6 +46,18 @@ public struct DefaultBeacon: Codable, Hashable {
 /// A Base implementation wrapping @player-ui/beacon-plugin
 /// Used as a base for framework specific integrations
 open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
+    /// The name used to identify this plugin to Player's JS runtime, shared by both
+    /// `BaseBeaconPlugin` (ios) and `BeaconPlugin` (swiftui)
+    public static var beaconPluginName: String {
+        "BeaconPlugin.BeaconPlugin"
+    }
+
+    /// The bundled JS file name for this plugin, shared by both
+    /// `BaseBeaconPlugin` (ios) and `BeaconPlugin` (swiftui)
+    public static var beaconFileName: String {
+        "BeaconPlugin.native"
+    }
+
     public var hooks: BeaconPluginHooks?
     /// The callback to call when a beacon is fired from the plugin
     public var callback: ((BeaconStruct) -> Void)?
@@ -58,7 +70,10 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     /// - context: The context to load the plugin into
     /// - onBeacon: A callback to receive beacon events
     public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
-        self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
+        self.init(
+            fileName: BaseBeaconPlugin.beaconFileName,
+            pluginName: BaseBeaconPlugin.beaconPluginName
+        )
         callback = onBeacon
         self.plugins = plugins
     }

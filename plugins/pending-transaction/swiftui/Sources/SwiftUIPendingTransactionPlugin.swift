@@ -37,7 +37,7 @@ public class SwiftUIPendingTransactionPlugin<T: Identifiable & Hashable>: Native
         // transactionContext should attach to decoder prior to decoding a view
         player.assetRegistry.decoder.setPendingTransaction(transactionContext)
 
-        player.hooks?.view.tap(name: "SwiftUIPendingTransactionPlugin") { view in
+        player.hooks?.view.tap(name: pluginName) { view in
             let keyPath = self.keyPath
             return AnyView(view.environment(keyPath, self.transactionContext))
         }
