@@ -48,16 +48,12 @@ public struct DefaultBeacon: Codable, Hashable {
 open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     /// The name used to identify this plugin to Player's JS runtime, shared by both
     /// `BaseBeaconPlugin` (ios) and `BeaconPlugin` (swiftui)
-    /// - Note: computed rather than a stored property because static stored properties
-    ///   aren't supported on generic types
     public static var beaconPluginName: String {
         "BeaconPlugin.BeaconPlugin"
     }
 
     /// The bundled JS file name for this plugin, shared by both
     /// `BaseBeaconPlugin` (ios) and `BeaconPlugin` (swiftui)
-    /// - Note: computed rather than a stored property because static stored properties
-    ///   aren't supported on generic types
     public static var beaconFileName: String {
         "BeaconPlugin.native"
     }
