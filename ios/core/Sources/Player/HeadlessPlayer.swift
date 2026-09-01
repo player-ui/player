@@ -64,6 +64,34 @@ public protocol CoreHooks {
     init(from: JSValue)
 }
 
+public extension CoreHooks {
+    /// Hook names shared by all `CoreHooks` conformers (`HeadlessHooks`, `TestHooks`,
+    /// `SwiftUIPlayerHooks`)
+    static var flowControllerHookName: String {
+        "flowController"
+    }
+
+    static var viewControllerHookName: String {
+        "viewController"
+    }
+
+    static var dataControllerHookName: String {
+        "dataController"
+    }
+
+    static var errorControllerHookName: String {
+        "errorController"
+    }
+
+    static var stateHookName: String {
+        "state"
+    }
+
+    static var onStartHookName: String {
+        "onStart"
+    }
+}
+
 // MARK: PlayerRegistry
 
 /// Defines the minimum required functionality for a registry

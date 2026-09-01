@@ -54,11 +54,14 @@ public class TestHooks: CoreHooks {
     public var onStart: Hook<FlowType>
 
     public required init(from player: JSValue) {
-        flowController = Hook<FlowController>(baseValue: player, name: "flowController")
-        viewController = Hook<ViewController>(baseValue: player, name: "viewController")
-        dataController = Hook<DataController>(baseValue: player, name: "dataController")
-        errorController = Hook<ErrorController>(baseValue: player, name: "errorController")
-        state = Hook<BaseFlowState>(baseValue: player, name: "state")
-        onStart = Hook<FlowType>(baseValue: player, name: "onStart")
+        flowController = Hook<FlowController>(baseValue: player, name: Self.flowControllerHookName)
+        viewController = Hook<ViewController>(baseValue: player, name: Self.viewControllerHookName)
+        dataController = Hook<DataController>(baseValue: player, name: Self.dataControllerHookName)
+        errorController = Hook<ErrorController>(
+            baseValue: player,
+            name: Self.errorControllerHookName
+        )
+        state = Hook<BaseFlowState>(baseValue: player, name: Self.stateHookName)
+        onStart = Hook<FlowType>(baseValue: player, name: Self.onStartHookName)
     }
 }
