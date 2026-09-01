@@ -1,3 +1,15 @@
+# 1.2.0-next.5 (Tue Sep 01 2026)
+
+#### 🐛 Bug Fix
+
+- Consolidates repeated string literal hook names into extensio [#946](https://github.com/player-ui/player/pull/946) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+#### Authors: 1
+
+- Angela Villadiego ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+---
+
 # 1.2.0-next.4 (Mon Aug 31 2026)
 
 #### 🐛 Bug Fix
