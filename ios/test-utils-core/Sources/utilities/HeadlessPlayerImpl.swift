@@ -37,12 +37,12 @@ public class HeadlessHooks: CoreHooks {
     public var onStart: Hook<FlowType>
 
     public required init(from value: JSValue) {
-        flowController = Hook(baseValue: value, name: "flowController")
-        viewController = Hook(baseValue: value, name: "viewController")
-        dataController = Hook(baseValue: value, name: "dataController")
-        errorController = Hook(baseValue: value, name: "errorController")
-        state = Hook(baseValue: value, name: "state")
-        onStart = Hook<FlowType>(baseValue: value, name: "onStart")
+        flowController = Hook(baseValue: value, name: Self.flowControllerHookName)
+        viewController = Hook(baseValue: value, name: Self.viewControllerHookName)
+        dataController = Hook(baseValue: value, name: Self.dataControllerHookName)
+        errorController = Hook(baseValue: value, name: Self.errorControllerHookName)
+        state = Hook(baseValue: value, name: Self.stateHookName)
+        onStart = Hook<FlowType>(baseValue: value, name: Self.onStartHookName)
     }
 }
 
