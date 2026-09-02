@@ -10,12 +10,12 @@ import PlayerUILogger
 import SwiftHooks
 import SwiftUI
 
-extension SwiftUIPlayer {
+public extension SwiftUIPlayer {
     /// A SwiftUIPlayer Context maintains the current javascript state of Player. This includes
     /// providing
     /// stable storage for Player JSValue across SwiftUI View updates.
     ///
-    public final class Context: ObservableObject {
+    final class Context: ObservableObject {
         /// A global context that can be managed by a single SwiftUIPlayer at a time. This may be
         /// useful
         /// for fullscreen player views when @StateObject is not available to the host application.
