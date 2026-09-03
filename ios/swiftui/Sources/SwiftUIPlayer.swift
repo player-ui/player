@@ -237,7 +237,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             autoreleasepool {
                 if let ctx = player?.context {
                     ctx.exceptionHandler = nil
-                    ctx.setObject(nil, forKeyedSubscript: "setTimeout" as NSString)
+                    ctx.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
                 // Break plugin → JSContext/JSValue references
