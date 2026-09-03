@@ -1,3 +1,15 @@
+# 1.2.0-next.6 (Thu Sep 03 2026)
+
+#### 🐛 Bug Fix
+
+- Isolate setTimeout bridge key as a shared constant [#948](https://github.com/player-ui/player/pull/948) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+#### Authors: 1
+
+- Angela Villadiego ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+
+---
+
 # 1.2.0-next.5 (Tue Sep 01 2026)
 
 #### 🐛 Bug Fix
