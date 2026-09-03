@@ -8,8 +8,6 @@ import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.MapBackedNode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.serializer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -27,10 +25,11 @@ class AssetContextAndroidTest {
 
     private val assetMap = mapOf("id" to "first", "type" to "rando")
 
-    private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset<Unit>(assetContext, serializer()) {
-        override suspend fun initView(data: Unit) = TextView(context)
+    @Suppress("DEPRECATION_ERROR")
+    private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset(assetContext) {
+        override fun initView() = TextView(context)
 
-        override fun CoroutineScope.hydrate(view: View, data: Unit) = Unit
+        override fun View.hydrate() = Unit
     }
 
     private val assetContext by lazy {

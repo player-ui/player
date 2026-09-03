@@ -4,20 +4,19 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.utils.makeFlow
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 internal class BrokenAsset(
     assetContext: AssetContext,
-) : RenderableAsset<BrokenAsset.Data>(assetContext, Data.serializer()) {
+) : DecodableAsset<BrokenAsset.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         var layout: Layout,
@@ -30,15 +29,15 @@ internal class BrokenAsset(
         Linear,
     }
 
-    override suspend fun initView(data: Data) = when (data.layout) {
+    override fun initView() = when (data.layout) {
         Layout.Frame -> FrameLayout(requireContext())
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) {
+    override fun View.hydrate() {
         if (data.shouldFail ||
-            (data.layout == Layout.Frame && view is LinearLayout) ||
-            (data.layout == Layout.Linear && view is FrameLayout)
+            (data.layout == Layout.Frame && this is LinearLayout) ||
+            (data.layout == Layout.Linear && this is FrameLayout)
         ) {
             invalidateView()
         }

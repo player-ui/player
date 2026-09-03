@@ -1,7 +1,7 @@
 package com.intuit.playerui.android.reference.demo.test.assets.info
 
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -12,12 +12,10 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Test
 
 class InfoUITest : ComposeUITest("info") {
-    enum class Action(
-        val label: String,
-    ) {
-        Next("Next"),
-        Dismiss("Dismiss"),
-        Continue("Continue"),
+    enum class Action {
+        Next,
+        Dismiss,
+        Continue,
     }
 
     fun verifyView(view: Int) {
@@ -25,12 +23,18 @@ class InfoUITest : ComposeUITest("info") {
             .check(matches(isDisplayed()))
     }
 
-    fun verifyAndProceed(view: Int, action: Action? = null) {
+    fun verifyAndProceed(
+        view: Int,
+        action: Action? = null,
+        index: Int? = null,
+    ) {
         verifyView(view)
 
         action?.let {
-            waitForViewInRoot(withText(it.label))
-            onView(withText(it.label)).perform(click())
+            androidComposeRule
+                .onAllNodesWithTag("action")
+                .get(index ?: 0)
+                .performClick()
         }
     }
 
@@ -38,11 +42,11 @@ class InfoUITest : ComposeUITest("info") {
     fun basic() {
         launchMock("info-modal-flow")
 
-        verifyAndProceed(1, Action.Continue)
-        verifyAndProceed(2, Action.Dismiss)
-        verifyAndProceed(1, Action.Continue)
-        verifyAndProceed(2, Action.Next)
-        verifyAndProceed(3, Action.Next)
+        verifyAndProceed(1, Action.Continue, 0)
+        verifyAndProceed(2, Action.Dismiss, 1)
+        verifyAndProceed(1, Action.Continue, 0)
+        verifyAndProceed(2, Action.Next, 0)
+        verifyAndProceed(3, Action.Next, 0)
         verifyView(1)
 
         player.shouldBeAtState<InProgressState>()

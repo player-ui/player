@@ -205,12 +205,6 @@ final class com/intuit/playerui/android/a2ui/Button$Data$Companion$$childSeriali
 	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/a2ui/Button$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Button$Data$Companion$$childSerializers$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
 final class com/intuit/playerui/android/a2ui/Button$Data$run$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -281,12 +275,6 @@ public final class com/intuit/playerui/android/a2ui/Card$Data$$serializer : kotl
 
 public final class com/intuit/playerui/android/a2ui/Card$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/a2ui/Card$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Card$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/Card$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
@@ -813,18 +801,6 @@ public final class com/intuit/playerui/android/a2ui/Modal$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
 final class com/intuit/playerui/android/a2ui/Modal$content$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
 	public synthetic fun invoke ()Ljava/lang/Object;
 	public final fun invoke ()V
@@ -1054,12 +1030,6 @@ public final class com/intuit/playerui/android/a2ui/Tabs$TabItem$$serializer : k
 
 public final class com/intuit/playerui/android/a2ui/Tabs$TabItem$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/a2ui/Tabs$TabItem$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Tabs$TabItem$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/Tabs$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
