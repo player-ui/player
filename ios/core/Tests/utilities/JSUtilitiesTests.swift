@@ -21,7 +21,7 @@ class JSUtilitiesTests: XCTestCase {
         let function: @convention(block) () -> Void = {
             expection.fulfill()
         }
-        context.objectForKeyedSubscript("setTimeout")?.call(withArguments: [
+        context.objectForKeyedSubscript(JSUtilities.setTimeoutKey)?.call(withArguments: [
             JSValue(object: function, in: context) as Any,
             1,
         ])
