@@ -2,6 +2,7 @@ load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_compiler_plugin", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config")
+load("//jvm:opts.bzl", "OPTINS")
 
 exports_files([
     "pom.tpl",
@@ -28,14 +29,7 @@ kt_jvm_library(
     ],
 )
 
-optins = [
-    "kotlin.RequiresOptIn",
-    "com.intuit.playerui.core.utils.InternalPlayerApi",
-    "com.intuit.playerui.core.experimental.ExperimentalPlayerApi",
-    "kotlinx.serialization.ExperimentalSerializationApi",
-    "kotlinx.coroutines.ExperimentalCoroutinesApi",
-    "kotlin.contracts.ExperimentalContracts",
-]
+optins = OPTINS
 
 # Common main Kotlin compiler options
 kt_kotlinc_options(
