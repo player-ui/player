@@ -196,12 +196,12 @@ internal open class GraalValueEncoder(
             encodeFunction(function)
         } else {
             val proxyExecutable = ProxyExecutable { args ->
-                val encodedArgs = (args.indices).map { args[it].handleValue(format) }
-                val arity = (function as kotlin.jvm.internal.FunctionBase<*>).arity
-                val matchedArgs = (0 until arity)
-                    .map { encodedArgs.getOrNull(it) }
+                // [invokeVararg] trims and pads to the target's parameter list itself, so the args
+                // are handed over as-is
+                val encodedArgs = (args.indices)
+                    .map { args[it].handleValue(format) }
                     .toTypedArray()
-                format.encodeToGraalValue(function.invokeVararg(*matchedArgs))
+                format.encodeToGraalValue(function.invokeVararg(*encodedArgs))
             }
             putContent(proxyExecutable)
         }

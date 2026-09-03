@@ -678,18 +678,18 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Valu
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Lkotlin/Function;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1 : com/eclipsesource/v8/JavaCallback {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Lkotlin/Function;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Lkotlin/Function;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }

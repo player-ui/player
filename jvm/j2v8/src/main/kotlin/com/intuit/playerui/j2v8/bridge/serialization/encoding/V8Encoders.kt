@@ -318,19 +318,13 @@ internal open class V8ValueEncoder(
     } else {
         putContent(
             V8Function(format) { args ->
+                // [invokeVararg] trims and pads to the target's parameter list itself, so the args
+                // are handed over as-is. Note that padding will fail if arg types are non-nullable.
                 val encodedArgs = (0 until args.length())
                     .map { args[it].handleValue(format) }
-
-                // Hate that we need to look at an internal class for arity
-                val arity = (function as kotlin.jvm.internal.FunctionBase<*>).arity
-
-                // trim and pad args to fit arity constraints,
-                // note that padding will fail if arg types are non-nullable
-                val matchedArgs = (0 until arity)
-                    .map { encodedArgs.getOrNull(it) }
                     .toTypedArray()
 
-                handleInvocation(function::class, matchedArgs) {
+                handleInvocation(function::class, encodedArgs) {
                     function.invokeVararg(*it)
                 }
             },
