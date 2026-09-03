@@ -1,3 +1,15 @@
+# 1.2.0-next.7 (Thu Sep 03 2026)
+
+#### 🐛 Bug Fix
+
+- Swiftuiplayer refactor [#947](https://github.com/player-ui/player/pull/947) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
 # 1.2.0-next.6 (Thu Sep 03 2026)
 
 #### 🐛 Bug Fix
