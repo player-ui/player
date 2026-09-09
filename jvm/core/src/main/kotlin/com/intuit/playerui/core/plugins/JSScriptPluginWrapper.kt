@@ -15,7 +15,7 @@ public abstract class JSScriptPluginWrapper(
     public val name: String,
     protected val script: String,
     private val sourcePath: String? = null,
-    private val preCompiledScript: ByteArray? = null,
+    protected val preCompiledScript: ByteArray? = null,
 ) : JSPluginWrapper {
     public constructor(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader) :
         this(

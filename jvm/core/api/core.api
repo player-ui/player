@@ -3868,6 +3868,7 @@ public abstract class com/intuit/playerui/core/plugins/JSScriptPluginWrapper : c
 	public final fun getInstance ()Lcom/intuit/playerui/core/bridge/Node;
 	public final fun getName ()Ljava/lang/String;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
+	protected final fun getPreCompiledScript ()[B
 	protected final fun getScript ()Ljava/lang/String;
 	public final fun isInstantiated ()Z
 	protected final fun setInstance (Lcom/intuit/playerui/core/bridge/Node;)V

@@ -46,6 +46,14 @@ public final class com/intuit/playerui/android/testutils/asset/AssertionsKt$shou
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/intuit/playerui/android/testutils/asset/AssertionsKt$shouldBeView$view$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public fun <init> (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)V
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public final class com/intuit/playerui/android/testutils/asset/AssertionsKt$waitUntilState$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public fun <init> (Lcom/intuit/playerui/core/player/state/PlayerFlowState;Lkotlin/coroutines/Continuation;)V
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;

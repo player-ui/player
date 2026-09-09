@@ -4,6 +4,7 @@ import android.widget.LinearLayout
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncViewStub
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.NestedAsset
 import com.intuit.playerui.android.utils.SimpleAsset
@@ -14,8 +15,9 @@ import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,12 +39,23 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `tested nested asset constructs`() = runBlockingTest {
-        val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
-        val nested = asset.awaitRender(appContext)
+    fun `tested nested asset constructs`() = runBlocking {
+        val nested = NestedAsset(assetContext).render(appContext).let {
+            if (it is AsyncViewStub) it.awaitView() else it
+        }
         assertTrue(nested is LinearLayout)
-        assertNotNull(NestedAsset.dummy)
-        assertNotNull(NestedAsset.dummy2?.firstOrNull())
+    }
+
+    @Test
+    fun `test nested asset context`() = runBlockingTest {
+        val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
+        asset.render(appContext).let {
+            if (it is AsyncViewStub) it.awaitView() else it
+        }
+        assertEquals(appContext, NestedAsset.dummy?.context)
+        NestedAsset.dummy2?.forEach {
+            assertEquals(appContext, it?.context)
+        } ?: Unit
     }
 
     @OptIn(ExperimentalPlayerApi::class)
@@ -63,7 +76,10 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
         assertFalse(onHydrationStarted)
         assertFalse(onHydrationCompleted)
-        asset.awaitRender(appContext)
+        val view = asset.render(appContext) as AsyncViewStub
+        assertTrue(onHydrationStarted)
+        assertFalse(onHydrationCompleted)
+        view.awaitView()
         assertTrue(onHydrationStarted)
         assertTrue(onHydrationCompleted)
     }

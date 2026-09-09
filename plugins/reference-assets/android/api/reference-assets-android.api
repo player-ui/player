@@ -113,12 +113,6 @@ final class com/intuit/playerui/android/reference/assets/action/Action$Data$Comp
 	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/reference/assets/action/Action$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/action/Action$Data$Companion$$childSerializers$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
 final class com/intuit/playerui/android/reference/assets/action/Action$Data$run$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -238,22 +232,16 @@ final class com/intuit/playerui/android/reference/assets/collection/Collection$D
 	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/reference/assets/collection/Collection$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data$Companion$$childSerializers$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
 final class com/intuit/playerui/android/reference/assets/collection/Collection$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/android/reference/assets/info/Info : com/intuit/playerui/android/asset/RenderableAsset {
+public final class com/intuit/playerui/android/reference/assets/info/Info : com/intuit/playerui/android/asset/SuspendableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;)V
-	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;)V
+	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -301,24 +289,6 @@ final class com/intuit/playerui/android/reference/assets/info/Info$Data$Companio
 	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$3;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$4;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
 public final class com/intuit/playerui/android/reference/assets/input/FormattedEditText : androidx/appcompat/widget/AppCompatEditText {
 	public static final field $stable I
 	public fun <init> (Landroid/content/Context;)V
@@ -336,11 +306,11 @@ public final class com/intuit/playerui/android/reference/assets/input/FormattedE
 	public fun onTextChanged (Ljava/lang/CharSequence;III)V
 }
 
-public final class com/intuit/playerui/android/reference/assets/input/Input : com/intuit/playerui/android/asset/RenderableAsset {
+public final class com/intuit/playerui/android/reference/assets/input/Input : com/intuit/playerui/android/asset/SuspendableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;)V
-	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;)V
+	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -395,18 +365,6 @@ final class com/intuit/playerui/android/reference/assets/input/Input$Data$Compan
 	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$3;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$4;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
 final class com/intuit/playerui/android/reference/assets/input/Input$Data$format$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -450,32 +408,32 @@ public final class com/intuit/playerui/android/reference/assets/input/Input$Vali
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
 	public final fun invoke (Landroid/text/Editable;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
 	public synthetic fun invoke ()Ljava/lang/Object;
 	public final fun invoke ()V
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$1$1$formatted$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1$formatted$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$1$2 : android/view/View$OnFocusChangeListener {
+final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2 : android/view/View$OnFocusChangeListener {
 	public final fun onFocusChange (Landroid/view/View;Z)V
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$1$2$1 : com/intuit/playerui/plugins/transactions/PendingTransaction {
+final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2$1 : com/intuit/playerui/plugins/transactions/PendingTransaction {
 	public final fun commit ()V
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$1$2$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -486,11 +444,11 @@ final class com/intuit/playerui/android/reference/assets/input/Input$initView$2$
 	public final fun onEditorAction (Landroid/widget/TextView;ILandroid/view/KeyEvent;)Z
 }
 
-public final class com/intuit/playerui/android/reference/assets/text/Text : com/intuit/playerui/android/asset/RenderableAsset {
+public final class com/intuit/playerui/android/reference/assets/text/Text : com/intuit/playerui/android/asset/SuspendableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;)V
-	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;)V
+	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }

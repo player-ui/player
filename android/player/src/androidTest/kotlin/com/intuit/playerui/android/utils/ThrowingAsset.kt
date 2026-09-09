@@ -4,20 +4,19 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.utils.makeFlow
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 internal class ThrowingAsset(
     assetContext: AssetContext,
-) : RenderableAsset<ThrowingAsset.Data>(assetContext, Data.serializer()) {
+) : DecodableAsset<ThrowingAsset.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         var layout: Layout,
@@ -30,12 +29,12 @@ internal class ThrowingAsset(
         Linear,
     }
 
-    override suspend fun initView(data: Data) = when (data.layout) {
+    override fun initView() = when (data.layout) {
         Layout.Frame -> FrameLayout(requireContext())
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) = throw Exception("Throwing during render")
+    override fun View.hydrate() = throw Exception("Throwing during render")
 
     companion object {
         val sampleMap = mapOf(

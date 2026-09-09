@@ -8,16 +8,15 @@ import androidx.annotation.StyleRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin.Companion.referenceAssetsPlugin
 import com.intuit.playerui.core.player.Player
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 
 class Text(
     assetContext: AssetContext,
-) : RenderableAsset<Text.Data>(assetContext, Data.serializer()) {
+) : SuspendableAsset<Text.Data>(assetContext, Data.serializer()) {
     object Styles {
         @StyleRes val Default = R.style.Text
 
@@ -60,9 +59,9 @@ class Text(
         }
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) {
-        when (view) {
-            is TextView -> view.text = buildSpannedString {
+    override suspend fun View.hydrate(data: Data) {
+        when (this) {
+            is TextView -> text = buildSpannedString {
                 data.ref?.let {
                     inSpans(refSpan(it)) { append(data.value) }
                 } ?: append(data.value)
