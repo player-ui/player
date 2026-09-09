@@ -1,3 +1,15 @@
+# 1.2.0-next.8 (Wed Sep 09 2026)
+
+#### 🚀 Enhancement
+
+- Revert Android Asset Breaking Changes [#934](https://github.com/player-ui/player/pull/934) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 1.2.0-next.7 (Thu Sep 03 2026)
 
 #### 🐛 Bug Fix
