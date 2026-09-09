@@ -1,3 +1,63 @@
+# 1.2.0 (Wed Sep 09 2026)
+
+### Release Notes
+
+#### Add ContextPlugin: shared Player state for external consumers ([#891](https://github.com/player-ui/player/pull/891))
+
+Adds the `ContextPlugin` family for sharing Player state with external consumers.
+
+- **`@player-ui/context-plugin`** (new) — per-flow context store with symbol-keyed entries, derived transforms, subscriptions, and frozen per-flow history snapshots. `StateContextPlugin` publishes an aggregated `player.state` entry exposing flow/data/validation state plus callable `flow.transition` and `data.set` actions.
+- **JVM / iOS** — `ContextPlugin` and `StateContextPlugin` wrappers with typed reads: `get<T>(name)` (JVM) and `get(name:as:)` (iOS) deserialize entries, including function-valued members, into typed objects. Typed `list()`, `history()`, and snapshot reads included.
+- **Subscriptions on derived values fire on transitive source updates** — updating a root value notifies subscribers of every transform downstream of it, at any depth.
+- [JVM]: **`NodeSerializableFunction`** is now `public` and resolves its backing node and serializer lazily, so delegates can be declared on plugin wrappers whose node is assigned during `apply`. Existing eager call sites are unaffected.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+#### XLR Docs ([#924](https://github.com/player-ui/player/pull/924))
+
+Enhance XLR docs to document architecture and usage
+
+#### first pass at core player docs ([#920](https://github.com/player-ui/player/pull/920))
+
+Added docs for core player systems
+
+---
+
+#### 🚀 Enhancement
+
+- Revert Android Asset Breaking Changes [#934](https://github.com/player-ui/player/pull/934) ([@brocollie08](https://github.com/brocollie08))
+- Add ContextPlugin: shared Player state for external consumers [#891](https://github.com/player-ui/player/pull/891) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 🐛 Bug Fix
+
+- Release main [#949](https://github.com/player-ui/player/pull/949) ([@intuit-svc](https://github.com/intuit-svc))
+- Swiftuiplayer refactor [#947](https://github.com/player-ui/player/pull/947) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Isolate setTimeout bridge key as a shared constant [#948](https://github.com/player-ui/player/pull/948) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- Consolidates repeated string literal hook names into extensio [#946](https://github.com/player-ui/player/pull/946) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- Consolidate duplicated pluginName string literals into shared constants [#944](https://github.com/player-ui/player/pull/944) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- Re-run flaky tests up to 3 times on CI (iOS only) [#940](https://github.com/player-ui/player/pull/940) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Extract JS bridging keys into CoreJSKeys enum [#941](https://github.com/player-ui/player/pull/941) ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- HBC change file path lookup [#918](https://github.com/player-ui/player/pull/918) ([@brocollie08](https://github.com/brocollie08))
+- Code quality fixes for swift UI player [#933](https://github.com/player-ui/player/pull/933) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+- Set trackUpdateTime in Android MetricPlugin [#928](https://github.com/player-ui/player/pull/928) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- XLR Docs [#924](https://github.com/player-ui/player/pull/924) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS uses the same shared mocks as other platforms [#929](https://github.com/player-ui/player/pull/929) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Use Normal Executor For Docs Build As They Are Timing Out Frequently [#931](https://github.com/player-ui/player/pull/931) ([@KetanReddy](https://github.com/KetanReddy))
+- first pass at core player docs [#920](https://github.com/player-ui/player/pull/920) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 8
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Angela Villadiego ([@AngelaVilladiego](https://github.com/AngelaVilladiego))
+- Chloe ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+
+---
+
 # 1.2.0-next.8 (Wed Sep 09 2026)
 
 #### 🚀 Enhancement
