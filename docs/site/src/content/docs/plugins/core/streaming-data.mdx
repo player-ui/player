@@ -186,9 +186,9 @@ The status binding carries:
 | `totalRecords` | number  | Records loaded so far                            |
 | `error`        | string? | The failure message if the loader threw          |
 
-## Sorting and searching
+## Sorting, searching, and updating
 
-The data stays queryable through normal Player mechanisms. The plugin registers expressions that operate on the in-memory store and re-resolve any views reading the binding:
+The data stays queryable and editable through normal Player mechanisms. The plugin registers expressions that operate on the in-memory store and re-resolve any views reading the binding:
 
 ```js
 // Sort by a field ("asc" is the default direction). Omit the field to clear the sort.
@@ -199,13 +199,33 @@ searchStreamingData("transactions", "brokerage");
 
 // Clear both
 clearStreamingDataQuery("transactions");
+
+// Update a single record by a key field. The fourth argument is an object of fields to merge.
+// Typically evaluated from an action's exp with a model-ref for the row key:
+updateStreamingDataRecord("transactions", "id", {{transactions._row_.id}}, {"status": "reviewed"});
 ```
 
 These are regular expressions, so they can hang off an `action` asset's `exp`, run on view transitions, or be evaluated programmatically. Search and sort compose (search filters first, then sort orders the matches), and `{{transactions.length}}` reflects the filtered count while `{{transactionsStatus.totalRecords}}` keeps the unfiltered total.
 
 The defaults compare a single field with numeric awareness (numeric strings like `"1467.65"` sort as numbers, missing values sort last) and search across a record's own string, number, and boolean properties. Supply `comparator` / `searchPredicate` on the source config for anything else, like locale-sensitive collation or searching only specific columns.
 
-The same operations are available on the plugin instance as `plugin.sort()`, `plugin.search()`, and `plugin.clearQuery()` for custom asset code that holds a plugin reference.
+The same operations are available on the plugin instance for custom asset code that holds a plugin reference: `plugin.sort()`, `plugin.search()`, `plugin.clearQuery()`, and `plugin.update(binding, predicate, patch)`. `plugin.update()` accepts any predicate function and a partial-record patch object (or a function from the current record to a patch), giving you full control when the expression form is too rigid.
+
+### Freeze behavior and update performance
+
+By default records are frozen (`freeze` is `true`). When `updateStreamingDataRecord` or `plugin.update()` matches a record, it creates a new frozen copy with the merged fields. This rebuilds the view array, so every consumer gets a new reference — correct, but a full re-render at 50k rows.
+
+Set `freeze: false` on the source config when you need in-place edits that don't rebuild the view:
+
+```ts
+new StreamingDataPlugin({
+  binding: "transactions",
+  loader,
+  freeze: false,
+});
+```
+
+With `freeze: false` and no active sort or search, `plugin.update()` mutates the matching record in place and only increments the revision counter without rebuilding the view array. The view reference is unchanged, so a memoized component won't re-render. Player is still notified (the status write triggers a dirty check), so the expression system and data controller see the change. If a sort or search is active when the update runs, the view is always rebuilt so the updated record lands in the right position.
 
 ## Building an asset for streamed data
 
@@ -227,7 +247,7 @@ This is where teams usually trip. The plugin makes 50k records cheap to _resolve
 
 ## Limitations
 
-- The streamed binding is read-only by design. Row editing needs a different pattern (for example writing edits to a normal binding keyed by record id, and merging in the asset)
+- The streamed binding is **read-only through normal data-model writes**. Use `updateStreamingDataRecord` or `plugin.update()` to edit records — direct `set`/`delete` calls on the binding are warned-and-dropped
 - Streamed records don't participate in `serialize()`, validation, or schema defaults. They're display data, not form data
 - Reading the model root (or any ancestor of the streamed binding) won't include the streamed subtree
 - Loaders are per-source and sequentially consumed; if you need parallel fetching, do it inside `load()` and yield in order

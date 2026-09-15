@@ -1,4 +1,5 @@
 import type {
+  StreamingDataRecordPatch,
   StreamingDataSortDirection,
   StreamingDataSourceConfig,
 } from "./types";
@@ -227,6 +228,70 @@ export class StreamingDataStore<TRecord = unknown> {
     }
 
     return this.view;
+  }
+
+  /**
+   * Update records matching `predicate` by applying `patch`.
+   *
+   * When `freeze` is not `false` (the default), each matched record is replaced
+   * with a new frozen object so the array stays immutable. When `freeze` is
+   * `false`, the record is mutated in place via `Object.assign`, preserving
+   * the outer array identity so callers that cached `getView()` see the edit
+   * without a full re-sort.
+   *
+   * The view cache is invalidated only when at least one record is updated AND
+   * either the record was replaced (frozen path) or an active query (sort/search)
+   * means the update may change the view — otherwise `currentRevision` is
+   * incremented without clearing the cache, so `getView()` returns the same
+   * array reference (useful for large frozen-free datasets under no active sort).
+   *
+   * Returns the number of records that were updated.
+   */
+  public updateWhere(
+    predicate: (record: TRecord) => boolean,
+    patch: StreamingDataRecordPatch<TRecord>,
+  ): number {
+    let count = 0;
+
+    for (let i = 0; i < this.records.length; i += 1) {
+      const record = this.records[i];
+
+      if (!predicate(record)) {
+        continue;
+      }
+
+      const fields =
+        typeof patch === "function" ? patch(record) : patch;
+
+      if (fields === undefined || fields === null) {
+        continue;
+      }
+
+      count += 1;
+
+      if (this.options.freeze !== false) {
+        // Frozen path: replace the record with a new frozen object
+        this.records[i] = Object.freeze({ ...record, ...fields }) as TRecord;
+      } else {
+        // Mutable path: update in place to preserve array identity
+        Object.assign(record as object, fields);
+      }
+    }
+
+    if (count > 0) {
+      const hasActiveQuery =
+        this.query.sort !== undefined || this.query.search !== undefined;
+
+      if (this.options.freeze !== false || hasActiveQuery) {
+        // Replaced records or an active query — must rebuild the view
+        this.invalidate();
+      } else {
+        // In-place mutation with no active query — revision bump only
+        this.currentRevision += 1;
+      }
+    }
+
+    return count;
   }
 
   /** Drop all records and reset the query */

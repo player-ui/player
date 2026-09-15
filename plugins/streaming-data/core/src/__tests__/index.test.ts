@@ -5,6 +5,7 @@ import {
   CLEAR_QUERY_EXPRESSION_NAME,
   SEARCH_EXPRESSION_NAME,
   SORT_EXPRESSION_NAME,
+  UPDATE_EXPRESSION_NAME,
   StreamingDataPlugin,
 } from "..";
 import type { TransactionRecord } from "./helpers";
@@ -438,6 +439,164 @@ describe("multiple sources", () => {
 
     expect(state().controllers.data.get("accounts")).toHaveLength(1);
     expect(state().controllers.data.get("transactions")).toHaveLength(10);
+  });
+});
+
+describe("updating", () => {
+  const startWithRecords = async (
+    records: Array<TransactionRecord>,
+    options: { freeze?: boolean } = {},
+  ) => {
+    const loader = new ArrayLoader(paginate(records, 500));
+    const plugin = new StreamingDataPlugin({
+      binding: "transactions",
+      loader,
+      ...options,
+    });
+    const started = start(plugin);
+
+    await vi.waitFor(() => {
+      expect(
+        started.state().controllers.data.get("transactionsStatus.completed"),
+      ).toBe(true);
+    });
+
+    return { ...started, plugin };
+  };
+
+  test("updateStreamingDataRecord expression updates a record by key field", async () => {
+    const records = generateRecords(10);
+    const targetId = records[4].id;
+    const { state } = await startWithRecords(records);
+
+    state().controllers.expression.evaluate(
+      `${UPDATE_EXPRESSION_NAME}("transactions", "id", "${targetId}", {"status": "updated-via-expression"})`,
+    );
+
+    const updatedRow = state().controllers.data.get("transactions.4");
+    expect(updatedRow.status).toBe("updated-via-expression");
+
+    // Other rows are not affected
+    expect(state().controllers.data.get("transactions.0.status")).not.toBe(
+      "updated-via-expression",
+    );
+  });
+
+  test("plugin.update() by predicate updates matching records", async () => {
+    const records = generateRecords(10);
+    const { state, plugin } = await startWithRecords(records);
+
+    const count = plugin.update(
+      "transactions",
+      (r) => (r as TransactionRecord).term === "SHORT",
+      { status: "patched" },
+    );
+
+    const shortCount = records.filter((r) => r.term === "SHORT").length;
+    expect(count).toBe(shortCount);
+
+    const allRows = state().controllers.data.get(
+      "transactions",
+    ) as Array<TransactionRecord>;
+    const patchedRows = allRows.filter((r) => r.status === "patched");
+    expect(patchedRows).toHaveLength(shortCount);
+  });
+
+  test("update with freeze:false mutates in place and preserves view identity", async () => {
+    const records = generateRecords(5);
+    const { state, plugin } = await startWithRecords(records, {
+      freeze: false,
+    });
+
+    const viewBefore = plugin.getView("transactions");
+
+    plugin.update(
+      "transactions",
+      (r) => (r as TransactionRecord).id === records[2].id,
+      { status: "patched" },
+    );
+
+    const viewAfter = plugin.getView("transactions");
+
+    // View identity is preserved when freeze is false and no sort/search is active
+    expect(viewAfter).toBe(viewBefore);
+    expect((viewAfter![2] as TransactionRecord).status).toBe("patched");
+  });
+
+  test("update with freeze:true replaces the record with a new frozen object", async () => {
+    const records = generateRecords(5);
+    const { state, plugin } = await startWithRecords(records);
+
+    const viewBefore = plugin.getView("transactions");
+
+    plugin.update(
+      "transactions",
+      (r) => (r as TransactionRecord).id === records[0].id,
+      { status: "replaced" },
+    );
+
+    const viewAfter = plugin.getView("transactions");
+
+    // View array identity changes (record was replaced)
+    expect(viewAfter).not.toBe(viewBefore);
+    expect(Object.isFrozen(viewAfter![0])).toBe(true);
+    expect((viewAfter![0] as TransactionRecord).status).toBe("replaced");
+  });
+
+  test("update with active sort re-orders affected rows correctly", async () => {
+    const records = generateRecords(20);
+    const { state, plugin } = await startWithRecords(records, { freeze: false });
+
+    // Sort by amount descending
+    state().controllers.expression.evaluate(
+      `${SORT_EXPRESSION_NAME}("transactions", "amount", "desc")`,
+    );
+
+    const viewBefore = plugin.getView("transactions") as Array<TransactionRecord>;
+    const topRecord = viewBefore[0];
+
+    // Set the top-sorted record's amount to the smallest possible value
+    plugin.update(
+      "transactions",
+      (r) => (r as TransactionRecord).id === topRecord.id,
+      { amount: "0.01" },
+    );
+
+    const viewAfter = plugin.getView("transactions") as Array<TransactionRecord>;
+
+    // The updated record should have dropped from first position
+    expect(viewAfter[0].id).not.toBe(topRecord.id);
+    // The updated record should now appear last (amount 0.01 sorts last desc)
+    expect(viewAfter[viewAfter.length - 1].id).toBe(topRecord.id);
+  });
+
+  test("view re-resolves after an update", async () => {
+    const records = generateRecords(5);
+    const { state, plugin } = await startWithRecords(records);
+
+    const updatesBefore = state().controllers.view.currentView?.lastUpdate;
+
+    plugin.update(
+      "transactions",
+      (r) => (r as TransactionRecord).id === records[0].id,
+      { status: "changed" },
+    );
+
+    await vi.waitFor(() => {
+      const updatesAfter = state().controllers.view.currentView?.lastUpdate;
+      expect(updatesAfter).not.toBe(updatesBefore);
+    });
+  });
+
+  test("updating an unknown binding warns and returns 0", async () => {
+    const records = generateRecords(5);
+    const { plugin } = await startWithRecords(records);
+
+    const count = plugin.update("unknownBinding", () => true, {
+      status: "noop",
+    });
+
+    expect(count).toBe(0);
   });
 });
 
