@@ -13,6 +13,7 @@ import type {
 import { StreamingDataStore } from "./store";
 import { StreamingDataPluginSymbol } from "./symbols";
 import type {
+  StreamingDataRecordPatch,
   StreamingDataSortDirection,
   StreamingDataSourceConfig,
   StreamingDataStatus,
@@ -26,6 +27,23 @@ export const SEARCH_EXPRESSION_NAME = "searchStreamingData";
 
 /** The expression used to clear sort + search on a streamed data source: clearStreamingDataQuery(binding) */
 export const CLEAR_QUERY_EXPRESSION_NAME = "clearStreamingDataQuery";
+
+/**
+ * The expression used to update a single record in a streamed data source by a key field.
+ *
+ * `updateStreamingDataRecord(binding, keyField, keyValue, patch)`
+ *
+ * - `binding`  — the registered streamed data binding (e.g. `"transactions"`)
+ * - `keyField` — the record field to match on (e.g. `"uuid"`)
+ * - `keyValue` — the value that field must equal (e.g. `{{transactions._row_.uuid}}`)
+ * - `patch`    — an object with the fields to merge into the matching record
+ *
+ * Unknown `binding` values are warned-and-no-op'd. `keyValue` comparison is
+ * strict equality (`===`). If `freeze` is not `false` on the source config
+ * the matched record is replaced with a new frozen copy; otherwise it is
+ * mutated in place.
+ */
+export const UPDATE_EXPRESSION_NAME = "updateStreamingDataRecord";
 
 const INITIAL_STATUS: StreamingDataStatus = {
   started: false,
@@ -198,6 +216,10 @@ export class StreamingDataPlugin implements PlayerPlugin {
         CLEAR_QUERY_EXPRESSION_NAME,
         this.clearQueryHandler,
       );
+      evaluator.addExpressionFunction(
+        UPDATE_EXPRESSION_NAME,
+        this.updateHandler,
+      );
     });
 
     player.hooks.onEnd.tap(this.name, () => {
@@ -257,6 +279,36 @@ export class StreamingDataPlugin implements PlayerPlugin {
   /** The current (query-applied) records for a streamed source */
   public getView(binding: string): ReadonlyArray<unknown> | undefined {
     return this.findSourceByString(binding)?.store.getView();
+  }
+
+  /**
+   * Update records in the named source that match `predicate`.
+   *
+   * `patch` is merged into each matching record (see `StreamingDataRecordPatch`).
+   * When at least one record is updated, Player is notified so dependent views
+   * re-resolve.
+   *
+   * Returns the number of records that were updated, or 0 if the binding is
+   * unknown (a warning is also logged).
+   */
+  public update(
+    binding: string,
+    predicate: (record: unknown) => boolean,
+    patch: StreamingDataRecordPatch<unknown>,
+  ): number {
+    const state = this.findSourceByString(binding);
+
+    if (!state) {
+      return 0;
+    }
+
+    const count = state.store.updateWhere(predicate, patch);
+
+    if (count > 0) {
+      this.notifyDataChanged(state);
+    }
+
+    return count;
   }
 
   private readonly middleware: DataModelMiddleware = {
@@ -485,6 +537,17 @@ export class StreamingDataPlugin implements PlayerPlugin {
     binding,
   ) => {
     this.clearQuery(binding);
+  };
+
+  private readonly updateHandler: ExpressionHandler<
+    [string, string, unknown, Record<string, unknown>]
+  > = (context, binding, keyField, keyValue, patch) => {
+    this.update(
+      binding,
+      (record) =>
+        (record as Record<string, unknown>)?.[keyField] === keyValue,
+      patch as StreamingDataRecordPatch<unknown>,
+    );
   };
 
   private validateConfigs(): void {

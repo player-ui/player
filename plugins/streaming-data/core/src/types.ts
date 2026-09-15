@@ -54,6 +54,17 @@ export interface StreamingDataStatus {
 /** The direction used when sorting streamed records */
 export type StreamingDataSortDirection = "asc" | "desc";
 
+/**
+ * A patch applied to a single streamed record.
+ *
+ * Pass a partial record object to merge specific fields, or a function that
+ * receives the current record and returns the fields to merge (or `void` / `undefined`
+ * to skip the record without counting it as a match).
+ */
+export type StreamingDataRecordPatch<TRecord> =
+  | Partial<TRecord>
+  | ((record: TRecord) => Partial<TRecord> | void);
+
 /** Configuration for a single streamed data source */
 export interface StreamingDataSourceConfig<TRecord = unknown> {
   /**
