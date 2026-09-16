@@ -56,7 +56,12 @@ androidx-test-espresso = { module = "androidx.test.espresso:espresso-intents", v
 androidx-test-junit-ktx = { module = "androidx.test.ext:junit-ktx", version = "1.1.3" }
 kluent = { module = "org.amshove.kluent:kluent", version = "1.68" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
-mockk = { module = "io.mockk:mockk", version = "1.12.5" }
+# 1.13.2+ required: earlier versions throw InstantiationError instantiating sealed classes
+# (e.g. metrics' Timing) on a JDK 17 target, since sealed classes carry a PermittedSubclasses
+# attribute that objenesis/bytecode instrumentation can't handle. See mockk PR #916.
+# mockk-jvm, not mockk: from 1.13 the root artifact is a Kotlin Multiplatform metadata module
+# whose jar holds no classes - the JVM implementation lives in the -jvm variant.
+mockk = { module = "io.mockk:mockk-jvm", version = "1.13.13" }
 robolectric = { module = "org.robolectric:robolectric", version = "4.15.1" }
 
 # Junit5
