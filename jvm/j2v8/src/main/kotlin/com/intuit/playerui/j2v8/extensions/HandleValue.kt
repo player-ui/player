@@ -8,6 +8,7 @@ import com.eclipsesource.v8.V8Value
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.serialization.encoding.narrowTo
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
@@ -20,10 +21,13 @@ import kotlinx.serialization.builtins.ArraySerializer
 
 internal fun Any?.handleValue(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? =
     when (this) {
-        is V8Primitive -> value
+        is V8Primitive -> value.narrowIfNumber(deserializationStrategy)
         is V8Value -> transform(format, deserializationStrategy)
-        else -> this
+        else -> this.narrowIfNumber(deserializationStrategy)
     }
+
+private fun Any?.narrowIfNumber(deserializationStrategy: DeserializationStrategy<*>?): Any? =
+    if (this is Number && deserializationStrategy != null) toDouble().narrowTo(deserializationStrategy) else this
 
 private fun V8Value.transform(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>?): Any? =
     evaluateInJSThreadIfDefinedBlocking(format.runtime) {

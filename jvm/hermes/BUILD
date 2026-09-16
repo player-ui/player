@@ -26,7 +26,10 @@ kt_player_module(
     name = "hermes",
     main_deps = main_deps,
     main_exports = main_exports,
+    # the JSI APIs use context receivers to require the runtime thread context
+    main_opts = "//jvm:main_options_with_context_receivers",
     test_deps = test_deps,
+    test_opts = "//jvm:test_options_with_context_receivers",
     test_package = "com.intuit.playerui",
 )
 
