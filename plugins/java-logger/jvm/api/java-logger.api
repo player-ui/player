@@ -8,12 +8,6 @@ public final class com/intuit/playerui/plugins/logging/jul/JavaLoggerConfig : co
 	public fun setName (Ljava/lang/String;)V
 }
 
-final class com/intuit/playerui/plugins/logging/jul/JavaLoggerConfig$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/plugins/logging/jul/JavaLoggerConfig$1;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/util/logging/Logger;)V
-}
-
 public final class com/intuit/playerui/plugins/logging/jul/JavaLoggerFactory : com/intuit/playerui/core/plugins/logging/PlayerLoggingFactory {
 	public static final field INSTANCE Lcom/intuit/playerui/plugins/logging/jul/JavaLoggerFactory;
 	public synthetic fun create (Lkotlin/jvm/functions/Function1;)Lcom/intuit/playerui/core/plugins/LoggerPlugin;

@@ -99,11 +99,6 @@ synthetic class com/intuit/playerui/plugins/metrics/MetricsPlugin$Hooks$Serializ
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/plugins/metrics/MetricsPlugin$apply$renderEndHandler$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
-	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/plugins/metrics/MetricsPluginKt {
 	public static final fun getMetricsPlugin (Lcom/intuit/playerui/core/player/Player;)Lcom/intuit/playerui/plugins/metrics/MetricsPlugin;
 	public static final fun getRequestTimePlugin (Lcom/intuit/playerui/core/player/Player;)Lcom/intuit/playerui/plugins/metrics/RequestTimePlugin;
@@ -171,11 +166,6 @@ public final class com/intuit/playerui/plugins/metrics/RequestTimeWebPlugin : co
 }
 
 private final class com/intuit/playerui/plugins/metrics/RequestTimeWebPlugin$Companion {
-}
-
-final class com/intuit/playerui/plugins/metrics/RequestTimeWebPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Ljava/lang/Integer;
-	public synthetic fun invoke ()Ljava/lang/Object;
 }
 
 public abstract class com/intuit/playerui/plugins/metrics/Timing : com/intuit/playerui/core/bridge/NodeWrapper {

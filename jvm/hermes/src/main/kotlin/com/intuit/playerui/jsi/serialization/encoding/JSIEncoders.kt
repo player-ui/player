@@ -168,7 +168,7 @@ internal open class JSIValueEncoder(
             // keep the serializer: a FunctionLikeSerializer carries the function's parameter types,
             // which the arguments from JS have to be decoded against
             serializer.descriptor == FunctionLikeSerializer.descriptor ->
-            encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
+                encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
             value is Node -> encodeNode(value)

@@ -15,10 +15,11 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import org.graalvm.polyglot.Value
 
-internal fun Any?.handleValue(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? = when (this) {
-    is Value -> transform(format, deserializationStrategy)
-    else -> this
-}
+internal fun Any?.handleValue(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? =
+    when (this) {
+        is Value -> transform(format, deserializationStrategy)
+        else -> this
+    }
 
 private fun Value.transform(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? = when {
     isNull -> null

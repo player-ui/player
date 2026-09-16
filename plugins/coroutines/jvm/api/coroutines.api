@@ -20,7 +20,7 @@ public final class com/intuit/playerui/plugins/coroutines/FlowScopePlugin$FlowCo
 public final class com/intuit/playerui/plugins/coroutines/FlowScopePlugin$FlowContext$Key : kotlin/coroutines/CoroutineContext$Key {
 }
 
-final class com/intuit/playerui/plugins/coroutines/FlowScopePlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/plugins/coroutines/FlowScopePlugin$apply$1 : kotlin/jvm/functions/Function1 {
 	public final fun invoke (Lcom/intuit/playerui/core/player/state/PlayerFlowState;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -44,21 +44,6 @@ public final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin : com/in
 	public static synthetic fun waitForUpdates$default (Lcom/intuit/playerui/plugins/coroutines/UpdatesPlugin;JLkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lcom/intuit/playerui/core/asset/Asset;
 }
 
-final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/view/ViewController;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$apply$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/view/View;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$apply$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/asset/Asset;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$apply$1$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -71,12 +56,6 @@ final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$flush$1 : kotli
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$waitForUpdates$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/plugins/coroutines/UpdatesPlugin$waitForUpdates$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()V
 }
 
 final class com/intuit/playerui/plugins/coroutines/UpdatesPlugin$waitForUpdates$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -99,11 +78,5 @@ public final class com/intuit/playerui/plugins/coroutines/UpdatesPluginKt {
 	public static final fun waitForUpdates (Lcom/intuit/playerui/core/player/Player;J)Lcom/intuit/playerui/core/asset/Asset;
 	public static final fun waitForUpdates (Lcom/intuit/playerui/core/player/Player;JLkotlin/jvm/functions/Function0;)Lcom/intuit/playerui/core/asset/Asset;
 	public static synthetic fun waitForUpdates$default (Lcom/intuit/playerui/core/player/Player;JLkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lcom/intuit/playerui/core/asset/Asset;
-}
-
-final class com/intuit/playerui/plugins/coroutines/UpdatesPluginKt$waitForUpdates$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/plugins/coroutines/UpdatesPluginKt$waitForUpdates$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()V
 }
 

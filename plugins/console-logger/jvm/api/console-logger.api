@@ -6,33 +6,3 @@ public final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin
 	public fun apply (Lcom/intuit/playerui/core/player/Player;)V
 }
 
-final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin$apply$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin$apply$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin$apply$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin$apply$5 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/plugins/consolelogger/ConsoleLoggerPlugin$apply$6 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)V
-}
-

@@ -57,13 +57,13 @@ public final class com/intuit/playerui/utils/mocks/ClassLoaderMock : com/intuit/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/utils/mocks/ClassLoaderMock$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/utils/mocks/ClassLoaderMock$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lcom/intuit/playerui/utils/mocks/ClassLoaderMock$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -79,16 +79,6 @@ public final class com/intuit/playerui/utils/mocks/ClassLoaderMocksReader {
 	public final fun findMockByName (Ljava/lang/String;)Lcom/intuit/playerui/utils/mocks/ClassLoaderMock;
 	public final fun getManifest ()Ljava/lang/String;
 	public final fun getMocks ()Ljava/util/List;
-}
-
-final class com/intuit/playerui/utils/mocks/ClassLoaderMocksReader$manifest$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/lang/String;
-}
-
-final class com/intuit/playerui/utils/mocks/ClassLoaderMocksReader$mocks$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
 }
 
 public abstract interface class com/intuit/playerui/utils/mocks/Mock {
