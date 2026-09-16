@@ -3,7 +3,6 @@ package com.intuit.playerui.hermes.extensions
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
-import com.intuit.playerui.core.bridge.serialization.encoding.narrowTo
 import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
 import com.intuit.playerui.hermes.bridge.HermesNode
@@ -31,12 +30,11 @@ private fun Value.transform(format: JSIFormat, deserializationStrategy: Deserial
     isUndefined() -> null
     isNull() -> null
     isBoolean() -> asBoolean()
-    isNumber() -> asNumber().narrowTo(deserializationStrategy)
+    isNumber() -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) }
+        ?: asNumber().let { if (it % 1 == 0.0) it.toInt() else it }
     isString() -> asString(format.runtime)
     isBigInt() -> asBigInt(format.runtime)
     isSymbol() -> asSymbol(format.runtime).toString(format.runtime)
-    // decode against the declared type when it's known, so a lambda can take a @Serializable
-    // parameter rather than always receiving a Node
     isObject() -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) }
         ?: asObject(format.runtime).transform(format)
     else -> null

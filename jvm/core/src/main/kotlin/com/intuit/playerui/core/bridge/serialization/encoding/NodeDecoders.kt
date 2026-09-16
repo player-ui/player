@@ -7,10 +7,8 @@ import com.intuit.playerui.core.bridge.serialization.format.RuntimeEncodingExcep
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.bridge.serialization.json.value
 import com.intuit.playerui.core.utils.InternalPlayerApi
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlin.reflect.KCallable
@@ -85,14 +83,3 @@ public interface RuntimeValueDecoder<T> : NodeDecoder {
 
 @InternalPlayerApi
 public interface RuntimeValueCompositeDecoder<T> : RuntimeValueDecoder<T>
-
-@InternalPlayerApi
-public fun Double.narrowTo(deserializationStrategy: DeserializationStrategy<*>?): Any = when (deserializationStrategy?.descriptor?.kind) {
-    PrimitiveKind.LONG -> toLong()
-    PrimitiveKind.INT -> toInt()
-    PrimitiveKind.SHORT -> toInt().toShort()
-    PrimitiveKind.BYTE -> toInt().toByte()
-    PrimitiveKind.FLOAT -> toFloat()
-    PrimitiveKind.DOUBLE -> this
-    else -> if (this % 1 == 0.0) toInt() else this
-}
