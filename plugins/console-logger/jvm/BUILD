@@ -9,7 +9,7 @@ main_deps = main_exports
 
 test_deps = [
     "//jvm/testutils:with-runtimes",
-    artifact("io.mockk:mockk"),
+    artifact("io.mockk:mockk-jvm"),
 ]
 
 kt_player_plugin(

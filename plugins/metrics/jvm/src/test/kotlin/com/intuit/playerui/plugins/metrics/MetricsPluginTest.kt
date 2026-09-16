@@ -21,7 +21,11 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExtendWith(MockKExtension::class)
 internal class MetricsPluginTest : PlayerTest() {
-    private val renderEndHandler: RenderEndHandler = { _, _, _ -> }
+    // an object expression, not a lambda: mockkObject proxies the instance's class, and an
+    // invokedynamic lambda is a hidden class that kotlin-reflect can't resolve
+    private val renderEndHandler: RenderEndHandler = object : RenderEndHandler {
+        override fun invoke(timing: Timing?, renderMetrics: RenderMetrics?, flowMetrics: PlayerFlowMetrics?) = Unit
+    }
 
     override val plugins = getMetricPlugin()
 
@@ -141,7 +145,11 @@ internal class MetricsPluginTest : PlayerTest() {
 
 @ExtendWith(MockKExtension::class)
 internal class RequestTimePluginTest : PlayerTest() {
-    private val renderEndHandler: RenderEndHandler = { _, _, _ -> }
+    // an object expression, not a lambda: mockkObject proxies the instance's class, and an
+    // invokedynamic lambda is a hidden class that kotlin-reflect can't resolve
+    private val renderEndHandler: RenderEndHandler = object : RenderEndHandler {
+        override fun invoke(timing: Timing?, renderMetrics: RenderMetrics?, flowMetrics: PlayerFlowMetrics?) = Unit
+    }
     private val getRequestTime: () -> Int = { 5 }
 
     override val plugins = getRequestTimePlugins()

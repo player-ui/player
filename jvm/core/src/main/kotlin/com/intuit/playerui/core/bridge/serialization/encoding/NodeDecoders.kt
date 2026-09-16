@@ -7,8 +7,10 @@ import com.intuit.playerui.core.bridge.serialization.format.RuntimeEncodingExcep
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.bridge.serialization.json.value
 import com.intuit.playerui.core.utils.InternalPlayerApi
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlin.reflect.KCallable
@@ -43,11 +45,11 @@ public interface FunctionEncoder : Encoder {
     // TODO: Can we encodeFunctions such that we can get the original function instance back on decode?
     //       We actually can by checking if it's a host function (then we could probably get the actual
     //       host function impl back, maybe even the method reference if it's enhanced
-    public fun encodeFunction(any: Any?) {
+    public fun encodeFunction(any: Any?, parameterSerializers: List<KSerializer<*>> = emptyList()) {
         when (any) {
             is KCallable<*> -> encodeFunction(any)
             is Invokable<*> -> encodeFunction(any)
-            is Function<*> -> encodeFunction(any)
+            is Function<*> -> encodeFunction(any, parameterSerializers)
             null -> encodeNull()
             else -> throw SerializationException("can only decode functions of types: [Invokable<*>, Function<*>, KCallable<*>]")
         }
@@ -57,7 +59,12 @@ public interface FunctionEncoder : Encoder {
 
     public fun encodeFunction(kCallable: KCallable<*>)
 
-    public fun encodeFunction(function: Function<*>)
+    /**
+     * [parameterSerializers] describe the types [function] declares, so arguments from the JS side
+     * can be decoded to match before invoking it. Empty when the types aren't known, in which case
+     * arguments are passed as the runtime decoded them.
+     */
+    public fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>> = emptyList())
 }
 
 public interface FunctionDecoder : Decoder {
@@ -78,3 +85,14 @@ public interface RuntimeValueDecoder<T> : NodeDecoder {
 
 @InternalPlayerApi
 public interface RuntimeValueCompositeDecoder<T> : RuntimeValueDecoder<T>
+
+@InternalPlayerApi
+public fun Double.narrowTo(deserializationStrategy: DeserializationStrategy<*>?): Any = when (deserializationStrategy?.descriptor?.kind) {
+    PrimitiveKind.LONG -> toLong()
+    PrimitiveKind.INT -> toInt()
+    PrimitiveKind.SHORT -> toInt().toShort()
+    PrimitiveKind.BYTE -> toInt().toByte()
+    PrimitiveKind.FLOAT -> toFloat()
+    PrimitiveKind.DOUBLE -> this
+    else -> if (this % 1 == 0.0) toInt() else this
+}

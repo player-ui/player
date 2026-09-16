@@ -16,6 +16,8 @@ def kt_player_module(
 
         # Package level config
         module_name = None,
+        main_opts = "//jvm:main_options",
+        test_opts = "//jvm:test_options",
         main_srcs = None,
         main_resources = None,
         main_resource_jars = None,
@@ -41,7 +43,7 @@ def kt_player_module(
         excluded_workspaces = excluded_workspaces,
         pom_template = "//jvm:pom.tpl",
         module_name = module_name,
-        main_opts = "//jvm:main_options",
+        main_opts = main_opts,
         main_srcs = main_srcs,
         main_resources = main_resources,
         main_resource_jars = main_resource_jars,
@@ -51,7 +53,7 @@ def kt_player_module(
         main_exports = main_exports,
         main_runtime_deps = main_runtime_deps,
         test_package = test_package,
-        test_opts = "//jvm:test_options",
+        test_opts = test_opts,
         test_srcs = test_srcs,
         test_resources = test_resources,
         test_resource_jars = test_resource_jars,

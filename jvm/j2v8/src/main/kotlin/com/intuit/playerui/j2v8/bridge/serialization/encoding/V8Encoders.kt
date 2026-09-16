@@ -28,6 +28,7 @@ import com.intuit.playerui.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.playerui.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.j2v8.extensions.handleValue
 import com.intuit.playerui.j2v8.pushPrimitive
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -210,7 +211,10 @@ internal open class V8ValueEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            serializer.descriptor == FunctionLikeSerializer.descriptor -> encodeFunction(value)
+            // keep the serializer: a FunctionLikeSerializer carries the function's parameter types,
+            // which the arguments from JS have to be decoded against
+            serializer.descriptor == FunctionLikeSerializer.descriptor ->
+                encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
             value is Node -> encodeNode(value)
@@ -313,24 +317,18 @@ internal open class V8ValueEncoder(
      *  implementation of [KCallable.call] so that we
      *  don't even need to use Java reflection. Until then...
      */
-    override fun encodeFunction(function: Function<*>) = if (function is Invokable<*>) {
+    override fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>>) = if (function is Invokable<*>) {
         encodeFunction(function)
     } else {
         putContent(
             V8Function(format) { args ->
+                // [invokeVararg] trims and pads to the target's parameter list itself, so the args
+                // are handed over as-is. Note that padding will fail if arg types are non-nullable.
                 val encodedArgs = (0 until args.length())
-                    .map { args[it].handleValue(format) }
-
-                // Hate that we need to look at an internal class for arity
-                val arity = (function as kotlin.jvm.internal.FunctionBase<*>).arity
-
-                // trim and pad args to fit arity constraints,
-                // note that padding will fail if arg types are non-nullable
-                val matchedArgs = (0 until arity)
-                    .map { encodedArgs.getOrNull(it) }
+                    .map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
                     .toTypedArray()
 
-                handleInvocation(function::class, matchedArgs) {
+                handleInvocation(function::class, encodedArgs) {
                     function.invokeVararg(*it)
                 }
             },
