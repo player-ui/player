@@ -222,8 +222,7 @@ public class Value private constructor(
                     val encodedArgs = args
                         .mapIndexed { i, arg ->
                             arg.handleValue((runtime as HermesRuntime).format, parameterSerializers.getOrNull(i))
-                        }
-                        .toTypedArray()
+                        }.toTypedArray()
 
                     from(
                         runtime,

@@ -71,86 +71,6 @@ public final class com/intuit/playerui/hermes/bridge/HermesNode : com/intuit/pla
 	public final fun values ()Ljava/util/List;
 }
 
-final class com/intuit/playerui/hermes/bridge/HermesNode$deserialize$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$entries$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/Set;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$get$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$getFunction$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Function;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$getInvokable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Function;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$getList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/util/List;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$getObject$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$getSerializable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$keys$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/Set;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$keys$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/util/Set;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$nativeReferenceEquals$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Boolean;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$nativeReferenceEquals$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Boolean;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$size$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Ljava/lang/Integer;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$value$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$value$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/HermesNode$values$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
-}
-
 public abstract interface class com/intuit/playerui/hermes/bridge/JSIValueWrapper {
 	public abstract fun getValue ()Lcom/intuit/playerui/jsi/Value;
 }
@@ -255,62 +175,11 @@ public final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$Confi
 	public static synthetic fun invoke$default (Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$Config$Companion;ZILjava/lang/Object;)Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$Config;
 }
 
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$add$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$backingNode$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/core/bridge/Node;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$backingNode$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$checkBlockingThread$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$checkBlockingThread$1;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/lang/Thread;)V
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$dispatcher$1 : java/util/concurrent/ThreadFactory {
-	public static final field INSTANCE Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$dispatcher$1;
-	public final fun newThread (Ljava/lang/Runnable;)Ljava/lang/Thread;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$execute$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$executeRaw$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$load$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$release$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$scope$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/coroutines/CoroutineScope;
-}
-
-final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntime$serialize$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/hermes/bridge/runtime/HermesRuntimeContainer : com/intuit/playerui/core/bridge/runtime/PlayerRuntimeContainer {
@@ -339,21 +208,6 @@ public final class com/intuit/playerui/hermes/extensions/DedicatedRuntimeThreadC
 }
 
 public final class com/intuit/playerui/hermes/extensions/HandleValueKt {
-}
-
-final class com/intuit/playerui/hermes/extensions/HandleValueKt$toInvokable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/extensions/HandleValueKt$toInvokable$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/hermes/extensions/HandleValueKt$transform$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/hermes/extensions/LockKt {
@@ -459,18 +313,6 @@ public final class com/intuit/playerui/jsi/Function$Companion {
 	public static synthetic fun createFromHostFunction$default (Lcom/intuit/playerui/jsi/Function$Companion;Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Ljava/lang/String;ILkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lcom/intuit/playerui/jsi/Function;
 }
 
-final class com/intuit/playerui/jsi/Function$Companion$createFromHostFunction$1 : com/intuit/playerui/jsi/HostFunctionInterface {
-	public final fun call (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;[Lcom/intuit/playerui/jsi/Value;)Lcom/intuit/playerui/jsi/Value;
-}
-
-final class com/intuit/playerui/jsi/Function$Companion$createFromHostFunction$2 : com/intuit/playerui/jsi/HostFunctionInterface {
-	public final fun call (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;[Lcom/intuit/playerui/jsi/Value;)Lcom/intuit/playerui/jsi/Value;
-}
-
-final class com/intuit/playerui/jsi/Function$Companion$createFromHostFunction$3 : com/intuit/playerui/jsi/HostFunctionInterface {
-	public final fun call (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;[Lcom/intuit/playerui/jsi/Value;)Lcom/intuit/playerui/jsi/Value;
-}
-
 public final class com/intuit/playerui/jsi/HostFunction : com/intuit/playerui/jsi/HostFunctionInterface {
 	public fun <init> (Lcom/intuit/playerui/jsi/HostFunctionInterface;)V
 	public fun call (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;[Lcom/intuit/playerui/jsi/Value;)Lcom/intuit/playerui/jsi/Value;
@@ -538,16 +380,6 @@ public class com/intuit/playerui/jsi/Runtime : com/intuit/playerui/jsi/HybridCla
 	public final fun stringify (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Value;)Ljava/lang/String;
 }
 
-final class com/intuit/playerui/jsi/Runtime$jsEquals$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/jsi/Function;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/Runtime$jsEquals$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Function;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/jsi/Symbol : com/intuit/playerui/jsi/JSIValueContainer {
 	public static final field Companion Lcom/intuit/playerui/jsi/Symbol$Companion;
 	public fun asValue (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;)Lcom/intuit/playerui/jsi/Value;
@@ -604,25 +436,13 @@ public final class com/intuit/playerui/jsi/Value$Companion {
 	public final fun from (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;J)Lcom/intuit/playerui/jsi/Value;
 	public final fun from (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Object;)Lcom/intuit/playerui/jsi/Value;
 	public final fun from (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Symbol;)Lcom/intuit/playerui/jsi/Value;
-	public final fun from (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Ljava/lang/Object;)Lcom/intuit/playerui/jsi/Value;
+	public final fun from (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Ljava/lang/Object;Ljava/util/List;)Lcom/intuit/playerui/jsi/Value;
 	public final fun from (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Ljava/lang/String;)Lcom/intuit/playerui/jsi/Value;
 	public final fun from (Z)Lcom/intuit/playerui/jsi/Value;
+	public static synthetic fun from$default (Lcom/intuit/playerui/jsi/Value$Companion;Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Ljava/lang/Object;Ljava/util/List;ILjava/lang/Object;)Lcom/intuit/playerui/jsi/Value;
 	public final fun getNull ()Lcom/intuit/playerui/jsi/Value;
 	public final fun getUndefined ()Lcom/intuit/playerui/jsi/Value;
 	public final fun strictEquals (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;Lcom/intuit/playerui/jsi/Value;)Z
-}
-
-final class com/intuit/playerui/jsi/Value$Companion$from$1 : com/intuit/playerui/jsi/HostFunctionInterface {
-	public final fun call (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;[Lcom/intuit/playerui/jsi/Value;)Lcom/intuit/playerui/jsi/Value;
-}
-
-final class com/intuit/playerui/jsi/Value$Companion$from$2 : com/intuit/playerui/jsi/HostFunctionInterface {
-	public final fun call (Lcom/intuit/playerui/jsi/Runtime;Lcom/intuit/playerui/jsi/Value;[Lcom/intuit/playerui/jsi/Value;)Lcom/intuit/playerui/jsi/Value;
-}
-
-final class com/intuit/playerui/jsi/Value$Companion$from$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/jsi/ValueKt {
@@ -639,21 +459,6 @@ public abstract class com/intuit/playerui/jsi/serialization/encoding/AbstractJSI
 	public fun getFormat ()Lcom/intuit/playerui/jsi/serialization/format/JSIFormat;
 	public fun getValue ()Lcom/intuit/playerui/jsi/Value;
 	public synthetic fun getValue ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/AbstractJSIValueDecoder$beginStructure$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeValueCompositeDecoder;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/AbstractJSIValueDecoder$decodeFunction$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/core/bridge/Invokable;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/AbstractJSIValueDecoder$decodeValue$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIArrayListDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeArrayListDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
@@ -688,50 +493,15 @@ public final class com/intuit/playerui/jsi/serialization/encoding/JSIArrayListDe
 	public synthetic fun getValue ()Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/jsi/serialization/encoding/JSIArrayListDecoder$decodeValueElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIArrayListDecoder$getElementAtIndex$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIArrayListDecoder$keys$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIArrayListDecoder$keys$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Integer;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIDecodersKt {
 }
 
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIEncodersKt {
 }
 
-final class com/intuit/playerui/jsi/serialization/encoding/JSIEncodersKt$writeToValue$encoder$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/jsi/Value;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIExceptionEncoder : com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder {
 	public fun <init> (Lcom/intuit/playerui/jsi/serialization/format/JSIFormat;Lkotlin/jvm/functions/Function1;)V
 	public fun encodeSerializableValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIExceptionEncoder$contentMap$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/jsi/Object;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIExceptionEncoder$contentMap$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClassDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
@@ -766,31 +536,6 @@ public final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClass
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
 	public fun getValue ()Lcom/intuit/playerui/jsi/Value;
 	public synthetic fun getValue ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClassDecoder$decodeElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClassDecoder$decodeValueElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClassDecoder$getElementAtIndex$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClassDecoder$keys$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectClassDecoder$keys$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/util/Set;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectInstanceDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
@@ -862,36 +607,6 @@ public final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDe
 	public synthetic fun getValue ()Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDecoder$buildDecoderForSerializableElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDecoder$decodeElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDecoder$decodeValueElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDecoder$getElementAtIndex$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDecoder$keys$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIObjectMapDecoder$keys$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/util/Set;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/jsi/serialization/encoding/JSISealedClassDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
 	public fun <init> (Lcom/intuit/playerui/jsi/serialization/format/JSIFormat;Lcom/intuit/playerui/jsi/Value;Lcom/intuit/playerui/jsi/Object;)V
 	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
@@ -926,11 +641,6 @@ public final class com/intuit/playerui/jsi/serialization/encoding/JSISealedClass
 	public synthetic fun getValue ()Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/jsi/serialization/encoding/JSISealedClassDecoder$decodeValueElement$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIValueDecoder : com/intuit/playerui/jsi/serialization/encoding/AbstractJSIValueDecoder {
 	public fun <init> (Lcom/intuit/playerui/jsi/serialization/format/JSIFormat;Lcom/intuit/playerui/jsi/Value;)V
 }
@@ -940,8 +650,8 @@ public class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder : ko
 	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeEncoder;
 	public fun encodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Z
 	public fun encodeFunction (Lcom/intuit/playerui/core/bridge/Invokable;)V
-	public fun encodeFunction (Ljava/lang/Object;)V
-	public fun encodeFunction (Lkotlin/Function;)V
+	public fun encodeFunction (Ljava/lang/Object;Ljava/util/List;)V
+	public fun encodeFunction (Lkotlin/Function;Ljava/util/List;)V
 	public fun encodeFunction (Lkotlin/reflect/KCallable;)V
 	public final fun encodeJSIValue (Lcom/intuit/playerui/jsi/Value;)V
 	public fun encodeNode (Lcom/intuit/playerui/core/bridge/Node;)V
@@ -961,6 +671,7 @@ public final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncode
 	public static final field MAP Lcom/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$Mode;
 	public static final field PRIMITIVE Lcom/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$Mode;
 	public static final field UNDECIDED Lcom/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$Mode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$Mode;
 	public static fun values ()[Lcom/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$Mode;
 }
@@ -971,56 +682,6 @@ public synthetic class com/intuit/playerui/jsi/serialization/encoding/JSIValueEn
 
 synthetic class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public final fun invoke (Lcom/intuit/playerui/jsi/Value;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$beginStructure$consumer$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/jsi/Value;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$contentMap$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$currentContent$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$currentContent$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$encodeFunction$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$encodeFunction$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$encodeFunction$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$encodeValue$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Lcom/intuit/playerui/jsi/Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$putContent$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/String;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$putContent$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -1054,16 +715,6 @@ public final class com/intuit/playerui/jsi/serialization/format/JSIFormat : com/
 	public synthetic fun parseToRuntimeValue (Ljava/lang/String;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/jsi/serialization/format/JSIFormat$encodeToString$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/hermes/extensions/RuntimeThreadContext;)Ljava/lang/String;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/jsi/serialization/format/JSIFormat$runtime$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/jsi/serialization/format/JSIFormatConfiguration : com/intuit/playerui/core/bridge/serialization/format/RuntimeFormatConfiguration {
 	public final fun component1 ()Lcom/intuit/playerui/core/bridge/runtime/Runtime;
 	public final fun component2 ()Lkotlinx/serialization/modules/SerializersModule;
@@ -1093,11 +744,5 @@ public final class com/intuit/playerui/jsi/serialization/serializers/JSIValueCon
 	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/jsi/JSIValueContainer;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/jsi/serialization/serializers/JSIValueContainerSerializer$descriptor$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/jsi/serialization/serializers/JSIValueContainerSerializer$descriptor$1;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlinx/serialization/descriptors/ClassSerialDescriptorBuilder;)V
 }
 

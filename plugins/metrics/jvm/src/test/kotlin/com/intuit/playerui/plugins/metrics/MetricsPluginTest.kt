@@ -24,7 +24,11 @@ internal class MetricsPluginTest : PlayerTest() {
     // an object expression, not a lambda: mockkObject proxies the instance's class, and an
     // invokedynamic lambda is a hidden class that kotlin-reflect can't resolve
     private val renderEndHandler: RenderEndHandler = object : RenderEndHandler {
-        override fun invoke(timing: Timing?, renderMetrics: RenderMetrics?, flowMetrics: PlayerFlowMetrics?) = Unit
+        override fun invoke(
+            timing: Timing?,
+            renderMetrics: RenderMetrics?,
+            flowMetrics: PlayerFlowMetrics?,
+        ) = Unit
     }
 
     override val plugins = getMetricPlugin()
@@ -148,7 +152,11 @@ internal class RequestTimePluginTest : PlayerTest() {
     // an object expression, not a lambda: mockkObject proxies the instance's class, and an
     // invokedynamic lambda is a hidden class that kotlin-reflect can't resolve
     private val renderEndHandler: RenderEndHandler = object : RenderEndHandler {
-        override fun invoke(timing: Timing?, renderMetrics: RenderMetrics?, flowMetrics: PlayerFlowMetrics?) = Unit
+        override fun invoke(
+            timing: Timing?,
+            renderMetrics: RenderMetrics?,
+            flowMetrics: PlayerFlowMetrics?,
+        ) = Unit
     }
     private val getRequestTime: () -> Int = { 5 }
 
