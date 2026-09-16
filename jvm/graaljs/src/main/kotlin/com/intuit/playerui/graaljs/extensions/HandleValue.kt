@@ -3,7 +3,6 @@ package com.intuit.playerui.graaljs.extensions
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
-import com.intuit.playerui.core.bridge.serialization.encoding.narrowTo
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
@@ -32,8 +31,8 @@ private fun Value.transform(format: RuntimeFormat<Value>, deserializationStrateg
     canExecute() -> toInvokable<Any>(format, format.serializer())
     metaObject.toString() == "symbol" -> null // this is also awful, but consistent w/ j2v8
     else -> when (this.`as`(Any::class.java)) {
-        is Int -> deserializationStrategy?.let { asDouble().narrowTo(it) } ?: asInt()
-        is Double, is Long -> deserializationStrategy?.let { asDouble().narrowTo(it) } ?: try {
+        is Int -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) } ?: asInt()
+        is Double, is Long -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) } ?: try {
             asInt()
         } catch (e: Exception) {
             asDouble()

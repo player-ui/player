@@ -1170,7 +1170,6 @@ public final class com/intuit/playerui/core/bridge/serialization/encoding/NodeDe
 }
 
 public final class com/intuit/playerui/core/bridge/serialization/encoding/NodeDecodersKt {
-	public static final fun narrowTo (DLkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
 	public static final fun requireNodeDecoder (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder;
 	public static final fun requireNodeEncoder (Lkotlinx/serialization/encoding/Encoder;)Lcom/intuit/playerui/core/bridge/serialization/encoding/NodeEncoder;
 }
