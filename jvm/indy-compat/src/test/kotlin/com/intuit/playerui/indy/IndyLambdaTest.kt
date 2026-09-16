@@ -15,10 +15,10 @@ import org.junit.jupiter.api.TestTemplate
 /**
  * Proves Kotlin functions still cross into a JS runtime when compiled the way K2 compiles them.
  *
- * This module is built with `-Xlambdas=indy -Xsam-conversions=indy` (see the BUILD file), so every
- * lambda below is spun by LambdaMetafactory as a hidden class implementing only its [Function]
- * interface - not a named class extending `kotlin.jvm.internal.Lambda`. That is exactly what a
- * consumer on K2 produces, and what forced them to pin `-Xlambdas=class` before.
+ * `//jvm:test_options` sets `-Xlambdas=indy -Xsam-conversions=indy`, so every lambda below is spun
+ * by LambdaMetafactory as a hidden class implementing only its [Function] interface - not a named
+ * class extending `kotlin.jvm.internal.Lambda`. That is exactly what a consumer on K2 produces, and
+ * what forced them to pin `-Xlambdas=class` before.
  *
  * If these pass, consumers do not need those flags.
  */
@@ -26,10 +26,10 @@ internal class IndyLambdaTest : RuntimeTest() {
     /**
      * Guard for the rest of the file.
      *
-     * [kt_kotlinc_options] attributes are filtered against the bundled compiler's capabilities, so
-     * an unsupported option is dropped silently rather than failing the build. Without this check a
-     * regression there would leave every test below compiling in `class` mode and passing for the
-     * wrong reason.
+     * `kt_kotlinc_options` attributes are filtered against the bundled compiler's capabilities, so
+     * an unsupported option is dropped silently rather than failing the build - and rules_kotlin
+     * still defaults `-Xlambdas` to "class". Without this check, either regression would leave every
+     * test below compiling in `class` mode and passing for the wrong reason.
      */
     @Test
     fun `this module really is compiled with indy lambdas`() {

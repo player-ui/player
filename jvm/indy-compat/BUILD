@@ -1,27 +1,16 @@
-load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test")
-load("//jvm:opts.bzl", "OPTINS")
 
-# Compiles this module the way a K2 consumer compiles theirs.
+# Guards the indy codegen contract end-to-end: Kotlin functions must still cross into a JS runtime
+# when compiled with -Xlambdas=indy/-Xsam-conversions=indy (the Kotlin 2.x/Gradle default, KT-45375),
+# rather than as named classes extending kotlin.jvm.internal.Lambda.
 #
-# K2 defaults to generating lambdas and SAM conversions through invokedynamic/LambdaMetafactory
-# (KT-45375) instead of as named classes extending kotlin.jvm.internal.Lambda. Player must not depend
-# on the latter, or consumers are forced to pin `-Xlambdas=class`/`-Xsam-conversions=class` to use it.
-#
-# These are per-target options, and the kotlinc bundled with rules_kotlin honors them independently
-# of the toolchain's language_version - so this proves the indy contract while the repo as a whole is
-# still pinned to 1.8, without waiting on the frontend flip.
-kt_kotlinc_options(
-    name = "indy_options",
-    x_lambdas = "indy",
-    x_optin = OPTINS,
-    x_sam_conversions = "indy",
-)
-
+# This deliberately uses //jvm:test_options rather than a local option set, so the guard asserts on
+# the codegen mode the repo actually ships. A local override would keep passing even if the repo-wide
+# setting regressed - which is the failure this target exists to catch.
 kt_jvm_junit5_test(
     name = "test",
     srcs = glob(["src/test/kotlin/**/*.kt"]),
-    kotlinc_opts = ":indy_options",
+    kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.playerui.indy",
     deps = [
         "//jvm/testutils:with-runtimes",

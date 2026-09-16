@@ -3,6 +3,7 @@ package com.intuit.playerui.hermes.extensions
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.serialization.encoding.narrowTo
 import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
 import com.intuit.playerui.hermes.bridge.HermesNode
@@ -20,24 +21,24 @@ import kotlinx.serialization.DeserializationStrategy
 // help prevent inefficiencies trying to, possibly redundantly, defer to the runtime thread when the APIs require.
 
 context(RuntimeThreadContext)
-internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
-    is Value -> transform(format)
+internal fun Any?.handleValue(format: JSIFormat, deserializationStrategy: DeserializationStrategy<*>? = null): Any? = when (this) {
+    is Value -> transform(format, deserializationStrategy)
     else -> this
 }
 
 context(RuntimeThreadContext)
-private fun Value.transform(format: JSIFormat): Any? = when {
+private fun Value.transform(format: JSIFormat, deserializationStrategy: DeserializationStrategy<*>? = null): Any? = when {
     isUndefined() -> null
     isNull() -> null
     isBoolean() -> asBoolean()
-    isNumber() -> asNumber().let { double ->
-        // this is currently done to work well with existing Player runtime integration, but should go away when JSI convergence happens
-        if (double % 1 == 0.0) double.toInt() else double
-    }
+    isNumber() -> asNumber().narrowTo(deserializationStrategy)
     isString() -> asString(format.runtime)
     isBigInt() -> asBigInt(format.runtime)
     isSymbol() -> asSymbol(format.runtime).toString(format.runtime)
-    isObject() -> asObject(format.runtime).transform(format)
+    // decode against the declared type when it's known, so a lambda can take a @Serializable
+    // parameter rather than always receiving a Node
+    isObject() -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) }
+        ?: asObject(format.runtime).transform(format)
     else -> null
 }
 

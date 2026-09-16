@@ -16,6 +16,7 @@ import com.intuit.playerui.jsi.serialization.format.JSIEncodingException
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue
 import com.intuit.playerui.jsi.serialization.format.encodeToValue
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
@@ -184,7 +185,11 @@ public class Value private constructor(
         ): Boolean
 
         context(RuntimeThreadContext)
-        public fun from(runtime: Runtime, value: Any?): Value = when (value) {
+        public fun from(
+            runtime: Runtime,
+            value: Any?,
+            parameterSerializers: List<KSerializer<*>> = emptyList(),
+        ): Value = when (value) {
             null -> `null`
             Unit -> undefined
             is NodeWrapper -> from(runtime, value.node)
@@ -212,8 +217,12 @@ public class Value private constructor(
                 value::class.qualifiedName ?: "unknown",
                 22,
                 HostFunction { _, _, args ->
+                    // decode each arg to the type the function declares, so a whole JS number
+                    // reaches e.g. a Long parameter as a Long rather than an Int
                     val encodedArgs = args
-                        .map { it.handleValue((runtime as HermesRuntime).format) }
+                        .mapIndexed { i, arg ->
+                            arg.handleValue((runtime as HermesRuntime).format, parameterSerializers.getOrNull(i))
+                        }
                         .toTypedArray()
 
                     from(
