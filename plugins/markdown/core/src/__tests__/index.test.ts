@@ -468,20 +468,11 @@ describe("MarkdownPlugin", () => {
   });
 
   it("handles non-string markdown values without throwing", () => {
-    // `MarkdownAsset.value` is typed as `string | undefined`, but it's
-    // ultimately populated by expression/binding resolution at runtime,
-    // which isn't statically enforced to match that type. Player's own
-    // string-resolver deliberately returns a binding's raw, unconverted
-    // value when a property's entire value is a single expression (see
-    // core/player/src/string-resolver/index.ts's "return the raw value"
-    // branch) — e.g. so a numeric-typed binding used as an asset's value can
-    // stay numeric rather than being forced to a string. A markdown asset
-    // can end up on the receiving end of that same mechanism.
-    //
-    // Going through a full Player+flow to reach this deterministically needs
-    // machinery (a schema-typed data binding) this plugin's own tests don't
-    // otherwise set up, so this exercises parseAssetMarkdownContent directly
-    // with a non-string value standing in for that outcome.
+    // Player's string-resolver can return a binding's raw non-string value
+    // (see string-resolver's "return the raw value" branch), so a markdown
+    // asset's value isn't guaranteed to be a string despite its type.
+    // Exercising this via a full flow needs schema machinery this plugin's
+    // tests don't set up, so we call parseAssetMarkdownContent directly.
     const asset: MarkdownAsset = {
       id: "md-non-string",
       type: "markdown",
