@@ -5,6 +5,8 @@ import { Registry } from "@player-ui/partial-match-registry";
 import { PartialMatchFingerprintPlugin } from "@player-ui/partial-match-fingerprint-plugin";
 import { buildMockMappers } from "./helpers";
 import { MarkdownPlugin } from "..";
+import { parseAssetMarkdownContent } from "../utils";
+import type { MarkdownAsset } from "../types";
 
 describe("MarkdownPlugin", () => {
   describe("Transform Operation", () => {
@@ -463,6 +465,45 @@ describe("MarkdownPlugin", () => {
 
     expect(view?.label?.asset?.type).toBe("text");
     expect(view?.label?.asset?.value).toBe("");
+  });
+
+  it("handles non-string markdown values without throwing", () => {
+    // `MarkdownAsset.value` is typed as `string | undefined`, but it's
+    // ultimately populated by expression/binding resolution at runtime,
+    // which isn't statically enforced to match that type. Player's own
+    // string-resolver deliberately returns a binding's raw, unconverted
+    // value when a property's entire value is a single expression (see
+    // core/player/src/string-resolver/index.ts's "return the raw value"
+    // branch) — e.g. so a numeric-typed binding used as an asset's value can
+    // stay numeric rather than being forced to a string. A markdown asset
+    // can end up on the receiving end of that same mechanism.
+    //
+    // Going through a full Player+flow to reach this deterministically needs
+    // machinery (a schema-typed data binding) this plugin's own tests don't
+    // otherwise set up, so this exercises parseAssetMarkdownContent directly
+    // with a non-string value standing in for that outcome.
+    const asset: MarkdownAsset = {
+      id: "md-non-string",
+      type: "markdown",
+      value: 42 as unknown as string,
+    };
+
+    expect(() =>
+      parseAssetMarkdownContent({
+        asset,
+        mappers: buildMockMappers(),
+        parser: (obj) => obj as any,
+      }),
+    ).not.toThrow();
+
+    const result = parseAssetMarkdownContent({
+      asset,
+      mappers: buildMockMappers(),
+      parser: (obj) => obj as any,
+    }) as any;
+
+    expect(result?.type).toBe("text");
+    expect(result?.value).toBe("42");
   });
 
   describe("Interactions with Asset Registry", () => {
