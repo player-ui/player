@@ -31,16 +31,9 @@ export function parseAssetMarkdownContent({
     options?: ParseObjectOptions,
   ) => Node.Node | null;
 }): Node.Node | null {
-  // `asset.value` is typed as `string | undefined`, but it's ultimately
-  // populated by expression/binding resolution at runtime, which can hand
-  // back a non-string, non-nullish value (e.g. a number, or an object) if a
-  // template can't be fully resolved. `?? ""` only substitutes for
-  // null/undefined, so a non-string survives unchanged straight into
-  // `fromMarkdown`. mdast-util-from-markdown's preprocessor only handles a
-  // string or a Buffer (decoding the latter via `TextDecoder`); anything
-  // else falls into the Buffer branch and throws `TextDecoder is not
-  // defined` in any environment where that global isn't available (e.g.
-  // J2V8). Coerce explicitly so `input` is always a real string.
+  // asset.value can resolve to a non-string at runtime (e.g. unresolved
+  // template); fromMarkdown only accepts string/Buffer and throws
+  // "TextDecoder is not defined" on J2V8 for anything else, so coerce here.
   const rawValue = asset.value;
   const input =
     rawValue === undefined || rawValue === null ? "" : String(rawValue);
