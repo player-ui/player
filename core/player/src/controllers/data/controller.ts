@@ -93,68 +93,63 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     transaction: RawSetTransaction,
     options?: DataModelOptions,
   ): Updates {
-    let normalizedTransaction: BatchSetTransaction = [];
+    const normalizedTransaction: BatchSetTransaction = [];
+    const formatted = Boolean(options?.formatted);
 
     if (Array.isArray(transaction)) {
-      normalizedTransaction = transaction.map(([binding, value]) => {
-        const parsed = this.pathResolver.parse(binding);
-
-        return [
+      for (let i = 0; i < transaction.length; i++) {
+        const parsed = this.pathResolver.parse(transaction[i][0]);
+        normalizedTransaction.push([
           parsed,
-          this.resolveDataValue(parsed, value, Boolean(options?.formatted)),
-        ];
-      }) as BatchSetTransaction;
+          this.resolveDataValue(parsed, transaction[i][1], formatted),
+        ]);
+      }
     } else {
-      normalizedTransaction = Object.keys(transaction).map(
-        (binding: string) => {
-          const parsed = this.pathResolver.parse(binding);
-          const val = transaction[binding];
-
-          return [
-            parsed,
-            this.resolveDataValue(parsed, val, Boolean(options?.formatted)),
-          ];
-        },
-      ) as BatchSetTransaction;
+      const bindings = Object.keys(transaction);
+      for (let i = 0; i < bindings.length; i++) {
+        const parsed = this.pathResolver.parse(bindings[i]);
+        normalizedTransaction.push([
+          parsed,
+          this.resolveDataValue(parsed, transaction[bindings[i]], formatted),
+        ]);
+      }
     }
 
     // Figure out what the base changes being applied are
-    const setUpdates = normalizedTransaction.reduce<Updates>(
-      (updates, [binding, newVal]) => {
-        const oldVal = this.get(binding, { includeInvalid: true });
+    const setUpdates: Updates = [];
+    for (let i = 0; i < normalizedTransaction.length; i++) {
+      const binding = normalizedTransaction[i][0];
+      const newVal = normalizedTransaction[i][1];
+      const oldVal = this.get(binding, { includeInvalid: true });
 
-        const update = {
-          binding,
-          newValue: newVal,
-          oldValue: oldVal,
-        };
+      // Cheap reference check short-circuits the deep dequal for the common
+      // unchanged-primitive / same-reference case.
+      if (oldVal === newVal || dequal(oldVal, newVal)) {
+        this.logger?.debug(
+          `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`,
+        );
+      } else {
+        setUpdates.push({ binding, newValue: newVal, oldValue: oldVal });
 
-        if (dequal(oldVal, newVal)) {
-          this.logger?.debug(
-            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`,
-          );
-        } else {
-          updates.push(update);
-
-          this.logger?.debug(
-            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`,
-          );
-        }
-
-        return updates;
-      },
-      [],
-    );
+        this.logger?.debug(
+          `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`,
+        );
+      }
+    }
 
     // Get the applied update
     const result = this.getModel().set(normalizedTransaction, options);
 
     // Add any extra bindings that were effected
-    const setUpdateBindings = new Set(setUpdates.map((su) => su.binding));
+    const setUpdateBindings = new Set<BindingInstance>();
+    for (let i = 0; i < setUpdates.length; i++) {
+      setUpdateBindings.add(setUpdates[i].binding);
+    }
     result.forEach((tr) => {
       if (
         !setUpdateBindings.has(tr.binding) &&
-        (tr.force === true || !dequal(tr.oldValue, tr.newValue))
+        (tr.force === true ||
+          (tr.oldValue !== tr.newValue && !dequal(tr.oldValue, tr.newValue)))
       ) {
         this.logger?.debug(
           `Path: ${tr.binding.asString()} was changed from: ${

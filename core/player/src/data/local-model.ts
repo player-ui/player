@@ -2,6 +2,7 @@ import get from "dlv";
 import { setIn, omit, removeAt } from "timm";
 import type { BindingInstance } from "../binding";
 import type { BatchSetTransaction, DataModelImpl, Updates } from "./model";
+import { ownedSetIn } from "./owned-set-in";
 
 /**
  * A data model that stores data in an in-memory JS object
@@ -31,11 +32,34 @@ export class LocalModel implements DataModelImpl {
 
   public set(transaction: BatchSetTransaction) {
     const effectiveOperations: Updates = [];
-    transaction.forEach(([binding, value]) => {
-      const oldValue = this.get(binding);
-      this.model = setIn(this.model, binding.asArray(), value) as any;
+
+    // Single-entry sets are by far the most common; use timm's setIn directly
+    // to skip the per-batch bookkeeping that only pays off across multiple
+    // updates sharing ancestors.
+    if (transaction.length === 1) {
+      const binding = transaction[0][0];
+      const value = transaction[0][1];
+      const path = binding.asArray() as string[];
+      const oldValue = get(this.model, path);
+      this.model = setIn(this.model, path, value) as any;
       effectiveOperations.push({ binding, oldValue, newValue: value });
-    });
+      return effectiveOperations;
+    }
+
+    // Containers cloned during this batch, so shared ancestors are copied once.
+    const owned = new WeakSet<object>();
+    let model = this.model;
+
+    for (let i = 0; i < transaction.length; i++) {
+      const binding = transaction[i][0];
+      const value = transaction[i][1];
+      const path = binding.asArray() as string[];
+      const oldValue = get(model, path);
+      model = ownedSetIn(model, path, value, owned);
+      effectiveOperations.push({ binding, oldValue, newValue: value });
+    }
+
+    this.model = model;
     return effectiveOperations;
   }
 
