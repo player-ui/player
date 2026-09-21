@@ -1,3 +1,15 @@
+# 1.2.1-next.0 (Mon Sep 21 2026)
+
+#### 🐛 Bug Fix
+
+- Feature/markdown non string value [#953](https://github.com/player-ui/player/pull/953) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 1
+
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+
+---
+
 # 1.2.0 (Wed Sep 09 2026)
 
 ### Release Notes
