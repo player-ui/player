@@ -31,7 +31,12 @@ export function parseAssetMarkdownContent({
     options?: ParseObjectOptions,
   ) => Node.Node | null;
 }): Node.Node | null {
-  const input = asset.value ?? "";
+  // asset.value can resolve to a non-string at runtime (e.g. unresolved
+  // template); fromMarkdown only accepts string/Buffer and throws
+  // "TextDecoder is not defined" on J2V8 for anything else, so coerce here.
+  const rawValue = asset.value;
+  const input =
+    rawValue === undefined || rawValue === null ? "" : String(rawValue);
   const { children } = fromMarkdown(input);
 
   // No markdown content: return an empty text asset

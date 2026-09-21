@@ -5,6 +5,8 @@ import { Registry } from "@player-ui/partial-match-registry";
 import { PartialMatchFingerprintPlugin } from "@player-ui/partial-match-fingerprint-plugin";
 import { buildMockMappers } from "./helpers";
 import { MarkdownPlugin } from "..";
+import { parseAssetMarkdownContent } from "../utils";
+import type { MarkdownAsset } from "../types";
 
 describe("MarkdownPlugin", () => {
   describe("Transform Operation", () => {
@@ -463,6 +465,35 @@ describe("MarkdownPlugin", () => {
 
     expect(view?.label?.asset?.type).toBe("text");
     expect(view?.label?.asset?.value).toBe("");
+  });
+
+  it("handles non-string markdown values without throwing", () => {
+    // Player's string-resolver can return a binding's raw non-string value
+    // so a markdown asset's value isn't guaranteed to be a string despite its type.
+    // Exercising this via a full flow needs schema machinery this plugin's
+    // tests don't set up, so we call parseAssetMarkdownContent directly.
+    const asset: MarkdownAsset = {
+      id: "md-non-string",
+      type: "markdown",
+      value: 42 as unknown as string,
+    };
+
+    expect(() =>
+      parseAssetMarkdownContent({
+        asset,
+        mappers: buildMockMappers(),
+        parser: (obj) => obj as any,
+      }),
+    ).not.toThrow();
+
+    const result = parseAssetMarkdownContent({
+      asset,
+      mappers: buildMockMappers(),
+      parser: (obj) => obj as any,
+    }) as any;
+
+    expect(result?.type).toBe("text");
+    expect(result?.value).toBe("42");
   });
 
   describe("Interactions with Asset Registry", () => {
