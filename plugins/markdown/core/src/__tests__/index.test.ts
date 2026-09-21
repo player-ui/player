@@ -469,8 +469,7 @@ describe("MarkdownPlugin", () => {
 
   it("handles non-string markdown values without throwing", () => {
     // Player's string-resolver can return a binding's raw non-string value
-    // (see string-resolver's "return the raw value" branch), so a markdown
-    // asset's value isn't guaranteed to be a string despite its type.
+    // so a markdown asset's value isn't guaranteed to be a string despite its type.
     // Exercising this via a full flow needs schema machinery this plugin's
     // tests don't set up, so we call parseAssetMarkdownContent directly.
     const asset: MarkdownAsset = {
