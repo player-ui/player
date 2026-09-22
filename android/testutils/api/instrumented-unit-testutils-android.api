@@ -28,12 +28,7 @@ final class com/intuit/playerui/android/testutils/asset/AssetTest$awaitCompleteH
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/testutils/asset/AssetTest$beforeEach$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Lcom/intuit/playerui/android/asset/RenderableAsset;Z)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/testutils/asset/AssetTest$beforeEach$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/android/testutils/asset/AssetTest$beforeEach$2 : kotlin/jvm/functions/Function1 {
 	public final fun invoke (Lcom/intuit/playerui/core/player/state/PlayerFlowState;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -59,22 +54,5 @@ final class com/intuit/playerui/android/testutils/asset/AssetTest$consumeLatestV
 synthetic class com/intuit/playerui/android/testutils/asset/AssetTest$currentAssetTree$1$1 : kotlin/jvm/internal/AdaptedFunctionReference, kotlin/jvm/functions/Function1 {
 	public final fun invoke (Landroid/view/View;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/testutils/asset/AssetTest$launchJson$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/testutils/asset/AssetTest$launchJson$1;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/android/testutils/asset/AssetTest$player$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/android/AndroidPlayer;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/testutils/asset/AssetTest$plugins$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/testutils/asset/AssetTest$plugins$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
 }
 

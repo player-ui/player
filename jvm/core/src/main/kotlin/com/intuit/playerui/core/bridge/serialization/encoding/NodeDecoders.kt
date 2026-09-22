@@ -43,11 +43,11 @@ public interface FunctionEncoder : Encoder {
     // TODO: Can we encodeFunctions such that we can get the original function instance back on decode?
     //       We actually can by checking if it's a host function (then we could probably get the actual
     //       host function impl back, maybe even the method reference if it's enhanced
-    public fun encodeFunction(any: Any?) {
+    public fun encodeFunction(any: Any?, parameterSerializers: List<KSerializer<*>> = emptyList()) {
         when (any) {
             is KCallable<*> -> encodeFunction(any)
             is Invokable<*> -> encodeFunction(any)
-            is Function<*> -> encodeFunction(any)
+            is Function<*> -> encodeFunction(any, parameterSerializers)
             null -> encodeNull()
             else -> throw SerializationException("can only decode functions of types: [Invokable<*>, Function<*>, KCallable<*>]")
         }
@@ -57,7 +57,7 @@ public interface FunctionEncoder : Encoder {
 
     public fun encodeFunction(kCallable: KCallable<*>)
 
-    public fun encodeFunction(function: Function<*>)
+    public fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>> = emptyList())
 }
 
 public interface FunctionDecoder : Decoder {

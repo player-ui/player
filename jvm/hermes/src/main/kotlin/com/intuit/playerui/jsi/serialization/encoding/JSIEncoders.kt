@@ -18,6 +18,7 @@ import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.JSIEncodingException
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -164,7 +165,8 @@ internal open class JSIValueEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            serializer.descriptor == FunctionLikeSerializer.descriptor -> encodeFunction(value)
+            serializer.descriptor == FunctionLikeSerializer.descriptor ->
+                encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
             value is Node -> encodeNode(value)
@@ -195,8 +197,8 @@ internal open class JSIValueEncoder(
         putContent(Value.from(runtime, kCallable))
     }
 
-    override fun encodeFunction(function: Function<*>) = runtime.evaluateInJSThreadBlocking {
-        putContent(Value.from(runtime, function))
+    override fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>>) = runtime.evaluateInJSThreadBlocking {
+        putContent(Value.from(runtime, function, parameterSerializers))
     }
 }
 

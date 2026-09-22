@@ -20,8 +20,18 @@ import kotlinx.serialization.builtins.ArraySerializer
 
 internal fun Any?.handleValue(format: RuntimeFormat<V8Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? =
     when (this) {
-        is V8Primitive -> value
+        is V8Primitive -> if (value is Number && deserializationStrategy != null) {
+            format.decodeFromRuntimeValue(deserializationStrategy, this)
+        } else {
+            value
+        }
         is V8Value -> transform(format, deserializationStrategy)
+        // host function args arrive as plain JVM values rather than V8Primitives, so wrap to decode
+        is Number -> if (deserializationStrategy != null) {
+            format.decodeFromRuntimeValue(deserializationStrategy, V8Primitive(this))
+        } else {
+            this
+        }
         else -> this
     }
 
@@ -29,7 +39,11 @@ private fun V8Value.transform(format: RuntimeFormat<V8Value>, deserializationStr
     evaluateInJSThreadIfDefinedBlocking(format.runtime) {
         when (this) {
             V8.getUndefined() -> null
-            is V8Primitive -> value
+            is V8Primitive -> if (value is Number && deserializationStrategy != null) {
+                format.decodeFromRuntimeValue(deserializationStrategy, this)
+            } else {
+                value
+            }
             is V8Function -> toInvokable<Any?>(format, this, format.serializer())
             is V8Array -> deserializationStrategy?.let { format.decodeFromRuntimeValue(deserializationStrategy, this) } ?: toList(format)
             is V8Object -> deserializationStrategy?.let { format.decodeFromRuntimeValue(deserializationStrategy, this) } ?: toNode(format)

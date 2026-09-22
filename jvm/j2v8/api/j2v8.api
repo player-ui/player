@@ -18,13 +18,7 @@ public class com/intuit/playerui/j2v8/V8Primitive : com/eclipsesource/v8/V8Value
 public final class com/intuit/playerui/j2v8/V8PrimitiveKt {
 }
 
-final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Array$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/V8PrimitiveKt$V8Array$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function2;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
@@ -35,25 +29,9 @@ public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1$1 : com/e
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Function$1$1$1 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function2;Lcom/eclipsesource/v8/V8Array;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/V8PrimitiveKt$V8Object$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/V8PrimitiveKt$V8Object$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/V8PrimitiveKt$getV8Value$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/V8PrimitiveKt$getV8Value$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)Lcom/eclipsesource/v8/V8Value;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -118,78 +96,6 @@ public final class com/intuit/playerui/j2v8/bridge/V8Node : com/intuit/playerui/
 	public final fun values ()Ljava/util/List;
 }
 
-final class com/intuit/playerui/j2v8/bridge/V8Node$entries$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/Set;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$get$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$getFunction$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Function;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$getInvokable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Function;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$getList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Array;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$getObject$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/eclipsesource/v8/V8Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$getSerializable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$hashCode$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/V8Node$hashCode$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Integer;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$keys$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/Set;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$keys$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/util/Set;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$nativeReferenceEquals$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Boolean;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$size$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Ljava/lang/Integer;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$toString$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/V8Node$toString$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/String;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/V8Node$values$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/List;
-}
-
 public final class com/intuit/playerui/j2v8/bridge/V8NodeKt {
 	public static final fun Node (Lcom/intuit/playerui/core/bridge/runtime/Runtime;Lcom/eclipsesource/v8/V8Object;)Lcom/intuit/playerui/core/bridge/Node;
 }
@@ -223,16 +129,6 @@ public final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig : c
 	public fun hashCode ()I
 	public final fun setRuntime (Lcom/eclipsesource/v8/V8;)V
 	public fun toString ()Ljava/lang/String;
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig$executorService$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/util/concurrent/ExecutorService;
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig$executorService$2$1 : java/util/concurrent/ThreadFactory {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeConfig$executorService$2$1;
-	public final fun newThread (Ljava/lang/Runnable;)Ljava/lang/Thread;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/runtime/J2V8RuntimeContainer : com/intuit/playerui/core/bridge/runtime/PlayerRuntimeContainer {
@@ -327,27 +223,6 @@ final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$1 : kotlin/corouti
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$add$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$checkBlockingThread$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/runtime/V8Runtime$checkBlockingThread$1;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/lang/Thread;)V
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$execute$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$executeRaw$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$init$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -355,26 +230,11 @@ final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$init$2 : kotlin/co
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$load$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$release$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$scope$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/coroutines/CoroutineScope;
-}
-
-final class com/intuit/playerui/j2v8/bridge/runtime/V8Runtime$serialize$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/runtime/V8RuntimeKt {
@@ -433,37 +293,15 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Arra
 	public synthetic fun getValue ()Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ArrayListDecoder$keys$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ArrayListDecoder$keys$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)Ljava/util/List;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8DecodersKt {
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8EncodersKt {
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8EncodersKt$writeV8$encoder$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Value;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder : com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/jvm/functions/Function1;)V
 	public fun encodeSerializableValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder$contentMap$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/eclipsesource/v8/V8Object;
-	public synthetic fun invoke ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder$contentMap$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ExceptionEncoder$contentMap$2$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectClassDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
@@ -500,11 +338,6 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Obje
 	public synthetic fun getValue ()Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectClassDecoder$keys$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/util/List;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectMapDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectMapDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Object;)V
 	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
@@ -537,12 +370,6 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Obje
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
 	public fun getValue ()Lcom/eclipsesource/v8/V8Object;
 	public synthetic fun getValue ()Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectMapDecoder$keys$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ObjectMapDecoder$keys$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/util/List;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8SealedClassDecoder : com/intuit/playerui/core/bridge/serialization/encoding/AbstractRuntimeObjectClassDecoder, com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder {
@@ -588,8 +415,8 @@ public class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncod
 	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeEncoder;
 	public fun encodeElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Z
 	public fun encodeFunction (Lcom/intuit/playerui/core/bridge/Invokable;)V
-	public fun encodeFunction (Ljava/lang/Object;)V
-	public fun encodeFunction (Lkotlin/Function;)V
+	public fun encodeFunction (Ljava/lang/Object;Ljava/util/List;)V
+	public fun encodeFunction (Lkotlin/Function;Ljava/util/List;)V
 	public fun encodeFunction (Lkotlin/reflect/KCallable;)V
 	public fun encodeNode (Lcom/intuit/playerui/core/bridge/Node;)V
 	public fun encodeNull ()V
@@ -608,6 +435,7 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Valu
 	public static final field MAP Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 	public static final field PRIMITIVE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 	public static final field UNDECIDED Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 	public static fun values ()[Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode;
 }
@@ -616,34 +444,12 @@ public synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8
 	public static final synthetic field $EnumSwitchMapping$0 [I
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$add$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 synthetic class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$beginStructure$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Ljava/lang/Object;)V
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$beginStructure$consumer$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Value;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentList$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Array;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentMap$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$contentMap$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/core/bridge/Invokable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
@@ -654,13 +460,13 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Valu
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$1$1$1 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lcom/intuit/playerui/core/bridge/Invokable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
@@ -671,42 +477,37 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Valu
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2$1$1 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3 : kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Lkotlin/Function;Ljava/util/List;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1 : com/eclipsesource/v8/JavaCallback {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Lkotlin/Function;Ljava/util/List;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/Function;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$3$1$1 : kotlin/jvm/functions/Function1 {
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Lkotlin/Function;Ljava/util/List;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$2$1 : kotlin/jvm/functions/Function1 {
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$3$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$3$1 : kotlin/jvm/functions/Function1 {
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$set$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/format/BuildersKt {
@@ -736,16 +537,6 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8Form
 	public fun parseToRuntimeValue (Ljava/lang/String;)Lcom/eclipsesource/v8/V8Value;
 	public synthetic fun parseToRuntimeValue (Ljava/lang/String;)Ljava/lang/Object;
 	public final fun parseToV8Value (Ljava/lang/String;)Lcom/eclipsesource/v8/V8Value;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format$parseToRuntimeValue$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Value;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format$v8$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/eclipsesource/v8/V8;
-	public synthetic fun invoke ()Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/format/J2V8FormatConfiguration : com/intuit/playerui/core/bridge/serialization/format/RuntimeFormatConfiguration {
@@ -785,43 +576,7 @@ public final class com/intuit/playerui/j2v8/extensions/ArgsKt {
 public final class com/intuit/playerui/j2v8/extensions/HandleValueKt {
 }
 
-final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toInvokable$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Function;)Lcom/intuit/playerui/core/bridge/Invokable;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toInvokable$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toInvokable$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Function;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toList$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Array;)Ljava/util/List;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/extensions/HandleValueKt$toNode$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Lcom/intuit/playerui/core/bridge/Node;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/j2v8/extensions/HandleValueKt$transform$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/eclipsesource/v8/V8Value;)Ljava/lang/Object;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/j2v8/extensions/InvokeKt {
-}
-
-final class com/intuit/playerui/j2v8/extensions/InvokeKt$invoke$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/j2v8/extensions/InvokeKt$invoke$1;
-	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Array;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/extensions/LockKt {

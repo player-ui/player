@@ -11,7 +11,7 @@ test_deps = [
     "//jvm/testutils:with-runtimes",
     "//plugins/reference-assets/jvm",
     "//plugins/coroutines/jvm",
-    artifact("io.mockk:mockk"),
+    artifact("io.mockk:mockk-jvm"),
     artifact("org.amshove.kluent:kluent"),
 ]
 
