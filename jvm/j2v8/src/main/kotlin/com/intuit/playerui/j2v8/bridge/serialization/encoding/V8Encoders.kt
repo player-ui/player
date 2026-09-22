@@ -237,11 +237,11 @@ internal open class V8ValueEncoder(
 
     override fun encodeFunction(invokable: Invokable<*>) = putContent(
         V8Function(format) { args ->
-            val encodedArgs = (0 until args.length())
+            val decodedArgs = (0 until args.length())
                 .map { args[it].handleValue(format) }
                 .toTypedArray()
 
-            invokable(*encodedArgs)
+            invokable(*decodedArgs)
         },
     )
 
@@ -259,7 +259,7 @@ internal open class V8ValueEncoder(
      */
     override fun encodeFunction(kCallable: KCallable<*>) = putContent(
         V8Function(format) { args ->
-            val encodedArgs = (0 until args.length())
+            val decodedArgs = (0 until args.length())
                 .map { args[it].handleValue(format) }
             var index = 0
             val matchedArgs = kCallable.valueParameters
@@ -267,8 +267,8 @@ internal open class V8ValueEncoder(
                     // vararg support, all input args of that type will be included in vararg array
                     if (kParam.isVararg) {
                         val start = index
-                        while (index in encodedArgs.indices) {
-                            val currValue = encodedArgs.getOrNull(index)
+                        while (index in decodedArgs.indices) {
+                            val currValue = decodedArgs.getOrNull(index)
 
                             // check if type is nullable and value is null
                             if ((
@@ -285,10 +285,10 @@ internal open class V8ValueEncoder(
                             }
                         }
                         // only take matching args
-                        encodedArgs.slice(start until index).toTypedArray()
+                        decodedArgs.slice(start until index).toTypedArray()
                     } else {
                         // not matching arg types here, just relying on order
-                        if (index in encodedArgs.indices) encodedArgs[index++] else null
+                        if (index in decodedArgs.indices) decodedArgs[index++] else null
                     }
                 }.toTypedArray()
 
@@ -320,11 +320,11 @@ internal open class V8ValueEncoder(
     } else {
         putContent(
             V8Function(format) { args ->
-                val encodedArgs = (0 until args.length())
+                val decodedArgs = (0 until args.length())
                     .map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
                     .toTypedArray()
 
-                handleInvocation(function::class, encodedArgs) {
+                handleInvocation(function::class, decodedArgs) {
                     function.invokeVararg(*it)
                 }
             },
