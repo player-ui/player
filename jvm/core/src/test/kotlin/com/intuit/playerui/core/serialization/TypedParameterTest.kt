@@ -27,15 +27,6 @@ internal data class Config(val name: String, val count: Int)
  * handing back a [Node].
  */
 internal class TypedParameterTest : RuntimeTest() {
-    /**
-     * Guard for the rest of the file, and for the repo's codegen setting.
-     *
-     * rules_kotlin still defaults `-Xlambdas` to "class", and `kt_kotlinc_options` attributes are
-     * filtered against the bundled compiler's capabilities - an unsupported one is dropped silently
-     * rather than failing the build. Either regression would leave these tests compiling in class
-     * mode, where the compiler's own `Number.longValue()` bridge hides the mismatch and everything
-     * below passes for the wrong reason.
-     */
     @Test
     fun `lambdas are compiled with indy codegen`() {
         val lambda: (String) -> String = { "got:$it" }
