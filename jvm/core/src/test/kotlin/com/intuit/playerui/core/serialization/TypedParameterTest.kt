@@ -1,11 +1,13 @@
-package com.intuit.playerui.indy
+package com.intuit.playerui.core.serialization
 
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.utils.test.RuntimeTest
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestTemplate
 
 @Serializable
@@ -16,15 +18,36 @@ internal data class Config(val name: String, val count: Int)
  * are decoded against them.
  *
  * This is what lets a whole JS number reach a `Long` parameter as a `Long`: JS has one number type,
- * so without the declared type the runtime can only guess a JVM box (and guesses [Int]). Under
- * class-mode lambda codegen the compiler inserted a `Number.longValue()` bridge that hid the
- * mismatch; invokedynamic codegen enforces the declared type exactly, so the conversion has to
- * happen when the argument is decoded.
+ * so without the declared type the runtime can only guess a JVM box (and guesses [Int]). Class-mode
+ * lambda codegen used to hide the mismatch behind a compiler-generated `Number.longValue()` bridge;
+ * invokedynamic codegen (the Kotlin 2.x default) enforces the declared type exactly, so the
+ * conversion has to happen when the argument is decoded.
  *
  * The same mechanism decodes objects into whatever type the parameter declares, rather than always
  * handing back a [Node].
  */
 internal class TypedParameterTest : RuntimeTest() {
+    /**
+     * Guard for the rest of the file, and for the repo's codegen setting.
+     *
+     * rules_kotlin still defaults `-Xlambdas` to "class", and `kt_kotlinc_options` attributes are
+     * filtered against the bundled compiler's capabilities - an unsupported one is dropped silently
+     * rather than failing the build. Either regression would leave these tests compiling in class
+     * mode, where the compiler's own `Number.longValue()` bridge hides the mismatch and everything
+     * below passes for the wrong reason.
+     */
+    @Test
+    fun `lambdas are compiled with indy codegen`() {
+        val lambda: (String) -> String = { "got:$it" }
+
+        assertFalse(
+            lambda is kotlin.jvm.internal.FunctionBase<*>,
+            "expected an invokedynamic lambda, but got a class-mode one (${lambda::class}) - " +
+                "check x_lambdas/x_sam_conversions on //jvm:test_options",
+        )
+        assertTrue(lambda is Function1<*, *>)
+    }
+
     @TestTemplate
     fun `whole numbers reach the declared numeric type`() {
         runtime.add("asLong") { v: Long -> "long:$v" }

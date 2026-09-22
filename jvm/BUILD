@@ -90,7 +90,8 @@ ktlint_config(
 
 # NOTE: the language version no longer implies a lambda codegen mode. K2 defaults to
 # -Xlambdas=indy/-Xsam-conversions=indy (KT-45375), which the bridge used to break on; that
-# dependency is gone, and //jvm/indy-compat guards it. Don't reintroduce -Xlambdas=class here.
+# dependency is gone, and TypedParameterTest in //jvm/core guards it. Don't reintroduce
+# -Xlambdas=class here.
 define_kt_toolchain(
     name = "kotlin_toolchain",
     api_version = "2.1",
