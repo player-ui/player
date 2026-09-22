@@ -20,12 +20,6 @@ public sealed class FunctionLikeSerializer<T>(
     /**
      * Serializers for the function's parameters, in declaration order, used to decode arguments to
      * the types the function actually accepts before invoking it.
-     *
-     * Without these, a JS caller's arguments reach the function as whatever the runtime happened to
-     * decode them to - notably a whole JS number becomes an [Int], which cannot be passed to a
-     * parameter declared [Long]. Class-mode lambda codegen papered over that with a synthetic
-     * `Number.longValue()` bridge; invokedynamic codegen (the Kotlin 2.x default) enforces the
-     * declared type exactly, so the conversion has to happen here instead.
      */
     public val parameterSerializers: List<KSerializer<*>> = emptyList(),
 ) : KSerializer<T> {

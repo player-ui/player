@@ -211,8 +211,6 @@ internal open class V8ValueEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            // keep the serializer: a FunctionLikeSerializer carries the function's parameter types,
-            // which the arguments from JS have to be decoded against
             serializer.descriptor == FunctionLikeSerializer.descriptor ->
                 encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
@@ -322,8 +320,6 @@ internal open class V8ValueEncoder(
     } else {
         putContent(
             V8Function(format) { args ->
-                // [invokeVararg] trims and pads to the target's parameter list itself, so the args
-                // are handed over as-is. Note that padding will fail if arg types are non-nullable.
                 val encodedArgs = (0 until args.length())
                     .map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
                     .toTypedArray()

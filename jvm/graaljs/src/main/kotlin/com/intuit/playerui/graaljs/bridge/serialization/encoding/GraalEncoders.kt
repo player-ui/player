@@ -197,9 +197,6 @@ internal open class GraalValueEncoder(
             encodeFunction(function)
         } else {
             val proxyExecutable = ProxyExecutable { args ->
-                // [invokeVararg] trims and pads to the target's parameter list itself, so the args
-                // are handed over as-is. Each arg is decoded against the type the function declares,
-                // so a whole JS number reaches e.g. a Long parameter as a Long rather than an Int.
                 val encodedArgs = (args.indices)
                     .map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
                     .toTypedArray()
@@ -211,8 +208,6 @@ internal open class GraalValueEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            // keep the serializer: a FunctionLikeSerializer carries the function's parameter types,
-            // which the arguments from JS have to be decoded against
             serializer.descriptor == FunctionLikeSerializer.descriptor ->
                 encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)

@@ -165,8 +165,6 @@ internal open class JSIValueEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            // keep the serializer: a FunctionLikeSerializer carries the function's parameter types,
-            // which the arguments from JS have to be decoded against
             serializer.descriptor == FunctionLikeSerializer.descriptor ->
                 encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)

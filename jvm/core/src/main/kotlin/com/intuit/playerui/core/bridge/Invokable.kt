@@ -129,11 +129,6 @@ public fun <R> Invokable<R>.toFunction(functionTypeName: String): Function<R> = 
  */
 @Suppress("UNCHECKED_CAST", "ktlint:standard:max-line-length", "ktlint:standard:argument-list-wrapping", "ktlint:standard:chain-method-continuation")
 public fun Function<*>.invokeVararg(vararg args: Any?): Any? = when (this) {
-    // NOTE: both must stay ahead of the FunctionN branches below. [Invokable] implements Function0
-    // through Function22, so a narrower branch would match it and drop arguments. And a lambda with
-    // arity > 22 implements FunctionN, but invokedynamic codegen emits it without the getArity()
-    // that FunctionBase declares - so the `is FunctionN` checks the compiler lowers to
-    // TypeIntrinsics.isFunctionOfArity would throw AbstractMethodError before reaching it.
     is Invokable -> this(*args)
     is FunctionN -> this(*args)
     is Function0 -> this()

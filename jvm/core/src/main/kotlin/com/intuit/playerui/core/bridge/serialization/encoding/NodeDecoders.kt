@@ -57,11 +57,6 @@ public interface FunctionEncoder : Encoder {
 
     public fun encodeFunction(kCallable: KCallable<*>)
 
-    /**
-     * [parameterSerializers] describe the types [function] declares, so arguments from the JS side
-     * can be decoded to match before invoking it. Empty when the types aren't known, in which case
-     * arguments are passed as the runtime decoded them.
-     */
     public fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>> = emptyList())
 }
 

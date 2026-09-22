@@ -217,16 +217,14 @@ public class Value private constructor(
                 value::class.qualifiedName ?: "unknown",
                 22,
                 HostFunction { _, _, args ->
-                    // decode each arg to the type the function declares, so a whole JS number
-                    // reaches e.g. a Long parameter as a Long rather than an Int
-                    val encodedArgs = args
+                    val decodedArgs = args
                         .mapIndexed { i, arg ->
                             arg.handleValue((runtime as HermesRuntime).format, parameterSerializers.getOrNull(i))
                         }.toTypedArray()
 
                     from(
                         runtime,
-                        handleInvocation(value::class, encodedArgs) {
+                        handleInvocation(value::class, decodedArgs) {
                             value.invokeVararg(*it)
                         },
                     )
