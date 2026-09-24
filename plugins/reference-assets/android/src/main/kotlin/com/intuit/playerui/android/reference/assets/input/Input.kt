@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.plugins.transactions.commitPendingTransaction
 import com.intuit.playerui.plugins.transactions.registerPendingTransaction
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 
 class Input(
     assetContext: AssetContext,
-) : SuspendableAsset<Input.Data>(assetContext, Data.serializer()) {
+) : RenderableAsset<Input.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Validation(
         val message: String,
@@ -30,8 +30,8 @@ class Input(
         private val set: (String?) -> Unit,
         private val format: (String?) -> String?,
         /** Optional [label] that gives some semantic meaning to the field asset */
-        val label: RenderableAsset? = null,
-        val note: RenderableAsset? = null,
+        val label: AnyAsset? = null,
+        val note: AnyAsset? = null,
         /** The current value of the input from the data-model */
         val value: String? = null,
         val validation: Validation? = null,
@@ -59,10 +59,11 @@ class Input(
             }
         }.rootView
 
-    override suspend fun View.hydrate(data: Data) {
-        data.label?.render(Text.Styles.Label) into findViewById(R.id.input_label_container)
+    override fun CoroutineScope.hydrate(view: View, data: Data) {
+        inflate(data.label, view.findViewById(R.id.input_label_container), Text.Styles.Label)
+        inflate(data.note, view.findViewById(R.id.input_note_container), Text.Styles.Note)
 
-        findViewById<FormattedEditText>(R.id.input_field).run {
+        view.findViewById<FormattedEditText>(R.id.input_field).run {
             error = data.validation?.message
             if (data.value != text.toString()) {
                 setText(data.value ?: "")
@@ -90,7 +91,7 @@ class Input(
                     player.commitPendingTransaction()
                 } else {
                     player.registerPendingTransaction {
-                        hydrationScope.launch {
+                        launch {
                             data.set(text.toString())
                         }
                     }
@@ -100,7 +101,5 @@ class Input(
             // need to refresh registered pending transaction if we have focus
             if (hasFocus()) onFocusChangeListener.onFocusChange(this, true)
         }
-
-        data.note?.render(Text.Styles.Note) into findViewById(R.id.input_note_container)
     }
 }

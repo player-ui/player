@@ -16,7 +16,7 @@ import kotlin.coroutines.resume
 
 internal sealed class Update {
     data class Asset(
-        val asset: RenderableAsset?,
+        val asset: RenderableAsset<*>?,
         val index: Int,
     ) : Update()
 
@@ -25,7 +25,7 @@ internal sealed class Update {
     ) : Update()
 }
 
-internal suspend fun AndroidPlayer.awaitFirstView(flow: JsonElement): RenderableAsset? = suspendCancellableCoroutine { cont ->
+internal suspend fun AndroidPlayer.awaitFirstView(flow: JsonElement): RenderableAsset<*>? = suspendCancellableCoroutine { cont ->
     onUpdate { asset, _ -> cont.resume(asset) }
     start(flow)
 }

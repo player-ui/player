@@ -20,7 +20,7 @@ public sealed class ManagedPlayerState {
 
     /** State containing the current [asset] representation of the current in-progress flow */
     public data class Running(
-        public val asset: RenderableAsset?,
+        public val asset: RenderableAsset<*>?,
         public val animateViewTransition: Boolean,
     ) : ManagedPlayerState()
 

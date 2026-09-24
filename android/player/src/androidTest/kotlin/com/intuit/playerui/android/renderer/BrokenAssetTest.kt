@@ -9,22 +9,28 @@ import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.StaleViewException
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.BrokenAsset
 import com.intuit.playerui.android.utils.BrokenAsset.Companion.asset
+import com.intuit.playerui.android.utils.CoroutineTestDispatcherRule
 import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class BrokenAssetTest {
+    @get:Rule
+    val coroutineRule = CoroutineTestDispatcherRule()
     private val runtime = BrokenAsset.runtime
 
     val appContext: Context = ApplicationProvider.getApplicationContext()
@@ -43,46 +49,52 @@ internal class BrokenAssetTest {
     }
 
     @Test
-    fun `invalidate view should fail on first render`() {
-        var thrown: Throwable? = null
+    fun `invalidate view should fail on first render`() = runBlocking {
+        var caught: AssetRenderException? = null
         try {
-            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(appContext)
-        } catch (exception: Throwable) {
-            thrown = exception
+            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).awaitRender(appContext)
+        } catch (e: AssetRenderException) {
+            caught = e
         }
-
-        assertNotNull(thrown)
-        assertTrue(thrown is AssetRenderException)
-        assertTrue((thrown as AssetRenderException).cause is StaleViewException)
+        assertNotNull(caught)
+        assertTrue(caught!!.cause is StaleViewException)
     }
 
     @Test
-    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() {
+    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() = runBlocking {
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(appContext) is FrameLayout,
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).awaitRender(appContext) is FrameLayout,
         )
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(appContext) is LinearLayout,
+            BrokenAsset(
+                baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear)),
+            ).awaitRender(appContext) is LinearLayout,
         )
     }
 
     @Test
-    fun `manual rehydration should fail the player on invalidate view`() {
+    fun `manual rehydration should fail the player on invalidate view`() = runBlocking {
         BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).apply {
-            assertTrue(render(appContext) is FrameLayout)
-            data.layout = BrokenAsset.Layout.Linear
+            assertTrue(awaitRender(appContext) is FrameLayout)
+            val rehydrationComplete = CompletableDeferred<Unit>()
+            player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("manual-rehydrate") {
+                rehydrationComplete.complete(Unit)
+            }
+            getData().layout = BrokenAsset.Layout.Linear
             rehydrate()
+            rehydrationComplete.await()
         }
         assertTrue(player.state is ErrorState)
     }
 
     @Test
     fun `cannot render without a context`() {
+        val exception = org.junit.Assert.assertThrows(PlayerException::class.java) {
+            BrokenAsset(baseContext).requireContext()
+        }
         assertEquals(
             "Android context not found! Ensure the asset is rendered with a valid Android context.",
-            assertThrows(PlayerException::class.java) {
-                BrokenAsset(baseContext).requireContext()
-            }.message,
+            exception.message,
         )
         assertTrue(player.state is ErrorState)
     }
