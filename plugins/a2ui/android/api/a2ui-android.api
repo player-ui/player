@@ -22,20 +22,31 @@ public final class com/intuit/playerui/android/a2ui/A2UIList$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/A2UIList$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/A2UIList$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/A2UIList$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/A2UIList$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/A2UIList$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/A2UIList$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/A2UIList$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/A2UIList$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/A2UIList$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/A2UIList$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/A2UIList$content$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/A2UIPlugin : com/intuit/playerui/android/AndroidPlayerPlugin, com/intuit/playerui/core/plugins/JSPluginWrapper {
@@ -172,20 +183,32 @@ public final class com/intuit/playerui/android/a2ui/Button$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Button$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Button$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Button$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Button$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Button$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Button$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Button$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Button$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Button$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Button$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Button$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Button$Data$Companion$$childSerializers$2;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/Button$Data$run$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -195,14 +218,24 @@ final class com/intuit/playerui/android/a2ui/Button$Data$run$2 : kotlin/coroutin
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/a2ui/Button$content$1 : kotlin/jvm/functions/Function3 {
+final class com/intuit/playerui/android/a2ui/Button$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
 	public final fun invoke (Landroidx/compose/foundation/layout/RowScope;Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/a2ui/Button$content$2 : kotlin/jvm/functions/Function3 {
+final class com/intuit/playerui/android/a2ui/Button$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
 	public final fun invoke (Landroidx/compose/foundation/layout/RowScope;Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Button$content$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Button$content$onClick$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
 }
 
 final class com/intuit/playerui/android/a2ui/Button$content$onClick$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -234,14 +267,14 @@ public final class com/intuit/playerui/android/a2ui/Card$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Card$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Card$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Card$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Card$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Card$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Card$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Card$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -250,7 +283,18 @@ public final class com/intuit/playerui/android/a2ui/Card$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/a2ui/Card$content$1 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/Card$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Card$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Card$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Card$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -279,20 +323,26 @@ public final class com/intuit/playerui/android/a2ui/CheckBox$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/CheckBox$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/CheckBox$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/CheckBox$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/CheckBox$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/CheckBox$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/CheckBox$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/CheckBox$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/CheckBox$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/CheckBox$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/CheckBox$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/CheckBox$Data$set$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -302,11 +352,21 @@ final class com/intuit/playerui/android/a2ui/CheckBox$Data$set$2 : kotlin/corout
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+final class com/intuit/playerui/android/a2ui/CheckBox$content$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Z)V
+}
+
 final class com/intuit/playerui/android/a2ui/CheckBox$content$1$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/CheckBox$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/ChoicePicker : com/intuit/playerui/android/compose/ComposableAsset {
@@ -335,20 +395,38 @@ public final class com/intuit/playerui/android/a2ui/ChoicePicker$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/ChoicePicker$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/ChoicePicker$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion$$childSerializers$2;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion$$childSerializers$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ChoicePicker$Data$Companion$$childSerializers$3;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/ChoicePicker$Data$set$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -373,20 +451,40 @@ public final class com/intuit/playerui/android/a2ui/ChoicePicker$Option {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/ChoicePicker$Option$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/ChoicePicker$Option$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ChoicePicker$Option$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/ChoicePicker$Option;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/ChoicePicker$Option;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/ChoicePicker$Option;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/ChoicePicker$Option;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/ChoicePicker$Option$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$content$1$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$content$1$1$2$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Z)V
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$content$1$1$2$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
+}
+
+final class com/intuit/playerui/android/a2ui/ChoicePicker$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 final class com/intuit/playerui/android/a2ui/ChoicePicker$content$toggle$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -422,14 +520,14 @@ public final class com/intuit/playerui/android/a2ui/Column$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Column$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Column$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Column$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Column$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Column$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Column$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Column$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -438,13 +536,24 @@ public final class com/intuit/playerui/android/a2ui/Column$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+final class com/intuit/playerui/android/a2ui/Column$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Column$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Column$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public final class com/intuit/playerui/android/a2ui/ComposableSingletons$ModalKt {
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ComposableSingletons$ModalKt;
 	public fun <init> ()V
 	public final fun getLambda$-301057916$plugins_a2ui_android_a2ui_android_base ()Lkotlin/jvm/functions/Function3;
 }
 
-final class com/intuit/playerui/android/a2ui/ComposableSingletons$ModalKt$lambda$-301057916$1 : kotlin/jvm/functions/Function3 {
+final class com/intuit/playerui/android/a2ui/ComposableSingletons$ModalKt$lambda$-301057916$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/ComposableSingletons$ModalKt$lambda$-301057916$1;
 	public final fun invoke (Landroidx/compose/foundation/layout/RowScope;Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -476,20 +585,26 @@ public final class com/intuit/playerui/android/a2ui/DateTimeInput$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/DateTimeInput$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/DateTimeInput$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/DateTimeInput$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/DateTimeInput$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/DateTimeInput$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/DateTimeInput$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/DateTimeInput$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/DateTimeInput$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/DateTimeInput$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/DateTimeInput$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/DateTimeInput$Data$set$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -499,6 +614,11 @@ final class com/intuit/playerui/android/a2ui/DateTimeInput$Data$set$2 : kotlin/c
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+final class com/intuit/playerui/android/a2ui/DateTimeInput$content$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/lang/String;)V
+}
+
 final class com/intuit/playerui/android/a2ui/DateTimeInput$content$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -506,7 +626,12 @@ final class com/intuit/playerui/android/a2ui/DateTimeInput$content$1$1$1 : kotli
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/a2ui/DateTimeInput$content$2 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/DateTimeInput$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/DateTimeInput$content$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -533,20 +658,25 @@ public final class com/intuit/playerui/android/a2ui/Divider$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Divider$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Divider$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Divider$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Divider$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Divider$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Divider$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Divider$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Divider$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Divider$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/Icon : com/intuit/playerui/android/compose/ComposableAsset {
@@ -573,20 +703,25 @@ public final class com/intuit/playerui/android/a2ui/Icon$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Icon$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Icon$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Icon$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Icon$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Icon$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Icon$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Icon$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Icon$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Icon$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/Image : com/intuit/playerui/android/compose/ComposableAsset {
@@ -617,20 +752,25 @@ public final class com/intuit/playerui/android/a2ui/Image$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Image$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Image$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Image$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Image$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Image$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Image$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Image$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Image$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Image$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/Modal : com/intuit/playerui/android/compose/ComposableAsset {
@@ -657,14 +797,14 @@ public final class com/intuit/playerui/android/a2ui/Modal$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Modal$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Modal$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Modal$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Modal$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Modal$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Modal$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Modal$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -673,12 +813,44 @@ public final class com/intuit/playerui/android/a2ui/Modal$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/a2ui/Modal$content$4 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Modal$Data$Companion$$childSerializers$2;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Modal$content$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
+}
+
+final class com/intuit/playerui/android/a2ui/Modal$content$3$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
+}
+
+final class com/intuit/playerui/android/a2ui/Modal$content$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/a2ui/Modal$content$5 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/Modal$content$4$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
+}
+
+final class com/intuit/playerui/android/a2ui/Modal$content$5 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Modal$content$6 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -709,20 +881,31 @@ public final class com/intuit/playerui/android/a2ui/Row$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Row$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Row$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Row$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Row$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Row$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Row$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Row$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Row$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Row$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Row$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Row$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/Slider : com/intuit/playerui/android/compose/ComposableAsset {
@@ -751,20 +934,26 @@ public final class com/intuit/playerui/android/a2ui/Slider$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Slider$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Slider$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Slider$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Slider$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Slider$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Slider$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Slider$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Slider$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Slider$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Slider$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/Slider$Data$set$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -774,11 +963,21 @@ final class com/intuit/playerui/android/a2ui/Slider$Data$set$2 : kotlin/coroutin
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+final class com/intuit/playerui/android/a2ui/Slider$content$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public final fun invoke (F)V
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 final class com/intuit/playerui/android/a2ui/Slider$content$1$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Slider$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/Tabs : com/intuit/playerui/android/compose/ComposableAsset {
@@ -803,20 +1002,26 @@ public final class com/intuit/playerui/android/a2ui/Tabs$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Tabs$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Tabs$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Tabs$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Tabs$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Tabs$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Tabs$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Tabs$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Tabs$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Tabs$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Tabs$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Tabs$TabItem {
@@ -835,14 +1040,14 @@ public final class com/intuit/playerui/android/a2ui/Tabs$TabItem {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Tabs$TabItem$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Tabs$TabItem$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Tabs$TabItem$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Tabs$TabItem;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Tabs$TabItem;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Tabs$TabItem;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Tabs$TabItem;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -851,12 +1056,33 @@ public final class com/intuit/playerui/android/a2ui/Tabs$TabItem$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/a2ui/Tabs$content$2$1 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/Tabs$TabItem$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Tabs$TabItem$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Tabs$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/a2ui/Tabs$content$2$1$1$2 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/Tabs$content$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Tabs$content$2$1$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()V
+}
+
+final class com/intuit/playerui/android/a2ui/Tabs$content$2$1$1$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/Tabs$content$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -885,20 +1111,25 @@ public final class com/intuit/playerui/android/a2ui/Text$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/Text$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/Text$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/Text$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Text$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/Text$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Text$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/Text$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/Text$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/Text$content$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/a2ui/TextField : com/intuit/playerui/android/compose/ComposableAsset {
@@ -929,20 +1160,26 @@ public final class com/intuit/playerui/android/a2ui/TextField$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/TextField$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/TextField$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/TextField$Data$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/TextField$Data;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/TextField$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/TextField$Data;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/TextField$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/a2ui/TextField$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+final class com/intuit/playerui/android/a2ui/TextField$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/TextField$Data$Companion$$childSerializers$1;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/a2ui/TextField$Data$set$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -969,14 +1206,14 @@ public final class com/intuit/playerui/android/a2ui/TextField$Validation {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class com/intuit/playerui/android/a2ui/TextField$Validation$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final class com/intuit/playerui/android/a2ui/TextField$Validation$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/a2ui/TextField$Validation$$serializer;
-	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/TextField$Validation;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/a2ui/TextField$Validation;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/TextField$Validation;)V
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/a2ui/TextField$Validation;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -985,9 +1222,14 @@ public final class com/intuit/playerui/android/a2ui/TextField$Validation$Compani
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/a2ui/TextField$content$1$1 : kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/a2ui/TextField$content$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/TextField$content$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/lang/String;)V
 }
 
 final class com/intuit/playerui/android/a2ui/TextField$content$2$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -995,5 +1237,10 @@ final class com/intuit/playerui/android/a2ui/TextField$content$2$1$1 : kotlin/co
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/a2ui/TextField$content$4 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 

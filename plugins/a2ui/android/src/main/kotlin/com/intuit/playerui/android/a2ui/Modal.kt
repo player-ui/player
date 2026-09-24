@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
 import androidx.compose.material.Text as ComposeText
@@ -28,8 +28,8 @@ public class Modal(
 ) : ComposableAsset<Modal.Data>(assetContext, Data.serializer()) {
     @Serializable
     public data class Data(
-        val entryPointChild: RenderableAsset? = null,
-        val contentChild: RenderableAsset? = null,
+        val entryPointChild: AnyAsset? = null,
+        val contentChild: AnyAsset? = null,
     )
 
     @Composable

@@ -2,14 +2,14 @@ package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import androidx.core.view.children
+import android.widget.FrameLayout
+import androidx.activity.ComponentActivity
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
-import com.intuit.playerui.android.R
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
@@ -22,26 +22,27 @@ import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow
 import com.intuit.playerui.utils.start
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
+import org.robolectric.android.controller.ActivityController
+import org.robolectric.annotation.LooperMode
 
 @RunWith(AndroidJUnit4::class)
+@LooperMode(LooperMode.Mode.INSTRUMENTATION_TEST)
 @OptIn(ExperimentalCoroutinesApi::class)
 public abstract class AssetTest(
     private val group: String? = null,
@@ -64,7 +65,6 @@ public abstract class AssetTest(
     private suspend fun consumeLatestView(timeout: Long = 5_000): View = try {
         withTimeout(timeout) {
             viewChannel.first().apply {
-                awaitCompleteHydration()
                 currentView = takeIf { it != emptyView }
                 viewChannel.resetReplayCache()
             }
@@ -73,17 +73,23 @@ public abstract class AssetTest(
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    protected var currentAssetTree: RenderableAsset? = null
+    private lateinit var activityController: ActivityController<ComponentActivity>
+
+    private val hostActivity: ComponentActivity get() = activityController.get()
+
+    private fun newRenderContainer(): FrameLayout = FrameLayout(hostActivity).also { container ->
+        hostActivity.setContentView(container)
+    }
+
+    private lateinit var renderContainer: FrameLayout
+
+    protected var currentAssetTree: RenderableAsset<*>? = null
         private set(value) {
-            // reset view on new asset
             currentView = null
-
             field = value
-
-            field?.let {
-                when (val view = it.render(context)) {
-                    is SuspendableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
-                    else -> viewChannel.tryEmit(view)
+            field?.let { asset ->
+                CoroutineScope(Dispatchers.Main).run {
+                    with(asset) { renderInto(renderContainer, hostActivity) }
                 }
             }
         }
@@ -107,7 +113,15 @@ public abstract class AssetTest(
 
     @Before
     public fun beforeEach() {
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            activityController = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+            renderContainer = newRenderContainer()
+        }
+        player.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap("AssetTest-render") {
+            CoroutineScope(Dispatchers.Main).launch {
+                viewChannel.emit(renderContainer.getChildAt(0) ?: emptyView)
+            }
+        }
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
             if (state !is InProgressState) {
@@ -115,11 +129,6 @@ public abstract class AssetTest(
                 viewChannel.tryEmit(emptyView)
             }
         }
-    }
-
-    @After
-    public fun afterEach() {
-        Dispatchers.resetMain()
     }
 
     protected fun launchMock(): Unit = launchMock(name.methodName)
@@ -147,17 +156,5 @@ public abstract class AssetTest(
 
     protected fun blockUntilRendered(timeout: Long = 5_000): View = runBlocking {
         awaitRendered(timeout)
-    }
-
-    /** Naive helper for suspending until hydration is complete, resolves async view stubs and recursively awaits all children for hydration */
-    private suspend fun View.awaitCompleteHydration() {
-        if (this is SuspendableAsset.AsyncViewStub) {
-            awaitView()?.awaitCompleteHydration()
-            return
-        }
-
-        while (getTag(R.bool.view_hydrated) == false) delay(25)
-
-        if (this is ViewGroup) children.forEach { it.awaitCompleteHydration() }
     }
 }
