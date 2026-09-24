@@ -178,10 +178,6 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4"
   },
-  "volta": {
-    "node": "22.15.1",
-    "pnpm": "10.18.1"
-  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@swc/core",

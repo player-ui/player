@@ -33,14 +33,34 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
       <td>Update via System Settings. Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.</td>
     </tr>
     <tr>
-      <td><a href="https://github.com/bazelbuild/bazelisk">bazelisk</a></td>
+      <td><a href="https://mise.jdx.dev/installing-mise.html">mise</a></td>
       <td>Latest</td>
-      <td>Install through homebrew</td>
+      <td>Install through homebrew (<code>brew install mise</code>), then <a href="https://mise.jdx.dev/installing-mise.html#shells">activate it in your shell</a>. mise manages most of the command-line tools below &mdash; see <a href="#tools-managed-by-mise">Tools managed by mise</a>.</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/bazelbuild/bazelisk">bazelisk</a></td>
+      <td>1.29.0</td>
+      <td>Managed by mise. bazelisk is a launcher that reads <a href="./.bazelversion"><code>.bazelversion</code></a> to pick the actual bazel version (currently 8.3.1), so you don't install bazel yourself.</td>
+    </tr>
+    <tr>
+      <td><a href="https://nodejs.org/">Node</a></td>
+      <td>22.15.1</td>
+      <td>Managed by mise.</td>
     </tr>
     <tr>
       <td><a href="https://pnpm.io/installation">pnpm</a></td>
-      <td>&gt;= 9.0.0</td>
-      <td>Install via <a href="https://volta.sh/">volta</a>. Our repo specifies an appropriate pnpm version in our package.json for Volta.</td>
+      <td>10.18.1</td>
+      <td>Managed by mise.</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/casey/just">just</a></td>
+      <td>1.58.0</td>
+      <td>Managed by mise. Runs the recipes in our <a href="./justfile"><code>justfile</code></a> for many common commands &mdash; list them with <code>just -l</code>.</td>
+    </tr>
+    <tr>
+      <td>Python</td>
+      <td>3.13.15</td>
+      <td>Managed by mise. Used by some of our coverage and Android test scripts.</td>
     </tr>
     <tr>
       <td><a href="https://www.swift.org/download/">Swift</a></td>
@@ -55,9 +75,9 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
       </td>
     </tr>
     <tr>
-      <td>Python</td>
-      <td>>= 2.7.18</td>
-      <td>Use <a href="https://realpython.com/intro-to-pyenv/">pyenv</a> to manage versions</td>
+      <td>rsync</td>
+      <td>Latest</td>
+      <td>Install through homebrew (<code>brew install rsync</code>). Not available through mise. This fixes a bunch of permission denied issues &mdash; see <a href="#additional-set-up">the iOS set-up</a>.</td>
     </tr>
     <tr>
       <td><a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification">Signed Commits</a></td>
@@ -67,9 +87,29 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
   </tbody>
 </table>
 
+### Tools managed by mise
+
+`bazelisk`, `node`, `pnpm`, `just`, and `python` are all pinned in [`mise.toml`](./mise.toml). Once mise is installed and [activated in your shell](https://mise.jdx.dev/installing-mise.html#shells), install all of them in one shot from the repo root:
+
+```bash
+mise install
+```
+
+mise will then automatically use the pinned versions whenever you `cd` into this repo. To confirm what it resolved:
+
+```bash
+mise ls --current
+```
+
+Everything else in the table above (MacOS, Xcode, Swift, rsync) is installed separately, since mise can't manage those.
+
+> [!NOTE]
+> This repo previously used [volta](https://volta.sh/) for Node/pnpm and recommended [pyenv](https://github.com/pyenv/pyenv) for Python; bazelisk and just were installed through homebrew.
+> If you have those installed, you can remove them (e.g. `brew uninstall volta pyenv bazelisk just`) so they don't shadow the binaries mise provides.
+
 ## Building and Testing Locally (All platforms)
 
-> This project also contains [just](https://github.com/casey/just) recipes for many common commands. They can be listed using `just -l`
+> This project also contains [just](https://github.com/casey/just) recipes for many common commands. They can be listed using `just -l`. `just` is installed by `mise install`.
 
 ### Player
 
