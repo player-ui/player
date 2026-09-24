@@ -70,26 +70,10 @@ public final class com/intuit/playerui/android/AndroidPlayer$Hooks$CompositionLo
 	public final fun call (Ljava/util/HashMap;Lkotlin/jvm/functions/Function1;)V
 }
 
-final class com/intuit/playerui/android/AndroidPlayer$Hooks$CompositionLocalProvidedValuesHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function2;Ljava/util/HashMap;)V
-}
-
 public final class com/intuit/playerui/android/AndroidPlayer$Hooks$ContextHook : com/intuit/hooks/SyncWaterfallHook {
 	public static final field $stable I
 	public fun <init> ()V
 	public final fun call (Landroid/content/Context;)Landroid/content/Context;
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$Hooks$ContextHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/AndroidPlayer$Hooks$ContextHook$call$1;
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function2;Landroid/content/Context;Ljava/util/HashMap;)Landroid/content/Context;
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$Hooks$ContextHook$call$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function2;Ljava/util/HashMap;)V
 }
 
 public final class com/intuit/playerui/android/AndroidPlayer$Hooks$RecycleHook : com/intuit/hooks/SyncHook {
@@ -98,22 +82,10 @@ public final class com/intuit/playerui/android/AndroidPlayer$Hooks$RecycleHook :
 	public final fun call ()V
 }
 
-final class com/intuit/playerui/android/AndroidPlayer$Hooks$RecycleHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/AndroidPlayer$Hooks$RecycleHook$call$1;
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)V
-}
-
 public final class com/intuit/playerui/android/AndroidPlayer$Hooks$ReleaseHook : com/intuit/hooks/SyncHook {
 	public static final field $stable I
 	public fun <init> ()V
 	public final fun call ()V
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$Hooks$ReleaseHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/AndroidPlayer$Hooks$ReleaseHook$call$1;
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)V
 }
 
 public final class com/intuit/playerui/android/AndroidPlayer$Hooks$UpdateHook : com/intuit/hooks/SyncBailHook {
@@ -122,36 +94,11 @@ public final class com/intuit/playerui/android/AndroidPlayer$Hooks$UpdateHook : 
 	public final fun call (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlin/jvm/functions/Function1;)Lkotlin/Unit;
 }
 
-final class com/intuit/playerui/android/AndroidPlayer$Hooks$UpdateHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)Lcom/intuit/hooks/BailResult;
-}
-
 public final class com/intuit/playerui/android/AndroidPlayer$SingleAccessValue {
 	public static final field $stable I
 	public fun <init> (Ljava/lang/Object;)V
 	public final fun getValue ()Ljava/lang/Object;
 	public final fun setValue (Ljava/lang/Object;)V
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$onUpdate$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/view/ViewController;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$onUpdate$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/view/View;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$onUpdate$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/asset/Asset;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/AndroidPlayer$onUpdate$1$1$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/util/HashMap;)V
 }
 
 public final class com/intuit/playerui/android/AndroidPlayer$special$$inlined$conform$1 : kotlinx/serialization/KSerializer {
@@ -163,7 +110,7 @@ public final class com/intuit/playerui/android/AndroidPlayer$special$$inlined$co
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
-public final class com/intuit/playerui/android/AndroidPlayer$special$$inlined$registerContextualSerializer$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+public final class com/intuit/playerui/android/AndroidPlayer$special$$inlined$registerContextualSerializer$1 : kotlin/jvm/functions/Function1 {
 	public fun <init> (Lkotlinx/serialization/KSerializer;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/serialization/modules/SerializersModuleBuilder;)V
@@ -197,11 +144,6 @@ public final class com/intuit/playerui/android/AssetContext {
 	public fun toString ()Ljava/lang/String;
 }
 
-final class com/intuit/playerui/android/AssetContext$type$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Ljava/lang/String;
-}
-
 public final class com/intuit/playerui/android/AssetContextKt {
 	public static final fun build (Lcom/intuit/playerui/android/AssetContext;)Lcom/intuit/playerui/android/asset/RenderableAsset;
 	public static final fun withContext (Lcom/intuit/playerui/android/AssetContext;Landroid/content/Context;)Lcom/intuit/playerui/android/AssetContext;
@@ -231,12 +173,6 @@ public final class com/intuit/playerui/android/asset/AssetRenderException$Compan
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/asset/AssetRenderException$assetParentPath$pathString$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/asset/AssetRenderException$assetParentPath$pathString$1;
-	public final fun invoke (Lcom/intuit/playerui/android/AssetContext;)Ljava/lang/CharSequence;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public abstract class com/intuit/playerui/android/asset/DecodableAsset : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;Lkotlinx/serialization/KSerializer;)V
@@ -255,19 +191,25 @@ public abstract class com/intuit/playerui/android/asset/RenderableAsset : com/in
 	protected final fun getHydrationScope ()Lkotlinx/coroutines/CoroutineScope;
 	public fun getNode ()Lcom/intuit/playerui/core/bridge/Node;
 	public final fun getPlayer ()Lcom/intuit/playerui/android/AndroidPlayer;
-	public abstract fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;)V
+	public abstract fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Ljava/util/List;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Ljava/util/List;Lkotlin/jvm/functions/Function1;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Lkotlin/jvm/functions/Function1;)V
+	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Lkotlin/jvm/functions/Function1;[Ljava/lang/Integer;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;[Ljava/lang/Integer;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;[Ljava/lang/Integer;Ljava/lang/String;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;[Ljava/lang/Integer;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;[Ljava/lang/Integer;Lkotlin/jvm/functions/Function1;)V
+	public final fun inflate (Lkotlinx/coroutines/CoroutineScope;Ljava/util/List;Landroid/view/ViewGroup;[Ljava/lang/Integer;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
 	public static synthetic fun inflate$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public static synthetic fun inflate$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Ljava/util/List;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public static synthetic fun inflate$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Ljava/util/List;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public static synthetic fun inflate$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun inflate$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Lcom/intuit/playerui/android/asset/RenderableAsset;Landroid/view/ViewGroup;Lkotlin/jvm/functions/Function1;[Ljava/lang/Integer;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun inflate$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Ljava/util/List;Landroid/view/ViewGroup;[Ljava/lang/Integer;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public final fun inflateViewCallback (Lkotlinx/coroutines/CoroutineScope;Ljava/util/List;[Ljava/lang/Integer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
+	public static synthetic fun inflateViewCallback$default (Lcom/intuit/playerui/android/asset/RenderableAsset;Lkotlinx/coroutines/CoroutineScope;Ljava/util/List;[Ljava/lang/Integer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 	public abstract fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invalidateView ()V
 	public final fun rehydrate ()V
@@ -280,10 +222,6 @@ public final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrat
 	public fun <init> ()V
 	public fun apply (Lcom/intuit/playerui/android/AndroidPlayer;)V
 	public final fun getHooks ()Lcom/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks;
-	public final fun preTrackChild (Lcom/intuit/playerui/android/asset/RenderableAsset;)V
-	public final fun renderingComplete (Lcom/intuit/playerui/android/asset/RenderableAsset;Z)V
-	public static synthetic fun renderingComplete$default (Lcom/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin;Lcom/intuit/playerui/android/asset/RenderableAsset;ZILjava/lang/Object;)V
-	public final fun trackHydration (Lcom/intuit/playerui/android/asset/RenderableAsset;)V
 }
 
 public final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks {
@@ -299,37 +237,10 @@ public final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrat
 	public final fun call ()V
 }
 
-final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks$OnHydrationCompleteHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks$OnHydrationCompleteHook$call$1;
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)V
-}
-
 public final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks$OnHydrationStartedHook : com/intuit/hooks/SyncHook {
 	public static final field $stable I
 	public fun <init> ()V
 	public final fun call ()V
-}
-
-final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks$OnHydrationStartedHook$call$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$Hooks$OnHydrationStartedHook$call$1;
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Ljava/util/HashMap;)V
-}
-
-final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/view/ViewController;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$apply$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Lcom/intuit/playerui/core/view/View;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/asset/RenderableAsset$AsyncHydrationTrackerPlugin$apply$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/util/HashMap;Lcom/intuit/playerui/core/asset/Asset;)V
 }
 
 private final class com/intuit/playerui/android/asset/RenderableAsset$Companion {
@@ -364,11 +275,16 @@ public final class com/intuit/playerui/android/asset/RenderableAsset$Serializer$
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
-public abstract interface class com/intuit/playerui/android/asset/RenderableAsset$ViewportAsset {
+public final class com/intuit/playerui/android/asset/RenderableAsset$SubtreeCompletion : kotlin/coroutines/AbstractCoroutineContextElement {
+	public static final field $stable I
+	public static final field Key Lcom/intuit/playerui/android/asset/RenderableAsset$SubtreeCompletion$Key;
+	public fun <init> ()V
 }
 
-final class com/intuit/playerui/android/asset/RenderableAsset$data$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Ljava/lang/Object;
+public final class com/intuit/playerui/android/asset/RenderableAsset$SubtreeCompletion$Key : kotlin/coroutines/CoroutineContext$Key {
+}
+
+public abstract interface class com/intuit/playerui/android/asset/RenderableAsset$ViewportAsset {
 }
 
 final class com/intuit/playerui/android/asset/RenderableAsset$doRender$1 : kotlin/coroutines/jvm/internal/ContinuationImpl {
@@ -396,6 +312,34 @@ final class com/intuit/playerui/android/asset/RenderableAsset$getData$2 : kotlin
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+final class com/intuit/playerui/android/asset/RenderableAsset$inflate$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflate$3 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflate$3$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflate$3$views$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 final class com/intuit/playerui/android/asset/RenderableAsset$inflateChild$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -403,7 +347,35 @@ final class com/intuit/playerui/android/asset/RenderableAsset$inflateChild$1 : k
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/asset/RenderableAsset$inflateChild$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/asset/RenderableAsset$inflateChild$1$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflateViewCallback$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflateViewCallback$3 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflateViewCallback$3$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
+	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
+	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+final class com/intuit/playerui/android/asset/RenderableAsset$inflateViewCallback$3$views$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -472,36 +444,21 @@ public abstract class com/intuit/playerui/android/compose/ComposableAsset : com/
 	public final fun compose (Lcom/intuit/playerui/android/asset/RenderableAsset;Landroidx/compose/ui/Modifier;Lcom/intuit/playerui/android/compose/AssetStyle;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
 	public final fun compose (Ljava/lang/Object;Landroidx/compose/runtime/Composer;II)V
 	public abstract fun content (Ljava/lang/Object;Landroidx/compose/runtime/Composer;I)V
-	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;)V
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/compose/ComposableAsset$compose$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()V
-}
-
-synthetic class com/intuit/playerui/android/compose/ComposableAsset$compose$2$1$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+synthetic class com/intuit/playerui/android/compose/ComposableAsset$compose$1$1$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Ljava/util/List;)V
 }
 
-final class com/intuit/playerui/android/compose/ComposableAsset$compose$2$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/compose/ComposableAsset$compose$1$2 : kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/compose/ComposableAsset$compose$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/compose/ComposableAsset$compose$4$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/compose/ComposableAsset$compose$5 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/compose/ComposableAsset$compose$3$1 : kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -513,23 +470,13 @@ final class com/intuit/playerui/android/compose/ComposableAsset$compose$data$2$1
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-synthetic class com/intuit/playerui/android/compose/ComposableAsset$composeAndroidView$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/compose/ComposableAsset$composeAndroidView$1;
+synthetic class com/intuit/playerui/android/compose/ComposableAsset$composeAndroidView$1$1 : kotlin/jvm/internal/FunctionReferenceImpl, kotlin/jvm/functions/Function1 {
+	public static final field INSTANCE Lcom/intuit/playerui/android/compose/ComposableAsset$composeAndroidView$1$1;
 	public final fun invoke (Landroid/content/Context;)Landroid/widget/FrameLayout;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/compose/ComposableAsset$composeAndroidView$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Landroid/widget/FrameLayout;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/compose/ComposableAsset$composeAndroidView$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/compose/ComposableAsset$hydrate$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
+final class com/intuit/playerui/android/compose/ComposableAsset$hydrate$2 : kotlin/jvm/functions/Function2 {
 	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -659,23 +606,7 @@ public final class com/intuit/playerui/android/lifecycle/PlayerViewModel$Factory
 	public fun create (Ljava/lang/Class;)Landroidx/lifecycle/ViewModel;
 }
 
-final class com/intuit/playerui/android/lifecycle/PlayerViewModel$Factory$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/lifecycle/PlayerViewModel$Factory$1;
-	public final fun invoke (Lcom/intuit/playerui/core/managed/AsyncIterator;)Lcom/intuit/playerui/android/lifecycle/PlayerViewModel;
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/lifecycle/PlayerViewModel$apply$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Lcom/intuit/playerui/android/asset/RenderableAsset;Z)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/lifecycle/PlayerViewModel$apply$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/lang/String;)V
-}
-
-final class com/intuit/playerui/android/lifecycle/PlayerViewModel$apply$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
+final class com/intuit/playerui/android/lifecycle/PlayerViewModel$apply$3 : kotlin/jvm/functions/Function1 {
 	public final fun invoke (Lcom/intuit/playerui/core/player/state/PlayerFlowState;)V
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -692,11 +623,6 @@ final class com/intuit/playerui/android/lifecycle/PlayerViewModel$onCleared$1 : 
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/lifecycle/PlayerViewModel$player$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public final fun invoke ()Lcom/intuit/playerui/android/AndroidPlayer;
-	public synthetic fun invoke ()Ljava/lang/Object;
 }
 
 final class com/intuit/playerui/android/lifecycle/PlayerViewModel$player$2$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -845,14 +771,6 @@ final class com/intuit/playerui/android/ui/PlayerFragment$1$1$3 : kotlin/corouti
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/ui/PlayerFragment$buildFallbackView$1$1 : android/view/View$OnClickListener {
-	public final fun onClick (Landroid/view/View;)V
-}
-
-final class com/intuit/playerui/android/ui/PlayerFragment$buildFallbackView$1$2 : android/view/View$OnClickListener {
-	public final fun onClick (Landroid/view/View;)V
-}
-
 final class com/intuit/playerui/android/ui/PlayerFragment$handleAssetUpdate$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -872,15 +790,5 @@ final class com/intuit/playerui/android/ui/PlayerFragment$launchWhenReady$1 : ko
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/ui/PlayerFragment$renderIntoPlayerCanvas$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/util/HashMap;)V
-}
-
-final class com/intuit/playerui/android/ui/PlayerFragment$renderIntoPlayerCanvas$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke (Ljava/util/HashMap;)V
 }
 

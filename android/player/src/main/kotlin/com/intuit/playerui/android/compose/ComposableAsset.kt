@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -20,7 +19,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.overlayStyles
@@ -48,7 +46,7 @@ public abstract class ComposableAsset<Data>(
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
-    override fun CoroutineScope.hydrate(view: View, data: Data) {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
         require(view is ComposeView)
         view.setContent {
             compose(data = data)
@@ -70,10 +68,6 @@ public abstract class ComposableAsset<Data>(
                 )
                 null
             }
-        }
-
-        SideEffect {
-            player.asyncHydrationTrackerPlugin?.renderingComplete(this@ComposableAsset, completedComposable = true)
         }
 
         data?.let {
@@ -109,7 +103,6 @@ public abstract class ComposableAsset<Data>(
         }
         context.build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
-            player.asyncHydrationTrackerPlugin?.preTrackChild(this)
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
