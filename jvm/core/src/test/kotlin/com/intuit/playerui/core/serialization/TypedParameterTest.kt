@@ -11,7 +11,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestTemplate
 
 @Serializable
-internal data class Config(val name: String, val count: Int)
+internal data class Config(
+    val name: String,
+    val count: Int,
+)
 
 /**
  * A lambda registered with [add] declares the types it accepts, and arguments coming back from JS
@@ -68,7 +71,10 @@ internal class TypedParameterTest : RuntimeTest() {
     @TestTemplate
     fun `objects decode into a declared serializable type`() {
         var received: Config? = null
-        runtime.add("takesConfig") { c: Config -> received = c; "ok" }
+        runtime.add("takesConfig") { c: Config ->
+            received = c
+            "ok"
+        }
 
         runtime.execute("takesConfig({name: 'player', count: 2})")
 
@@ -78,7 +84,10 @@ internal class TypedParameterTest : RuntimeTest() {
     @TestTemplate
     fun `objects still arrive as a Node when that is what is declared`() {
         var received: Node? = null
-        runtime.add("takesNode") { n: Node -> received = n; "ok" }
+        runtime.add("takesNode") { n: Node ->
+            received = n
+            "ok"
+        }
 
         runtime.execute("takesNode({name: 'player'})")
 
@@ -88,7 +97,10 @@ internal class TypedParameterTest : RuntimeTest() {
     @TestTemplate
     fun `objects fall back to a Node when the parameter is untyped`() {
         var received: Any? = null
-        runtime.add("takesAny") { a: Any? -> received = a; "ok" }
+        runtime.add("takesAny") { a: Any? ->
+            received = a
+            "ok"
+        }
 
         runtime.execute("takesAny({name: 'player'})")
 
