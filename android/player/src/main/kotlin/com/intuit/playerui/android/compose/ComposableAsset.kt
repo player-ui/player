@@ -19,17 +19,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.state.inProgressState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.KSerializer
 import kotlin.collections.emptyList
 import kotlin.coroutines.cancellation.CancellationException
@@ -44,14 +41,14 @@ import kotlin.coroutines.cancellation.CancellationException
 public abstract class ComposableAsset<Data>(
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
-) : SuspendableAsset<Data>(assetContext, serializer) {
+) : RenderableAsset<Data>(assetContext, serializer) {
     override suspend fun initView(data: Data): View = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
-    override suspend fun View.hydrate(data: Data) {
-        require(this is ComposeView)
-        setContent {
+    override suspend fun CoroutineScope.hydrate(view: View, data: Data) {
+        require(view is ComposeView)
+        view.setContent {
             compose(data = data)
         }
     }
@@ -94,7 +91,7 @@ public abstract class ComposableAsset<Data>(
      * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
      */
     @Composable
-    public fun RenderableAsset.compose(
+    public fun RenderableAsset<*>.compose(
         modifier: Modifier = Modifier,
         styles: AssetStyle? = null,
         tag: String? = null,
@@ -122,11 +119,14 @@ public abstract class ComposableAsset<Data>(
     }
 
     @Composable
-    private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
-        AndroidView(factory = ::FrameLayout, modifier) {
-            hydrationScope.launch(Dispatchers.Main) {
-                render(styles) into it
-            }
+    private fun RenderableAsset<*>.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
+        val childAsset = this
+        AndroidView(factory = ::FrameLayout, modifier) { container ->
+            this@ComposableAsset.hydrationScope.inflate(
+                childAsset,
+                container,
+                styles,
+            )
         }
     }
 }

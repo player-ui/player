@@ -91,26 +91,20 @@ public final class com/intuit/playerui/android/reference/assets/action/Action$Da
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/action/Action$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/action/Action$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/action/Action$Data$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/action/Action$Data;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/action/Action$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/action/Action$Data;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/action/Action$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/action/Action$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/action/Action$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/action/Action$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/reference/assets/action/Action$Data$run$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -120,11 +114,6 @@ final class com/intuit/playerui/android/reference/assets/action/Action$Data$run$
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/reference/assets/action/Action$content$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()V
-}
-
 final class com/intuit/playerui/android/reference/assets/action/Action$content$1$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -132,14 +121,9 @@ final class com/intuit/playerui/android/reference/assets/action/Action$content$1
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/reference/assets/action/Action$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function3 {
+final class com/intuit/playerui/android/reference/assets/action/Action$content$2 : kotlin/jvm/functions/Function3 {
 	public final fun invoke (Landroidx/compose/foundation/layout/RowScope;Landroidx/compose/runtime/Composer;I)V
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/reference/assets/action/Action$content$3 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/reference/assets/badge/Badge : com/intuit/playerui/android/compose/ComposableAsset {
@@ -166,25 +150,20 @@ public final class com/intuit/playerui/android/reference/assets/badge/Badge$Data
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/badge/Badge$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/badge/Badge$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/badge/Badge$Data$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/badge/Badge$Data;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/badge/Badge$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/badge/Badge$Data;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/badge/Badge$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/badge/Badge$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/badge/Badge$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/android/reference/assets/collection/Collection : com/intuit/playerui/android/compose/ComposableAsset {
@@ -210,14 +189,14 @@ public final class com/intuit/playerui/android/reference/assets/collection/Colle
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/collection/Collection$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/collection/Collection$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -226,22 +205,11 @@ public final class com/intuit/playerui/android/reference/assets/collection/Colle
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-final class com/intuit/playerui/android/reference/assets/collection/Collection$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/collection/Collection$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/collection/Collection$content$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Landroidx/compose/runtime/Composer;I)V
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class com/intuit/playerui/android/reference/assets/info/Info : com/intuit/playerui/android/asset/SuspendableAsset {
+public final class com/intuit/playerui/android/reference/assets/info/Info : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -267,26 +235,20 @@ public final class com/intuit/playerui/android/reference/assets/info/Info$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/info/Info$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/info/Info$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/info/Info$Data$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/info/Info$Data;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/info/Info$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/info/Info$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/info/Info$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/input/FormattedEditText : androidx/appcompat/widget/AppCompatEditText {
@@ -306,11 +268,11 @@ public final class com/intuit/playerui/android/reference/assets/input/FormattedE
 	public fun onTextChanged (Ljava/lang/CharSequence;III)V
 }
 
-public final class com/intuit/playerui/android/reference/assets/input/Input : com/intuit/playerui/android/asset/SuspendableAsset {
+public final class com/intuit/playerui/android/reference/assets/input/Input : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -337,32 +299,20 @@ public final class com/intuit/playerui/android/reference/assets/input/Input$Data
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/input/Input$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/input/Input$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/input/Input$Data$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/input/Input$Data;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/input/Input$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/input/Input$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$2 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/input/Input$Data$Companion$$childSerializers$2;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 final class com/intuit/playerui/android/reference/assets/input/Input$Data$format$2 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -392,30 +342,20 @@ public final class com/intuit/playerui/android/reference/assets/input/Input$Vali
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/input/Input$Validation$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/input/Input$Validation$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/input/Input$Validation$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/input/Input$Validation;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/input/Input$Validation;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/input/Input$Validation;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/input/Input$Validation;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/input/Input$Validation$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public final fun invoke (Landroid/text/Editable;)V
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()V
 }
 
 final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1$formatted$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
@@ -425,14 +365,6 @@ final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$1
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2 : android/view/View$OnFocusChangeListener {
-	public final fun onFocusChange (Landroid/view/View;Z)V
-}
-
-final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2$1 : com/intuit/playerui/plugins/transactions/PendingTransaction {
-	public final fun commit ()V
-}
-
 final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function2 {
 	public final fun create (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -440,15 +372,11 @@ final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-final class com/intuit/playerui/android/reference/assets/input/Input$initView$2$1$1 : android/widget/TextView$OnEditorActionListener {
-	public final fun onEditorAction (Landroid/widget/TextView;ILandroid/view/KeyEvent;)Z
-}
-
-public final class com/intuit/playerui/android/reference/assets/text/Text : com/intuit/playerui/android/asset/SuspendableAsset {
+public final class com/intuit/playerui/android/reference/assets/text/Text : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -468,26 +396,20 @@ public final class com/intuit/playerui/android/reference/assets/text/Text$Data {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/text/Text$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/text/Text$Data$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/text/Text$Data$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/text/Text$Data;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/text/Text$Data;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/text/Text$Data$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
-}
-
-final class com/intuit/playerui/android/reference/assets/text/Text$Data$Companion$$childSerializers$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function0 {
-	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Companion$$childSerializers$1;
-	public synthetic fun invoke ()Ljava/lang/Object;
-	public final fun invoke ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class com/intuit/playerui/android/reference/assets/text/Text$Data$Modifier {
@@ -506,14 +428,14 @@ public final class com/intuit/playerui/android/reference/assets/text/Text$Data$M
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -535,14 +457,14 @@ public final class com/intuit/playerui/android/reference/assets/text/Text$Data$M
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public synthetic class com/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/intuit/playerui/android/reference/assets/text/Text$Data$Modifier$LinkMetaData;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }

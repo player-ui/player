@@ -16,6 +16,7 @@ import com.intuit.playerui.jsi.serialization.format.JSIEncodingException
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue
 import com.intuit.playerui.jsi.serialization.format.encodeToValue
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
@@ -184,7 +185,11 @@ public class Value private constructor(
         ): Boolean
 
         context(RuntimeThreadContext)
-        public fun from(runtime: Runtime, value: Any?): Value = when (value) {
+        public fun from(
+            runtime: Runtime,
+            value: Any?,
+            parameterSerializers: List<KSerializer<*>> = emptyList(),
+        ): Value = when (value) {
             null -> `null`
             Unit -> undefined
             is NodeWrapper -> from(runtime, value.node)
@@ -212,20 +217,14 @@ public class Value private constructor(
                 value::class.qualifiedName ?: "unknown",
                 22,
                 HostFunction { _, _, args ->
-                    val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
-
-                    // Hate that we need to look at an internal class for arity
-                    val arity = (value as kotlin.jvm.internal.FunctionBase<*>).arity
-
-                    // trim and pad args to fit arity constraints,
-                    // note that padding will fail if arg types are non-nullable
-                    val matchedArgs = (0 until arity)
-                        .map { encodedArgs.getOrNull(it) }
-                        .toTypedArray()
+                    val decodedArgs = args
+                        .mapIndexed { i, arg ->
+                            arg.handleValue((runtime as HermesRuntime).format, parameterSerializers.getOrNull(i))
+                        }.toTypedArray()
 
                     from(
                         runtime,
-                        handleInvocation(value::class, matchedArgs) {
+                        handleInvocation(value::class, decodedArgs) {
                             value.invokeVararg(*it)
                         },
                     )

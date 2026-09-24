@@ -130,6 +130,7 @@ public fun <R> Invokable<R>.toFunction(functionTypeName: String): Function<R> = 
 @Suppress("UNCHECKED_CAST", "ktlint:standard:max-line-length", "ktlint:standard:argument-list-wrapping", "ktlint:standard:chain-method-continuation")
 public fun Function<*>.invokeVararg(vararg args: Any?): Any? = when (this) {
     is Invokable -> this(*args)
+    is FunctionN -> this(*args)
     is Function0 -> this()
     is Function1<*, *> -> (this as Function1<Any?, *>)(args.getOrNull(0))
     is Function2<*, *, *> -> (this as Function2<Any?, Any?, *>)(args.getOrNull(0), args.getOrNull(1))
@@ -153,7 +154,6 @@ public fun Function<*>.invokeVararg(vararg args: Any?): Any? = when (this) {
     is Function20<*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *> -> (this as Function20<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, *>)(args.getOrNull(0), args.getOrNull(1), args.getOrNull(2), args.getOrNull(3), args.getOrNull(4), args.getOrNull(5), args.getOrNull(6), args.getOrNull(7), args.getOrNull(8), args.getOrNull(9), args.getOrNull(10), args.getOrNull(11), args.getOrNull(12), args.getOrNull(13), args.getOrNull(14), args.getOrNull(15), args.getOrNull(16), args.getOrNull(17), args.getOrNull(18), args.getOrNull(19))
     is Function21<*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *> -> (this as Function21<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, *>)(args.getOrNull(0), args.getOrNull(1), args.getOrNull(2), args.getOrNull(3), args.getOrNull(4), args.getOrNull(5), args.getOrNull(6), args.getOrNull(7), args.getOrNull(8), args.getOrNull(9), args.getOrNull(10), args.getOrNull(11), args.getOrNull(12), args.getOrNull(13), args.getOrNull(14), args.getOrNull(15), args.getOrNull(16), args.getOrNull(17), args.getOrNull(18), args.getOrNull(19), args.getOrNull(20))
     is Function22<*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *> -> (this as Function22<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, *>)(args.getOrNull(0), args.getOrNull(1), args.getOrNull(2), args.getOrNull(3), args.getOrNull(4), args.getOrNull(5), args.getOrNull(6), args.getOrNull(7), args.getOrNull(8), args.getOrNull(9), args.getOrNull(10), args.getOrNull(11), args.getOrNull(12), args.getOrNull(13), args.getOrNull(14), args.getOrNull(15), args.getOrNull(16), args.getOrNull(17), args.getOrNull(18), args.getOrNull(19), args.getOrNull(20), args.getOrNull(21))
-    is FunctionN -> this(*args)
     else -> throw IllegalArgumentException("this (${this::class}) does not implement any known function interface")
 }
 
