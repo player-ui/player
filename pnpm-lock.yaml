@@ -69,8 +69,8 @@ importers:
         specifier: ^4.6.0
         version: 4.7.0(monaco-editor@0.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@player-cli/cli':
-        specifier: ^1.0.0
-        version: 1.0.0(@babel/core@7.28.0)(@oclif/config@1.18.16)(@player-lang/json-language-service@1.0.1)(@player-lang/react-dsl@1.0.1(@types/react@18.3.23)(react@18.3.1))(@xlr-lib/xlr-converters@1.0.0(jsonc-parser@2.3.1))(@xlr-lib/xlr-sdk@1.0.0)(@xlr-lib/xlr-utils@1.0.0(jsonc-parser@2.3.1))(@xlr-lib/xlr@1.0.0)
+        specifier: file:/private/tmp/claude-502/-Users-chan-Workspace-cli/5d1cf70b-8ec8-4edf-ab19-c98720f09805/scratchpad/player-cli-cli-0.0.0-PLACEHOLDER.tgz
+        version: file:../../../../private/tmp/claude-502/-Users-chan-Workspace-cli/5d1cf70b-8ec8-4edf-ab19-c98720f09805/scratchpad/player-cli-cli-0.0.0-PLACEHOLDER.tgz(@babel/core@7.28.0)(@oclif/config@1.18.16)(@player-lang/json-language-service@1.0.1)(@player-lang/react-dsl@1.0.1(@types/react@18.3.23)(react@18.3.1))(@xlr-lib/xlr-converters@1.0.0(jsonc-parser@2.3.1))(@xlr-lib/xlr-sdk@1.0.0)(@xlr-lib/xlr-utils@1.1.0-next.0(jsonc-parser@2.3.1))(@xlr-lib/xlr@1.1.0-next.0)
       '@player-lang/react-dsl':
         specifier: 1.0.1
         version: 1.0.1(@types/react@18.3.23)(react@18.3.1)
@@ -177,11 +177,11 @@ importers:
         specifier: ^10.0.4
         version: 10.0.4(storybook@10.1.4(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@xlr-lib/xlr':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: 1.1.0-next.0
+        version: 1.1.0-next.0
       '@xlr-lib/xlr-utils':
-        specifier: ^1.0.0
-        version: 1.0.0(jsonc-parser@2.3.1)
+        specifier: 1.1.0-next.0
+        version: 1.1.0-next.0(jsonc-parser@2.3.1)
       all-contributors-cli:
         specifier: ^6.20.0
         version: 6.26.1
@@ -2685,16 +2685,17 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==, tarball: https://registry.npmjs.org/@pkgr/core/-/core-0.2.9.tgz}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@player-cli/cli@1.0.0':
-    resolution: {integrity: sha512-eD0orhzkplBGwr60aH5od3fseVCiGm4Xt8P/qpoDaWA4EysB555eLUJQnt5geNdYa2eteYpwa713g6ezO2qXvQ==, tarball: https://registry.npmjs.org/@player-cli/cli/-/cli-1.0.0.tgz}
+  '@player-cli/cli@file:../../../../private/tmp/claude-502/-Users-chan-Workspace-cli/5d1cf70b-8ec8-4edf-ab19-c98720f09805/scratchpad/player-cli-cli-0.0.0-PLACEHOLDER.tgz':
+    resolution: {integrity: sha512-I3kQBb7urAf27BG3pOmszQ0xmQp7Fi6bCVSb/XU1P4z0HTYgWctfeqdtEF46jpkVdNAbHIo3A95dg0IC2a+Skw==, tarball: file:../../../../private/tmp/claude-502/-Users-chan-Workspace-cli/5d1cf70b-8ec8-4edf-ab19-c98720f09805/scratchpad/player-cli-cli-0.0.0-PLACEHOLDER.tgz}
+    version: 0.0.0-PLACEHOLDER
     hasBin: true
     peerDependencies:
       '@player-lang/json-language-service': ^1.0.1
       '@player-lang/react-dsl': ^1.0.1
-      '@xlr-lib/xlr': ^1.0.0
-      '@xlr-lib/xlr-converters': ^1.0.0
-      '@xlr-lib/xlr-sdk': ^1.0.0
-      '@xlr-lib/xlr-utils': ^1.0.0
+      '@xlr-lib/xlr': 1.1.0-next.0
+      '@xlr-lib/xlr-converters': 1.1.0-next.0
+      '@xlr-lib/xlr-sdk': 1.1.0-next.0
+      '@xlr-lib/xlr-utils': 1.1.0-next.0
 
   '@player-lang/json-language-service@1.0.1':
     resolution: {integrity: sha512-yJ7gqzk/F+l/DnDItziglvv2eBbynJHL5601S1upkA3IasDBshfNBU+wvA+dGBeDfXs/11DiN74fSnpiiW8cvQ==, tarball: https://registry.npmjs.org/@player-lang/json-language-service/-/json-language-service-1.0.1.tgz}
@@ -3743,8 +3744,16 @@ packages:
     peerDependencies:
       jsonc-parser: 2.3.1
 
+  '@xlr-lib/xlr-utils@1.1.0-next.0':
+    resolution: {integrity: sha512-eT9KEwQQLdraJdVDY7lq1YnzQY5kYMJES7EUZtFH2Ge0XkRf9K5kyAGO/BI5x7wGkfPmKtPmaRrXc5IbZA/low==, tarball: https://registry.npmjs.org/@xlr-lib/xlr-utils/-/xlr-utils-1.1.0-next.0.tgz}
+    peerDependencies:
+      jsonc-parser: 2.3.1
+
   '@xlr-lib/xlr@1.0.0':
     resolution: {integrity: sha512-Zfu6/lLauRQafuUo+JvbKZ2lmQkxtDgJxnGtWieGNct6mSHhWKWRc7siXQlboBxwu84yMcjLSrOxvD9WrBtLWQ==, tarball: https://registry.npmjs.org/@xlr-lib/xlr/-/xlr-1.0.0.tgz}
+
+  '@xlr-lib/xlr@1.1.0-next.0':
+    resolution: {integrity: sha512-ZfiMna7EekGVMriUUIUsMPLmpwlHC4GFpbW4pZ4XHm2lAOwC/obA6/29Bt7InlBPrrImqLF50wfmXE1jz5TWZA==, tarball: https://registry.npmjs.org/@xlr-lib/xlr/-/xlr-1.1.0-next.0.tgz}
 
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==, tarball: https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz}
@@ -5217,6 +5226,7 @@ packages:
   eslint@9.33.0:
     resolution: {integrity: sha512-TS9bTNIryDzStCpJN93aC5VRSW3uTx9sClUn4B87pwiCaJh220otoI0X8mJKr+VcPtniMdN8GKjlwgWGUv5ZKA==, tarball: https://registry.npmjs.org/eslint/-/eslint-9.33.0.tgz}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -11532,7 +11542,7 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@player-cli/cli@1.0.0(@babel/core@7.28.0)(@oclif/config@1.18.16)(@player-lang/json-language-service@1.0.1)(@player-lang/react-dsl@1.0.1(@types/react@18.3.23)(react@18.3.1))(@xlr-lib/xlr-converters@1.0.0(jsonc-parser@2.3.1))(@xlr-lib/xlr-sdk@1.0.0)(@xlr-lib/xlr-utils@1.0.0(jsonc-parser@2.3.1))(@xlr-lib/xlr@1.0.0)':
+  '@player-cli/cli@file:../../../../private/tmp/claude-502/-Users-chan-Workspace-cli/5d1cf70b-8ec8-4edf-ab19-c98720f09805/scratchpad/player-cli-cli-0.0.0-PLACEHOLDER.tgz(@babel/core@7.28.0)(@oclif/config@1.18.16)(@player-lang/json-language-service@1.0.1)(@player-lang/react-dsl@1.0.1(@types/react@18.3.23)(react@18.3.1))(@xlr-lib/xlr-converters@1.0.0(jsonc-parser@2.3.1))(@xlr-lib/xlr-sdk@1.0.0)(@xlr-lib/xlr-utils@1.1.0-next.0(jsonc-parser@2.3.1))(@xlr-lib/xlr@1.1.0-next.0)':
     dependencies:
       '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.0)
       '@babel/preset-env': 7.28.0(@babel/core@7.28.0)
@@ -11543,10 +11553,10 @@ snapshots:
       '@oclif/plugin-plugins': 1.10.11(@oclif/config@1.18.16)
       '@player-lang/json-language-service': 1.0.1
       '@player-lang/react-dsl': 1.0.1(@types/react@18.3.23)(react@18.3.1)
-      '@xlr-lib/xlr': 1.0.0
+      '@xlr-lib/xlr': 1.1.0-next.0
       '@xlr-lib/xlr-converters': 1.0.0(jsonc-parser@2.3.1)
       '@xlr-lib/xlr-sdk': 1.0.0
-      '@xlr-lib/xlr-utils': 1.0.0(jsonc-parser@2.3.1)
+      '@xlr-lib/xlr-utils': 1.1.0-next.0(jsonc-parser@2.3.1)
       chalk: 4.1.2
       cosmiconfig: 7.1.0
       cross-fetch: 3.2.0
@@ -12802,7 +12812,17 @@ snapshots:
       jsonc-parser: 2.3.1
       tslib: 2.8.1
 
+  '@xlr-lib/xlr-utils@1.1.0-next.0(jsonc-parser@2.3.1)':
+    dependencies:
+      '@xlr-lib/xlr': 1.1.0-next.0
+      jsonc-parser: 2.3.1
+      tslib: 2.8.1
+
   '@xlr-lib/xlr@1.0.0':
+    dependencies:
+      tslib: 2.8.1
+
+  '@xlr-lib/xlr@1.1.0-next.0':
     dependencies:
       tslib: 2.8.1
 

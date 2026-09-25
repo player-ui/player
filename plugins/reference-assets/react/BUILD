@@ -1,4 +1,4 @@
-load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@rules_player//player:defs.bzl", "js_xlr_pipeline")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
@@ -8,8 +8,11 @@ tsup_config(name = "tsup_config")
 
 vitest_config(name = "vitest_config")
 
-js_pipeline(
+js_xlr_pipeline(
     package_name = "@player-ui/reference-assets-plugin-react",
+    ios_package_name = "PlayerUIReferenceAssets",
+    android_package_name = "com.intuit.playerui.plugins:reference-assets",
+    xlr_meta_data = {"kind": "reference"},
     srcs = [
         "postcss.config.js",
         "tailwind.config.js",
@@ -45,4 +48,5 @@ js_pipeline(
         "//:node_modules/lucide-react",
         "//:node_modules/tailwind-merge",
     ],
+    cli = "@player-cli/cli",
 )
