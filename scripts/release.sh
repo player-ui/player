@@ -13,9 +13,9 @@ NPM_TAG=canary
 if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then
   NPM_TAG=next
 elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
-  # Releases off the main branch are for older majors. 
-  # Don't want to bump the latest tag for those
   NPM_TAG=latest
+elif [ "$CURRENT_BRANCH" == "version-2" ]; then
+  NPM_TAG=next-major
 fi
 
 # NPM Prepublish
@@ -33,6 +33,8 @@ MVN_RELEASE_TYPE=snapshot
 if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then
   MVN_RELEASE_TYPE=release
 elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
+  MVN_RELEASE_TYPE=release
+elif [ "$CURRENT_BRANCH" == "version-2" ]; then
   MVN_RELEASE_TYPE=release
 fi
 

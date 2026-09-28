@@ -2,6 +2,7 @@
   "author": "intuit-svc <opensource-svc@intuit.com>",
   "baseBranch": "main",
   "versionBranches": true,
+  "prereleaseBranches": ["next", "version-2"],
   "noVersionPrefix": true,
   "owner": "player-ui",
   "repo": "player",

@@ -658,6 +658,12 @@ workflows:
             - test
 
       - release:
+          filters:
+            branches:
+              only:
+                - main
+                - version-0
+                - version-2
           context:
             - Publish
           requires:
