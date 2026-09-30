@@ -16,6 +16,11 @@ internal data class Config(
     val count: Int,
 )
 
+// top-level so kotlin-reflect can call it through the KCallable path
+internal fun takesLong(v: Long): String = "long:$v"
+
+internal fun takesNullableLong(v: Long?): String = "long:$v"
+
 /**
  * A lambda registered with [add] declares the types it accepts, and arguments coming back from JS
  * are decoded against them.
@@ -52,6 +57,20 @@ internal class TypedParameterTest : RuntimeTest() {
         assertEquals("long:500", runtime.execute("asLong(500)"))
         assertEquals("int:500", runtime.execute("asInt(500)"))
         assertEquals("double:500.0", runtime.execute("asDouble(500)"))
+    }
+
+    @TestTemplate
+    fun `whole numbers reach the declared numeric type of a function reference`() {
+        runtime.add("asLong", ::takesLong)
+
+        assertEquals("long:500", runtime.execute("asLong(500)"))
+    }
+
+    @TestTemplate
+    fun `whole numbers reach a boxed numeric type of a function reference`() {
+        runtime.add("asNullableLong", ::takesNullableLong)
+
+        assertEquals("long:500", runtime.execute("asNullableLong(500)"))
     }
 
     @TestTemplate

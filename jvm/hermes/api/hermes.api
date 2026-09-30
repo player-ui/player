@@ -664,6 +664,7 @@ public class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder : ko
 	protected fun getContentMap ()Lcom/intuit/playerui/jsi/Object;
 	protected final fun getRuntime ()Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime;
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun parameterSerializers (Lkotlin/reflect/KCallable;)Ljava/util/List;
 }
 
 public final class com/intuit/playerui/jsi/serialization/encoding/JSIValueEncoder$Mode : java/lang/Enum {

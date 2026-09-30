@@ -428,6 +428,7 @@ public class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncod
 	protected fun getContentList ()Lcom/eclipsesource/v8/V8Array;
 	protected fun getContentMap ()Lcom/eclipsesource/v8/V8Object;
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun parameterSerializers (Lkotlin/reflect/KCallable;)Ljava/util/List;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$Mode : java/lang/Enum {
@@ -467,18 +468,18 @@ public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8Valu
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2 : kotlin/jvm/functions/Function1 {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Ljava/util/List;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8;)Lcom/eclipsesource/v8/V8Function;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2$1 : com/eclipsesource/v8/JavaCallback {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Ljava/util/List;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;Lcom/eclipsesource/v8/V8Array;)Ljava/lang/Object;
 }
 
 public final class com/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder$encodeFunction$$inlined$V8Function$2$1$1 : kotlin/jvm/functions/Function1 {
-	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;)V
+	public fun <init> (Lcom/intuit/playerui/j2v8/bridge/serialization/format/J2V8Format;Lcom/eclipsesource/v8/V8Array;Lkotlin/reflect/KCallable;Lcom/intuit/playerui/j2v8/bridge/serialization/encoding/V8ValueEncoder;Ljava/util/List;)V
 	public final fun invoke (Lcom/eclipsesource/v8/V8Object;)Ljava/lang/Object;
 	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
 }

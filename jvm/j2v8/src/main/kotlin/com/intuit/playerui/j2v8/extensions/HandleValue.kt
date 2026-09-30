@@ -26,12 +26,6 @@ internal fun Any?.handleValue(format: RuntimeFormat<V8Value>, deserializationStr
             value
         }
         is V8Value -> transform(format, deserializationStrategy)
-        // host function args arrive as plain JVM values rather than V8Primitives, so wrap to decode
-        is Number -> if (deserializationStrategy != null) {
-            format.decodeFromRuntimeValue(deserializationStrategy, V8Primitive(this))
-        } else {
-            this
-        }
         else -> this
     }
 

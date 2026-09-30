@@ -27,6 +27,7 @@ import com.intuit.playerui.j2v8.bridge.serialization.format.J2V8EncodingExceptio
 import com.intuit.playerui.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.playerui.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.j2v8.extensions.handleValue
+import com.intuit.playerui.j2v8.getV8Value
 import com.intuit.playerui.j2v8.pushPrimitive
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
@@ -212,7 +213,7 @@ internal open class V8ValueEncoder(
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
             serializer.descriptor == FunctionLikeSerializer.descriptor ->
-                encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
+                encodeFunction(value, (serializer as FunctionLikeSerializer<*>).parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
             value is Node -> encodeNode(value)
@@ -238,7 +239,7 @@ internal open class V8ValueEncoder(
     override fun encodeFunction(invokable: Invokable<*>) = putContent(
         V8Function(format) { args ->
             val decodedArgs = (0 until args.length())
-                .map { args[it].handleValue(format) }
+                .map { args.getV8Value(format.runtime, it).handleValue(format) }
                 .toTypedArray()
 
             invokable(*decodedArgs)
@@ -257,46 +258,53 @@ internal open class V8ValueEncoder(
      *  be the last param. Potential to look backwards as well to pull out values
      *  that match expected param types after the vararg.
      */
-    override fun encodeFunction(kCallable: KCallable<*>) = putContent(
-        V8Function(format) { args ->
-            val decodedArgs = (0 until args.length())
-                .map { args[it].handleValue(format) }
-            var index = 0
-            val matchedArgs = kCallable.valueParameters
-                .map { kParam ->
-                    // vararg support, all input args of that type will be included in vararg array
-                    if (kParam.isVararg) {
-                        val start = index
-                        while (index in decodedArgs.indices) {
-                            val currValue = decodedArgs.getOrNull(index)
+    override fun encodeFunction(kCallable: KCallable<*>) {
+        val parameterSerializers = parameterSerializers(kCallable)
 
-                            // check if type is nullable and value is null
-                            if ((
-                                    currValue == null &&
-                                        // base type or type argument could be marked nullable
-                                        (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
-                                ) ||
-                                // otherwise check if arg matches type if not null
-                                (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
-                            ) {
-                                index++
-                            } else {
-                                break
+        putContent(
+            V8Function(format) { args ->
+                val decodedArgs = (0 until args.length())
+                    .map { args.getV8Value(format.runtime, it).handleValue(format, parameterSerializers.getOrNull(it)) }
+                var index = 0
+                val matchedArgs = kCallable.valueParameters
+                    .map { kParam ->
+                        // vararg support, all input args of that type will be included in vararg array
+                        if (kParam.isVararg) {
+                            val start = index
+                            while (index in decodedArgs.indices) {
+                                val currValue = decodedArgs.getOrNull(index)
+
+                                // check if type is nullable and value is null
+                                if ((
+                                        currValue == null &&
+                                            // base type or type argument could be marked nullable
+                                            (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
+                                    ) ||
+                                    // otherwise check if arg matches type if not null
+                                    (
+                                        currValue != null &&
+                                            currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>)
+                                    )
+                                ) {
+                                    index++
+                                } else {
+                                    break
+                                }
                             }
+                            // only take matching args
+                            decodedArgs.slice(start until index).toTypedArray()
+                        } else {
+                            // not matching arg types here, just relying on order
+                            if (index in decodedArgs.indices) decodedArgs[index++] else null
                         }
-                        // only take matching args
-                        decodedArgs.slice(start until index).toTypedArray()
-                    } else {
-                        // not matching arg types here, just relying on order
-                        if (index in decodedArgs.indices) decodedArgs[index++] else null
-                    }
-                }.toTypedArray()
+                    }.toTypedArray()
 
-            handleInvocation(kCallable::class, matchedArgs) {
-                kCallable.call(*it)
-            }
-        },
-    )
+                handleInvocation(kCallable::class, matchedArgs) {
+                    kCallable.call(*it)
+                }
+            },
+        )
+    }
 
     /**
      * Create [V8Function] from [Function]. Currently, uses the awful [invokeVararg]
@@ -321,7 +329,7 @@ internal open class V8ValueEncoder(
         putContent(
             V8Function(format) { args ->
                 val decodedArgs = (0 until args.length())
-                    .map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
+                    .map { args.getV8Value(format.runtime, it).handleValue(format, parameterSerializers.getOrNull(it)) }
                     .toTypedArray()
 
                 handleInvocation(function::class, decodedArgs) {

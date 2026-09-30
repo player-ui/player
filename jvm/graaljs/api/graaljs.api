@@ -352,6 +352,7 @@ public class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValu
 	protected fun getContentList ()Lorg/graalvm/polyglot/Value;
 	protected fun getContentMap ()Lorg/graalvm/polyglot/Value;
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun parameterSerializers (Lkotlin/reflect/KCallable;)Ljava/util/List;
 }
 
 public final class com/intuit/playerui/graaljs/bridge/serialization/encoding/GraalValueEncoder$Mode : java/lang/Enum {

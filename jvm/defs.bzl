@@ -17,7 +17,6 @@ def kt_player_module(
         # Package level config
         module_name = None,
         main_opts = "//jvm:main_options",
-        test_opts = "//jvm:test_options",
         main_srcs = None,
         main_resources = None,
         main_resource_jars = None,
@@ -27,6 +26,7 @@ def kt_player_module(
         main_exports = None,
         main_runtime_deps = None,
         test_package = None,
+        test_opts = "//jvm:test_options",
         test_srcs = None,
         test_resources = None,
         test_resource_jars = None,

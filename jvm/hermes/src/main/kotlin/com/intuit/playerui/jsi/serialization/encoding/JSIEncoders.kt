@@ -166,7 +166,7 @@ internal open class JSIValueEncoder(
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
             serializer.descriptor == FunctionLikeSerializer.descriptor ->
-                encodeFunction(value, (serializer as? FunctionLikeSerializer<*>)?.parameterSerializers ?: emptyList())
+                encodeFunction(value, (serializer as FunctionLikeSerializer<*>).parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
             value is Node -> encodeNode(value)
@@ -194,7 +194,7 @@ internal open class JSIValueEncoder(
     }
 
     override fun encodeFunction(kCallable: KCallable<*>) = runtime.evaluateInJSThreadBlocking {
-        putContent(Value.from(runtime, kCallable))
+        putContent(Value.from(runtime, kCallable, parameterSerializers(kCallable)))
     }
 
     override fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>>) = runtime.evaluateInJSThreadBlocking {

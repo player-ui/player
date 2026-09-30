@@ -188,7 +188,7 @@ public class Value private constructor(
         public fun from(
             runtime: Runtime,
             value: Any?,
-            parameterSerializers: List<KSerializer<*>> = emptyList(),
+            parameterSerializers: List<KSerializer<*>?> = emptyList(),
         ): Value = when (value) {
             null -> `null`
             Unit -> undefined

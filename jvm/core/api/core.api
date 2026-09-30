@@ -1147,6 +1147,7 @@ public abstract interface class com/intuit/playerui/core/bridge/serialization/en
 	public abstract fun encodeFunction (Ljava/lang/Object;Ljava/util/List;)V
 	public abstract fun encodeFunction (Lkotlin/Function;Ljava/util/List;)V
 	public abstract fun encodeFunction (Lkotlin/reflect/KCallable;)V
+	public abstract fun parameterSerializers (Lkotlin/reflect/KCallable;)Ljava/util/List;
 }
 
 public final class com/intuit/playerui/core/bridge/serialization/encoding/FunctionEncoder$DefaultImpls {
@@ -1157,6 +1158,7 @@ public final class com/intuit/playerui/core/bridge/serialization/encoding/Functi
 	public static fun encodeNotNullMark (Lcom/intuit/playerui/core/bridge/serialization/encoding/FunctionEncoder;)V
 	public static fun encodeNullableSerializableValue (Lcom/intuit/playerui/core/bridge/serialization/encoding/FunctionEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public static fun encodeSerializableValue (Lcom/intuit/playerui/core/bridge/serialization/encoding/FunctionEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public static fun parameterSerializers (Lcom/intuit/playerui/core/bridge/serialization/encoding/FunctionEncoder;Lkotlin/reflect/KCallable;)Ljava/util/List;
 }
 
 public abstract interface class com/intuit/playerui/core/bridge/serialization/encoding/NodeDecoder : com/intuit/playerui/core/bridge/serialization/encoding/FunctionDecoder, kotlinx/serialization/encoding/Decoder {
@@ -1185,6 +1187,7 @@ public final class com/intuit/playerui/core/bridge/serialization/encoding/NodeEn
 	public static fun encodeNotNullMark (Lcom/intuit/playerui/core/bridge/serialization/encoding/NodeEncoder;)V
 	public static fun encodeNullableSerializableValue (Lcom/intuit/playerui/core/bridge/serialization/encoding/NodeEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public static fun encodeSerializableValue (Lcom/intuit/playerui/core/bridge/serialization/encoding/NodeEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public static fun parameterSerializers (Lcom/intuit/playerui/core/bridge/serialization/encoding/NodeEncoder;Lkotlin/reflect/KCallable;)Ljava/util/List;
 }
 
 public abstract interface class com/intuit/playerui/core/bridge/serialization/encoding/RuntimeValueCompositeDecoder : com/intuit/playerui/core/bridge/serialization/encoding/RuntimeValueDecoder {

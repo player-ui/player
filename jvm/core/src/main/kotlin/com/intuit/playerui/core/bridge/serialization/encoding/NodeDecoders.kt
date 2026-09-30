@@ -11,7 +11,9 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.serializerOrNull
 import kotlin.reflect.KCallable
+import kotlin.reflect.full.valueParameters
 
 /** Simple extension of a [Decoder] to provide serializers a way to decode a [Node] */
 public interface NodeDecoder :
@@ -58,6 +60,16 @@ public interface FunctionEncoder : Encoder {
     public fun encodeFunction(kCallable: KCallable<*>)
 
     public fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>> = emptyList())
+
+    /**
+     * Serializers for [kCallable]'s parameters, by position, so args coming back from JS can be decoded
+     * to the declared types. Stops at the first vararg, since it absorbs a variable number of args, and
+     * leaves a `null` for any parameter type without a serializer so it decodes as it would untyped.
+     */
+    @InternalPlayerApi
+    public fun parameterSerializers(kCallable: KCallable<*>): List<KSerializer<*>?> = kCallable.valueParameters
+        .takeWhile { !it.isVararg }
+        .map { serializersModule.serializerOrNull(it.type) }
 }
 
 public interface FunctionDecoder : Decoder {

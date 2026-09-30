@@ -54,34 +54,6 @@ kt_kotlinc_options(
     x_sam_conversions = "indy",
 )
 
-# Context receivers are only used by //jvm/hermes, and enabling them repo-wide makes K2 reject
-# `this@Outer` inside an extension whose receiver has the same type as the enclosing class as an
-# ambiguous label - which is otherwise valid code (see RenderableAsset's render extensions). Scope
-# the flag to the module that needs it.
-#
-# Context receivers are deprecated and removed in language version 2.2+, where these become
-# `x_context_parameters` and every `context(Foo)` becomes `context(_: Foo)`.
-kt_kotlinc_options(
-    name = "main_options_with_context_receivers",
-    jvm_target = "17",
-    visibility = ["//visibility:public"],
-    x_context_receivers = True,
-    x_explicit_api_mode = "strict",
-    x_lambdas = "indy",
-    x_optin = optins,
-    x_sam_conversions = "indy",
-)
-
-kt_kotlinc_options(
-    name = "test_options_with_context_receivers",
-    jvm_target = "17",
-    visibility = ["//visibility:public"],
-    x_context_receivers = True,
-    x_lambdas = "indy",
-    x_optin = optins,
-    x_sam_conversions = "indy",
-)
-
 ktlint_config(
     name = "lint_config",
     editorconfig = "//:.editorconfig",
