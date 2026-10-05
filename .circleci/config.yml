@@ -153,7 +153,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
+            brew install bazelisk lcov
 
       - macos/preboot-simulator:
           version: "26.4"
