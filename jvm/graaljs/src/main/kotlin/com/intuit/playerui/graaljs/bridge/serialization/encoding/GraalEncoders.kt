@@ -18,6 +18,7 @@ import com.intuit.playerui.graaljs.bridge.serialization.format.GraalFormat
 import com.intuit.playerui.graaljs.bridge.serialization.format.encodeToGraalValue
 import com.intuit.playerui.graaljs.extensions.blockingLock
 import com.intuit.playerui.graaljs.extensions.handleValue
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -146,62 +147,67 @@ internal open class GraalValueEncoder(
 
     override fun encodeFunction(invokable: Invokable<*>) = putContent(
         ProxyExecutable { args ->
-            val encodedArgs = (args.indices)
+            val decodedArgs = (args.indices)
                 .map { args[it].handleValue(format) }
                 .toTypedArray()
 
-            format.encodeToGraalValue(invokable(*encodedArgs))
+            format.encodeToGraalValue(invokable(*decodedArgs))
         },
     )
 
-    override fun encodeFunction(kCallable: KCallable<*>) = putContent(
-        ProxyExecutable { args ->
-            val encodedArgs = (args.indices).map { args[it].handleValue(format) }
-            var index = 0
-            val matchedArgs = kCallable.valueParameters
-                .map { kParam ->
-                    // vararg support, all input args of that type will be included in vararg array
-                    if (kParam.isVararg) {
-                        val start = index
-                        while (index in encodedArgs.indices) {
-                            val currValue = encodedArgs.getOrNull(index)
+    override fun encodeFunction(kCallable: KCallable<*>) {
+        val parameterSerializers = parameterSerializers(kCallable)
 
-                            // check if type is nullable and value is null
-                            if ((
-                                    currValue == null &&
-                                        // base type or type argument could be marked nullable
-                                        (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
-                                ) ||
-                                // otherwise check if arg matches type if not null
-                                (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
-                            ) {
-                                index++
-                            } else {
-                                break
+        putContent(
+            ProxyExecutable { args ->
+                val decodedArgs = (args.indices).map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
+                var index = 0
+                val matchedArgs = kCallable.valueParameters
+                    .map { kParam ->
+                        // vararg support, all input args of that type will be included in vararg array
+                        if (kParam.isVararg) {
+                            val start = index
+                            while (index in decodedArgs.indices) {
+                                val currValue = decodedArgs.getOrNull(index)
+
+                                // check if type is nullable and value is null
+                                if ((
+                                        currValue == null &&
+                                            // base type or type argument could be marked nullable
+                                            (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
+                                    ) ||
+                                    // otherwise check if arg matches type if not null
+                                    (
+                                        currValue != null &&
+                                            currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>)
+                                    )
+                                ) {
+                                    index++
+                                } else {
+                                    break
+                                }
                             }
+                            // only take matching args
+                            decodedArgs.slice(start until index).toTypedArray()
+                        } else {
+                            // not matching arg types here, just relying on order
+                            if (index in decodedArgs.indices) decodedArgs[index++] else null
                         }
-                        // only take matching args
-                        encodedArgs.slice(start until index).toTypedArray()
-                    } else {
-                        // not matching arg types here, just relying on order
-                        if (index in encodedArgs.indices) encodedArgs[index++] else null
-                    }
-                }.toTypedArray()
-            format.encodeToGraalValue(kCallable.call(*matchedArgs))
-        },
-    )
+                    }.toTypedArray()
+                format.encodeToGraalValue(kCallable.call(*matchedArgs))
+            },
+        )
+    }
 
-    override fun encodeFunction(function: Function<*>) {
+    override fun encodeFunction(function: Function<*>, parameterSerializers: List<KSerializer<*>>) {
         if (function is Invokable<*>) {
             encodeFunction(function)
         } else {
             val proxyExecutable = ProxyExecutable { args ->
-                val encodedArgs = (args.indices).map { args[it].handleValue(format) }
-                val arity = (function as kotlin.jvm.internal.FunctionBase<*>).arity
-                val matchedArgs = (0 until arity)
-                    .map { encodedArgs.getOrNull(it) }
+                val decodedArgs = (args.indices)
+                    .map { args[it].handleValue(format, parameterSerializers.getOrNull(it)) }
                     .toTypedArray()
-                format.encodeToGraalValue(function.invokeVararg(*matchedArgs))
+                format.encodeToGraalValue(function.invokeVararg(*decodedArgs))
             }
             putContent(proxyExecutable)
         }
@@ -209,7 +215,8 @@ internal open class GraalValueEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            serializer.descriptor == FunctionLikeSerializer.descriptor -> encodeFunction(value)
+            serializer.descriptor == FunctionLikeSerializer.descriptor ->
+                encodeFunction(value, (serializer as FunctionLikeSerializer<*>).parameterSerializers ?: emptyList())
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
             value is Node -> encodeNode(value)

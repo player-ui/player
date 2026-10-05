@@ -27,11 +27,6 @@ public final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin
 private final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin$Companion {
 }
 
-final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin$apply$jsHandlers$1$callback$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function2 {
-	public final fun invoke (Lcom/intuit/playerui/core/bridge/Node;Lcom/intuit/playerui/core/bridge/Node;)Lcom/intuit/playerui/core/bridge/Promise;
-	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 final class com/intuit/playerui/plugins/externalState/ExternalStatePlugin$apply$jsHandlers$1$callback$1$1 : kotlin/coroutines/jvm/internal/SuspendLambda, kotlin/jvm/functions/Function3 {
 	public synthetic fun invoke (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
