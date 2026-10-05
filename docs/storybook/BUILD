@@ -19,6 +19,7 @@ deps = [
     ":node_modules/@player-ui/computed-properties-plugin",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/storybook",
+    ":node_modules/@player-ui/streaming-data-plugin",
     ":node_modules/@player-ui/async-node-plugin",
     ":node_modules/@player-ui/expression-plugin",
     ":node_modules/@player-ui/player",
