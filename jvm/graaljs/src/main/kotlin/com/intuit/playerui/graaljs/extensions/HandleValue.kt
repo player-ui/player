@@ -14,12 +14,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import org.graalvm.polyglot.Value
 
-internal fun Any?.handleValue(format: RuntimeFormat<Value>): Any? = when (this) {
-    is Value -> transform(format)
-    else -> this
-}
+internal fun Any?.handleValue(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? =
+    when (this) {
+        is Value -> transform(format, deserializationStrategy)
+        else -> this
+    }
 
-private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
+private fun Value.transform(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<*>? = null): Any? = when {
     isNull -> null
     isHostObject -> when (val hostObject = asHostObject<Any>()) {
         is Unit -> null
@@ -30,8 +31,8 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
     canExecute() -> toInvokable<Any>(format, format.serializer())
     metaObject.toString() == "symbol" -> null // this is also awful, but consistent w/ j2v8
     else -> when (this.`as`(Any::class.java)) {
-        is Int -> asInt()
-        is Double, is Long -> try {
+        is Int -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) } ?: asInt()
+        is Double, is Long -> deserializationStrategy?.let { format.decodeFromRuntimeValue(it, this) } ?: try {
             asInt()
         } catch (e: Exception) {
             asDouble()

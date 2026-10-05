@@ -8,11 +8,6 @@ public final class com/intuit/playerui/plugins/expression/ExpressionPlugin : com
 private final class com/intuit/playerui/plugins/expression/ExpressionPlugin$Companion {
 }
 
-final class com/intuit/playerui/plugins/expression/ExpressionPlugin$apply$1$1$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
-	public synthetic fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun invoke ([Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/intuit/playerui/plugins/expression/ExpressionPluginKt {
 }
 

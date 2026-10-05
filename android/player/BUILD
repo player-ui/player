@@ -46,7 +46,7 @@ main_resources = [
 
 unit_test_deps = [
     "//jvm/testutils:with-runtimes",
-    artifact("io.mockk:mockk"),
+    artifact("io.mockk:mockk-jvm"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
     artifact("androidx.test:core"),
 ]
@@ -54,7 +54,7 @@ unit_test_deps = [
 instrumented_test_deps = [
     "//jvm/testutils",
     "//android/testutils:with-runtime",
-    artifact("io.mockk:mockk"),
+    artifact("io.mockk:mockk-jvm"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
     artifact("androidx.test:core"),
     "//jvm:kotlin_serialization",

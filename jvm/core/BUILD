@@ -27,7 +27,7 @@ test_deps = [
     "//plugins/reference-assets/jvm",
     "//plugins/a2ui/jvm",
     "//plugins/a2ui/mocks:jar",
-    artifact("io.mockk:mockk"),
+    artifact("io.mockk:mockk-jvm"),
     artifact("org.amshove.kluent:kluent"),
 ]
 

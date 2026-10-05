@@ -17,6 +17,7 @@ import kotlinx.serialization.serializer
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.typeOf
 
 public interface RuntimeFormat<Value> : SerialFormat {
     public val runtime: Runtime<Value>
@@ -69,6 +70,13 @@ public fun <T : Any> RuntimeFormat<*>.registerContextualSerializer(klass: KClass
 public inline fun <reified T> RuntimeFormat<*>.serializer(): KSerializer<T> = when {
     T::class == Any::class -> GenericSerializer().conform()
     T::class.isSubclassOf(KCallable::class) -> KCallableSerializer<Any?>(GenericSerializer().conform()) as KSerializer<T>
+    T::class.isSubclassOf(Function::class) ->
+        serializersModule.getContextual(
+            T::class as KClass<Any>,
+            typeOf<T>().arguments.map { argument ->
+                argument.type?.let { serializersModule.serializer(it) } ?: GenericSerializer().conform()
+            },
+        ) as? KSerializer<T> ?: serializersModule.serializer()
     else -> serializersModule.serializer()
 }
 
