@@ -153,7 +153,12 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            brew install bazelisk lcov
+            # lcov 2.6 can't be installed with current version of brew
+            # TODO update brew
+            brew tap-new --no-git local/pins
+            curl -fsSL --create-dirs -o "$(brew --repository local/pins)/Formula/lcov.rb" \
+              https://raw.githubusercontent.com/Homebrew/homebrew-core/bbfcaac1061bd44f4027ab4f3b33cc3e5ecc6d26/Formula/l/lcov.rb
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk local/pins/lcov
 
       - macos/preboot-simulator:
           version: "26.4"
