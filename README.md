@@ -8,7 +8,7 @@
 </h1>
 
 > **Warning**
-> Player is still in early development, some features may still be in progress.
+> Player is still in early development, some features may still be in progress. [trigger]
 
 [![CircleCI](https://circleci.com/gh/player-ui/player/tree/main.svg?style=svg)](https://circleci.com/gh/player-ui/player/tree/main) [![codecov](https://codecov.io/gh/player-ui/player/branch/main/graph/badge.svg?token=YY8Bp8DuZN)](https://codecov.io/gh/player-ui/player) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg)](#contributors)
