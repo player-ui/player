@@ -26,7 +26,9 @@ jobs:
         uses: repo-sync/pull-request@v2.9
         with:
           source_branch: ${{ env.SOURCE_RELEASE_BRANCH }}
-          destination_branch: "main"
+          # Release back into the dispatched branch. Hardcoding main would merge
+          # a version-2 release into the 1.x trunk.
+          destination_branch: ${{ github.ref_name }}
           pr_allow_empty: true
           pr_title: "Release ${GITHUB_REF##*/}"
           pr_label: "release"

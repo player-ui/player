@@ -1,7 +1,4 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-await-in-loop */
-const { execSync } = require("child_process");
+import { execSync } from "child_process";
 
 const getLatestReleaseTags = () => {
   const tags = execSync("git tag --sort=-creatordate", { encoding: "utf8" });
@@ -23,7 +20,7 @@ class NextChangelogsPlugin {
       const [latest, second] = getLatestReleaseTags();
       if (dryRun) {
         auto.logger.log.info(
-          `Dry run: making changelog from last release: ${latestRelease}`,
+          `Dry run: making changelog from last release: ${latest}`,
         );
       } else {
         await auto.changelog({
@@ -31,10 +28,15 @@ class NextChangelogsPlugin {
           to: latest,
           title: `${latest}`,
         });
-        execSync(`git push ${auto.remote} ${auto.baseBranch}`);
+        // Push to the branch being released, not baseBranch. version-* branches
+        // cut their own prereleases and must not write changelogs onto main.
+        const branch = execSync("git symbolic-ref --short HEAD", {
+          encoding: "utf8",
+        }).trim();
+        execSync(`git push ${auto.remote} ${branch}`);
       }
     });
   }
 }
 
-module.exports = NextChangelogsPlugin;
+export default NextChangelogsPlugin;
