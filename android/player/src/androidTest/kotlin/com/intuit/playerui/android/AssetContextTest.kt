@@ -31,7 +31,7 @@ internal class AssetContextTest {
     @MockK lateinit var context2: Context
     private var asset = mockk<Asset>()
     private val player = AndroidPlayer()
-    private var renderable = mockk<RenderableAsset>()
+    private var renderable = mockk<RenderableAsset<*>>()
     private val factory = { _: AssetContext -> renderable }
     lateinit var assetContext: AssetContext
 

@@ -10,7 +10,8 @@ import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.android.utils.ThrowingAsset
 import com.intuit.playerui.android.utils.ThrowingAsset.Companion.asset
 import com.intuit.playerui.utils.start
-import org.junit.Assert.assertThrows
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,11 +30,14 @@ internal class ThrowingAssetTest {
     }
 
     @Test
-    fun `wrap throwable in an AssetRenderException`() {
+    fun `wrap throwable in an AssetRenderException`() = runTest {
         player.start(ThrowingAsset.sampleFlow)
-        assertThrows(AssetRenderException::class.java) {
-            ThrowingAsset(baseContext.copy(asset = runtime.asset(value = 21)))
-                .render(appContext)
+        var threw = false
+        try {
+            ThrowingAsset(baseContext.copy(asset = runtime.asset(value = 21))).awaitRender(appContext)
+        } catch (e: AssetRenderException) {
+            threw = true
         }
+        assertTrue(threw)
     }
 }

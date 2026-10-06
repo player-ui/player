@@ -2,13 +2,18 @@ package com.intuit.playerui.android.asset
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.StyleRes
+import com.intuit.hooks.HookContext
+import com.intuit.hooks.SyncHook
 import com.intuit.playerui.android.AndroidPlayer
+import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.DEPRECATED_WITH_DECODABLEASSET
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Style
 import com.intuit.playerui.android.extensions.Styles
+import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.removeSelf
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withStyles
@@ -18,14 +23,22 @@ import com.intuit.playerui.core.asset.AssetWrapper
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeDecoder
-import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.fail
 import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.coroutines.subScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ContextualSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -34,39 +47,31 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 
 internal typealias CachedAssetView = Pair<AssetContext?, View?>
 
+/** Convenience type represents slot for any arbitrary asset instance */
+public typealias AnyAsset = RenderableAsset<out @Contextual Any>
+
 /**
  * [RenderableAsset] is the base class for each asset in an asset tree.
- * It is the second stage in the transform process. It's most important
- * method is [render], which delegates to [initView] and [hydrate]
- * to instantiate a [View] and populate it with the latest [asset] data.
- * This approach attempts to optimize by preventing unnecessary [View]
- * mutations.
+ * Subclasses implement [initView] and [hydrate] to provide a [View] populated
+ * with typed [Data] decoded from the asset node.
  *
  * [RenderableAsset]s are powered with an [AssetContext], which provides
  * access to the underlying asset node as well as the Android [Context].
  * Beaconing and expansion hooks can be accessed through the [AssetContext]
- * as well. The asset registry is responsible for creating [RenderableAsset]s
- * and can be configured with any factory method to supply [AssetContext]s
- * to a new instance. However, it is recommended just propagate the
- * [AssetContext] in the constructor as to keep asset registration simple.
+ * as well.
  */
-@Suppress("ktlint:standard:annotation") // To prevent class from being double indented
-@Serializable(RenderableAsset.ContextualSerializer::class)
-public abstract class RenderableAsset @Deprecated(
-    "RenderableAssets should be migrated to DecodableAsset",
-    ReplaceWith("DecodableAsset(assetContext, serializer)"),
-    DeprecationLevel.ERROR,
-) public constructor(
+@Serializable(ContextualSerializer::class)
+public abstract class RenderableAsset<Data>(
     public val assetContext: AssetContext,
+    private val serializer: KSerializer<Data>,
 ) : NodeWrapper {
-    /**
-     * Helper to get the current cached [AssetContext] and [View].
-     * Will return empty pair if not found.
-     */
     internal val cachedAssetView: CachedAssetView get() =
         player.getCachedAssetView(assetContext) ?: cachedAssetViewNotFound
 
@@ -77,16 +82,137 @@ public abstract class RenderableAsset @Deprecated(
 
     override val node: Node by asset
 
-    /** Build arbitrary [View] to represent the [asset] */
-    protected abstract fun initView(): View
+    /** Suspendable way to deserialize an instance of [Data] */
+    public suspend fun getData(): Data = withContext(Dispatchers.Default) {
+        data
+    }
 
-    /** Hydrate [View] with data from [asset] */
-    protected abstract fun View.hydrate()
+    private val data: Data by lazy {
+        try {
+            asset.deserialize(serializer)
+        } catch (exception: SerializationException) {
+            assetContext.player.logger.error("Could not deserialize data for $asset", exception)
+            throw PlayerException("Could not deserialize data for $asset", exception)
+        }
+    }
+
+    // ── Foundational abstract API for XML/Compose assets ──────────────────────────────────────────────────────────
+
+    /** Build a [View] for the asset, to be launched in [Dispatchers.Default] */
+    public abstract suspend fun initView(data: Data): View
+
+    /** Hydrate [View] with data from [asset]. Runs on [Dispatchers.Main]; [this] scope is the [hydrationScope] for launching child renders. */
+    public abstract suspend fun CoroutineScope.hydrate(view: View, data: Data)
+
+    internal class SubtreeCompletion : AbstractCoroutineContextElement(Key) {
+        companion object Key : CoroutineContext.Key<SubtreeCompletion>
+
+        private val lock = Any()
+        private var pending = 0
+        private var selfDone = false
+        private var fired = false
+        private val done = CompletableDeferred<Unit>()
+
+        internal suspend fun await(): Unit = done.await()
+
+        internal fun expectChild() = synchronized(lock) { pending++ }
+
+        internal fun childDone() {
+            if (completes { pending-- }) done.complete(Unit)
+        }
+
+        internal fun selfHydrateDone() {
+            if (completes { selfDone = true }) done.complete(Unit)
+        }
+
+        private inline fun completes(mutate: () -> Unit): Boolean = synchronized(lock) {
+            mutate()
+            if (!fired && selfDone && pending == 0) {
+                fired = true
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private val subtreeCompletion: SubtreeCompletion? get() =
+        _hydrationScope?.coroutineContext?.get(SubtreeCompletion)
+
+    // ── Concrete render implementation ────────────────────────────────────────
+
+    internal suspend fun render(): View = try {
+        val isRoot = currentCoroutineContext()[SubtreeCompletion] == null
+        val tracker = if (isRoot) player.asyncHydrationTrackerPlugin else null
+        tracker?.hooks?.onHydrationStarted?.call()
+        cachedAssetView
+            .let { (cachedAssetContext, cachedView) ->
+                requireContext()
+                when {
+                    cachedView == null -> {
+                        renewHydrationScope("recreating view")
+                        doRender()
+                    }
+                    cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
+                        renewHydrationScope("recreating view")
+                        cachedView.removeSelf()
+                        doRender()
+                    }
+                    !cachedAssetContext.asset.nativeReferenceEquals(asset) -> {
+                        renewHydrationScope("rehydrating ${asset.id}")
+                        val completion = subtreeCompletion
+                        try {
+                            rehydrate(cachedView)
+                            completion?.selfHydrateDone()
+                            completion?.await()
+                            cachedView
+                        } catch (_: StaleViewException) {
+                            renewHydrationScope("recreating after stale rehydrate")
+                            doRender()
+                        }
+                    }
+                    else -> cachedView
+                }
+            }.also {
+                player.cacheAssetView(assetContext, it)
+                tracker?.hooks?.onHydrationComplete?.call()
+            }
+    } catch (exception: Throwable) {
+        if (exception is CancellationException) throw exception
+        if (exception is AssetRenderException) {
+            exception.assetParentPath += assetContext
+            throw exception
+        }
+        throw AssetRenderException(assetContext, "Failed to render asset", exception)
+    }
+
+    private suspend fun doRender(): View {
+        val completion = subtreeCompletion
+        return try {
+            val (data, view) = withContext(Dispatchers.Default) {
+                val data = getData()
+                data to initView(data)
+            }
+            withContext(Dispatchers.Main) {
+                hydrationScope.hydrate(view, data)
+            }
+            completion?.selfHydrateDone()
+            completion?.await()
+            view
+        } catch (exception: Throwable) {
+            if (exception is CancellationException) throw exception
+            if (exception is StaleViewException) throw exception
+            if (exception is AssetRenderException) {
+                exception.assetParentPath += assetContext
+                throw exception
+            }
+            throw AssetRenderException(assetContext, "Failed to render asset", exception)
+        }
+    }
 
     /**
-     * A [CoroutineScope] that should be used when launching coroutines during asset hydration.
-     * This scope will be cancelled on each re-render (i.e. whenever the data updates) and when
-     * the [Player.flowScope] is cancelled.
+     * A [CoroutineScope] for use during asset hydration.
+     * Cancelled on each re-render and when the [Player.flowScope] is cancelled.
      */
     protected val hydrationScope: CoroutineScope get() = _hydrationScope
         ?: throw PlayerException(
@@ -99,179 +225,228 @@ public abstract class RenderableAsset @Deprecated(
 
     internal fun renewHydrationScope(message: String): CoroutineScope {
         _hydrationScope?.cancel(message)
-        _hydrationScope = player.subScope()
+        _hydrationScope = player.subScope(SubtreeCompletion())
         return hydrationScope
     }
 
-    /**
-     * Construct a [View] that represents the asset.
-     *
-     * The default implementation delegates to [initView] and [hydrate]
-     * to construct this [View] and populate it with the latest data. It
-     * also automatically caches the instance of the [View] and detects
-     * when it needs to reconstruct or rehydrate.
-     */
-    private fun render(): View = try {
-        cachedAssetView
-            .let { (cachedAssetContext, cachedView) ->
-                requireContext()
-                when {
-                    // View not found. Create and hydrate.
-                    cachedView == null -> {
-                        renewHydrationScope("recreating view")
-                        initView().also { it.hydrate() }
-                    } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
-                    cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
-                        renewHydrationScope("recreating view")
-                        cachedView.removeSelf()
-                        initView().also { it.hydrate() }
-                    }
-                    // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
-                    // implementation to throw [StaleViewException] to signify that the view is out of sync.
-                    // This can only be done from invalidateView, so we have a guarantee that the view has
-                    // already been removed from the cache.
-                    !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
-                        try {
-                            cachedView.also(::rehydrate)
-                        } catch (exception: StaleViewException) {
-                            player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
-                            render()
-                        }
-                    // View found, everything is in sync. Do nothing.
-                    else -> cachedView
-                }
-            }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
-    } catch (exception: Throwable) {
-        if (exception is AssetRenderException) {
-            exception.assetParentPath += assetContext
-            throw exception
-        } else {
-            throw AssetRenderException(assetContext, "Failed to render asset", exception)
-        }
-    }
+    // ── Rehydration ───────────────────────────────────────────────────────────
 
-    /** Invalidate view, causing a complete re-render of the current asset */
     public fun invalidateView() {
         player.removeCachedAssetView(assetContext)
         throw StaleViewException(assetContext)
     }
 
-    /** Private helper for managing scope for hydration */
-    private fun rehydrate(view: View) {
-        renewHydrationScope("rehydrating ${asset.id}")
-        view.hydrate()
-    }
-
-    /** Instruct a [RenderableAsset] to [rehydrate] */
     public fun rehydrate(): Unit = cachedAssetView.let { (_, view) ->
-        try {
-            view?.also(::rehydrate)
-        } catch (exception: StaleViewException) {
-            player.inProgressState?.fail("stale child while trying to rehydrate: ${exception.assetContext.id}")
+        view ?: return
+        renewHydrationScope("rehydrating ${asset.id}")
+        val completion = subtreeCompletion
+        val tracker = player.asyncHydrationTrackerPlugin
+        tracker?.hooks?.onHydrationStarted?.call()
+        hydrationScope.launch {
+            try {
+                rehydrate(view)
+                completion?.selfHydrateDone()
+                completion?.await()
+            } catch (exception: StaleViewException) {
+                player.inProgressState?.fail("stale child while trying to rehydrate: ${exception.assetContext.id}")
+            } finally {
+                tracker?.hooks?.onHydrationComplete?.call()
+            }
         }
     }
 
-    /**
-     * Render the asset using the resulting [Context] of the [AndroidPlayer.Hooks.ContextHook]
-     * called with the provided [context].
-     *
-     * This should only be called from the Activity/Fragment to provide a [context] for [RenderableAsset]s to render with.
-     * Rendering of nested children assets should instead invoke the contextual [RenderableAsset.render] methods
-     * to automatically pull [context] from their parents.
-     */
-    public fun render(context: Context): View = assetContext
-        .withContext(player.hooks.context.call(context))
-        .build()
-        .render()
+    private suspend fun rehydrate(view: View) {
+        val data = getData()
+        withContext(Dispatchers.Main) {
+            hydrationScope.hydrate(view, data)
+        }
+    }
 
-    /** Render child asset from the context of a parent asset, ensuring that the [context] is passed down */
-    public fun RenderableAsset.render(): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .build()
-        .render()
+    // ── Public render entry points ────────────────────────────────────────────
 
-    /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).build() }
+        inflateChild(asset, container, viewApply)
+    }
+
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
         @StyleRes vararg styles: Style?,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withStyles(*styles)
-        .build()
-        .render()
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+        inflateChild(asset, container)
+    }
 
-    /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        viewApply: (View) -> Unit,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+        inflateChild(asset, container, viewApply)
+    }
+
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
         @StyleRes styles: Styles?,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withStyles(styles)
-        .build()
-        .render()
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withStyles(styles).build() }
+        inflateChild(asset, container, viewApply)
+    }
 
-    /** Render a [View] with a specific [tag] through a new [RenderableAsset] created with a new [AssetContext] */
-    public fun RenderableAsset.render(tag: String): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withTag(tag)
-        .build()
-        .render()
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        tag: String,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).build() }
+        inflateChild(asset, container, viewApply)
+    }
 
-    /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
         @StyleRes vararg styles: Style?,
         tag: String,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withTag(tag)
-        .withStyles(*styles)
-        .build()
-        .render()
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() }
+        inflateChild(asset, container)
+    }
 
-    /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        tag: String,
+        viewApply: (View) -> Unit,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() }
+        inflateChild(asset, container, viewApply)
+    }
+
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
         @StyleRes styles: Styles?,
         tag: String,
-    ): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .withTag(tag)
-        .withStyles(styles)
-        .build()
-        .render()
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(styles).build() }
+        inflateChild(asset, container, viewApply)
+    }
 
-    // Expansion helpers
+    @Deprecated("Use inflate without callback instead, this may get removed without additional warning.", level = DeprecationLevel.WARNING)
+    public fun CoroutineScope.inflate(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        callback: ((View?) -> Unit),
+        @StyleRes vararg styles: Style?,
+        tag: String,
+        viewApply: ((View) -> Unit)? = null,
+    ) {
+        val asset = child?.assetContext?.run { withContext(requireContext()).withTag(tag).withStyles(*styles).build() }
+        inflateChild(asset, container, viewApply, callback)
+    }
 
-    /** Unwraps the [AssetWrapper] extracting [asset] as a [RenderableAsset] */
-    public fun AssetWrapper.asRenderableAsset(): RenderableAsset? = player.expandAsset(this.asset)
+    public fun CoroutineScope.inflate(
+        children: List<RenderableAsset<*>?>,
+        container: ViewGroup,
+        @StyleRes vararg styles: Style?,
+        viewApply: ((View, Int) -> Unit)? = null,
+        order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
+    ) {
+        val completion = coroutineContext[SubtreeCompletion]
+        val built = children.map { child ->
+            child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+        }
+        built.forEach { asset -> asset?.let { completion?.expectChild() } }
+        launch {
+            val ordered = built.order()
+            val views = ordered
+                .map { asset -> asset?.let { async { it.render() } } }
+                .mapIndexed { index, deferredView ->
+                    deferredView?.await()?.also { view -> viewApply?.invoke(view, index) }
+                }
+            withContext(Dispatchers.Main) { views into container }
+            built.forEach { asset -> asset?.let { completion?.childDone() } }
+        }
+    }
 
-    /** Expand [name] as a [RenderableAsset] from the base [asset] */
-    @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
-    @Suppress("DEPRECATION_ERROR")
-    public fun expand(name: String, context: Context? = this@RenderableAsset.context): RenderableAsset? = asset.expand(name, context)
+    @Deprecated("Use inflate without callback instead, this may get removed without additional warning.", level = DeprecationLevel.WARNING)
+    public fun CoroutineScope.inflateViewCallback(
+        children: List<RenderableAsset<*>?>,
+        @StyleRes vararg styles: Style?,
+        callback: ((List<View?>) -> Unit),
+        viewApply: ((View, Int) -> Unit)? = null,
+        order: suspend List<RenderableAsset<*>?>.() -> List<RenderableAsset<*>?> = { this },
+    ) {
+        val completion = coroutineContext[SubtreeCompletion]
+        val built = children.map { child ->
+            child?.assetContext?.run { withContext(requireContext()).withStyles(*styles).build() }
+        }
+        built.forEach { asset -> asset?.let { completion?.expectChild() } }
+        launch {
+            val ordered = built.order()
+            val views = ordered
+                .map { asset -> asset?.let { async { it.render() } } }
+                .mapIndexed { index, deferredView ->
+                    deferredView?.await()?.also { view -> viewApply?.invoke(view, index) }
+                }
+            withContext(Dispatchers.Main) { callback.invoke(views) }
+            built.forEach { asset -> asset?.let { completion?.childDone() } }
+        }
+    }
 
-    /** Expand [name] as a [RenderableAsset] from [this] specific [Node] */
-    @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
-    @Suppress("DEPRECATION_ERROR")
-    public fun Node.expand(name: String, context: Context? = this@RenderableAsset.context): RenderableAsset? = getObject(name)
-        ?.let(::AssetWrapper)
-        ?.run { expand(context) }
+    private fun CoroutineScope.inflateChild(
+        child: RenderableAsset<*>?,
+        container: ViewGroup,
+        viewApply: ((View) -> Unit)? = null,
+        callback: ((View?) -> Unit)? = null,
+    ) {
+        val completion = if (child != null) coroutineContext[SubtreeCompletion] else null
+        completion?.expectChild()
+        launch {
+            val view = child?.render()
+            view?.let { viewApply?.invoke(it) }
+            withContext(Dispatchers.Main) {
+                callback?.invoke(view) ?: (view into container)
+            }
+            completion?.childDone()
+        }
+    }
 
-    /** Expand an [AssetWrapper] with a potentially styled [Context] */
-    @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
-    public fun AssetWrapper.expand(context: Context? = this@RenderableAsset.context): RenderableAsset? = asset
-        .let { player.expandAsset(it, context) }
+    /** Root entry point — render this asset into [container] using [context] to bootstrap the context chain. */
+    public fun CoroutineScope.renderInto(container: FrameLayout, context: Context) {
+        val asset = assetContext
+            .withContext(player.hooks.context.call(context))
+            .build()
+        launch {
+            try {
+                val view = asset.render()
+                withContext(Dispatchers.Main) { view into container }
+            } catch (_: CancellationException) {
+            } catch (exception: AssetRenderException) {
+                player.inProgressState?.fail(exception)
+            } catch (exception: Throwable) {
+                player.inProgressState?.fail(AssetRenderException(assetContext, "Failed to render asset", exception))
+            }
+        }
+    }
 
-    /** Expand [name] as a collection of [RenderableAsset]s from the base [asset] */
-    @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
-    @Suppress("DEPRECATION_ERROR")
-    public fun expandList(name: String, context: Context? = this@RenderableAsset.context): List<RenderableAsset> =
-        asset.expandList(name, context)
+    // ── Expansion helpers ─────────────────────────────────────────────────────
 
-    /** Expand [name] as a collection of [RenderableAsset]s from [this] specific [Node] */
-    @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
-    @Suppress("DEPRECATION_ERROR")
-    public fun Node.expandList(name: String, context: Context? = this@RenderableAsset.context): List<RenderableAsset> = getList(name)
-        ?.filterIsInstance<Node>()
-        ?.map(::AssetWrapper)
-        ?.mapNotNull { it.expand(context) } ?: emptyList()
+    public fun AssetWrapper.asRenderableAsset(): RenderableAsset<*>? = player.expandAsset(this.asset)
+
+    // ── Utilities ─────────────────────────────────────────────────────────────
 
     public fun beacon(
         action: String,
@@ -286,47 +461,70 @@ public abstract class RenderableAsset @Deprecated(
         throw error
     }
 
-    /**
-     * Special interface to be implemented by assets that are meant to fill
-     * the entire player canvas space regardless of content length
-     */
     public interface ViewportAsset
 
     private companion object {
         private val cachedAssetViewNotFound: Pair<AssetContext?, View?> = null to null
     }
 
+    // ── Serialization ─────────────────────────────────────────────────────────
+
     public class Serializer(
         private val player: AndroidPlayer,
-    ) : KSerializer<RenderableAsset?> {
+    ) : KSerializer<RenderableAsset<*>?> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.playerui.android.asset.RenderableAsset")
 
-        /** Deserialize using the expansion process */
-        override fun deserialize(decoder: Decoder): RenderableAsset? = decoder
+        override fun deserialize(decoder: Decoder): RenderableAsset<*>? = decoder
             .requireNodeDecoder()
             .decodeNode()
             .let(::AssetWrapper)
             .asset
             .let(player::expandAsset)
 
-        /** Serialization of [RenderableAsset]s are not supported */
-        override fun serialize(encoder: Encoder, value: RenderableAsset?): Nothing =
-            throw SerializationException("DecodableAsset.Serializer.serialize is not supported")
+        override fun serialize(encoder: Encoder, value: RenderableAsset<*>?): Nothing =
+            throw SerializationException("RenderableAsset.Serializer.serialize is not supported")
 
-        /** Conform this [Serializer] to cast the expanded asset to [T] */
-        public inline fun <reified T : RenderableAsset?> conform(): KSerializer<T> = object : KSerializer<T?> by this as KSerializer<T?> {
-            override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as? T
-        } as KSerializer<T>
+        public inline fun <reified T : RenderableAsset<*>?> conform(): KSerializer<T> =
+            object : KSerializer<T?> by this as KSerializer<T?> {
+                override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as? T
+            } as KSerializer<T>
 
-        public fun <T : RenderableAsset> conform(klass: KClass<T>): KSerializer<T> = object : KSerializer<T?> by this as KSerializer<T?> {
-            override fun deserialize(decoder: Decoder) = try {
-                klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
-            } catch (e: ClassCastException) {
-                null
-            }
-        } as KSerializer<T>
+        public fun <T : RenderableAsset<*>> conform(klass: KClass<T>): KSerializer<T> =
+            object : KSerializer<T?> by this as KSerializer<T?> {
+                override fun deserialize(decoder: Decoder) = try {
+                    klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
+                } catch (e: ClassCastException) {
+                    null
+                }
+            } as KSerializer<T>
     }
 
-    // Seemingly needed to prevent stack overflow: https://github.com/Kotlin/kotlinx.serialization/issues/1776
-    internal object ContextualSerializer : KSerializer<RenderableAsset> by ContextualSerializer(RenderableAsset::class)
+    // ── Async hydration tracking ──────────────────────────────────────────────
+
+    // TODO: is this still needed
+    @ExperimentalPlayerApi
+    public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
+        public val hooks: Hooks = Hooks()
+
+        override fun apply(androidPlayer: AndroidPlayer) {}
+
+        public class Hooks {
+            public class OnHydrationStartedHook : SyncHook<(HookContext) -> Unit>() {
+                public fun call(): Unit = super.call { f, context ->
+                    f(context)
+                }
+            }
+
+            public class OnHydrationCompleteHook : SyncHook<(HookContext) -> Unit>() {
+                public fun call(): Unit = super.call { f, context ->
+                    f(context)
+                }
+            }
+
+            public val onHydrationStarted: OnHydrationStartedHook = OnHydrationStartedHook()
+            public val onHydrationComplete: OnHydrationCompleteHook = OnHydrationCompleteHook()
+        }
+    }
 }
+
+public val AndroidPlayer.asyncHydrationTrackerPlugin: RenderableAsset.AsyncHydrationTrackerPlugin? get() = findPlugin()

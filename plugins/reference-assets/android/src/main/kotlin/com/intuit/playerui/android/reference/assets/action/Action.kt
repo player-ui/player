@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
@@ -28,7 +28,7 @@ class Action(
 ) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
-        val label: RenderableAsset? = null,
+        val label: AnyAsset? = null,
         private val run: () -> Unit,
     ) {
         suspend fun run() = withContext(Dispatchers.Default) {

@@ -17,12 +17,16 @@ import androidx.transition.TransitionManager
  * @param root [FrameLayout] to be injected to
  */
 @MainThread
-public infix fun View?.into(root: FrameLayout) {
+internal infix fun View?.into(root: FrameLayout) {
+    removeRoot(root)
+    this into root as ViewGroup
+}
+
+private fun View?.removeRoot(root: FrameLayout) {
     val existing = root.getChildAt(0)
     if (this != existing) {
         root.removeView(existing)
     }
-    this into root as ViewGroup
 }
 
 /**
@@ -36,7 +40,7 @@ public infix fun View?.into(root: FrameLayout) {
  */
 
 @MainThread
-public fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
+internal fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
     root.removeAllViews()
     if (this == null) {
         if (root.visibility != View.GONE) {
@@ -62,7 +66,8 @@ public fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
  * @param root [ViewGroup] to be injected to
  */
 @MainThread
-public infix fun View?.into(root: ViewGroup) {
+internal infix fun View?.into(root: ViewGroup) {
+    (root as? FrameLayout)?.let { removeRoot(root) }
     if (this == null) {
         root.visibility = View.GONE
         root.removeAllViews()
@@ -83,7 +88,7 @@ public infix fun View?.into(root: ViewGroup) {
  * @param root [ViewGroup] to be injected to
  */
 @MainThread
-public infix fun List<View?>.into(root: ViewGroup) {
+internal infix fun List<View?>.into(root: ViewGroup) {
     val filtered = filterNotNull()
     if (filtered.isEmpty()) {
         if (root.visibility != View.GONE) {

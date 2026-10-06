@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.AnyAsset
 import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
 import androidx.compose.material.Card as ComposeCard
@@ -17,7 +17,7 @@ public class Card(
 ) : ComposableAsset<Card.Data>(assetContext, Data.serializer()) {
     @Serializable
     public data class Data(
-        val child: RenderableAsset? = null,
+        val child: AnyAsset? = null,
     )
 
     @Composable

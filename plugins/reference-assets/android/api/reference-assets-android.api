@@ -205,11 +205,11 @@ public final class com/intuit/playerui/android/reference/assets/collection/Colle
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-public final class com/intuit/playerui/android/reference/assets/info/Info : com/intuit/playerui/android/asset/SuspendableAsset {
+public final class com/intuit/playerui/android/reference/assets/info/Info : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/info/Info$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -268,11 +268,11 @@ public final class com/intuit/playerui/android/reference/assets/input/FormattedE
 	public fun onTextChanged (Ljava/lang/CharSequence;III)V
 }
 
-public final class com/intuit/playerui/android/reference/assets/input/Input : com/intuit/playerui/android/asset/SuspendableAsset {
+public final class com/intuit/playerui/android/reference/assets/input/Input : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/input/Input$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -372,11 +372,11 @@ final class com/intuit/playerui/android/reference/assets/input/Input$hydrate$2$2
 	public final fun invokeSuspend (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class com/intuit/playerui/android/reference/assets/text/Text : com/intuit/playerui/android/asset/SuspendableAsset {
+public final class com/intuit/playerui/android/reference/assets/text/Text : com/intuit/playerui/android/asset/RenderableAsset {
 	public static final field $stable I
 	public fun <init> (Lcom/intuit/playerui/android/AssetContext;)V
-	public fun hydrate (Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun hydrate (Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun hydrate (Lkotlinx/coroutines/CoroutineScope;Landroid/view/View;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun initView (Lcom/intuit/playerui/android/reference/assets/text/Text$Data;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun initView (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
