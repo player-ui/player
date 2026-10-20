@@ -36,6 +36,7 @@ dependencies = [
     "//:node_modules/@monaco-editor/react",
     "//:node_modules/esbuild-wasm",
     "//:node_modules/@devtools-ds/table",
+    "//:node_modules/@player-devtools/basic-plugin-react",
     "//:node_modules/dlv",
     "//:node_modules/ts-loader",
     "//:node_modules/tslib",

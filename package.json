@@ -35,6 +35,7 @@
     "@eslint/js": "^9.22.0",
     "@monaco-editor/react": "^4.6.0",
     "@player-cli/cli": "^1.0.0",
+    "@player-devtools/basic-plugin-react": "0.16.0",
     "@player-lang/react-dsl": "1.0.1",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-separator": "^1.0.3",
