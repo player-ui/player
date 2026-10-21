@@ -1,3 +1,29 @@
+# 1.3.0-next.0 (Tue Oct 20 2026)
+
+### Release Notes
+
+#### Add Devtools to Storybook ([#959](https://github.com/player-ui/player/pull/959))
+
+Adds devtools to Storybook Plugin to enable devtools debugging on all stories out of the box.
+
+---
+
+#### 🚀 Enhancement
+
+- Add Devtools to Storybook [#959](https://github.com/player-ui/player/pull/959) ([@KetanReddy](https://github.com/KetanReddy))
+- K2 upgrade [#951](https://github.com/player-ui/player/pull/951) ([@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- version-2 Config Changes [#956](https://github.com/player-ui/player/pull/956) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 1.2.1-next.0 (Mon Sep 21 2026)
 
 #### 🐛 Bug Fix
