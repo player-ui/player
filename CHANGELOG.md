@@ -1,3 +1,33 @@
+# 1.3.0 (Tue Oct 20 2026)
+
+### Release Notes
+
+#### Add Devtools to Storybook ([#959](https://github.com/player-ui/player/pull/959))
+
+Adds devtools to Storybook Plugin to enable devtools debugging on all stories out of the box.
+
+---
+
+#### 🚀 Enhancement
+
+- Add Devtools to Storybook [#959](https://github.com/player-ui/player/pull/959) ([@KetanReddy](https://github.com/KetanReddy))
+- K2 upgrade [#951](https://github.com/player-ui/player/pull/951) ([@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#960](https://github.com/player-ui/player/pull/960) ([@intuit-svc](https://github.com/intuit-svc))
+- version-2 Config Changes [#956](https://github.com/player-ui/player/pull/956) ([@brocollie08](https://github.com/brocollie08))
+- Feature/markdown non string value [#953](https://github.com/player-ui/player/pull/953) ([@JunDangIntuit](https://github.com/JunDangIntuit))
+
+#### Authors: 4
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@JunDangIntuit](https://github.com/JunDangIntuit)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 1.3.0-next.0 (Tue Oct 20 2026)
 
 ### Release Notes
