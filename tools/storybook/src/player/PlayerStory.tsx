@@ -7,6 +7,7 @@ import type {
 } from "@player-ui/react";
 import { ReactPlayer } from "@player-ui/react";
 import { BeaconPlugin } from "@player-ui/beacon-plugin-react";
+import { BasicReactDevtoolsPlugin } from "@player-devtools/basic-plugin-react";
 import { makeFlow } from "@player-ui/make-flow";
 import type { StartOptions } from "@player-ui/player";
 import { Placeholder } from "storybook/internal/components";
@@ -100,8 +101,17 @@ const PlayerJsonEditorStory = () => {
         setTrackedBeacons((t) => [...t, beacon]);
       },
     });
+    // The devtools plugin no-ops unless these flags are set (normally by the browser extension)
+    localStorage.setItem("player-ui-devtools-active", "true");
+    localStorage.setItem("player-ui-devtools-flipper-active", "true");
+
     return new ReactPlayer({
-      plugins: [new StorybookPlayerPlugin(dispatch), beaconPlugin, ...plugins],
+      plugins: [
+        new StorybookPlayerPlugin(dispatch),
+        beaconPlugin,
+        new BasicReactDevtoolsPlugin(),
+        ...plugins,
+      ],
     });
   }, [dispatch, plugins]);
 
