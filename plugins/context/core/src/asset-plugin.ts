@@ -105,6 +105,19 @@ const sameIds = (
   a.length === b.length &&
   a.every((id, index) => id === b[index]);
 
+/** Ids of every asset in a resolved view, in document order. */
+const collectAssetIds = (view: unknown): string[] => {
+  const ids = new Set<string>();
+  const visit = (asset: Asset) => {
+    ids.add(asset.id);
+    findNestedAssets(asset).forEach(visit);
+  };
+  if (isAsset(view)) {
+    visit(view);
+  }
+  return Array.from(ids);
+};
+
 const flattenIds = (nodes: ReadonlyArray<CollationNode>): string[] =>
   nodes.flatMap((node) => [
     node.id,
@@ -197,6 +210,10 @@ export class AssetContextPlugin implements PlayerPlugin {
     let assetIds: ReadonlyArray<string> = [];
     /** collated asset id -> id of the ancestor it's hidden under */
     const collatedBy = new Map<string, string>();
+    /** id -> whether it was published as a collating asset, for this view */
+    const published = new Map<string, boolean>();
+    /** The last resolved view the published ids were synced against. */
+    let lastSynced: unknown;
 
     const publishAssetIds = (ids: ReadonlyArray<string>) => {
       assetIds = ids;
@@ -211,7 +228,52 @@ export class AssetContextPlugin implements PlayerPlugin {
       }
     };
 
+    /** Clear the entry of an asset that's no longer in the view. */
+    const clearAsset = (id: string) => {
+      // A collating asset's entry is a transform over its own fields.
+      const key = published.get(id)
+        ? assetSelfContextKey(id)
+        : assetContextKey(id);
+      published.delete(id);
+      collatedBy.delete(id);
+      collatedBy.forEach((parentId, childId) => {
+        if (parentId === id) {
+          collatedBy.delete(childId);
+        }
+      });
+      // Skip keys the store no longer holds, e.g. after a flow rotation.
+      if (ctx.get(key) !== undefined) {
+        ctx.set(key, undefined);
+      }
+    };
+
+    /**
+     * Reconcile published entries with the resolved view: assets removed
+     * from the tree (e.g. no longer applicable) are cleared, and the id list
+     * follows document order.
+     */
+    const syncView = (view: unknown) => {
+      if (view === lastSynced) {
+        return;
+      }
+      lastSynced = view;
+
+      const ids = collectAssetIds(view).filter((id) => published.has(id));
+      const present = new Set(ids);
+      const removed = Array.from(published.keys()).filter(
+        (id) => !present.has(id),
+      );
+
+      if (!sameIds(assetIds, ids)) {
+        publishAssetIds(ids);
+      }
+      removed.forEach(clearAsset);
+      publishCollated();
+    };
+
     const resetView = () => {
+      Array.from(published.keys()).forEach(clearAsset);
+      lastSynced = undefined;
       collatedBy.clear();
       ctx.set(collatedAssetIdsContextKey, []);
       publishAssetIds([]);
@@ -329,16 +391,16 @@ export class AssetContextPlugin implements PlayerPlugin {
       descriptor: AssetContextDescriptor<any>,
     ) => {
       const entry = toAssetContext(descriptor, asset, nestedOptions);
+      const collates = Boolean(descriptor.collate?.length);
 
-      if (descriptor.collate?.length) {
+      if (collates) {
         publishCollatedAsset(asset, descriptor, entry);
       } else {
         ctx.set(assetContextKey(asset.id), entry);
       }
 
-      if (!assetIds.includes(asset.id)) {
-        publishAssetIds([...assetIds, asset.id]);
-      }
+      // The view-level id list is rebuilt once the whole update resolves.
+      published.set(asset.id, collates);
     };
 
     this.registerViewAggregations(ctx, []);
@@ -364,6 +426,8 @@ export class AssetContextPlugin implements PlayerPlugin {
 
             return resolved;
           });
+
+          resolver.hooks.afterUpdate.tap(this.name, syncView);
         });
       });
     });

@@ -133,9 +133,15 @@ describe("registration", () => {
       label: "Profile",
       children: { values: ["name-input", "email-input"] },
     });
-    expect(ctx.get(viewAssetIdsContextKey)).toEqual(
-      expect.arrayContaining(["name-input", "email-input", "profile"]),
-    );
+    // Document order: a parent comes before the assets nested in it.
+    expect(ctx.get(viewAssetIdsContextKey)).toEqual([
+      "profile",
+      "profile-label",
+      "name-input",
+      "name-input-label",
+      "email-input",
+      "email-input-label",
+    ]);
   });
 
   test("ignores assets without a descriptor", () => {
@@ -206,7 +212,10 @@ describe("registration", () => {
 
     transition(player);
 
-    expect(ids(ctx.get(viewAssetsContextKey))).toEqual(["thanks", "done"]);
+    expect(ids(ctx.get(viewAssetsContextKey))).toEqual(["done", "thanks"]);
+    // The previous view's entries are cleared.
+    expect(ctx.get(assetContextKey("name-input"))).toBeUndefined();
+    expect(ctx.get(assetContextKey("profile"))).toBeUndefined();
   });
 
   test("the most specific match wins", () => {
@@ -401,8 +410,8 @@ describe("collation", () => {
     expect(contact?.children).toEqual({ values: ["email-input"] });
     // Only the embedded level is hidden; deeper assets stay top-level.
     expect(ids(ctx.get(viewAssetsContextKey))).toEqual([
-      "email-input",
       "settings",
+      "email-input",
     ]);
   });
 
@@ -445,9 +454,9 @@ describe("collation", () => {
 
     expect(ids(ctx.get(viewAssetsContextKey))).toEqual(["profile"]);
     expect(ids(ctx.get(viewAllAssetsContextKey))).toEqual([
+      "profile",
       "name-input",
       "email-input",
-      "profile",
     ]);
     // Still readable by id.
     expect(ctx.get(assetContextKey("email-input"))?.value).toBe(
@@ -463,9 +472,9 @@ describe("collation", () => {
     player.start(makeFlow(profileView, profileData) as any);
 
     expect(ids(ctx.get(viewAssetsContextKey))).toEqual([
+      "profile",
       "name-input",
       "email-input",
-      "profile",
     ]);
   });
 
@@ -517,5 +526,153 @@ describe("collation", () => {
     expect(contact?.id).toBe("contact");
     expect(ids(contact?.items as AssetContext[])).toEqual(["email-input"]);
     expect(ids(ctx.get(viewAssetsContextKey))).toEqual(["settings"]);
+  });
+});
+
+describe("applicability", () => {
+  const conditionalView = {
+    id: "profile",
+    type: "collection",
+    label: text("profile-label", "Profile"),
+    values: [
+      input("name-input", "data.name", "Name"),
+      {
+        applicability: "{{data.showEmail}}",
+        ...input("email-input", "data.email", "Email"),
+      },
+    ],
+  };
+
+  const conditionalData = {
+    data: { ...profileData.data, showEmail: true },
+  };
+
+  // Labels aren't described, to keep the id lists short.
+  const registrations = baseRegistrations.filter(
+    ([match]) => match.type !== "text",
+  );
+
+  const setShowEmail = (player: Player, value: boolean) =>
+    dataController(player).set([["data.showEmail", value]]);
+
+  test("clears an asset that stops being applicable", async () => {
+    const { ctx, player } = setup(registrations);
+    player.start(makeFlow(conditionalView, conditionalData) as any);
+    expect(ctx.get(viewAssetIdsContextKey)).toContain("email-input");
+
+    setShowEmail(player, false);
+
+    await vitest.waitFor(() =>
+      expect(ctx.get(viewAssetIdsContextKey)).not.toContain("email-input"),
+    );
+    expect(ctx.get(assetContextKey("email-input"))).toBeUndefined();
+    expect(ids(ctx.get(viewAllAssetsContextKey))).toEqual([
+      "profile",
+      "name-input",
+    ]);
+    expect(ctx.get(assetContextKey("profile"))?.children).toEqual({
+      values: ["name-input"],
+    });
+  });
+
+  test("republishes an asset that becomes applicable again", async () => {
+    const { ctx, player } = setup(registrations);
+    player.start(makeFlow(conditionalView, conditionalData) as any);
+
+    setShowEmail(player, false);
+    await vitest.waitFor(() =>
+      expect(ctx.get(assetContextKey("email-input"))).toBeUndefined(),
+    );
+
+    setShowEmail(player, true);
+    await vitest.waitFor(() =>
+      expect(ctx.get(assetContextKey("email-input"))?.value).toBe(
+        "ada@example.com",
+      ),
+    );
+    // Back in document order, not appended.
+    expect(ctx.get(viewAssetIdsContextKey)).toEqual([
+      "profile",
+      "name-input",
+      "email-input",
+    ]);
+  });
+
+  test("notifies subscribers when an asset is cleared", async () => {
+    const { ctx, player } = setup(registrations);
+    player.start(makeFlow(conditionalView, conditionalData) as any);
+
+    const onEmail = vitest.fn();
+    ctx.subscribe(assetContextKey("email-input"), onEmail);
+    setShowEmail(player, false);
+
+    await vitest.waitFor(() => expect(onEmail).toHaveBeenCalled());
+    expect(onEmail).toHaveBeenLastCalledWith(undefined, expect.anything());
+  });
+
+  test("drops an inapplicable asset from its collating parent", async () => {
+    const { ctx, player } = setup([
+      [{ type: "input" }, inputContext],
+      [
+        { type: "collection" },
+        defineAssetContext({
+          fields: { label: "label.asset.value" },
+          collate: [{ slot: "values", as: "items" }],
+        }),
+      ],
+    ]);
+    player.start(makeFlow(conditionalView, conditionalData) as any);
+    expect(
+      ids(ctx.get(assetContextKey("profile"))?.items as AssetContext[]),
+    ).toEqual(["name-input", "email-input"]);
+
+    setShowEmail(player, false);
+
+    await vitest.waitFor(() =>
+      expect(
+        ids(ctx.get(assetContextKey("profile"))?.items as AssetContext[]),
+      ).toEqual(["name-input"]),
+    );
+    expect(ids(ctx.get(viewAssetsContextKey))).toEqual(["profile"]);
+    expect(ids(ctx.get(viewAllAssetsContextKey))).toEqual([
+      "profile",
+      "name-input",
+    ]);
+  });
+
+  test("clears every descendant when a parent stops being applicable", async () => {
+    const { ctx, player } = setup(registrations);
+    player.start(
+      makeFlow(
+        {
+          id: "view-1",
+          type: "collection",
+          values: [
+            {
+              applicability: "{{data.showEmail}}",
+              asset: {
+                id: "contact",
+                type: "collection",
+                values: [input("email-input", "data.email", "Email")],
+              },
+            },
+          ],
+        },
+        conditionalData,
+      ) as any,
+    );
+    expect(ctx.get(viewAssetIdsContextKey)).toEqual([
+      "view-1",
+      "contact",
+      "email-input",
+    ]);
+
+    setShowEmail(player, false);
+
+    await vitest.waitFor(() =>
+      expect(ctx.get(viewAssetIdsContextKey)).toEqual(["view-1"]),
+    );
+    expect(ctx.get(assetContextKey("contact"))).toBeUndefined();
+    expect(ctx.get(assetContextKey("email-input"))).toBeUndefined();
   });
 });

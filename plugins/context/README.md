@@ -321,8 +321,15 @@ carries its value type. Registration is the same either way.
 | `viewAssetsContextKey`                      | Top-level entries; collated descendants are nested instead |
 | `viewAllAssetsContextKey`                   | Every entry, flat, including collated descendants          |
 
-View-level lists are in resolution order: nested assets resolve before the
-asset that contains them. The id set resets on each new view.
+View-level lists follow document order, so a parent comes before the assets
+nested in it.
+
+Entries track what's actually on screen. After each view update, an asset that
+is no longer in the resolved view has its entry cleared to `undefined`, and
+subscribers are notified. This covers assets removed by applicability, or by a
+parent that stops rendering them. An asset that comes back is published again,
+in its original position. On a new view, the previous view's entries are
+cleared too.
 
 An entry is rewritten only when Player's own dependency tracking re-resolves
 that asset, so an unrelated data change doesn't touch it:
@@ -409,8 +416,8 @@ const collectionContext = defineAssetContext({
 //   summary: "Ada, ada@example.com" }
 ```
 
-> **Stale entries.** An asset that stops rendering mid-view (for example, hidden
-> by applicability) keeps its last entry until the next view.
+A descendant that stops rendering, for example because it's no longer
+applicable, drops out of its parent's collated entries on the same update.
 
 ---
 
