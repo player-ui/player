@@ -132,9 +132,12 @@ const collectAssetIds = (view: unknown): string[] => {
     ids.add(asset.id);
     findNestedAssets(asset).forEach(visit);
   };
+  // The view itself may not resolve to an asset (e.g. its id is an
+  // expression that resolves to nothing); its nested assets still count.
   if (isAsset(view)) {
-    visit(view);
+    ids.add(view.id);
   }
+  findNestedAssets(view).forEach(visit);
   return Array.from(ids);
 };
 

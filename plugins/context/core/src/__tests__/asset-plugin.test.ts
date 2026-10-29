@@ -304,6 +304,27 @@ describe("registration", () => {
     expect(ctx?.get(assetContextKey("name-input"))?.value).toBe("Ada");
   });
 
+  test("keeps nested entries when the view's own id doesn't resolve", async () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.start(
+      makeFlow(
+        // The id is an expression with nothing behind it.
+        { ...profileView, id: "{{data.viewId}}" },
+        profileData,
+      ) as any,
+    );
+
+    expect(ctx.get(viewAssetIdsContextKey)).toContain("name-input");
+    expect(ctx.get(assetContextKey("name-input"))?.value).toBe("Ada");
+
+    // Still there after an update syncs the view again.
+    dataController(player).set([["data.name", "Grace"]]);
+    await vitest.waitFor(() =>
+      expect(ctx.get(assetContextKey("name-input"))?.value).toBe("Grace"),
+    );
+    expect(ctx.get(viewAssetIdsContextKey)).toContain("email-input");
+  });
+
   test("entries are readable by name for native consumers", () => {
     const { ctx, player } = setup(baseRegistrations);
     player.start(makeFlow(profileView, profileData) as any);
