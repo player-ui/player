@@ -1,6 +1,6 @@
 import { describe, test, expect, vitest } from "vitest";
-import { Player } from "@player-ui/player";
-import type { InProgressState } from "@player-ui/player";
+import { NodeType, Player } from "@player-ui/player";
+import type { InProgressState, PlayerPlugin } from "@player-ui/player";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
 import { ContextPlugin } from "../plugin";
 import { defineAssetContext, prop } from "../asset-descriptor";
@@ -811,6 +811,77 @@ describe("applicability", () => {
       expect(ctx.get(viewAssetIdsContextKey)).toEqual(["view-1"]),
     );
     expect(ctx.get(assetContextKey("contact"))).toBeUndefined();
+    expect(ctx.get(assetContextKey("email-input"))).toBeUndefined();
+  });
+});
+
+describe("update timing", () => {
+  /** A plugin that changes resolved values in its own afterResolve tap. */
+  const afterResolvePlugin = (
+    name: string,
+    change: (resolved: any, read: (binding: string) => unknown) => any,
+  ): PlayerPlugin => ({
+    name,
+    apply: (player) => {
+      player.hooks.viewController.tap(name, (viewController) => {
+        viewController.hooks.view.tap(name, (view) => {
+          view.hooks.resolver.tap(name, (resolver) => {
+            resolver.hooks.afterResolve.tap(name, (resolved, node, options) =>
+              node.type === NodeType.Asset || node.type === NodeType.View
+                ? change(resolved, (binding) => options.data.model.get(binding))
+                : resolved,
+            );
+          });
+        });
+      });
+    },
+  });
+
+  test("reflects afterResolve changes from plugins registered later", () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.registerPlugin(
+      afterResolvePlugin("shout", (resolved) =>
+        resolved?.type === "text"
+          ? { ...resolved, value: String(resolved.value).toUpperCase() }
+          : resolved,
+      ),
+    );
+    player.start(makeFlow(profileView, profileData) as any);
+
+    expect(ctx.get(assetContextKey("name-input-label"))?.value).toBe("NAME");
+    expect(ctx.get(assetContextKey("name-input"))?.label).toBe("NAME");
+  });
+
+  test("republishes assets that come back into view without re-resolving", async () => {
+    // Shows one of the profile's values at a time, chosen by `data.page`.
+    const pager = afterResolvePlugin("pager", (resolved, read) => {
+      if (resolved?.id !== "profile") {
+        return resolved;
+      }
+      const page = Number(read("data.page") ?? 0);
+      return { ...resolved, values: resolved.values.slice(page, page + 1) };
+    });
+    const { ctx, player } = setup([[{ type: "input" }, inputContext]]);
+    player.registerPlugin(pager);
+    player.start(
+      makeFlow(profileView, {
+        data: { ...profileData.data, page: 0 },
+      }) as any,
+    );
+    const visible = () => ids(ctx.get(viewAllAssetsContextKey));
+    expect(visible()).toEqual(["name-input"]);
+
+    dataController(player).set([["data.page", 1]]);
+    await vitest.waitFor(() => expect(visible()).toEqual(["email-input"]));
+    expect(ctx.get(assetContextKey("name-input"))).toBeUndefined();
+    expect(ctx.get(assetContextKey("email-input"))?.value).toBe(
+      "ada@example.com",
+    );
+
+    // Back to the first page: name-input comes back from the cache.
+    dataController(player).set([["data.page", 0]]);
+    await vitest.waitFor(() => expect(visible()).toEqual(["name-input"]));
+    expect(ctx.get(assetContextKey("name-input"))?.value).toBe("Ada");
     expect(ctx.get(assetContextKey("email-input"))).toBeUndefined();
   });
 });

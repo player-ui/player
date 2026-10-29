@@ -125,20 +125,28 @@ const sameIds = (
   a.length === b.length &&
   a.every((id, index) => id === b[index]);
 
-/** Ids of every asset in a resolved view, in document order. */
-const collectAssetIds = (view: unknown): string[] => {
-  const ids = new Set<string>();
+/**
+ * Every asset in a resolved view by id, in document order. The first asset
+ * with a given id wins.
+ */
+const collectAssets = (view: unknown): Map<string, Asset> => {
+  const assets = new Map<string, Asset>();
+  const add = (asset: Asset) => {
+    if (!assets.has(asset.id)) {
+      assets.set(asset.id, asset);
+    }
+  };
   const visit = (asset: Asset) => {
-    ids.add(asset.id);
+    add(asset);
     findNestedAssets(asset).forEach(visit);
   };
   // The view itself may not resolve to an asset (e.g. its id is an
   // expression that resolves to nothing); its nested assets still count.
   if (isAsset(view)) {
-    ids.add(view.id);
+    add(view);
   }
   findNestedAssets(view).forEach(visit);
-  return Array.from(ids);
+  return assets;
 };
 
 /** Ids of every asset in a collation node, at any depth. */
@@ -272,8 +280,12 @@ export class AssetContextPlugin implements PlayerPlugin {
     let assetIds: ReadonlyArray<string> = [];
     /** collated asset id -> id of the ancestor it's hidden under */
     const collatedBy = new Map<string, string>();
-    /** id -> whether it was published as a collating asset, for this view */
-    const published = new Map<string, boolean>();
+    /** id -> descriptor, for every asset with an entry in this view */
+    const published = new Map<string, AssetContextDescriptor<any>>();
+    /** id -> descriptor, for described assets re-resolved in this update */
+    const pending = new Map<string, AssetContextDescriptor<any>>();
+    /** id -> descriptor, for assets published in this view that have left it */
+    const departed = new Map<string, AssetContextDescriptor<any>>();
     /** The last resolved view the published ids were synced against. */
     let lastSynced: unknown;
 
@@ -293,7 +305,7 @@ export class AssetContextPlugin implements PlayerPlugin {
     /** Clear the entry of an asset that's no longer in the view. */
     const clearAsset = (id: string) => {
       // A collating asset's entry is a transform over its own fields.
-      const key = published.get(id)
+      const key = published.get(id)?.collate?.length
         ? assetSelfContextKey(id)
         : assetContextKey(id);
       published.delete(id);
@@ -310,17 +322,40 @@ export class AssetContextPlugin implements PlayerPlugin {
     };
 
     /**
-     * Reconcile published entries with the resolved view: assets removed
-     * from the tree (e.g. no longer applicable) are cleared, and the id list
-     * follows document order.
+     * Reconcile entries with the resolved view once an update completes.
+     *
+     * - Assets that re-resolved are published from the final tree, so every
+     *   other `afterResolve` tap has already run, whatever the plugin order.
+     * - Assets that left the tree (e.g. no longer applicable) are cleared.
+     * - Assets that come back without re-resolving (e.g. a parent paging its
+     *   children, served from the resolver's cache) are published again.
+     * - The id list follows document order.
      */
     const syncView = (view: unknown) => {
+      const changed = new Map(pending);
+      pending.clear();
       if (view === lastSynced) {
         return;
       }
       lastSynced = view;
 
-      const ids = collectAssetIds(view).filter((id) => published.has(id));
+      const assets = collectAssets(view);
+      assets.forEach((asset, id) => {
+        const descriptor = changed.get(id) ?? departed.get(id);
+        if (descriptor) {
+          publishAsset(asset, descriptor);
+          departed.delete(id);
+        }
+      });
+      // Resolved but not rendered (e.g. rows on another page): remembered so
+      // they're published if they come into view from the cache.
+      changed.forEach((descriptor, id) => {
+        if (!assets.has(id)) {
+          departed.set(id, descriptor);
+        }
+      });
+
+      const ids = Array.from(assets.keys()).filter((id) => published.has(id));
       const present = new Set(ids);
       const removed = Array.from(published.keys()).filter(
         (id) => !present.has(id),
@@ -329,12 +364,20 @@ export class AssetContextPlugin implements PlayerPlugin {
       if (!sameIds(assetIds, ids)) {
         publishAssetIds(ids);
       }
-      removed.forEach(clearAsset);
+      removed.forEach((id) => {
+        const descriptor = published.get(id);
+        clearAsset(id);
+        if (descriptor) {
+          departed.set(id, descriptor);
+        }
+      });
       publishCollated();
     };
 
     const resetView = () => {
       Array.from(published.keys()).forEach(clearAsset);
+      pending.clear();
+      departed.clear();
       lastSynced = undefined;
       collatedBy.clear();
       ctx.set(collatedAssetIdsContextKey, []);
@@ -518,8 +561,7 @@ export class AssetContextPlugin implements PlayerPlugin {
         ctx.set(assetContextKey(asset.id), entry);
       }
 
-      // The view-level id list is rebuilt once the whole update resolves.
-      published.set(asset.id, collates);
+      published.set(asset.id, descriptor);
     };
 
     this.registerViewAggregations(ctx, []);
@@ -538,9 +580,10 @@ export class AssetContextPlugin implements PlayerPlugin {
               return resolved;
             }
 
+            // Published once the update completes; see `syncView`.
             const descriptor = this.getDescriptor(node.value);
             if (descriptor) {
-              publishAsset(resolved, descriptor);
+              pending.set(resolved.id, descriptor);
             }
 
             return resolved;

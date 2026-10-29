@@ -178,7 +178,8 @@ state.flow?.transition?.("Next");
 
 Asset types opt in with a **descriptor**: a small, declarative description of
 which resolved properties to publish. The plugin taps the view resolver and,
-whenever a described asset (or view) resolves, writes its entry to the store.
+after each view update in which a described asset (or view) resolved, writes
+its entry to the store.
 Assets without a descriptor are ignored. It auto-registers a `ContextPlugin` if
 one isn't already present, and never modifies the resolved view.
 
@@ -331,9 +332,14 @@ nested in it.
 Entries track what's actually on screen. After each view update, an asset that
 is no longer in the resolved view has its entry cleared to `undefined`, and
 subscribers are notified. This covers assets removed by applicability, or by a
-parent that stops rendering them. An asset that comes back is published again,
-in its original position. On a new view, the previous view's entries are
-cleared too.
+parent that stops rendering them (e.g. a list showing one page of its items).
+An asset that comes back is published again, in its original position, even
+when Player serves it from its cache rather than resolving it again. On a new
+view, the previous view's entries are cleared too.
+
+Entries are built from the final resolved view, once the update completes, so
+changes other plugins make in their own `afterResolve` taps are always
+reflected, wherever those plugins are registered.
 
 An entry is rewritten only when Player's own dependency tracking re-resolves
 that asset, so an unrelated data change doesn't touch it:
