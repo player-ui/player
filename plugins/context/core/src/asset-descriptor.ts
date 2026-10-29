@@ -10,14 +10,12 @@ export type AssetContext = {
   /** The asset's type. */
   type: string;
   /**
-   * Nested assets, keyed by the slot they were found in. Ids when the
-   * descriptor declares `children`; full entries when an ancestor collates
-   * this asset and expands its descendants.
+   * Nested assets, keyed by the property they were found under. Ids when the
+   * descriptor declares `children`; the collated value (entries, keeping the
+   * property's shape) when an ancestor collates this asset and expands its
+   * descendants.
    */
-  children?: Record<
-    string,
-    ReadonlyArray<string> | ReadonlyArray<AssetContext>
-  >;
+  children?: Record<string, unknown>;
   [key: string]: unknown;
 };
 
@@ -33,10 +31,22 @@ export type AssetContextField<T = Asset> = string | AssetContextExtractor<T>;
 /** A slot path under an asset: a dot-separated string or path segments. */
 export type AssetSlot = string | ReadonlyArray<string>;
 
-/** Options for rolling a parent's nested assets up into its own entry. */
+/**
+ * Options for rolling a parent's nested assets up into its own entry.
+ *
+ * The collated value keeps the slot's shape: plain objects and arrays are
+ * kept, each described asset is replaced by its entry, and branches without
+ * described assets are dropped. Assets without a descriptor are transparent:
+ * their nearest described descendants take their place.
+ */
 export type CollateOptions = {
   /** Where to look for nested assets under the parent. */
   slot: AssetSlot;
+  /**
+   * Plain values to pick off each item of the slot (or the slot itself, when
+   * it's an object), alongside the nested assets found in it.
+   */
+  fields?: Record<string, AssetContextField<any>>;
   /** Output key on the parent entry. Defaults to the slot name. */
   as?: string;
   /**
@@ -49,7 +59,10 @@ export type CollateOptions = {
    * They remain readable by id. Defaults to `true`.
    */
   hide?: boolean;
-  /** Summarize the collated entries instead of embedding them. */
+  /**
+   * Summarize instead of embedding. Receives the nearest collated entries as
+   * a flat list, in document order.
+   */
   reduce?: (entries: ReadonlyArray<AssetContext>) => unknown;
 };
 
@@ -223,27 +236,6 @@ export const findNestedAssets = (
 };
 
 /**
- * Group the nearest nested assets of a resolved asset by the top-level
- * property they were found under.
- */
-export const findNestedAssetsBySlot = (
-  asset: Asset,
-  options: NestedAssetOptions = {},
-): Record<string, Asset[]> => {
-  const out: Record<string, Asset[]> = {};
-  for (const key of Object.keys(asset)) {
-    const nested = findNestedAssets(
-      (asset as Record<string, unknown>)[key],
-      options,
-    );
-    if (nested.length > 0) {
-      out[key] = nested;
-    }
-  }
-  return out;
-};
-
-/**
  * Build an asset's context entry from its descriptor. Pure: no Player or
  * store access.
  */
@@ -292,14 +284,15 @@ export const toAssetContext = <T extends Asset>(
 /** Normalize a collation spec, applying defaults. */
 export const toCollateOptions = (
   spec: CollateSpec,
-): Required<Omit<CollateOptions, "reduce">> &
-  Pick<CollateOptions, "reduce"> => {
+): Required<Omit<CollateOptions, "fields" | "reduce">> &
+  Pick<CollateOptions, "fields" | "reduce"> => {
   const options = typeof spec === "string" ? { slot: spec } : spec;
   return {
     slot: options.slot,
     as: options.as ?? slotName(options.slot),
     depth: options.depth ?? "all",
     hide: options.hide ?? true,
+    fields: options.fields,
     reduce: options.reduce,
   };
 };

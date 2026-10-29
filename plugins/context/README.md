@@ -272,6 +272,10 @@ const choiceContext = defineAssetContext({
 });
 ```
 
+`each` copies the values you name. To embed whatever nested assets publish
+through their own descriptors, collate the property instead. See
+[Choosing `each` or `collate`](#choosing-each-or-collate).
+
 `children` records the ids of the nearest described assets under each slot.
 Assets without a descriptor are walked through, so a wrapper asset with no
 descriptor of its own doesn't hide what's inside it:
@@ -380,6 +384,7 @@ const collectionContext = defineAssetContext({
 | -------- | --------- | --------------------------------------------------------------- |
 | `slot`   | —         | Where to look under the parent (`"values"`, `["a", "b"]`)       |
 | `as`     | slot name | Output key on the parent entry                                  |
+| `fields` | —         | Plain values to pick off each item of the slot                  |
 | `depth`  | `"all"`   | How many described levels to embed; `1` embeds the nearest only |
 | `hide`   | `true`    | Omit collated descendants from `viewAssetsContextKey`           |
 | `reduce` | —         | `(entries) => unknown` to summarize instead of embedding        |
@@ -387,9 +392,49 @@ const collectionContext = defineAssetContext({
 A string spec is shorthand for `{ slot }` with every other option defaulted:
 `collate: ["values"]`.
 
+The collated value keeps the slot's shape. Each described asset is replaced by
+its entry, so you get whatever its own descriptor publishes without listing
+those fields again. Plain objects and arrays around the assets are kept, and
+branches that contain no described assets are dropped:
+
+- A list of assets, like `values` above, becomes a list of entries.
+- A single asset, such as `collate: ["label"]`, becomes that asset's entry.
+- A list of plain items becomes one object per item, with each nested asset's
+  entry at its original property.
+
+`fields` adds plain values from each item alongside its nested assets. Paths
+are relative to the item:
+
+```ts
+// A "table" whose rows are plain objects holding a text label:
+// items: [{ id: "task-1", status: "done", label: { asset: { type: "text", ... } } }]
+const tableContext = defineAssetContext({
+  collate: [{ slot: "items", fields: { id: "id", status: "status" } }],
+});
+```
+
+```jsonc
+// player.asset.tasks
+{
+  "id": "tasks",
+  "type": "table",
+  "items": [
+    {
+      "id": "task-1",
+      "status": "done",
+      "label": { "id": "task-1-label", "type": "text", "value": "Write docs" },
+    },
+  ],
+}
+```
+
+Items that have picked `fields` but no described assets are kept. Assets
+without a descriptor are transparent: their nearest described descendants
+take their place.
+
 - **Depth.** With the default `"all"`, each embedded entry carries its own
-  described descendants under `children`, keyed by the property they were found
-  under, all the way down. With `depth: 1`, only the nearest described
+  collated properties under `children`, keyed by property and shaped the same
+  way, all the way down. With `depth: 1`, only the nearest described
   descendants are embedded; anything below them stays a top-level entry.
 - **Nesting.** A descendant that has its own `collate` is embedded as-is — its
   entry already carries its rolled-up descendants.
@@ -399,7 +444,8 @@ A string spec is shorthand for `{ slot }` with every other option defaulted:
   `player.asset.<id>` and listed in `viewAllAssetsContextKey`. With
   `hide: false` they're also kept in `viewAssetsContextKey`.
 
-Summarize instead of embedding with `reduce`:
+Summarize instead of embedding with `reduce`. It receives the nearest collated
+entries as a flat list, in document order:
 
 ```ts
 const collectionContext = defineAssetContext({
@@ -418,6 +464,85 @@ const collectionContext = defineAssetContext({
 
 A descendant that stops rendering, for example because it's no longer
 applicable, drops out of its parent's collated entries on the same update.
+
+### Choosing `each` or `collate`
+
+Both turn an array into one context value per item. They differ in where the
+values come from:
+
+- `each` copies exactly the values you name.
+- `collate` embeds whatever the nested assets' own descriptors publish.
+
+Take a `table` asset whose rows are plain objects, each holding a `text` asset
+as its label:
+
+```jsonc
+// resolved "tasks" table
+{
+  "id": "tasks",
+  "type": "table",
+  "items": [
+    {
+      "id": "task-1",
+      "status": "done",
+      "label": {
+        "asset": {
+          "id": "task-1-label",
+          "type": "text",
+          "value": "Write docs",
+        },
+      },
+    },
+  ],
+}
+```
+
+With `each`, you name every value, and the label is read by path into a plain
+string:
+
+```ts
+const tableContext = defineAssetContext({
+  fields: {
+    items: each("items", {
+      id: "id",
+      status: "status",
+      label: "label.asset.value",
+    }),
+  },
+});
+// items: [{ id: "task-1", status: "done", label: "Write docs" }]
+```
+
+With `collate`, the label is embedded as the text asset's own entry. You only
+name the item's plain values:
+
+```ts
+const textContext = defineAssetContext({ fields: { value: "value" } });
+const tableContext = defineAssetContext({
+  collate: [{ slot: "items", fields: { id: "id", status: "status" } }],
+});
+// items: [{ id: "task-1", status: "done",
+//           label: { id: "task-1-label", type: "text", value: "Write docs" } }]
+```
+
+|                                    | `each`                                       | `collate`                                                            |
+| ---------------------------------- | -------------------------------------------- | -------------------------------------------------------------------- |
+| Declared in                        | `fields`                                     | `collate`                                                            |
+| Nested assets                      | Read by path; their descriptors are ignored  | Embedded as their own entries                                        |
+| Nested asset needs a descriptor    | No                                           | Yes: an undescribed asset contributes only its described descendants |
+| Nested asset changes its fields    | Update every `each` that reads it            | Picked up automatically                                              |
+| Nested entries in the view's lists | Listed separately, if they have a descriptor | Hidden from `viewAssetsContextKey` (unless `hide: false`)            |
+| Plain item values                  | The fields you name                          | The `fields` you name                                                |
+
+Use `each` when the items are plain data, such as a choice's options, or when
+you want a small fixed shape. Use `collate` when the items hold assets that
+already have descriptors, so each asset's context is defined once and appears
+inside its parent instead of beside it.
+
+A common mistake is collating a slot whose assets have no descriptor. In the
+example above, if `text` isn't registered, `collate` yields only
+`{ id, status }` for each row. Register a descriptor for the nested type, or
+read its value with `each` or `fields`.
 
 ---
 

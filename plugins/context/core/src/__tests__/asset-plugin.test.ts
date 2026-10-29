@@ -529,6 +529,123 @@ describe("collation", () => {
   });
 });
 
+describe("collating plain items", () => {
+  const tableView = {
+    id: "tasks",
+    type: "table",
+    title: text("tasks-title", "Tasks"),
+    items: [
+      {
+        id: "task-1",
+        status: "done",
+        label: text("task-1-label", "Write docs"),
+        // No described assets and no picked field: dropped.
+        style: { compact: true },
+      },
+      {
+        id: "task-2",
+        status: "open",
+        label: text("task-2-label", "{{data.name}} reviews"),
+      },
+    ],
+  };
+
+  const registrations = (
+    options: Record<string, unknown> = {},
+  ): AssetContextRegistration[] => [
+    [{ type: "text" }, textContext],
+    [
+      { type: "table" },
+      defineAssetContext({
+        collate: [{ slot: "items", ...options }],
+      }),
+    ],
+  ];
+
+  test("keeps each item's shape, with nested entries in place", () => {
+    const { ctx, player } = setup(registrations());
+    player.start(makeFlow(tableView, profileData) as any);
+
+    expect(ctx.get(assetContextKey("tasks"))).toEqual({
+      id: "tasks",
+      type: "table",
+      items: [
+        { label: { id: "task-1-label", type: "text", value: "Write docs" } },
+        { label: { id: "task-2-label", type: "text", value: "Ada reviews" } },
+      ],
+    });
+    // The labels are rolled up, so only the title is listed separately.
+    expect(ids(ctx.get(viewAssetsContextKey))).toEqual([
+      "tasks",
+      "tasks-title",
+    ]);
+  });
+
+  test("fields picks plain values off each item", () => {
+    const { ctx, player } = setup(
+      registrations({ fields: { id: "id", status: "status" } }),
+    );
+    player.start(makeFlow(tableView, profileData) as any);
+
+    expect(ctx.get(assetContextKey("tasks"))?.items).toEqual([
+      {
+        id: "task-1",
+        status: "done",
+        label: { id: "task-1-label", type: "text", value: "Write docs" },
+      },
+      {
+        id: "task-2",
+        status: "open",
+        label: { id: "task-2-label", type: "text", value: "Ada reviews" },
+      },
+    ]);
+  });
+
+  test("items with only picked fields are kept", () => {
+    const { ctx, player } = setup([
+      [
+        { type: "table" },
+        defineAssetContext({
+          collate: [{ slot: "items", fields: { status: "status" } }],
+        }),
+      ],
+    ]);
+    player.start(makeFlow(tableView, profileData) as any);
+
+    expect(ctx.get(assetContextKey("tasks"))?.items).toEqual([
+      { status: "done" },
+      { status: "open" },
+    ]);
+  });
+
+  test("a single-asset slot collates to that asset's entry", () => {
+    const { ctx, player } = setup([
+      [{ type: "text" }, textContext],
+      [{ type: "table" }, defineAssetContext({ collate: ["title"] })],
+    ]);
+    player.start(makeFlow(tableView, profileData) as any);
+
+    expect(ctx.get(assetContextKey("tasks"))?.title).toEqual({
+      id: "tasks-title",
+      type: "text",
+      value: "Tasks",
+    });
+  });
+
+  test("nested entries stay live", async () => {
+    const { ctx, player } = setup(registrations());
+    player.start(makeFlow(tableView, profileData) as any);
+
+    const onTable = vitest.fn();
+    ctx.subscribe(assetContextKey("tasks"), onTable);
+    dataController(player).set([["data.name", "Grace"]]);
+
+    await vitest.waitFor(() => expect(onTable).toHaveBeenCalled());
+    const items = ctx.get(assetContextKey("tasks"))?.items as any[];
+    expect(items[1]?.label?.value).toBe("Grace reviews");
+  });
+});
+
 describe("applicability", () => {
   const conditionalView = {
     id: "profile",

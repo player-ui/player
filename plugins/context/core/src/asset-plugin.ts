@@ -6,8 +6,8 @@ import { AssetContextPluginSymbol } from "./symbols";
 import { getContextPlugin } from "./utils";
 import {
   findNestedAssets,
-  findNestedAssetsBySlot,
   getPath,
+  pickFields,
   toAssetContext,
   toCollateOptions,
 } from "./asset-descriptor";
@@ -77,16 +77,29 @@ export const viewAllAssetsContextKey: ContextKey<ReadonlyArray<AssetContext>> =
     "Every asset context entry for the current view",
   );
 
-/** A described descendant and, when expanded, its own described descendants by slot. */
-type CollationNode = {
-  id: string;
-  children?: Record<string, ReadonlyArray<CollationNode>>;
-};
+/**
+ * The shape of a collated value, captured when the parent resolves and read
+ * back live: described assets are leaves (by id), optionally expanded into
+ * their own collated properties; lists and objects mirror the plain data
+ * around them.
+ */
+type CollationNode =
+  | {
+      kind: "asset";
+      id: string;
+      children?: Record<string, CollationNode>;
+    }
+  | { kind: "list"; items: ReadonlyArray<CollationNode> }
+  | {
+      kind: "object";
+      props: Record<string, CollationNode>;
+      values: Record<string, unknown>;
+    };
 
 type ResolvedCollation = Pick<CollateOptions, "reduce"> & {
   as: string;
   hide: boolean;
-  nodes: ReadonlyArray<CollationNode>;
+  node?: CollationNode;
 };
 
 const isAsset = (value: unknown): value is Asset =>
@@ -94,6 +107,13 @@ const isAsset = (value: unknown): value is Asset =>
   typeof value === "object" &&
   typeof (value as Asset).id === "string" &&
   typeof (value as Asset).type === "string";
+
+const isAssetWrapper = (value: unknown): value is { asset: Asset } =>
+  value !== null &&
+  typeof value === "object" &&
+  isAsset((value as { asset?: unknown }).asset);
+
+const isEmpty = (value: object): boolean => Object.keys(value).length === 0;
 
 const isDefined = <T>(value: T | undefined): value is T => value !== undefined;
 
@@ -118,30 +138,69 @@ const collectAssetIds = (view: unknown): string[] => {
   return Array.from(ids);
 };
 
-const flattenIds = (nodes: ReadonlyArray<CollationNode>): string[] =>
-  nodes.flatMap((node) => [
-    node.id,
-    ...Object.values(node.children ?? {}).flatMap(flattenIds),
-  ]);
+/** Ids of every asset in a collation node, at any depth. */
+const flattenIds = (node: CollationNode): string[] => {
+  switch (node.kind) {
+    case "asset":
+      return [
+        node.id,
+        ...Object.values(node.children ?? {}).flatMap(flattenIds),
+      ];
+    case "list":
+      return node.items.flatMap(flattenIds);
+    case "object":
+      return Object.values(node.props).flatMap(flattenIds);
+  }
+};
 
-/** Read a collated node's entry, embedding its expanded descendants. */
+/** The nearest asset nodes in a collation node, in document order. */
+const nearestAssets = (node: CollationNode): CollationNode[] => {
+  switch (node.kind) {
+    case "asset":
+      return [node];
+    case "list":
+      return node.items.flatMap(nearestAssets);
+    case "object":
+      return Object.values(node.props).flatMap(nearestAssets);
+  }
+};
+
+const readProps = (
+  props: Record<string, CollationNode>,
+  read: ContextReader,
+): Record<string, unknown> => {
+  const out: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(props)) {
+    const value = readCollationNode(child, read);
+    if (value !== undefined) {
+      out[key] = value;
+    }
+  }
+  return out;
+};
+
+/** Read a collation node back from the store, embedding current entries. */
 const readCollationNode = (
   node: CollationNode,
   read: ContextReader,
-): AssetContext | undefined => {
-  const entry = read(assetContextKey(node.id));
-  if (!entry || !node.children) {
-    return entry;
+): unknown => {
+  switch (node.kind) {
+    case "asset": {
+      const entry = read(assetContextKey(node.id));
+      if (!entry || !node.children) {
+        return entry;
+      }
+      return { ...entry, children: readProps(node.children, read) };
+    }
+    case "list":
+      return node.items
+        .map((item) => readCollationNode(item, read))
+        .filter(isDefined);
+    case "object": {
+      const out = { ...readProps(node.props, read), ...node.values };
+      return isEmpty(out) ? undefined : out;
+    }
   }
-
-  const children: Record<string, ReadonlyArray<AssetContext>> = {};
-  for (const [slot, nodes] of Object.entries(node.children)) {
-    children[slot] = nodes
-      .map((child) => readCollationNode(child, read))
-      .filter(isDefined);
-  }
-
-  return { ...entry, children };
 };
 
 /**
@@ -280,34 +339,88 @@ export class AssetContextPlugin implements PlayerPlugin {
     };
 
     /**
-     * Walk a described asset's nested assets, expanding each described
-     * descendant until `maxDepth`. A descendant with its own `collate` is
-     * not expanded: its entry already carries its rolled-up descendants.
+     * A described asset's node, expanding its own properties until
+     * `maxDepth`. A descendant with its own `collate` is not expanded: its
+     * entry already carries its rolled-up descendants.
      */
-    const toCollationNode = (
+    const toAssetNode = (
       asset: Asset,
       maxDepth: number,
       level: number,
     ): CollationNode => {
-      const node: CollationNode = { id: asset.id };
+      const node: CollationNode = { kind: "asset", id: asset.id };
       if (level >= maxDepth || this.getDescriptor(asset)?.collate?.length) {
         return node;
       }
 
-      const bySlot = Object.entries(
-        findNestedAssetsBySlot(asset, nestedOptions),
-      );
-      if (bySlot.length > 0) {
-        const children: Record<string, ReadonlyArray<CollationNode>> = {};
-        for (const [slot, nested] of bySlot) {
-          children[slot] = nested.map((child) =>
-            toCollationNode(child, maxDepth, level + 1),
-          );
+      const children: Record<string, CollationNode> = {};
+      for (const [key, value] of Object.entries(asset)) {
+        const child = toCollationNode(value, maxDepth, level + 1);
+        if (child) {
+          children[key] = child;
         }
+      }
+      if (!isEmpty(children)) {
         node.children = children;
       }
 
       return node;
+    };
+
+    /**
+     * Mirror a resolved value as a collation node, keeping only the branches
+     * that lead to described assets (or to picked `fields`). Returns
+     * `undefined` when there's nothing to collate.
+     */
+    const toCollationNode = (
+      value: unknown,
+      maxDepth: number,
+      level: number,
+      fields?: CollateOptions["fields"],
+    ): CollationNode | undefined => {
+      if (isAssetWrapper(value)) {
+        const { asset } = value;
+        if (nestedOptions.isDescribed?.(asset)) {
+          return toAssetNode(asset, maxDepth, level);
+        }
+
+        // Undescribed assets are transparent: their nearest described
+        // descendants stand in for them.
+        const items = findNestedAssets(asset, nestedOptions).map((nested) =>
+          toAssetNode(nested, maxDepth, level),
+        );
+        return items.length > 0 ? { kind: "list", items } : undefined;
+      }
+
+      if (Array.isArray(value)) {
+        const items = value.flatMap((item: unknown) => {
+          const node = toCollationNode(item, maxDepth, level, fields);
+          if (!node) {
+            return [];
+          }
+          // Splice a transparent asset's descendants into the list.
+          return node.kind === "list" && isAssetWrapper(item)
+            ? node.items
+            : [node];
+        });
+        return items.length > 0 ? { kind: "list", items } : undefined;
+      }
+
+      if (value === null || typeof value !== "object") {
+        return undefined;
+      }
+
+      const props: Record<string, CollationNode> = {};
+      for (const [key, child] of Object.entries(value)) {
+        const node = toCollationNode(child, maxDepth, level);
+        if (node) {
+          props[key] = node;
+        }
+      }
+      const values = fields ? pickFields(value, fields) : {};
+      return isEmpty(props) && isEmpty(values)
+        ? undefined
+        : { kind: "object", props, values };
     };
 
     const publishCollatedAsset = (
@@ -321,16 +434,18 @@ export class AssetContextPlugin implements PlayerPlugin {
           const options = toCollateOptions(spec);
           const maxDepth =
             options.depth === "all" ? Infinity : Math.max(1, options.depth);
-          const nodes = findNestedAssets(
+          const node = toCollationNode(
             getPath(asset, options.slot),
-            nestedOptions,
-          ).map((child) => toCollationNode(child, maxDepth, 1));
+            maxDepth,
+            1,
+            options.fields,
+          );
 
           return {
             as: options.as,
             hide: options.hide,
             reduce: options.reduce,
-            nodes,
+            node,
           };
         },
       );
@@ -341,18 +456,16 @@ export class AssetContextPlugin implements PlayerPlugin {
           collatedBy.delete(childId);
         }
       });
+      const idsOf = (collation: ResolvedCollation) =>
+        collation.node ? flattenIds(collation.node) : [];
       collations
         .filter((collation) => collation.hide)
         .forEach((collation) =>
-          flattenIds(collation.nodes).forEach((childId) =>
-            collatedBy.set(childId, id),
-          ),
+          idsOf(collation).forEach((childId) => collatedBy.set(childId, id)),
         );
 
       const selfKey = assetSelfContextKey(id);
-      const descendantIds = collations.flatMap((collation) =>
-        flattenIds(collation.nodes),
-      );
+      const descendantIds = collations.flatMap(idsOf);
 
       // A transform keeps this entry live: if only a descendant re-resolves,
       // the descendant's key changes and this entry recomputes from it.
@@ -367,15 +480,18 @@ export class AssetContextPlugin implements PlayerPlugin {
           }
 
           const out: AssetContext = { ...self };
-          for (const collation of collations) {
-            const entries = collation.nodes
-              .map((node) => readCollationNode(node, read))
-              .filter(isDefined);
-            const value = collation.reduce
-              ? collation.reduce(entries)
-              : entries;
+          for (const { node, reduce, as } of collations) {
+            let value: unknown;
+            if (reduce) {
+              const entries = (node ? nearestAssets(node) : [])
+                .map((asset) => readCollationNode(asset, read))
+                .filter(isDefined) as AssetContext[];
+              value = reduce(entries);
+            } else if (node) {
+              value = readCollationNode(node, read);
+            }
             if (value !== undefined && typeof value !== "function") {
-              out[collation.as] = value;
+              out[as] = value;
             }
           }
           return out;

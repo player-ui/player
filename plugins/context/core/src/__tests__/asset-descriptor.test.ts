@@ -1,11 +1,9 @@
 import { describe, test, expect } from "vitest";
-import type { Asset } from "@player-ui/player";
 import {
   constant,
   defineAssetContext,
   each,
   findNestedAssets,
-  findNestedAssetsBySlot,
   getPath,
   prop,
   toAssetContext,
@@ -153,12 +151,6 @@ describe("findNestedAssets", () => {
       "wrapper",
     ]);
   });
-
-  test("groups nested assets by top-level slot", () => {
-    const bySlot = findNestedAssetsBySlot(collection as unknown as Asset);
-    expect(Object.keys(bySlot)).toEqual(["label", "values"]);
-    expect(bySlot.values?.map((a) => a.id)).toEqual(["name-input", "wrapper"]);
-  });
 });
 
 describe("toCollateOptions", () => {
@@ -174,13 +166,22 @@ describe("toCollateOptions", () => {
 
   test("keeps explicit options", () => {
     const reduce = () => "summary";
+    const fields = { id: "id" };
     expect(
       toCollateOptions({
         slot: ["a", "b"],
+        fields,
         depth: 1,
         hide: false,
         reduce,
       }),
-    ).toEqual({ slot: ["a", "b"], as: "a.b", depth: 1, hide: false, reduce });
+    ).toEqual({
+      slot: ["a", "b"],
+      as: "a.b",
+      fields,
+      depth: 1,
+      hide: false,
+      reduce,
+    });
   });
 });
