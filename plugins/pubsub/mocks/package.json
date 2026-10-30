@@ -1,0 +1,8 @@
+{
+  "name": "@player-ui/pubsub-plugin-mocks",
+  "version": "0.0.0-PLACEHOLDER",
+  "dependencies": {
+    "@player-ui/reference-assets-cli-preset": "workspace:^",
+    "@player-ui/reference-assets-plugin-components": "workspace:^"
+  }
+}
