@@ -744,6 +744,15 @@ importers:
         specifier: workspace:^
         version: link:../../../core/make-flow
 
+  plugins/beacon/mocks:
+    dependencies:
+      '@player-ui/reference-assets-cli-preset':
+        specifier: workspace:^
+        version: link:../../reference-assets/cli-preset
+      '@player-ui/reference-assets-plugin-components':
+        specifier: workspace:^
+        version: link:../../reference-assets/components
+
   plugins/beacon/react:
     dependencies:
       '@player-ui/beacon-plugin':
@@ -909,6 +918,15 @@ importers:
         specifier: workspace:^
         version: link:../../../core/player
 
+  plugins/external-state/mocks:
+    dependencies:
+      '@player-ui/reference-assets-cli-preset':
+        specifier: workspace:^
+        version: link:../../reference-assets/cli-preset
+      '@player-ui/reference-assets-plugin-components':
+        specifier: workspace:^
+        version: link:../../reference-assets/components
+
   plugins/markdown/core:
     dependencies:
       '@player-ui/player':
@@ -970,6 +988,15 @@ importers:
       '@player-ui/player':
         specifier: workspace:^
         version: link:../../../core/player
+
+  plugins/pubsub/mocks:
+    dependencies:
+      '@player-ui/reference-assets-cli-preset':
+        specifier: workspace:^
+        version: link:../../reference-assets/cli-preset
+      '@player-ui/reference-assets-plugin-components':
+        specifier: workspace:^
+        version: link:../../reference-assets/components
 
   plugins/reference-assets/cli-preset:
     dependencies:
