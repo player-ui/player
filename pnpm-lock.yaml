@@ -594,6 +594,9 @@ importers:
       '@player-ui/storybook':
         specifier: workspace:^
         version: link:../../tools/storybook
+      '@player-ui/streaming-data-plugin':
+        specifier: workspace:^
+        version: link:../../plugins/streaming-data/core
 
   packages/a2ui/react:
     dependencies:
@@ -1082,6 +1085,12 @@ importers:
       '@player-ui/types':
         specifier: workspace:^
         version: link:../../../core/types
+
+  plugins/streaming-data/core:
+    dependencies:
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../../core/player
 
   plugins/types-provider/core:
     dependencies:
