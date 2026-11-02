@@ -29,3 +29,10 @@ filegroup(
     srcs = glob(["**/*.json"]),
     visibility = ["//visibility:public"],
 )
+
+# Used by iOS. Filters out just the JSON files
+filegroup(
+    name = "mocks_json",
+    srcs = [":dsl_mocks_external-state_compiled"],
+    visibility = ["//visibility:public"],
+)
