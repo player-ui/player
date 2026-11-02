@@ -9,6 +9,8 @@ PLUGIN_MOCKS = [
     "pubsub",
     "pending-transaction"
 ]
+# Plugins whose mocks are compiled from DSL; iOS must only get the JSON output
+DSL_PLUGIN_MOCKS = ["beacon", "external-state", "pubsub"]
 filegroup(
     name = "all_mocks",
     srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS + ["reference-assets"]] + [
@@ -27,7 +29,8 @@ filegroup(
 )
 filegroup(
     name = "plugin_mocks",
-    srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS],
+    srcs = ["//plugins/{}/mocks:mocks_json".format(plugin) for plugin in DSL_PLUGIN_MOCKS] +
+           ["//plugins/pending-transaction/mocks"],
     visibility = ["//visibility:public"],
 )
 filegroup(
