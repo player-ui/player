@@ -24,12 +24,6 @@ compile_mocks(
     dsl_package = "@player-lang/react-dsl"
 )
 
-filegroup(
-    name = "pubsub",
-    srcs = glob(["**/*.json"]),
-    visibility = ["//visibility:public"],
-)
-
 # Used by iOS. Filters out just the JSON files
 filegroup(
     name = "mocks_json",

@@ -1,12 +1,10 @@
 import React from "react";
 import { Action } from "@player-ui/reference-assets-plugin-components";
+import { expression as e } from "@player-lang/react-dsl";
 import type { DSLFlow } from "@player-lang/react-dsl";
 
 const view1 = (
-  <Action id="action">
-    <property name="exp">
-      {"@[ publish('some-event', 'event published message') ]@"}
-    </property>
+  <Action id="action" exp={e`publish('some-event', 'event published message')`}>
     <Action.Label>Clicked to publish event</Action.Label>
   </Action>
 );

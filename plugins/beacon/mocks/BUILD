@@ -11,7 +11,7 @@ create_base_dsl_config(
 )
 
 compile_mocks(
-    name = "mocks", #ust be called mocks
+    name = "mocks",
     mock_dirs = [
         "beacon"
     ],
@@ -22,12 +22,6 @@ compile_mocks(
     ],
     cli = "@player-cli/cli",
     dsl_package = "@player-lang/react-dsl"
-)
-
-filegroup(
-    name = "beacon",
-    srcs = glob(["**/*.json"]),
-    visibility = ["//visibility:public"],
 )
 
 # Used by iOS. Filters out just the JSON files
