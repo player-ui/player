@@ -13,7 +13,7 @@ create_base_dsl_config(
 compile_mocks(
     name = "mocks",
     mock_dirs = [
-        "beacon"
+        "beacon",
     ],
     dsl_config = ":dsl_config",
     data = [

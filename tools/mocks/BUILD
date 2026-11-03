@@ -30,7 +30,7 @@ filegroup(
 filegroup(
     name = "plugin_mocks",
     srcs = ["//plugins/{}/mocks:mocks_json".format(plugin) for plugin in DSL_PLUGIN_MOCKS] +
-           ["//plugins/pending-transaction/mocks"],
+           ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS if plugin not in DSL_PLUGIN_MOCKS],
     visibility = ["//visibility:public"],
 )
 filegroup(
