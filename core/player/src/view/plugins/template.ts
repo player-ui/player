@@ -146,7 +146,9 @@ export class TemplatePlugin implements ViewPlugin {
 
       if (
         node &&
-        (node.type === NodeType.View || node.type === NodeType.Asset) &&
+        (node.type === NodeType.View ||
+          node.type === NodeType.Asset ||
+          node.type === NodeType.Value) &&
         Array.isArray(node.children)
       ) {
         node.children = node.children.sort((a, b) => {
