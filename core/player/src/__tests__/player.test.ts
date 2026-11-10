@@ -895,3 +895,43 @@ test("prevents invalid data from being committed during action-driven backward n
   });
   expect(shadowValue).toBeUndefined();
 });
+
+test("runs a data stage tapped after another plugin read data", () => {
+  class ReadsDataPlugin {
+    name = "reads-data";
+
+    apply(player: Player) {
+      player.hooks.dataController.tap(this.name, (dataController) => {
+        dataController.get("name");
+      });
+    }
+  }
+
+  class AddsStagePlugin {
+    name = "adds-stage";
+
+    apply(player: Player) {
+      player.hooks.dataController.tap(this.name, (dataController) => {
+        dataController.hooks.resolveDataStages.tap(this.name, (pipeline) => [
+          ...pipeline,
+          {
+            get: (binding, options, next) =>
+              binding.asString() === "greeting"
+                ? "hello"
+                : next?.get(binding, options),
+            set: (transaction, options, next) =>
+              next?.set(transaction, options) ?? [],
+          },
+        ]);
+      });
+    }
+  }
+
+  const player = new Player({
+    plugins: [new ReadsDataPlugin(), new AddsStagePlugin()],
+  });
+  player.start(makeFlow({ type: "text", id: "text", value: "{{greeting}}" }));
+
+  const state = player.getState() as InProgressState;
+  expect(state.controllers.data.get("greeting")).toBe("hello");
+});

@@ -1,6 +1,7 @@
 import { describe, it, beforeEach, vitest, test, expect } from "vitest";
 import { BindingParser } from "../binding";
 import { LocalModel } from "../data";
+import type { DataModelMiddleware } from "../data";
 import { ValidationMiddleware } from "../validator";
 import type { Logger } from "..";
 import { DataController } from "..";
@@ -451,6 +452,68 @@ it("should handle deleting non-existent value + parent value", () => {
   });
 
   controller.delete("foo.bar");
+});
+
+describe("data stages tapped after first use", () => {
+  /** Answers reads of `greeting` and passes everything else through */
+  const greetingStage: DataModelMiddleware = {
+    name: "greeting",
+    get: (binding, options, next) =>
+      binding.asString() === "greeting" ? "hello" : next?.get(binding, options),
+    set: (transaction, options, next) => next?.set(transaction, options) ?? [],
+  };
+
+  /** A controller whose pipeline has already been built by a read */
+  const makeUsedController = () => {
+    const localData = new LocalModel();
+    const parser = new BindingParser({
+      get: localData.get,
+      set: localData.set,
+    });
+    const controller = new DataController(
+      { name: "frodo" },
+      { pathResolver: parser },
+    );
+    expect(controller.get("greeting")).toBeUndefined();
+    return controller;
+  };
+
+  it("runs a stage tapped after the first read", () => {
+    const controller = makeUsedController();
+
+    controller.hooks.resolveDataStages.tap("greeting", (pipeline) => [
+      ...pipeline,
+      greetingStage,
+    ]);
+
+    expect(controller.get("greeting")).toBe("hello");
+  });
+
+  it("keeps data written before the stage was tapped", () => {
+    const controller = makeUsedController();
+    controller.set([["age", 3]]);
+
+    controller.hooks.resolveDataStages.tap("greeting", (pipeline) => [
+      ...pipeline,
+      greetingStage,
+    ]);
+
+    expect(controller.get("")).toStrictEqual({ name: "frodo", age: 3 });
+  });
+
+  it("keeps listeners on the model", () => {
+    const controller = makeUsedController();
+    const onSet = vitest.fn();
+    controller.getModel().hooks.onSet.tap("test", onSet);
+
+    controller.hooks.resolveDataStages.tap("greeting", (pipeline) => [
+      ...pipeline,
+      greetingStage,
+    ]);
+    controller.set([["age", 3]]);
+
+    expect(onSet).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("Read Only Data Controller", () => {
