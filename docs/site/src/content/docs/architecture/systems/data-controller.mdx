@@ -28,7 +28,7 @@ constructor(
 
 `DataController` is created once per `player.start(flow)` call, seeded with the flow's `data` block and a `BindingParser`. See [Start to Render](/architecture/diagrams/start-to-render) for where it fits in the overall startup sequence. In practice, Player constructs it with the `ValidationController`'s middleware (`validationController.getDataMiddleware()`) and an error-controller middleware already in the `middleware` array, so validation and error handling are wired in before the first read or write happens.
 
-Internally, `DataController` lazily builds a `PipelinedDataModel` the first time `getModel()` is called, made up of a base `LocalModel` (the raw in-memory store) plus whatever middleware was supplied — see [Data Model](/architecture/systems/data-model) for how that pipeline itself works. `DataController`'s job is everything layered *on top* of that pipeline:
+Internally, `DataController` lazily builds a `PipelinedDataModel` the first time `getModel()` is called, made up of a base `LocalModel` (the raw in-memory store) plus whatever middleware was supplied and whatever `resolveDataStages` taps add (a tap added after that rebuilds the middleware in place) — see [Data Model](/architecture/systems/data-model) for how that pipeline itself works. `DataController`'s job is everything layered *on top* of that pipeline:
 
 - Parsing raw string/array bindings into `BindingInstance`s via the `pathResolver` before every operation.
 - Diffing old vs. new values (via `dequal`) so no-op writes don't fire update hooks.
@@ -71,7 +71,7 @@ All of the following are tapable hooks defined on `dataController.hooks` (verifi
 | Hook | Type | Gives you | Use it when… |
 | --- | --- | --- | --- |
 | `resolve` | `SyncWaterfallHook` | Declared on the class, but not called or tapped anywhere in `core/player` today — note that `ExpressionEvaluator` and the view `Resolver` each have their own, unrelated `hooks.resolve` of the same name; don't confuse the two | Probably not — treat as reserved/unused for now |
-| `resolveDataStages` | `SyncWaterfallHook<[DataPipeline]>` | The middleware array before it's frozen into the pipeline | You need to insert/remove/reorder middleware (see the [plugin implementation guide](/guides/plugin-implementation) for a worked example) |
+| `resolveDataStages` | `SyncWaterfallHook<[DataPipeline]>` | The middleware array the pipeline is built from. A stage tapped after the pipeline is built rebuilds it, keeping the data and the model's hooks | You need to insert/remove/reorder middleware (see the [plugin implementation guide](/guides/plugin-implementation) for a worked example) |
 | `resolveDefaultValue` | `SyncBailHook<[BindingInstance], any>` | A chance to supply a default when a `get` resolves to `undefined` | You want schema- or convention-based defaults |
 | `onDelete` | `SyncHook<[BindingInstance]>` | Notification after a `delete` completes | You need to react to removed bindings |
 | `onSet` | `SyncHook<[BatchSetTransaction]>` | The raw, normalized transaction passed to `set` | You want to observe every write attempt, including no-ops |
