@@ -1,0 +1,167 @@
+---
+title: Streaming Data
+---
+
+import CoreOnly from "../../../../components/CoreOnly.astro";
+
+<CoreOnly />
+
+The Streaming Data Plugin loads large collections into Player in batches without storing them in the data model. A flow declares each collection in its schema, the app registers the sources that load them, and content decides when loading starts. The plugin holds each record once, serves the list at the collection's binding, writes the collection's status to the data model, and saves changes through `EXTERNAL` states.
+
+The plugin doesn't sort, search, filter, or page. Whatever shows the collection, such as a table asset, does that work on the records the plugin serves.
+
+## Usage
+
+Register the plugin with a source for each collection, and add its `commitRecordsHandler` to the app's [External State Plugin](/plugins/multiplatform/external-state) so flows can save changes:
+
+```ts
+import { Player } from "@player-ui/player";
+import { ExternalStatePlugin } from "@player-ui/external-state-plugin";
+import { StreamingDataPlugin } from "@player-ui/streaming-data-plugin";
+
+const streamingData = new StreamingDataPlugin({
+  transactions: {
+    key: (transaction) => transaction.id,
+    async *load({ params, signal }) {
+      let page = 0;
+      let totalPages = 1;
+      while (page < totalPages) {
+        const response = await fetch(
+          `/accounts/${params.accountId}/transactions?page=${page}`,
+          { signal },
+        );
+        const body = await response.json();
+        totalPages = body.totalPages;
+        page += 1;
+        yield { records: body.records, totalBatches: totalPages };
+      }
+    },
+    async commit(changes, { params, signal }) {
+      const response = await fetch(
+        `/accounts/${params.accountId}/transactions`,
+        {
+          method: "POST",
+          body: JSON.stringify(changes),
+          signal,
+        },
+      );
+      return response.json();
+    },
+  },
+});
+
+const player = new Player({
+  plugins: [
+    streamingData,
+    new ExternalStatePlugin([streamingData.commitRecordsHandler]),
+  ],
+});
+```
+
+A source has three parts:
+
+- `key(record)` returns the record's unique key, or an empty string for a draft that hasn't been saved yet.
+- `load({ params, signal })` returns an async iterable of batches. Each batch has `records`, and optionally `totalBatches` so the plugin can report progress. The `signal` aborts when the flow ends or a new load replaces this one.
+- `commit(changes, { params, signal })` is optional. It receives the records to `create`, the records to `update` (each with its `key`, the changed fields in `patch`, and the whole `record` with them applied), and the keys to `remove`. It resolves with the saved `records` as the backend returned them, the `removed` keys, and the records that `failed`, each with a `key` and a `reason`.
+
+## Declaring a collection
+
+A collection is a schema entry with a `source`:
+
+```json
+{
+  "schema": {
+    "ROOT": {
+      "transactions": {
+        "type": "TransactionType",
+        "isArray": true,
+        "source": {
+          "ref": "transactions",
+          "status": "transactionsStatus",
+          "params": { "accountId": "{{accountId}}" }
+        }
+      }
+    }
+  }
+}
+```
+
+- `ref` names the source the app registered.
+- `status` is where the plugin writes the collection's status. It defaults to `<binding>Status`.
+- `params` are the source's inputs. The plugin resolves their templates when loading starts.
+
+A collection can sit inside nested types, but not inside an array or record entry. The plugin logs an error for a declaration it can't use and ignores it.
+
+## Loading
+
+Reading a collection never starts a load. Content starts one with the `loadStreamingData` expression, usually in a navigation `onStart`:
+
+```json
+{
+  "VIEW_transactions": {
+    "state_type": "VIEW",
+    "ref": "transactions-view",
+    "onStart": "loadStreamingData('transactions')",
+    "transitions": {}
+  }
+}
+```
+
+Loading the same collection again with the same params does nothing. With different params, the plugin drops the records and loads again. After a load fails, `retryStreamingData('transactions')` starts it over.
+
+While a load runs, the plugin writes this status to the status binding:
+
+| Field                                            | Meaning                                                                             |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `started`, `loading`, `completed`                | Where the load is                                                                   |
+| `loadedBatches`, `totalBatches`, `loadedRecords` | How much has arrived                                                                |
+| `progress`                                       | 0 to 1 when the source reports `totalBatches`, otherwise 0 until loading completes  |
+| `error`                                          | Why the load failed, if it did                                                      |
+| `committing`                                     | Whether a save is running                                                           |
+| `lastCommit`                                     | The latest save's `outcome`, `saved` and `failed` counts, `failedKeys`, and `error` |
+
+## Reading records
+
+The collection's binding serves the plugin's array by reference, so reading `transactions` doesn't copy it and `transactions.0.amount` reads one field of one record. Records are frozen, the binding is read-only, and the collection stays out of `serialize()`. The plugin logs a warning for each write or delete it ignores.
+
+When records change, the plugin tells Player as narrowly as it can, so a view only resolves again what reads the change: appended records announce `transactions.length`, and a replaced record announces its own index. Removals move records, so they announce the whole collection.
+
+Code that keeps more than the array, such as a table's sort keys, can get the collection with `getCollection(binding)` and `subscribe` to its changes: `appended`, `updated`, `removed`, `reset`, and `committed`.
+
+## Saving
+
+Saves run in `EXTERNAL` states with the `commit-records` ref. The handler collects the changes, calls the source's `commit`, merges the returned records by key, and transitions with `saved`, `partial`, or `failed`. It never throws.
+
+To change every selected record, name the keys in `param.update`, a binding to copy each record to in `param.rowBinding`, and the expressions that change it in `eachRow`:
+
+```json
+{
+  "EXTERNAL_categorize": {
+    "state_type": "EXTERNAL",
+    "ref": "commit-records",
+    "param": {
+      "binding": "transactions",
+      "update": "selectedKeys",
+      "rowBinding": "row"
+    },
+    "eachRow": ["{{row.category}} = 'travel'"],
+    "transitions": {
+      "saved": "VIEW_transactions",
+      "partial": "VIEW_transactions",
+      "failed": "VIEW_transactions"
+    }
+  }
+}
+```
+
+`eachRow` goes on the state beside `param`, not inside it, because Player resolves the templates in `param` when the state starts. The plugin fails a save with `eachRow` inside `param` and logs why.
+
+`param.save` names a binding holding a draft record: a draft without a key is created, and a draft with a key saves its changed fields. `param.remove` names a binding holding the key, or keys, to remove. One state can combine all three.
+
+Player drops the current view when an `EXTERNAL` state starts. So that the view can show the save running, the handler keeps the view that started the save current until the flow moves on. If that view is an overlay that closes when the flow leaves it, such as a modal, the handler shows the view underneath instead. Tell the plugin which views are overlays with the `isOverlay` option:
+
+```ts
+new StreamingDataPlugin(sources, {
+  isOverlay: (state) => state.attributes?.overlay === true,
+});
+```

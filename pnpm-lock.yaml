@@ -1083,6 +1083,15 @@ importers:
         specifier: workspace:^
         version: link:../../../core/types
 
+  plugins/streaming-data/core:
+    dependencies:
+      '@player-ui/external-state-plugin':
+        specifier: workspace:^
+        version: link:../../external-state/core
+      '@player-ui/player':
+        specifier: workspace:^
+        version: link:../../../core/player
+
   plugins/types-provider/core:
     dependencies:
       '@player-ui/player':
