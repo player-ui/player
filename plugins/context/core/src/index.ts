@@ -4,3 +4,5 @@ export * from "./types";
 export * from "./key";
 export * from "./utils";
 export * from "./state-plugin";
+export * from "./asset-descriptor";
+export * from "./asset-plugin";

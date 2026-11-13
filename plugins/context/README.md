@@ -4,13 +4,16 @@ A per-flow store of context entries, keyed by name, that lets external consumers
 (automation, devtools, native hosts) read, derive, and observe Player state
 without tapping every controller hook themselves.
 
-The package ships two plugins:
+The package ships three plugins:
 
 - **`ContextPlugin`** — the store. Holds named entries, supports derived
   (transform) entries, a subscribe API, and a per-flow history of snapshots.
 - **`StateContextPlugin`** — a consumer of `ContextPlugin` that mirrors Player
   runtime state (flow, view, data, status) into the store and publishes an
   aggregated `player.state` entry with scoped, callable actions.
+- **`AssetContextPlugin`** — lets each asset type declare which of its resolved
+  properties are published to the store, so consumers get a per-asset,
+  per-view snapshot without walking the view tree.
 
 ## Concepts
 
@@ -171,6 +174,384 @@ state.flow?.transition?.("Next");
 
 ---
 
+## `AssetContextPlugin` (core)
+
+Asset types opt in with a **descriptor**: a small, declarative description of
+which resolved properties to publish. The plugin taps the view resolver and,
+after each view update in which a described asset (or view) resolved, writes
+its entry to the store.
+Assets without a descriptor are ignored. It auto-registers a `ContextPlugin` if
+one isn't already present, and never modifies the resolved view.
+
+```ts
+import { Player } from "@player-ui/player";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
+import {
+  ContextPlugin,
+  AssetContextPlugin,
+  defineAssetContext,
+  assetContextKey,
+  viewAssetsContextKey,
+} from "@player-ui/context-plugin";
+
+const inputContext = defineAssetContext({
+  fields: { binding: "binding", value: "value", label: "label.asset.value" },
+});
+const textContext = defineAssetContext({ fields: { value: "value" } });
+
+const ctx = new ContextPlugin();
+const player = new Player({
+  plugins: [
+    ctx,
+    new ReferenceAssetsPlugin(),
+    new AssetContextPlugin([
+      [{ type: "input" }, inputContext],
+      [{ type: "text" }, textContext],
+    ]),
+  ],
+});
+
+player.start(flow);
+
+ctx.get(assetContextKey("name-input"));
+// { id: "name-input", type: "input", binding: "data.name", value: "Ada", label: "Name" }
+
+ctx.get(viewAssetsContextKey);
+// [{ id: "name-input-label", type: "text", value: "Name" }, { id: "name-input", ... }]
+```
+
+Descriptors are matched against the asset with the same partial-match rules as
+asset transforms, so a more specific match wins over a less specific one:
+
+```ts
+new AssetContextPlugin([
+  [{ type: "action" }, actionContext],
+  [{ type: "action", metaData: { role: "back" } }, backActionContext],
+]);
+```
+
+Any plugin can contribute more descriptors at any time. If several
+`AssetContextPlugin` instances are registered, they share the first one's
+registry.
+
+```ts
+import { getAssetContextPlugin } from "@player-ui/context-plugin";
+
+getAssetContextPlugin(player).register([[{ type: "image" }, imageContext]]);
+```
+
+### Descriptor reference
+
+`defineAssetContext<T>(descriptor)` types a descriptor against an asset shape.
+
+| Option     | Purpose                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| `fields`   | Output key → property path (`"value"`, `"metaData.role"`) or extractor `(asset) => unknown` |
+| `children` | Slot paths whose nested asset ids are recorded under `children`                             |
+| `collate`  | Slots whose nested assets are rolled up into this entry (see [Collation](#collation))       |
+| `extract`  | Escape hatch: `(asset) => object`, merged last                                              |
+
+Every entry has the asset's `id` and `type`; nothing else is published unless a
+descriptor asks for it. Extracted values that are `undefined` or functions are
+skipped, so callables like an action's `run` never reach the store — act on the
+running Player through `StateContextPlugin`'s scoped actions instead.
+
+Helpers for building fields:
+
+```ts
+import { constant, each, prop } from "@player-ui/context-plugin";
+
+const choiceContext = defineAssetContext({
+  fields: {
+    // Property path, same as the "binding" string shorthand.
+    binding: prop("binding"),
+    // A fixed value.
+    kind: constant("single-select"),
+    // Map every item of an array through its own fields.
+    options: each("choices", { id: "id", label: "label.asset.value" }),
+  },
+});
+```
+
+`each` copies the values you name. To embed whatever nested assets publish
+through their own descriptors, collate the property instead. See
+[Choosing `each` or `collate`](#choosing-each-or-collate).
+
+`children` records the ids of the nearest described assets under each slot.
+Assets without a descriptor are walked through, so a wrapper asset with no
+descriptor of its own doesn't hide what's inside it:
+
+```ts
+const collectionContext = defineAssetContext({
+  fields: { label: "label.asset.value" },
+  children: ["values"],
+});
+// { id: "profile", type: "collection", label: "Profile",
+//   children: { values: ["name-input", "email-input"] } }
+```
+
+#### Keeping field types
+
+`defineAssetContext<T>` checks a descriptor against `T`, but its return type is
+the general `AssetContextDescriptor<T>`, so the names of the declared fields are
+lost. If you want to derive types from a descriptor, declare it with
+`satisfies` instead. The descriptor is still checked against the asset shape,
+extractors still get a typed `asset` parameter, and the object keeps its
+literal type:
+
+```ts
+import type { InputAsset } from "@player-ui/reference-assets-plugin";
+import type { AssetContextDescriptor } from "@player-ui/context-plugin";
+
+const inputContext = {
+  fields: {
+    binding: "binding",
+    label: (asset) => asset.label?.asset.id, // asset: InputAsset
+  },
+} satisfies AssetContextDescriptor<InputAsset>;
+
+type InputFields = keyof typeof inputContext.fields; // "binding" | "label"
+type InputLabel = ReturnType<typeof inputContext.fields.label>; // string | undefined
+```
+
+Path strings such as `"binding"` widen to `string`, so only an extractor
+carries its value type. Registration is the same either way.
+
+### Published keys
+
+| Key                                         | Value                                                      |
+| ------------------------------------------- | ---------------------------------------------------------- |
+| `assetContextKey(id)` — `player.asset.<id>` | One asset's entry: `{ id, type, ...fields }`               |
+| `viewAssetIdsContextKey`                    | Ids of every described asset in the current view           |
+| `viewAssetsContextKey`                      | Top-level entries; collated descendants are nested instead |
+| `viewAllAssetsContextKey`                   | Every entry, flat, including collated descendants          |
+
+View-level lists follow document order, so a parent comes before the assets
+nested in it.
+
+Entries track what's actually on screen. After each view update, an asset that
+is no longer in the resolved view has its entry cleared to `undefined`, and
+subscribers are notified. This covers assets removed by applicability, or by a
+parent that stops rendering them (e.g. a list showing one page of its items).
+An asset that comes back is published again, in its original position, even
+when Player serves it from its cache rather than resolving it again. On a new
+view, the previous view's entries are cleared too.
+
+Entries are built from the final resolved view, once the update completes, so
+changes other plugins make in their own `afterResolve` taps are always
+reflected, wherever those plugins are registered.
+
+An entry is rewritten only when Player's own dependency tracking re-resolves
+that asset, so an unrelated data change doesn't touch it:
+
+```ts
+ctx.subscribe(assetContextKey("email-input"), onEmail);
+dataController.set([["data.name", "Grace"]]); // onEmail is not called
+```
+
+### Collation
+
+Some assets are only meaningful inside their parent — a label is just a string
+until you know what it labels. A parent can roll its descendants up into its
+own entry with `collate`. The children keep their own descriptors and don't
+need to know they're being collated.
+
+```ts
+const collectionContext = defineAssetContext({
+  fields: { label: "label.asset.value" },
+  collate: [{ slot: "values", as: "items" }],
+});
+```
+
+```jsonc
+// player.asset.profile
+{
+  "id": "profile",
+  "type": "collection",
+  "label": "Profile",
+  "items": [
+    {
+      "id": "name-input",
+      "type": "input",
+      "binding": "data.name",
+      "value": "Ada",
+    },
+    {
+      "id": "email-input",
+      "type": "input",
+      "binding": "data.email",
+      "value": "ada@example.com",
+    },
+  ],
+}
+```
+
+| Option   | Default   | Meaning                                                         |
+| -------- | --------- | --------------------------------------------------------------- |
+| `slot`   | —         | Where to look under the parent (`"values"`, `["a", "b"]`)       |
+| `as`     | slot name | Output key on the parent entry                                  |
+| `fields` | —         | Plain values to pick off each item of the slot                  |
+| `depth`  | `"all"`   | How many described levels to embed; `1` embeds the nearest only |
+| `hide`   | `true`    | Omit collated descendants from `viewAssetsContextKey`           |
+| `reduce` | —         | `(entries) => unknown` to summarize instead of embedding        |
+
+A string spec is shorthand for `{ slot }` with every other option defaulted:
+`collate: ["values"]`.
+
+The collated value keeps the slot's shape. Each described asset is replaced by
+its entry, so you get whatever its own descriptor publishes without listing
+those fields again. Plain objects and arrays around the assets are kept, and
+branches that contain no described assets are dropped:
+
+- A list of assets, like `values` above, becomes a list of entries.
+- A single asset, such as `collate: ["label"]`, becomes that asset's entry.
+- A list of plain items becomes one object per item, with each nested asset's
+  entry at its original property.
+
+`fields` adds plain values from each item alongside its nested assets. Paths
+are relative to the item:
+
+```ts
+// A "table" whose rows are plain objects holding a text label:
+// items: [{ id: "task-1", status: "done", label: { asset: { type: "text", ... } } }]
+const tableContext = defineAssetContext({
+  collate: [{ slot: "items", fields: { id: "id", status: "status" } }],
+});
+```
+
+```jsonc
+// player.asset.tasks
+{
+  "id": "tasks",
+  "type": "table",
+  "items": [
+    {
+      "id": "task-1",
+      "status": "done",
+      "label": { "id": "task-1-label", "type": "text", "value": "Write docs" },
+    },
+  ],
+}
+```
+
+Items that have picked `fields` but no described assets are kept. Assets
+without a descriptor are transparent: their nearest described descendants
+take their place.
+
+- **Depth.** With the default `"all"`, each embedded entry carries its own
+  collated properties under `children`, keyed by property and shaped the same
+  way, all the way down. With `depth: 1`, only the nearest described
+  descendants are embedded; anything below them stays a top-level entry.
+- **Nesting.** A descendant that has its own `collate` is embedded as-is — its
+  entry already carries its rolled-up descendants.
+- **Liveness.** The parent's entry is a transform over its descendants' entries,
+  so it updates whenever one of them does.
+- **Visibility.** Collated descendants are always readable at
+  `player.asset.<id>` and listed in `viewAllAssetsContextKey`. With
+  `hide: false` they're also kept in `viewAssetsContextKey`.
+
+Summarize instead of embedding with `reduce`. It receives the nearest collated
+entries as a flat list, in document order:
+
+```ts
+const collectionContext = defineAssetContext({
+  fields: { label: "label.asset.value" },
+  collate: [
+    {
+      slot: "values",
+      as: "summary",
+      reduce: (entries) => entries.map((entry) => entry.value).join(", "),
+    },
+  ],
+});
+// { id: "profile", type: "collection", label: "Profile",
+//   summary: "Ada, ada@example.com" }
+```
+
+A descendant that stops rendering, for example because it's no longer
+applicable, drops out of its parent's collated entries on the same update.
+
+### Choosing `each` or `collate`
+
+Both turn an array into one context value per item. They differ in where the
+values come from:
+
+- `each` copies exactly the values you name.
+- `collate` embeds whatever the nested assets' own descriptors publish.
+
+Take a `table` asset whose rows are plain objects, each holding a `text` asset
+as its label:
+
+```jsonc
+// resolved "tasks" table
+{
+  "id": "tasks",
+  "type": "table",
+  "items": [
+    {
+      "id": "task-1",
+      "status": "done",
+      "label": {
+        "asset": {
+          "id": "task-1-label",
+          "type": "text",
+          "value": "Write docs",
+        },
+      },
+    },
+  ],
+}
+```
+
+With `each`, you name every value, and the label is read by path into a plain
+string:
+
+```ts
+const tableContext = defineAssetContext({
+  fields: {
+    items: each("items", {
+      id: "id",
+      status: "status",
+      label: "label.asset.value",
+    }),
+  },
+});
+// items: [{ id: "task-1", status: "done", label: "Write docs" }]
+```
+
+With `collate`, the label is embedded as the text asset's own entry. You only
+name the item's plain values:
+
+```ts
+const textContext = defineAssetContext({ fields: { value: "value" } });
+const tableContext = defineAssetContext({
+  collate: [{ slot: "items", fields: { id: "id", status: "status" } }],
+});
+// items: [{ id: "task-1", status: "done",
+//           label: { id: "task-1-label", type: "text", value: "Write docs" } }]
+```
+
+|                                    | `each`                                       | `collate`                                                            |
+| ---------------------------------- | -------------------------------------------- | -------------------------------------------------------------------- |
+| Declared in                        | `fields`                                     | `collate`                                                            |
+| Nested assets                      | Read by path; their descriptors are ignored  | Embedded as their own entries                                        |
+| Nested asset needs a descriptor    | No                                           | Yes: an undescribed asset contributes only its described descendants |
+| Nested asset changes its fields    | Update every `each` that reads it            | Picked up automatically                                              |
+| Nested entries in the view's lists | Listed separately, if they have a descriptor | Hidden from `viewAssetsContextKey` (unless `hide: false`)            |
+| Plain item values                  | The fields you name                          | The `fields` you name                                                |
+
+Use `each` when the items are plain data, such as a choice's options, or when
+you want a small fixed shape. Use `collate` when the items hold assets that
+already have descriptors, so each asset's context is defined once and appears
+inside its parent instead of beside it.
+
+A common mistake is collating a slot whose assets have no descriptor. In the
+example above, if `text` isn't registered, `collate` yields only
+`{ id, status }` for each row. Register a descriptor for the nested type, or
+read its value with `each` or `fields`.
+
+---
+
 ## Native consumers (JVM & iOS)
 
 Native wrappers read entries by name and deserialize them into typed objects.
@@ -219,6 +600,13 @@ context.list() // [ContextEntryDescriptor]
 let snapshot = context.history().last
 snapshot?.get(name: "player.state", as: PlayerStateContext.self)
 ```
+
+### Asset context
+
+`AssetContextPlugin` doesn't have typed native wrappers yet. When it's
+registered in the core JS bundle, its entries are plain objects and can be read
+by name like any other entry, e.g. `player.view.assets` or
+`player.asset.<id>`.
 
 ---
 
