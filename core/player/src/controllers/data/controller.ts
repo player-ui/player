@@ -64,6 +64,16 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
     this.trash = new Set();
     this.pathResolver = options.pathResolver;
+
+    // The pipeline is built on first use, so a stage tapped after that would
+    // otherwise never run.
+    this.hooks.resolveDataStages.intercept({
+      tap: () => {
+        this.model?.setMiddleware(
+          this.hooks.resolveDataStages.call(this.baseMiddleware),
+        );
+      },
+    });
   }
 
   public getModel(): PipelinedDataModel {
