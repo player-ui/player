@@ -262,6 +262,7 @@ export class ValidationBindingTrackerViewPlugin
 
           tracked.clear();
           sections.clear();
+          resolvedNodeMap.clear();
           currentBindingTree = new Map();
         }
       },
