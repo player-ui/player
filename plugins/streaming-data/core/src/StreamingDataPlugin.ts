@@ -184,9 +184,9 @@ export class StreamingDataPlugin implements PlayerPlugin {
   apply(player: Player): void {
     this.logger = player.logger;
 
-    player.hooks.onStart.tap(this.name, (flow) => {
+    player.hooks.schema.tap(this.name, (schema) => {
       const { declarations, problems } = findCollectionDeclarations(
-        flow.schema,
+        schema.schema,
       );
       problems.forEach(({ binding, problem }) =>
         this.logger?.error(

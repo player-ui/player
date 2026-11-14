@@ -1,4 +1,3 @@
-import type { Schema } from "@player-ui/player";
 import type { CollectionSourceDeclaration } from "./types";
 
 export interface CollectionDeclaration {
@@ -34,45 +33,39 @@ const isSourceDeclaration = (
   source: unknown,
 ): source is CollectionSourceDeclaration => sourceProblem(source) === undefined;
 
+/** Player's parsed schema marks the items of an array entry with `[]` and of a record with `{}` */
+const isInsideArrayOrRecord = (binding: string): boolean =>
+  binding.split(".").some((segment) => segment === "[]" || segment === "{}");
+
 /**
- * Every schema entry with a `source`, found by walking the schema's types from ROOT. A collection
- * can't sit inside an array or record entry, so the walk doesn't descend into those.
+ * Every schema entry with a `source`, read from the schema Player parsed for the flow
+ * (`SchemaController.schema`, keyed by binding). A collection can't sit inside an array or
+ * record entry.
  */
-export function findCollectionDeclarations(schema: Schema.Schema | undefined): {
+export function findCollectionDeclarations(
+  parsedSchema: ReadonlyMap<string, unknown>,
+): {
   declarations: CollectionDeclaration[];
   problems: DeclarationProblem[];
 } {
   const declarations: CollectionDeclaration[] = [];
   const problems: DeclarationProblem[] = [];
-  if (!schema?.ROOT) return { declarations, problems };
 
-  const visit = (
-    node: Schema.Node,
-    path: string[],
-    visited: ReadonlySet<string>,
-  ): void => {
-    Object.entries(node).forEach(([property, dataType]) => {
-      const binding = [...path, property].join(".");
-      const { source } = dataType;
+  parsedSchema.forEach((dataType, binding) => {
+    if (!isPlainObject(dataType) || dataType.source === undefined) return;
+    const { source } = dataType;
 
-      if (source !== undefined) {
-        if (isSourceDeclaration(source)) {
-          declarations.push({ binding, source });
-        } else {
-          problems.push({ binding, problem: sourceProblem(source) ?? "" });
-        }
-        return;
-      }
+    if (isInsideArrayOrRecord(binding)) {
+      problems.push({
+        binding,
+        problem: "a collection can't sit inside an array or record",
+      });
+    } else if (isSourceDeclaration(source)) {
+      declarations.push({ binding, source });
+    } else {
+      problems.push({ binding, problem: sourceProblem(source) ?? "" });
+    }
+  });
 
-      if ("isArray" in dataType && dataType.isArray) return;
-      if ("isRecord" in dataType && dataType.isRecord) return;
-      const child = schema[dataType.type];
-      if (child && !visited.has(dataType.type)) {
-        visit(child, [...path, property], new Set([...visited, dataType.type]));
-      }
-    });
-  };
-
-  visit(schema.ROOT, [], new Set(["ROOT"]));
   return { declarations, problems };
 }
