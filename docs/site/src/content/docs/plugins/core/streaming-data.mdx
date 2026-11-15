@@ -62,7 +62,7 @@ A source has three parts:
 
 - `key(record)` returns the record's unique key, or an empty string for a draft that hasn't been saved yet.
 - `load({ params, signal })` returns an async iterable of batches. Each batch has `records`, and optionally `totalBatches` so the plugin can report progress. The `signal` aborts when the flow ends or a new load replaces this one.
-- `commit(changes, { params, signal })` is optional. It receives the records to `create`, the records to `update` (each with its `key`, the changed fields in `patch`, and the whole `record` with them applied), and the keys to `remove`. It resolves with the saved `records` as the backend returned them, the `removed` keys, and the records that `failed`, each with a `key` and a `reason`.
+- `commit(changes, { params, signal })` is optional. It receives the records to `create`, the records to `update` (each with its `key`, the changed fields in `patch`, and the whole `record` with them applied), and the records to `remove` (each with its `key` and the `record` the collection holds, so a source can address a delete with more than the key). It resolves with the saved `records` as the backend returned them, the `removed` keys, and the records that `failed`, each with a `key` and a `reason`.
 
 ## Declaring a collection
 
@@ -111,14 +111,17 @@ Loading the same collection again with the same params does nothing. With differ
 
 While a load runs, the plugin writes this status to the status binding:
 
-| Field                                            | Meaning                                                                             |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `started`, `loading`, `completed`                | Where the load is                                                                   |
-| `loadedBatches`, `totalBatches`, `loadedRecords` | How much has arrived                                                                |
-| `progress`                                       | 0 to 1 when the source reports `totalBatches`, otherwise 0 until loading completes  |
-| `error`                                          | Why the load failed, if it did                                                      |
-| `committing`                                     | Whether a save is running                                                           |
-| `lastCommit`                                     | The latest save's `outcome`, `saved` and `failed` counts, `failedKeys`, and `error` |
+| Field                                            | Meaning                                                                                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `started`, `loading`, `completed`                | Where the load is                                                                                |
+| `loadedBatches`, `totalBatches`, `loadedRecords` | How much has arrived                                                                             |
+| `progress`                                       | 0 to 1 when the source reports `totalBatches`, otherwise 0 until loading completes               |
+| `error`                                          | Why the load failed, if it did                                                                   |
+| `errorKind`                                      | A machine-readable reason for `error`, if the source gave one                                    |
+| `committing`                                     | Whether a save is running                                                                        |
+| `lastCommit`                                     | The latest save's `outcome`, `saved` and `failed` counts, `failedKeys`, `error`, and `errorKind` |
+
+When a load or save fails, the plugin copies a string `kind` from the error the source threw to `errorKind`, without interpreting it, and clears it whenever `error` clears. The source defines the values, such as `throttled` or `unavailable`, so content can branch on a stable value instead of the message.
 
 ## Reading records
 

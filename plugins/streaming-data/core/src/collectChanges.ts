@@ -94,8 +94,9 @@ export function collectChanges<R extends object>(
     }
   }
 
-  changes.remove = keysAt(context, request.remove).filter(
-    (key) => collection.indexOf(key) >= 0,
-  );
+  changes.remove = keysAt(context, request.remove).flatMap((key) => {
+    const record = collection.get(key);
+    return record ? [{ key, record }] : [];
+  });
   return changes;
 }

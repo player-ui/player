@@ -70,6 +70,15 @@ const isIndexable = (
 ): value is Record<string | number, unknown> =>
   typeof value === "object" && value !== null;
 
+/** `error` and, when the thrown error carries a string `kind`, `errorKind` */
+const errorFields = (error: unknown): { error: string; errorKind?: string } => {
+  const kind = isIndexable(error) ? error.kind : undefined;
+  return {
+    error: messageOf(error),
+    ...(typeof kind === "string" ? { errorKind: kind } : undefined),
+  };
+};
+
 /** Walks a relative binding path into a value without copying anything */
 const getIn = (value: unknown, path: ReadonlyArray<string | number>): unknown =>
   path.reduce<unknown>(
@@ -87,12 +96,15 @@ const overlaps = (a: string, b: string): boolean => {
     .every((segment, index) => segment === right[index]);
 };
 
-const failedCommit = (failedKeys: string[], error?: string): LastCommit => ({
+const failedCommit = (
+  failedKeys: string[],
+  reason?: { error: string; errorKind?: string },
+): LastCommit => ({
   outcome: "failed",
   saved: 0,
   failed: failedKeys.length,
   failedKeys,
-  ...(error === undefined ? undefined : { error }),
+  ...reason,
 });
 
 const outcomeOf = (result: CommitResult<object>): CommitOutcome => {
@@ -104,7 +116,7 @@ const outcomeOf = (result: CommitResult<object>): CommitOutcome => {
 
 const keysOf = (changes: RecordChanges<object>): string[] => [
   ...changes.update.map(({ key }) => key),
-  ...changes.remove,
+  ...changes.remove.map(({ key }) => key),
 ];
 
 /**
@@ -476,11 +488,11 @@ export class StreamingDataPlugin implements PlayerPlugin {
         });
     } catch (error) {
       if (!isCurrent()) return;
-      const message = messageOf(error);
+      const reason = errorFields(error);
       this.logger?.error(
-        `[${this.name}] Loading '${state.collection.binding}' failed: ${message}`,
+        `[${this.name}] Loading '${state.collection.binding}' failed: ${reason.error}`,
       );
-      this.patchStatus(state, { loading: false, error: message });
+      this.patchStatus(state, { loading: false, ...reason });
     }
   }
 
@@ -523,13 +535,13 @@ export class StreamingDataPlugin implements PlayerPlugin {
       });
       return await this.commitChanges(state, changes);
     } catch (error) {
-      const message = messageOf(error);
+      const reason = errorFields(error);
       this.logger?.error(
-        `[${this.name}] Saving '${request.binding}' failed: ${message}`,
+        `[${this.name}] Saving '${request.binding}' failed: ${reason.error}`,
       );
       this.patchStatus(state, {
         committing: false,
-        lastCommit: failedCommit([], message),
+        lastCommit: failedCommit([], reason),
       });
       return "failed";
     }
@@ -553,10 +565,9 @@ export class StreamingDataPlugin implements PlayerPlugin {
     const { source } = state;
     if (!source?.commit || !flowAbort) {
       this.patchStatus(state, {
-        lastCommit: failedCommit(
-          keysOf(changes),
-          "This collection's source can't save.",
-        ),
+        lastCommit: failedCommit(keysOf(changes), {
+          error: "This collection's source can't save.",
+        }),
       });
       return "failed";
     }
@@ -588,14 +599,14 @@ export class StreamingDataPlugin implements PlayerPlugin {
       this.notifyChanged(state, change);
       return outcome;
     } catch (error) {
-      const message = messageOf(error);
+      const reason = errorFields(error);
       if (this.dataController === dataController) {
         this.logger?.error(
-          `[${this.name}] Saving '${state.collection.binding}' failed: ${message}`,
+          `[${this.name}] Saving '${state.collection.binding}' failed: ${reason.error}`,
         );
         this.patchStatus(state, {
           committing: false,
-          lastCommit: failedCommit(keysOf(changes), message),
+          lastCommit: failedCommit(keysOf(changes), reason),
         });
       }
       return "failed";

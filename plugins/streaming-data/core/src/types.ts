@@ -20,11 +20,17 @@ export interface RecordUpdate<R> {
   record: R;
 }
 
+/** One record a save removes: its key, and the record as the collection holds it */
+export interface RecordRemoval<R> {
+  key: string;
+  record: R;
+}
+
 /** What a save asks the source to change */
 export interface RecordChanges<R> {
   create: R[];
   update: Array<RecordUpdate<R>>;
-  remove: string[];
+  remove: Array<RecordRemoval<R>>;
 }
 
 /** A record the source couldn't save, and why */
@@ -77,6 +83,8 @@ export interface LastCommit {
   failedKeys: string[];
   /** Why the save failed as a whole, if it did */
   error?: string;
+  /** A machine-readable reason for `error`, if the source gave one; the source defines the values */
+  errorKind?: string;
 }
 
 /** A collection's status, which the plugin writes to the collection's status binding */
@@ -94,6 +102,8 @@ export interface CollectionStatus {
   lastCommit?: LastCommit;
   /** Why loading failed, if it did */
   error?: string;
+  /** A machine-readable reason for `error`, if the source gave one; the source defines the values */
+  errorKind?: string;
 }
 
 /** A change to a collection's records, for consumers that keep more than the array */

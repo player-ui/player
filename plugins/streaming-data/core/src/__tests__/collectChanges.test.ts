@@ -116,20 +116,23 @@ describe("collectChanges", () => {
     ).toEqual([]);
   });
 
-  it("removes the held keys among one key or a list of them", () => {
+  it("removes the held records among one key or a list of them, each with its key", () => {
     expect(
       collectChanges(
         collection,
         request({ remove: "key" }),
         contextOf({ key: "a" }).context,
       ).remove,
-    ).toEqual(["a"]);
-    expect(
-      collectChanges(
-        collection,
-        request({ remove: "keys" }),
-        contextOf({ keys: ["b", "z", ""] }).context,
-      ).remove,
-    ).toEqual(["b"]);
+    ).toEqual([{ key: "a", record: { id: "a", name: "A" } }]);
+
+    const removed = collectChanges(
+      collection,
+      request({ remove: "keys" }),
+      contextOf({ keys: ["b", "z", ""] }).context,
+    ).remove;
+    expect(removed).toEqual([
+      { key: "b", record: { id: "b", name: "B", note: "keep" } },
+    ]);
+    expect(removed[0]?.record).toBe(collection.get("b"));
   });
 });

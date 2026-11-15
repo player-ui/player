@@ -108,7 +108,7 @@ const flow: Flow = {
 /** Saves every change it's given */
 const saveAll = (changes: RecordChanges<Item>): CommitResult<Item> => ({
   records: changes.update.map(({ record }) => record),
-  removed: changes.remove,
+  removed: changes.remove.map(({ key }) => key),
   failed: [],
 });
 
@@ -170,7 +170,12 @@ const feed = (
     push: (records: Item[], totalBatches?: number) =>
       send({ records, totalBatches }),
     end: () => send("end"),
-    fail: (message: string) => send(new Error(message)),
+    fail: (message: string, kind?: unknown) =>
+      send(
+        kind === undefined
+          ? new Error(message)
+          : Object.assign(new Error(message), { kind }),
+      ),
   };
 };
 
@@ -451,6 +456,23 @@ describe("StreamingDataPlugin", () => {
     expect(test.get("items")).toHaveLength(1);
   });
 
+  it("copies a string kind from a failed load to the status, and drops it with the error", async () => {
+    const test = setup();
+    test.evaluate("loadStreamingData('items')");
+    test.fail("Busy", "throttled");
+    await vitest.waitFor(() => expect(test.status()?.error).toBe("Busy"));
+    expect(test.status()?.errorKind).toBe("throttled");
+
+    test.evaluate("retryStreamingData('items')");
+    await vitest.waitFor(() => expect(test.loads).toHaveLength(2));
+    expect(test.status()?.error).toBeUndefined();
+    expect(test.status()).not.toHaveProperty("errorKind");
+
+    test.fail("Odd", 42);
+    await vitest.waitFor(() => expect(test.status()?.error).toBe("Odd"));
+    expect(test.status()).not.toHaveProperty("errorKind");
+  });
+
   it("cancels the load and drops the records when the flow ends", async () => {
     const test = setup();
     test.evaluate("loadStreamingData('items')");
@@ -508,7 +530,11 @@ describe("StreamingDataPlugin", () => {
       expect(test.status()?.lastCommit?.outcome).toBe("saved"),
     );
 
-    expect(test.commits[0]).toEqual({ create: [], update: [], remove: ["b"] });
+    expect(test.commits[0]).toEqual({
+      create: [],
+      update: [],
+      remove: [{ key: "b", record: { id: "b", name: "B" } }],
+    });
     expect(names(test)).toEqual(["A", "C"]);
     expect(test.plugin.getCollection("items")?.indexOf("c")).toBe(1);
     expect(test.status()).toMatchObject({
@@ -589,9 +615,41 @@ describe("StreamingDataPlugin", () => {
         error: "Offline",
       },
     });
+    expect(test.status()?.lastCommit).not.toHaveProperty("errorKind");
     expect(test.log.error).toHaveBeenCalledWith(
       "[StreamingDataPlugin] Saving 'items' failed: Offline",
     );
+  });
+
+  it("copies a string kind from a rejected save to lastCommit, and drops it on the next save", async () => {
+    let rejection: Error | undefined = Object.assign(new Error("Signed out"), {
+      kind: "session-expired",
+    });
+    const test = setup({
+      commitWith: (changes) => {
+        if (rejection) throw rejection;
+        return saveAll(changes);
+      },
+    });
+    await loadAll(test, [item("a")]);
+    test.controllers().data.set([["selected", ["a"]]]);
+
+    test.controllers().flow.transition("Rename");
+    await vitest.waitFor(() =>
+      expect(test.status()?.lastCommit?.outcome).toBe("failed"),
+    );
+    expect(test.status()?.lastCommit).toMatchObject({
+      error: "Signed out",
+      errorKind: "session-expired",
+    });
+
+    await vitest.waitFor(() => expect(test.stateName()).toBe("VIEW_main"));
+    rejection = undefined;
+    test.controllers().flow.transition("Rename");
+    await vitest.waitFor(() =>
+      expect(test.status()?.lastCommit?.outcome).toBe("saved"),
+    );
+    expect(test.status()?.lastCommit).not.toHaveProperty("errorKind");
   });
 
   it("fails a save when the collection's source can't save", async () => {
