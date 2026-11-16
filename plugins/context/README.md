@@ -54,6 +54,11 @@ const formStateKey = defineContextKey<{ name: string }>(
 ctx.set(formStateKey, { name: "Ada" });
 ctx.has(formStateKey); // true
 ctx.get(formStateKey); // { name: "Ada" }
+
+// Remove a key, value and transform, as if it was never set. Subscribers are
+// notified with `undefined`, and stay subscribed.
+ctx.delete(formStateKey);
+ctx.has(formStateKey); // false
 ```
 
 ### Derived entries (transforms)
@@ -330,12 +335,18 @@ View-level lists follow document order, so a parent comes before the assets
 nested in it.
 
 Entries track what's actually on screen. After each view update, an asset that
-is no longer in the resolved view has its entry cleared to `undefined`, and
-subscribers are notified. This covers assets removed by applicability, or by a
-parent that stops rendering them (e.g. a list showing one page of its items).
-An asset that comes back is published again, in its original position, even
-when Player serves it from its cache rather than resolving it again. On a new
-view, the previous view's entries are cleared too.
+is no longer in the resolved view has its entry removed from the store (it
+drops out of `has`, `list` and snapshots), and subscribers are notified with
+`undefined`. This covers assets removed by applicability, or by a parent that
+stops rendering them (e.g. a list showing one page of its items). An asset
+that comes back is published again, in its original position, even when
+Player serves it from its cache rather than resolving it again.
+
+The previous view's entries are removed on a new view, and when the flow moves
+to a state without a view, such as an `EXTERNAL` state the host handles. An
+`ACTION` or `FLOW` state passes straight on to the next state, so it leaves
+them in place, and so does an `END` state: the last view's entries are kept in
+the flow's history snapshot.
 
 Entries are built from the final resolved view, once the update completes, so
 changes other plugins make in their own `afterResolve` taps are always

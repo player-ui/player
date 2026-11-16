@@ -885,3 +885,129 @@ describe("update timing", () => {
     expect(ctx.get(assetContextKey("email-input"))).toBeUndefined();
   });
 });
+
+describe("view transitions", () => {
+  const thanksView = {
+    id: "done",
+    type: "collection",
+    values: [text("thanks", "Thanks")],
+  };
+
+  /** The profile view, then a state the host handles, without a view. */
+  const externalFlow = {
+    id: "flow-external",
+    views: [profileView],
+    data: profileData,
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          ref: profileView.id,
+          state_type: "VIEW",
+          transitions: { "*": "EXTERNAL_1" },
+        },
+        EXTERNAL_1: {
+          ref: "host-step",
+          state_type: "EXTERNAL",
+          transitions: { "*": "END_Done" },
+        },
+        END_Done: { state_type: "END", outcome: "done" },
+      },
+    },
+  };
+
+  /** Names of the asset entries the store holds, as a snapshot lists them. */
+  const assetEntryNames = (ctx: ContextPlugin) =>
+    ctx
+      .snapshot()
+      .entries.map((entry) => entry.name ?? "")
+      .filter((name) => name.startsWith("player.asset."))
+      .sort();
+
+  test("clears the view's entries when the flow leaves it for a state without a view", () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.start(externalFlow as any);
+    expect(ids(ctx.get(viewAssetsContextKey))).toContain("name-input");
+    const onName = vitest.fn();
+    ctx.subscribe(assetContextKey("name-input"), onName);
+
+    transition(player);
+
+    expect(
+      (player.getState() as InProgressState).controllers.view.currentView,
+    ).toBeUndefined();
+    expect(ctx.get(viewAssetIdsContextKey)).toEqual([]);
+    expect(ctx.get(viewAssetsContextKey)).toEqual([]);
+    expect(ctx.get(viewAllAssetsContextKey)).toEqual([]);
+    expect(ctx.has(assetContextKey("name-input"))).toBe(false);
+    expect(onName).toHaveBeenLastCalledWith(undefined, expect.anything());
+  });
+
+  test("keeps the last view's entries for the flow's history when it ends", async () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.start(makeFlow(profileView, profileData) as any);
+
+    transition(player);
+
+    await vitest.waitFor(() => expect(ctx.history()).toHaveLength(1));
+    expect(ctx.history()[0]?.get(assetContextKey("name-input"))?.value).toBe(
+      "Ada",
+    );
+    expect(ctx.get(assetContextKey("name-input"))).toBeUndefined();
+  });
+
+  test("removes the previous view's entries from the store, not only their values", () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.start(makeFlow(profileView, profileData, thanksView) as any);
+
+    transition(player);
+
+    expect(ctx.has(assetContextKey("name-input"))).toBe(false);
+    expect(ctx.has(assetContextKey("profile"))).toBe(false);
+    expect(assetEntryNames(ctx)).toEqual([
+      "player.asset.done",
+      "player.asset.thanks",
+    ]);
+  });
+
+  test("publishes an asset whose id the previous view used with another descriptor", () => {
+    const infoContext = defineAssetContext({ collate: ["primaryInfo"] });
+    const first = {
+      id: "first",
+      type: "collection",
+      values: [text("summary", "Plain text")],
+    };
+    const second = {
+      id: "second",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "summary",
+            type: "info",
+            primaryInfo: text("summary-detail", "Detail"),
+          },
+        },
+      ],
+    };
+    const { ctx, player } = setup([
+      ...baseRegistrations,
+      [{ type: "info" }, infoContext],
+    ]);
+    player.start(makeFlow(first, {}, second) as any);
+    expect(ctx.get(assetContextKey("summary"))).toEqual({
+      id: "summary",
+      type: "text",
+      value: "Plain text",
+    });
+
+    transition(player);
+
+    expect(ctx.get(assetContextKey("summary"))).toMatchObject({
+      id: "summary",
+      type: "info",
+      primaryInfo: { id: "summary-detail", value: "Detail" },
+    });
+  });
+});

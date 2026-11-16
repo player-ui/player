@@ -126,6 +126,23 @@ export class ContextStore {
     return { previousSources };
   }
 
+  /**
+   * Remove a key, as if it was never registered, set or given a transform.
+   * Transforms that read it as a source keep it, so they see it again once
+   * it's set.
+   */
+  delete(key: ContextKey): void {
+    const existing = this.entries.get(key.symbol);
+    if (!existing) {
+      return;
+    }
+
+    for (const src of existing.transform?.sources ?? []) {
+      this.dependents.get(src.symbol)?.delete(key.symbol);
+    }
+    this.entries.delete(key.symbol);
+  }
+
   get<Value>(key: ContextKey<Value>): Value | undefined {
     return this.compute(key.symbol) as Value | undefined;
   }

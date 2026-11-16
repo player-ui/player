@@ -113,6 +113,18 @@ const isAssetWrapper = (value: unknown): value is { asset: Asset } =>
   typeof value === "object" &&
   isAsset((value as { asset?: unknown }).asset);
 
+/**
+ * Flow states that don't clear the current view's entries: a `VIEW` resets
+ * them when its view is created, `ACTION` and `FLOW` states pass straight on
+ * to another state, and an `END` state keeps them for the flow's history.
+ */
+const STATES_KEEPING_VIEW: ReadonlyArray<string> = [
+  "VIEW",
+  "ACTION",
+  "FLOW",
+  "END",
+];
+
 const isEmpty = (value: object): boolean => Object.keys(value).length === 0;
 
 const isDefined = <T>(value: T | undefined): value is T => value !== undefined;
@@ -302,12 +314,13 @@ export class AssetContextPlugin implements PlayerPlugin {
       }
     };
 
-    /** Clear the entry of an asset that's no longer in the view. */
+    /**
+     * Remove the entry of an asset that's no longer in the view, so it drops
+     * out of the store, not just its value. A collating asset's entry is a
+     * transform over its own fields: both go. Keys the store no longer
+     * holds, e.g. after a flow rotation, are left alone.
+     */
     const clearAsset = (id: string) => {
-      // A collating asset's entry is a transform over its own fields.
-      const key = published.get(id)?.collate?.length
-        ? assetSelfContextKey(id)
-        : assetContextKey(id);
       published.delete(id);
       collatedBy.delete(id);
       collatedBy.forEach((parentId, childId) => {
@@ -315,10 +328,8 @@ export class AssetContextPlugin implements PlayerPlugin {
           collatedBy.delete(childId);
         }
       });
-      // Skip keys the store no longer holds, e.g. after a flow rotation.
-      if (ctx.get(key) !== undefined) {
-        ctx.set(key, undefined);
-      }
+      ctx.delete(assetContextKey(id));
+      ctx.delete(assetSelfContextKey(id));
     };
 
     /**
@@ -590,6 +601,18 @@ export class AssetContextPlugin implements PlayerPlugin {
           });
 
           resolver.hooks.afterUpdate.tap(this.name, syncView);
+        });
+      });
+    });
+
+    // A state without a view (e.g. one the host handles) leaves no assets on
+    // screen. Every other view state resets above, when its view is created.
+    player.hooks.flowController.tap(this.name, (flowController) => {
+      flowController.hooks.flow.tap(this.name, (flow) => {
+        flow.hooks.transition.tap(this.name, (_from, to) => {
+          if (!STATES_KEEPING_VIEW.includes(to.value.state_type)) {
+            resetView();
+          }
         });
       });
     });
