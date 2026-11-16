@@ -300,6 +300,8 @@ export class AssetContextPlugin implements PlayerPlugin {
     const departed = new Map<string, AssetContextDescriptor<any>>();
     /** The last resolved view the published ids were synced against. */
     let lastSynced: unknown;
+    /** id -> the value each described asset last resolved to in this view */
+    const lastResolved = new Map<string, unknown>();
 
     const publishAssetIds = (ids: ReadonlyArray<string>) => {
       assetIds = ids;
@@ -335,8 +337,9 @@ export class AssetContextPlugin implements PlayerPlugin {
     /**
      * Reconcile entries with the resolved view once an update completes.
      *
-     * - Assets that re-resolved are published from the final tree, so every
-     *   other `afterResolve` tap has already run, whatever the plugin order.
+     * - Assets whose resolved value changed are published from the final
+     *   tree, so every `afterResolve` tap has already run, whatever the
+     *   plugin order.
      * - Assets that left the tree (e.g. no longer applicable) are cleared.
      * - Assets that come back without re-resolving (e.g. a parent paging its
      *   children, served from the resolver's cache) are published again.
@@ -390,6 +393,7 @@ export class AssetContextPlugin implements PlayerPlugin {
       pending.clear();
       departed.clear();
       lastSynced = undefined;
+      lastResolved.clear();
       collatedBy.clear();
       ctx.set(collatedAssetIdsContextKey, []);
       publishAssetIds([]);
@@ -583,22 +587,31 @@ export class AssetContextPlugin implements PlayerPlugin {
         resetView();
 
         view.hooks.resolver.tap(this.name, (resolver) => {
-          resolver.hooks.afterResolve.tap(this.name, (resolved, node) => {
-            if (
-              (node.type !== NodeType.Asset && node.type !== NodeType.View) ||
-              !isAsset(resolved)
-            ) {
-              return resolved;
-            }
+          // Read-only, so it taps the end of each node's update rather than
+          // `afterResolve`: every `afterResolve` tap has run by then, wherever
+          // it's registered. A node served from the cache, or resolved to the
+          // same value, has the same value as last time and keeps its entry;
+          // any change, a later tap's included, gives it a new one.
+          resolver.hooks.afterNodeUpdate.tap(
+            this.name,
+            (_node, _parent, update) => {
+              const { node, value: resolved } = update;
+              if (
+                (node.type !== NodeType.Asset && node.type !== NodeType.View) ||
+                !isAsset(resolved) ||
+                lastResolved.get(resolved.id) === resolved
+              ) {
+                return;
+              }
 
-            // Published once the update completes; see `syncView`.
-            const descriptor = this.getDescriptor(node.value);
-            if (descriptor) {
-              pending.set(resolved.id, descriptor);
-            }
-
-            return resolved;
-          });
+              // Published once the update completes; see `syncView`.
+              const descriptor = this.getDescriptor(node.value);
+              if (descriptor) {
+                lastResolved.set(resolved.id, resolved);
+                pending.set(resolved.id, descriptor);
+              }
+            },
+          );
 
           resolver.hooks.afterUpdate.tap(this.name, syncView);
         });

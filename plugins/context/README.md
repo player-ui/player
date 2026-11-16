@@ -352,8 +352,10 @@ Entries are built from the final resolved view, once the update completes, so
 changes other plugins make in their own `afterResolve` taps are always
 reflected, wherever those plugins are registered.
 
-An entry is rewritten only when Player's own dependency tracking re-resolves
-that asset, so an unrelated data change doesn't touch it:
+An entry is rewritten only when that asset's resolved value changes: Player's
+own dependency tracking decides what re-resolves, and an asset that resolves
+to the same value keeps its entry. So an unrelated data change doesn't touch
+it:
 
 ```ts
 ctx.subscribe(assetContextKey("email-input"), onEmail);

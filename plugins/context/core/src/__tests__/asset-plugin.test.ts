@@ -852,6 +852,98 @@ describe("update timing", () => {
     expect(ctx.get(assetContextKey("name-input"))?.label).toBe("NAME");
   });
 
+  test("reflects afterResolve changes from plugins registered later on updates", async () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.registerPlugin(
+      afterResolvePlugin("shout", (resolved) =>
+        resolved?.type === "text"
+          ? { ...resolved, value: String(resolved.value).toUpperCase() }
+          : resolved,
+      ),
+    );
+    player.start(
+      makeFlow(
+        { ...profileView, values: [text("greeting", "Hi {{data.name}}")] },
+        profileData,
+      ) as any,
+    );
+    expect(ctx.get(assetContextKey("greeting"))?.value).toBe("HI ADA");
+
+    dataController(player).set([["data.name", "Grace"]]);
+
+    await vitest.waitFor(() =>
+      expect(ctx.get(assetContextKey("greeting"))?.value).toBe("HI GRACE"),
+    );
+  });
+
+  test("reflects a later afterResolve change Player doesn't count as an update", async () => {
+    let suffix = "";
+    const { ctx, player } = setup(baseRegistrations);
+    player.registerPlugin(
+      afterResolvePlugin("suffix", (resolved) =>
+        resolved?.id === "summary" && suffix
+          ? { ...resolved, value: `${resolved.value}${suffix}` }
+          : resolved,
+      ),
+    );
+    player.start(
+      makeFlow(
+        {
+          ...profileView,
+          values: [
+            ...profileView.values,
+            text("summary", "@[ {{data.count}} > 0 ? 'Some' : 'None' ]@"),
+          ],
+        },
+        { data: { ...profileData.data, count: 1 } },
+      ) as any,
+    );
+
+    // The summary resolves to the same text, so Player doesn't count it as
+    // updated, but the name changes too, so the view shows the new suffix.
+    suffix = "!";
+    dataController(player).set([
+      ["data.count", 2],
+      ["data.name", "Grace"],
+    ]);
+
+    await vitest.waitFor(() =>
+      expect(ctx.get(assetContextKey("name-input"))?.value).toBe("Grace"),
+    );
+    expect(ctx.get(assetContextKey("summary"))?.value).toBe("Some!");
+  });
+
+  test("keeps the entry of an asset that re-resolves to the same value", async () => {
+    const { ctx, player } = setup(baseRegistrations);
+    player.start(
+      makeFlow(
+        {
+          ...profileView,
+          values: [
+            ...profileView.values,
+            text("summary", "@[ {{data.count}} > 0 ? 'Some' : 'None' ]@"),
+          ],
+        },
+        { data: { ...profileData.data, count: 1 } },
+      ) as any,
+    );
+    expect(ctx.get(assetContextKey("summary"))?.value).toBe("Some");
+    const onName = vitest.fn();
+    const onSummary = vitest.fn();
+    ctx.subscribe(assetContextKey("name-input"), onName);
+    ctx.subscribe(assetContextKey("summary"), onSummary);
+
+    // The summary reads `data.count`, so it re-resolves, to the same text.
+    dataController(player).set([
+      ["data.count", 2],
+      ["data.name", "Grace"],
+    ]);
+
+    await vitest.waitFor(() => expect(onName).toHaveBeenCalled());
+    expect(ctx.get(assetContextKey("summary"))?.value).toBe("Some");
+    expect(onSummary).not.toHaveBeenCalled();
+  });
+
   test("republishes assets that come back into view without re-resolving", async () => {
     // Shows one of the profile's values at a time, chosen by `data.page`.
     const pager = afterResolvePlugin("pager", (resolved, read) => {
