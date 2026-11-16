@@ -7,6 +7,7 @@ import { Player } from "..";
 import type { ViewController } from "..";
 import actionsFlow from "./helpers/actions.flow";
 import type { InProgressState } from "../types";
+import type { DataPipeline } from "../data";
 import { ActionExpPlugin } from "./helpers/action-exp.plugin";
 import TrackBindingPlugin from "./helpers/binding.plugin";
 
@@ -934,4 +935,23 @@ test("runs a data stage tapped after another plugin read data", () => {
 
   const state = player.getState() as InProgressState;
   expect(state.controllers.data.get("greeting")).toBe("hello");
+});
+
+test("resolves data stages once when no plugin reads data while it sets up", () => {
+  const resolveStages = vitest.fn((pipeline: DataPipeline) => pipeline);
+
+  class CountsStagesPlugin {
+    name = "counts-stages";
+
+    apply(player: Player) {
+      player.hooks.dataController.tap(this.name, (dataController) => {
+        dataController.hooks.resolveDataStages.tap(this.name, resolveStages);
+      });
+    }
+  }
+
+  const player = new Player({ plugins: [new CountsStagesPlugin()] });
+  player.start(makeFlow({ type: "text", id: "text", value: "{{name}}" }));
+
+  expect(resolveStages).toHaveBeenCalledTimes(1);
 });
