@@ -64,16 +64,6 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
     this.trash = new Set();
     this.pathResolver = options.pathResolver;
-
-    // The pipeline is built on first use, so a stage tapped after that would
-    // otherwise never run.
-    this.hooks.resolveDataStages.intercept({
-      tap: () => {
-        this.model?.setMiddleware(
-          this.hooks.resolveDataStages.call(this.baseMiddleware),
-        );
-      },
-    });
   }
 
   public getModel(): PipelinedDataModel {
@@ -85,6 +75,16 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     }
 
     return this.model;
+  }
+
+  /**
+   * Rebuilds a built pipeline from `resolveDataStages`, keeping the model's data and hooks.
+   * Player calls this after its `dataController` hook; a stage tapped later needs another call.
+   */
+  public rebuildPipeline(): void {
+    this.model?.setMiddleware(
+      this.hooks.resolveDataStages.call(this.baseMiddleware),
+    );
   }
 
   private resolveDataValue(
