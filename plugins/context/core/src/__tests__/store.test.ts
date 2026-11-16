@@ -53,6 +53,27 @@ test("literal overrides transform on get", () => {
   expect(store.get(target)).toBe(99);
 });
 
+test("delete removes a key, and its place in the reverse index as a target", () => {
+  const store = new ContextStore();
+  const a = defineContextKey<number>("a", "A");
+  const sum = defineContextKey<number>("sum", "Sum");
+
+  store.set(a, 1);
+  store.registerTransform(sum, {
+    sources: [a],
+    compute: (read) => read(a),
+  });
+  store.delete(sum);
+
+  expect(store.has(sum)).toBe(false);
+  expect(store.get(sum)).toBeUndefined();
+  expect(store.dependentsOf(a.symbol)).toEqual([]);
+
+  store.delete(a);
+  expect(store.has(a)).toBe(false);
+  expect(store.list()).toEqual([]);
+});
+
 test("dependentsOf tracks reverse index from transform sources", () => {
   const store = new ContextStore();
   const src = defineContextKey<number>("src", "src");

@@ -393,6 +393,62 @@ test("list exposes registered descriptors with hasValue / hasTransform flags", (
   });
 });
 
+test("delete removes a key's value and transform, and notifies subscribers", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const literal = defineContextKey<number>("lit", "Literal");
+  const derived = defineContextKey<number>("der", "Derived");
+  const total = defineContextKey<number>("total", "Total");
+
+  plugin.set(literal, 1);
+  plugin.registerTransform(derived, { sources: [], compute: () => 2 });
+  plugin.registerTransform(total, {
+    sources: [literal],
+    compute: (read) => (read(literal) ?? 0) + 10,
+  });
+  const onLiteral = vitest.fn();
+  const onTotal = vitest.fn();
+  plugin.subscribe(literal, onLiteral);
+  plugin.subscribe(total, onTotal);
+
+  plugin.delete(literal);
+  plugin.delete(derived);
+
+  expect(plugin.has(literal)).toBe(false);
+  expect(plugin.has(derived)).toBe(false);
+  expect(plugin.list().map((d) => d.description)).toEqual(["Total"]);
+  expect(onLiteral).toHaveBeenCalledWith(undefined, literal);
+  // A transform reading the deleted key sees it gone, and hears it come back.
+  expect(onTotal).toHaveBeenLastCalledWith(10, total);
+  plugin.set(literal, 5);
+  expect(onTotal).toHaveBeenLastCalledWith(15, total);
+  expect(onLiteral).toHaveBeenLastCalledWith(5, literal);
+});
+
+test("delete leaves a key the store doesn't hold alone", () => {
+  const plugin = new ContextPlugin();
+  new Player({ plugins: [plugin] });
+  const handler = vitest.fn();
+  plugin.subscribeAll(handler);
+
+  plugin.delete(defineContextKey<number>("never-set", "Never set"));
+
+  expect(handler).not.toHaveBeenCalled();
+});
+
+test("a deleted transform isn't restored when the flow's store rotates", () => {
+  const plugin = new ContextPlugin();
+  const player = new Player({ plugins: [plugin] });
+  const derived = defineContextKey<number>("der", "Derived");
+
+  plugin.registerTransform(derived, { sources: [], compute: () => 2 });
+  plugin.delete(derived);
+  player.start(minimalFlow as any);
+  player.hooks.onEnd.call();
+
+  expect(plugin.has(derived)).toBe(false);
+});
+
 test("name-based bridge API round-trips set/get/has/subscribe", () => {
   const plugin = new ContextPlugin();
   new Player({ plugins: [plugin] });
@@ -401,6 +457,9 @@ test("name-based bridge API round-trips set/get/has/subscribe", () => {
   plugin.setByName("formState", "Current form state", { name: "Ada" });
   expect(plugin.getByName("formState")).toEqual({ name: "Ada" });
   expect(plugin.hasByName("formState")).toBe(true);
+  plugin.deleteByName("formState");
+  expect(plugin.hasByName("formState")).toBe(false);
+  expect(plugin.getByName("formState")).toBeUndefined();
 
   const handler = vitest.fn();
   plugin.subscribeByName("counter", "A counter", handler);

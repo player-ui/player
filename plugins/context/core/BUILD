@@ -16,6 +16,7 @@ js_pipeline(
         ":node_modules/@player-ui/player",
     ],
     deps = [
+        ":node_modules/@player-ui/partial-match-registry",
         "//:node_modules/tapable-ts",
     ],
     test_deps = [

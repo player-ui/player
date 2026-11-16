@@ -104,6 +104,21 @@ export class ContextPlugin implements PlayerPlugin {
     this.notifyIfChanged(key, value);
   }
 
+  /**
+   * Remove a key: its value and its transform, as if it was never set. It
+   * drops out of `has`, `list` and `snapshot`, and subscribers are notified
+   * that its value is now `undefined`. Subscriptions are kept, so they hear
+   * about the key again if it's set later.
+   */
+  delete(key: ContextKey): void {
+    const existed = this.store.has(key);
+    this.store.delete(key);
+    this.transforms.delete(key.symbol);
+    if (existed) {
+      this.notifyIfChanged(key, undefined);
+    }
+  }
+
   get<Value>(key: ContextKey<Value>): Value | undefined {
     const raw = this.store.get(key);
     const resolved = this.hooks.resolveValue.call(raw, key);
@@ -195,6 +210,11 @@ export class ContextPlugin implements PlayerPlugin {
   /** Bridge-friendly: check presence by string name. */
   hasByName(name: string): boolean {
     return this.has(this.ensureNamedKey(name));
+  }
+
+  /** Bridge-friendly: delete a key by string name. */
+  deleteByName(name: string): void {
+    this.delete(this.ensureNamedKey(name));
   }
 
   /** Bridge-friendly: subscribe by string name. */
