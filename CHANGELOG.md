@@ -1,3 +1,23 @@
+# 1.4.0-next.0 (Mon Nov 16 2026)
+
+### Release Notes
+
+#### Context Plugin Enhancements ([#961](https://github.com/player-ui/player/pull/961))
+
+Adds the ability/pattern for assets to automatically register the context they provide as part of their definition
+
+---
+
+#### 🚀 Enhancement
+
+- Context Plugin Enhancements [#961](https://github.com/player-ui/player/pull/961) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 1.3.1-next.0 (Thu Nov 12 2026)
 
 #### 🐛 Bug Fix
