@@ -339,10 +339,13 @@ export class StreamingDataPlugin implements PlayerPlugin {
   private startFlow(dataController: DataController): void {
     this.teardownFlow();
     this.dataController = dataController;
-    const flowAbort = new AbortController();
-    this.flowAbort = flowAbort;
     this.states = this.createStates();
     this.stateList = [...this.states.values()];
+    // Some JS engines, such as Player's iOS and Android ones, have no AbortController; a flow
+    // without a collection must still run there.
+    const flowAbort =
+      this.stateList.length > 0 ? new AbortController() : undefined;
+    this.flowAbort = flowAbort;
 
     dataController.hooks.resolveDataStages.tap(this.name, (pipeline) => [
       ...pipeline,
@@ -351,7 +354,7 @@ export class StreamingDataPlugin implements PlayerPlugin {
 
     // Player is still setting up the flow, including validation, when this hook runs.
     queueMicrotask(() => {
-      if (this.dataController !== dataController || flowAbort.signal.aborted)
+      if (this.dataController !== dataController || flowAbort?.signal.aborted)
         return;
       this.states.forEach((state) => this.patchStatus(state, {}));
     });

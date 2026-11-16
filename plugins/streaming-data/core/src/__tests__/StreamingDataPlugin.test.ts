@@ -488,6 +488,21 @@ describe("StreamingDataPlugin", () => {
     expect(test.plugin.getCollection("items")).toBeUndefined();
   });
 
+  it("runs a flow that declares no collection where AbortController doesn't exist", async () => {
+    vitest.stubGlobal("AbortController", undefined);
+    try {
+      const test = setup({ content: { ...flow, schema: undefined } });
+      await vitest.waitFor(() =>
+        expect(test.player.getState().status).toBe("in-progress"),
+      );
+      test.controllers().flow.transition("Done");
+      await test.done;
+      expect(test.player.getState().status).toBe("completed");
+    } finally {
+      vitest.unstubAllGlobals();
+    }
+  });
+
   it("saves the changes eachRow makes to each selected record, merges what the source returns, and transitions by outcome", async () => {
     const test = setup();
     await loadAll(test, [item("a"), item("b"), item("c")]);

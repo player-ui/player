@@ -64,6 +64,8 @@ A source has three parts:
 - `load({ params, signal })` returns an async iterable of batches. Each batch has `records`, and optionally `totalBatches` so the plugin can report progress. The `signal` aborts when the flow ends or a new load replaces this one.
 - `commit(changes, { params, signal })` is optional. It receives the records to `create`, the records to `update` (each with its `key`, the changed fields in `patch`, and the whole `record` with them applied), and the records to `remove` (each with its `key` and the `record` the collection holds, so a source can address a delete with more than the key). It resolves with the saved `records` as the backend returned them, the `removed` keys, and the records that `failed`, each with a `key` and a `reason`.
 
+The plugin creates `AbortController`s for the `signal`s, and uses only `abort()`, `signal.aborted`, and `signal.addEventListener("abort", ...)`. JavaScript engines without `AbortController`, such as the ones Player uses on iOS and Android, need one added before a flow that declares a collection starts. Flows without a collection don't need it.
+
 ## Declaring a collection
 
 A collection is a schema entry with a `source`:
