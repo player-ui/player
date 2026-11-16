@@ -1,3 +1,15 @@
+# 1.3.1-next.0 (Thu Nov 12 2026)
+
+#### 🐛 Bug Fix
+
+- Converting JSON to DSL for: Beacon, External Action, and PubSub [#962](https://github.com/player-ui/player/pull/962) ([@maxXu0713](https://github.com/maxXu0713))
+
+#### Authors: 1
+
+- xumax3 ([@maxXu0713](https://github.com/maxXu0713))
+
+---
+
 # 1.3.0 (Tue Oct 20 2026)
 
 ### Release Notes
