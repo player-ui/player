@@ -298,7 +298,6 @@ describe("StreamingDataPlugin", () => {
       completed: false,
       totalBatches: 2,
       loadedRecords: 2,
-      progress: 0.5,
     });
     expect(test.get("items")).toBe(test.plugin.getCollection("items")?.records);
     expect(test.get("items.1.name")).toBe("B");
@@ -309,7 +308,7 @@ describe("StreamingDataPlugin", () => {
     await vitest.waitFor(() =>
       expect(test.status()).toMatchObject({ completed: true, loading: false }),
     );
-    expect(test.status()).toMatchObject({ loadedRecords: 3, progress: 1 });
+    expect(test.status()).toMatchObject({ loadedBatches: 2, loadedRecords: 3 });
     expect(test.player.getState().status).toBe("in-progress");
   });
 
@@ -388,7 +387,7 @@ describe("StreamingDataPlugin", () => {
     await vitest.waitFor(() =>
       expect(test.get("unknownStatus")).toMatchObject({
         loading: false,
-        error: "No source is registered as 'nowhere'",
+        error: { message: "No source is registered as 'nowhere'" },
       }),
     );
   });
@@ -435,7 +434,9 @@ describe("StreamingDataPlugin", () => {
     test.evaluate("loadStreamingData('items')");
     test.push([item("a")], 3);
     test.fail("Offline");
-    await vitest.waitFor(() => expect(test.status()?.error).toBe("Offline"));
+    await vitest.waitFor(() =>
+      expect(test.status()?.error).toStrictEqual({ message: "Offline" }),
+    );
     expect(test.status()).toMatchObject({ loading: false, loadedRecords: 1 });
 
     test.evaluate("retryStreamingData('items')");
@@ -456,21 +457,25 @@ describe("StreamingDataPlugin", () => {
     expect(test.get("items")).toHaveLength(1);
   });
 
-  it("copies a string kind from a failed load to the status, and drops it with the error", async () => {
+  it("puts a string kind from a failed load on the status's error, and drops it with the error", async () => {
     const test = setup();
     test.evaluate("loadStreamingData('items')");
     test.fail("Busy", "throttled");
-    await vitest.waitFor(() => expect(test.status()?.error).toBe("Busy"));
-    expect(test.status()?.errorKind).toBe("throttled");
+    await vitest.waitFor(() =>
+      expect(test.status()?.error).toStrictEqual({
+        message: "Busy",
+        kind: "throttled",
+      }),
+    );
 
     test.evaluate("retryStreamingData('items')");
     await vitest.waitFor(() => expect(test.loads).toHaveLength(2));
     expect(test.status()?.error).toBeUndefined();
-    expect(test.status()).not.toHaveProperty("errorKind");
 
     test.fail("Odd", 42);
-    await vitest.waitFor(() => expect(test.status()?.error).toBe("Odd"));
-    expect(test.status()).not.toHaveProperty("errorKind");
+    await vitest.waitFor(() =>
+      expect(test.status()?.error).toStrictEqual({ message: "Odd" }),
+    );
   });
 
   it("cancels the load and drops the records when the flow ends", async () => {
@@ -627,16 +632,17 @@ describe("StreamingDataPlugin", () => {
         saved: 0,
         failed: 2,
         failedKeys: ["a", "b"],
-        error: "Offline",
       },
     });
-    expect(test.status()?.lastCommit).not.toHaveProperty("errorKind");
+    expect(test.status()?.lastCommit?.error).toStrictEqual({
+      message: "Offline",
+    });
     expect(test.log.error).toHaveBeenCalledWith(
       "[StreamingDataPlugin] Saving 'items' failed: Offline",
     );
   });
 
-  it("copies a string kind from a rejected save to lastCommit, and drops it on the next save", async () => {
+  it("puts a string kind from a rejected save on lastCommit's error, and drops it on the next save", async () => {
     let rejection: Error | undefined = Object.assign(new Error("Signed out"), {
       kind: "session-expired",
     });
@@ -653,9 +659,9 @@ describe("StreamingDataPlugin", () => {
     await vitest.waitFor(() =>
       expect(test.status()?.lastCommit?.outcome).toBe("failed"),
     );
-    expect(test.status()?.lastCommit).toMatchObject({
-      error: "Signed out",
-      errorKind: "session-expired",
+    expect(test.status()?.lastCommit?.error).toStrictEqual({
+      message: "Signed out",
+      kind: "session-expired",
     });
 
     await vitest.waitFor(() => expect(test.stateName()).toBe("VIEW_main"));
@@ -664,7 +670,7 @@ describe("StreamingDataPlugin", () => {
     await vitest.waitFor(() =>
       expect(test.status()?.lastCommit?.outcome).toBe("saved"),
     );
-    expect(test.status()?.lastCommit).not.toHaveProperty("errorKind");
+    expect(test.status()?.lastCommit).not.toHaveProperty("error");
   });
 
   it("fails a save when the collection's source can't save", async () => {
@@ -679,7 +685,7 @@ describe("StreamingDataPlugin", () => {
 
     expect(test.status()?.lastCommit).toMatchObject({
       failedKeys: ["a"],
-      error: "This collection's source can't save.",
+      error: { message: "This collection's source can't save." },
     });
     expect(names(test)).toEqual(["A"]);
   });

@@ -17,7 +17,7 @@ Register the plugin with a source for each collection, and add its `commitRecord
 ```ts
 import { Player } from "@player-ui/player";
 import { ExternalStatePlugin } from "@player-ui/external-state-plugin";
-import { StreamingDataPlugin } from "@player-ui/streaming-data-plugin";
+import { StreamingDataPlugin } from "@player-ui/streaming-data-plugin-core";
 
 const streamingData = new StreamingDataPlugin({
   transactions: {
@@ -61,7 +61,7 @@ const player = new Player({
 A source has three parts:
 
 - `key(record)` returns the record's unique key, or an empty string for a draft that hasn't been saved yet.
-- `load({ params, signal })` returns an async iterable of batches. Each batch has `records`, and optionally `totalBatches` so the plugin can report progress. The `signal` aborts when the flow ends or a new load replaces this one.
+- `load({ params, signal })` returns an async iterable of batches. Each batch has `records`, and optionally `totalBatches`, which the plugin copies to the status. The `signal` aborts when the flow ends or a new load replaces this one.
 - `commit(changes, { params, signal })` is optional. It receives the records to `create`, the records to `update` (each with its `key`, the changed fields in `patch`, and the whole `record` with them applied), and the records to `remove` (each with its `key` and the `record` the collection holds, so a source can address a delete with more than the key). It resolves with the saved `records` as the backend returned them, the `removed` keys, and the records that `failed`, each with a `key` and a `reason`.
 
 The plugin creates `AbortController`s for the `signal`s, and uses only `abort()`, `signal.aborted`, and `signal.addEventListener("abort", ...)`. JavaScript engines without `AbortController`, such as the ones Player uses on iOS and Android, need one added before a flow that declares a collection starts. Flows without a collection don't need it.
@@ -113,17 +113,17 @@ Loading the same collection again with the same params does nothing. With differ
 
 While a load runs, the plugin writes this status to the status binding:
 
-| Field                                            | Meaning                                                                                          |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `started`, `loading`, `completed`                | Where the load is                                                                                |
-| `loadedBatches`, `totalBatches`, `loadedRecords` | How much has arrived                                                                             |
-| `progress`                                       | 0 to 1 when the source reports `totalBatches`, otherwise 0 until loading completes               |
-| `error`                                          | Why the load failed, if it did                                                                   |
-| `errorKind`                                      | A machine-readable reason for `error`, if the source gave one                                    |
-| `committing`                                     | Whether a save is running                                                                        |
-| `lastCommit`                                     | The latest save's `outcome`, `saved` and `failed` counts, `failedKeys`, `error`, and `errorKind` |
+| Field                                            | Meaning                                                                             |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `started`, `loading`, `completed`                | Where the load is                                                                   |
+| `loadedBatches`, `totalBatches`, `loadedRecords` | How much has arrived                                                                |
+| `error`                                          | Why the load failed, if it did: a `message`, and a `kind` if the source gave one    |
+| `committing`                                     | Whether a save is running                                                           |
+| `lastCommit`                                     | The latest save's `outcome`, `saved` and `failed` counts, `failedKeys`, and `error` |
 
-When a load or save fails, the plugin copies a string `kind` from the error the source threw to `errorKind`, without interpreting it, and clears it whenever `error` clears. The source defines the values, such as `throttled` or `unavailable`, so content can branch on a stable value instead of the message.
+To show progress when the source reports `totalBatches`, divide `loadedBatches` by it, as in `{{transactionsStatus.loadedBatches}} / {{transactionsStatus.totalBatches}}`.
+
+When a load or save fails, `error.message` is the message of the error the source threw, and the plugin copies a string `kind` from that error to `error.kind` without interpreting it. The source defines the kinds, such as `throttled` or `unavailable`, so content can branch on a stable value instead of the message.
 
 ## Reading records
 

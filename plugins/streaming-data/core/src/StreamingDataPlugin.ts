@@ -29,6 +29,7 @@ import { MergeSummary, RecordCollection } from "./RecordCollection";
 import { StreamingDataPluginSymbol } from "./symbols";
 import { toCommitRequest } from "./toCommitRequest";
 import type {
+  CollectionError,
   CollectionHandle,
   CollectionStatus,
   CommitOutcome,
@@ -70,12 +71,12 @@ const isIndexable = (
 ): value is Record<string | number, unknown> =>
   typeof value === "object" && value !== null;
 
-/** `error` and, when the thrown error carries a string `kind`, `errorKind` */
-const errorFields = (error: unknown): { error: string; errorKind?: string } => {
+/** The thrown error's message and, when it carries a string `kind`, that kind */
+const toCollectionError = (error: unknown): CollectionError => {
   const kind = isIndexable(error) ? error.kind : undefined;
   return {
-    error: messageOf(error),
-    ...(typeof kind === "string" ? { errorKind: kind } : undefined),
+    message: messageOf(error),
+    ...(typeof kind === "string" ? { kind } : undefined),
   };
 };
 
@@ -98,13 +99,13 @@ const overlaps = (a: string, b: string): boolean => {
 
 const failedCommit = (
   failedKeys: string[],
-  reason?: { error: string; errorKind?: string },
+  error?: CollectionError,
 ): LastCommit => ({
   outcome: "failed",
   saved: 0,
   failed: failedKeys.length,
   failedKeys,
-  ...reason,
+  ...(error ? { error } : undefined),
 });
 
 const outcomeOf = (result: CommitResult<object>): CommitOutcome => {
@@ -459,7 +460,9 @@ export class StreamingDataPlugin implements PlayerPlugin {
     if (!source) {
       this.patchStatus(state, {
         loading: false,
-        error: `No source is registered as '${state.declaration.ref}'`,
+        error: {
+          message: `No source is registered as '${state.declaration.ref}'`,
+        },
       });
       return;
     }
@@ -477,25 +480,18 @@ export class StreamingDataPlugin implements PlayerPlugin {
           loadedBatches,
           totalBatches,
           loadedRecords: state.collection.records.length,
-          progress: totalBatches
-            ? Math.min(1, loadedBatches / totalBatches)
-            : 0,
         });
         this.notifyChanged(state, change);
       }
       if (isCurrent())
-        this.patchStatus(state, {
-          loading: false,
-          completed: true,
-          progress: 1,
-        });
+        this.patchStatus(state, { loading: false, completed: true });
     } catch (error) {
       if (!isCurrent()) return;
-      const reason = errorFields(error);
+      const reason = toCollectionError(error);
       this.logger?.error(
-        `[${this.name}] Loading '${state.collection.binding}' failed: ${reason.error}`,
+        `[${this.name}] Loading '${state.collection.binding}' failed: ${reason.message}`,
       );
-      this.patchStatus(state, { loading: false, ...reason });
+      this.patchStatus(state, { loading: false, error: reason });
     }
   }
 
@@ -538,9 +534,9 @@ export class StreamingDataPlugin implements PlayerPlugin {
       });
       return await this.commitChanges(state, changes);
     } catch (error) {
-      const reason = errorFields(error);
+      const reason = toCollectionError(error);
       this.logger?.error(
-        `[${this.name}] Saving '${request.binding}' failed: ${reason.error}`,
+        `[${this.name}] Saving '${request.binding}' failed: ${reason.message}`,
       );
       this.patchStatus(state, {
         committing: false,
@@ -569,7 +565,7 @@ export class StreamingDataPlugin implements PlayerPlugin {
     if (!source?.commit || !flowAbort) {
       this.patchStatus(state, {
         lastCommit: failedCommit(keysOf(changes), {
-          error: "This collection's source can't save.",
+          message: "This collection's source can't save.",
         }),
       });
       return "failed";
@@ -602,10 +598,10 @@ export class StreamingDataPlugin implements PlayerPlugin {
       this.notifyChanged(state, change);
       return outcome;
     } catch (error) {
-      const reason = errorFields(error);
+      const reason = toCollectionError(error);
       if (this.dataController === dataController) {
         this.logger?.error(
-          `[${this.name}] Saving '${state.collection.binding}' failed: ${reason.error}`,
+          `[${this.name}] Saving '${state.collection.binding}' failed: ${reason.message}`,
         );
         this.patchStatus(state, {
           committing: false,

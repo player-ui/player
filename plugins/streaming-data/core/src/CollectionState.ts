@@ -19,7 +19,6 @@ export const INITIAL_STATUS: CollectionStatus = {
   completed: false,
   loadedBatches: 0,
   loadedRecords: 0,
-  progress: 0,
   committing: false,
 };
 

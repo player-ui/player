@@ -9,7 +9,7 @@ tsup_config(name = "tsup_config")
 vitest_config(name = "vitest_config")
 
 js_pipeline(
-    package_name = "@player-ui/streaming-data-plugin",
+    package_name = "@player-ui/streaming-data-plugin-core",
     peer_deps = [
         ":node_modules/@player-ui/external-state-plugin",
         ":node_modules/@player-ui/player",

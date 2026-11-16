@@ -74,6 +74,13 @@ export interface CollectionSourceDeclaration {
 /** How a save ended */
 export type CommitOutcome = "saved" | "partial" | "failed";
 
+/** Why a load or a save failed */
+export interface CollectionError {
+  message: string;
+  /** A machine-readable reason, if the source gave one; the source defines the values */
+  kind?: string;
+}
+
 /** The latest save's result */
 export interface LastCommit {
   outcome: CommitOutcome;
@@ -82,9 +89,7 @@ export interface LastCommit {
   failed: number;
   failedKeys: string[];
   /** Why the save failed as a whole, if it did */
-  error?: string;
-  /** A machine-readable reason for `error`, if the source gave one; the source defines the values */
-  errorKind?: string;
+  error?: CollectionError;
 }
 
 /** A collection's status, which the plugin writes to the collection's status binding */
@@ -95,15 +100,11 @@ export interface CollectionStatus {
   loadedBatches: number;
   totalBatches?: number;
   loadedRecords: number;
-  /** 0 to 1 when the total is known, otherwise 0 until loading completes */
-  progress: number;
   /** True while a save is in flight */
   committing: boolean;
   lastCommit?: LastCommit;
   /** Why loading failed, if it did */
-  error?: string;
-  /** A machine-readable reason for `error`, if the source gave one; the source defines the values */
-  errorKind?: string;
+  error?: CollectionError;
 }
 
 /** A change to a collection's records, for consumers that keep more than the array */

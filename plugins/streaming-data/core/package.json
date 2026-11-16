@@ -1,5 +1,5 @@
 {
-  "name": "@player-ui/streaming-data-plugin",
+  "name": "@player-ui/streaming-data-plugin-core",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "peerDependencies": {
