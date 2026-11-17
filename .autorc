@@ -9,6 +9,39 @@
   "plugins": [
     [
       "all-contributors",
+      {
+        "exclude": ["intuit-svc", "Copilot", "copilot"],
+        "types": {
+          "example": [
+            "**/*.stories*",
+            "**/*.story.*",
+            "**/mocks/**"
+          ],
+          "infra": [
+            "**/.circle/**/*",
+            "**/.circleci/**/*",
+            "**/.github/**/*",
+            "**/travis.yml"
+          ],
+          "test": [
+            "**/*.test.*",
+            "**/test/**",
+            "**/__tests__/**",
+            "**/Tests/**",
+            "**/ViewInspector/**",
+            "**/androidTest/**"
+          ],
+          "code": [
+            "**/src/**/*",
+            "**/lib/**/*",
+            "**/Sources/**/*",
+            "**/package.json",
+            "**/tsconfig.json"
+          ]
+        }
+      }
+    ],
+    [
       "version-file",
       {
         "versionFile": "./VERSION",
