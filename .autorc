@@ -8,6 +8,7 @@
   "repo": "player",
   "plugins": [
     [
+      "all-contributors",
       "version-file",
       {
         "versionFile": "./VERSION",
