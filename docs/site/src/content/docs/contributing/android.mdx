@@ -1,11 +1,16 @@
-# Local Android Development
+---
+title: Local Android Development
+---
+
+import { Aside } from "@astrojs/starlight/components";
 
 ### Setup
 
 The following tools should only be required if you're building Android related targets -- and can be installed through the [sdkmanager CLI](https://developer.android.com/tools/sdkmanager) or the [Android Studio SDK Manager](https://developer.android.com/studio/intro/update#sdk-manager).
 
-> [!TIP]
-> If you're encountering _unexpected_ errors due to missing SDK/NDK, ensure you're not including Android targets implicitly, such as through [target pattern](https://bazel.build/run/build#specifying-build-targets) `//...` expansion or as a dependency of the explicit target to be built
+<Aside type="tip">
+If you're encountering _unexpected_ errors due to missing SDK/NDK, ensure you're not including Android targets implicitly, such as through [target pattern](https://bazel.build/run/build#specifying-build-targets) `//...` expansion or as a dependency of the explicit target to be built
+</Aside>
 
 <table>
   <thead>
@@ -24,7 +29,15 @@ The following tools should only be required if you're building Android related t
       </td>
       <td>&gt;= 35</td>
       <td>
-        Unless the SDK path is manually configured via the `android_sdk_repository` rule, the `ANDROID_HOME` environment variable should be defined when you're invoking build targets that require the SDK. SDK support is provided by [rules_android](https://github.com/bazelbuild/rules_android), see their README for more information.
+        Unless the SDK path is manually configured via the{" "}
+        <code>android_sdk_repository</code> rule, the{" "}
+        <code>ANDROID_HOME</code> environment variable should be defined when
+        you&apos;re invoking build targets that require the SDK. SDK support is
+        provided by{" "}
+        <a href="https://github.com/bazelbuild/rules_android">
+          rules_android
+        </a>
+        , see their README for more information.
       </td>
     </tr>
     <tr>
@@ -33,7 +46,16 @@ The following tools should only be required if you're building Android related t
       </td>
       <td>&gt;= 25b</td>
       <td>
-        Unless the NDK path is manually configured via the `android_ndk_repository`, the `ANDROID_NDK_HOME` environment variable should be defined when you're invoking build targets that require the NDK. NDK support is provided by [rules_android_ndk](https://github.com/bazelbuild/rules_android_ndk), see their README for more information, including NDK version compatibility.
+        Unless the NDK path is manually configured via the{" "}
+        <code>android_ndk_repository</code>, the{" "}
+        <code>ANDROID_NDK_HOME</code> environment variable should be defined
+        when you&apos;re invoking build targets that require the NDK. NDK
+        support is provided by{" "}
+        <a href="https://github.com/bazelbuild/rules_android_ndk">
+          rules_android_ndk
+        </a>
+        , see their README for more information, including NDK version
+        compatibility.
       </td>
     </tr>
   </tbody>
@@ -57,8 +79,9 @@ Building actually doesn't have a `just` command, since building is typically in 
 
 A great example of a target that isn't buildable on it's own is `//jvm/hermes/src/main/jni:hermes_jni_lib` -- it relies on _where_ it's being consumed from to provide the JNI context to build with. While you might not attempt to build that target explicitly, it can still implicitly fail your Bazel command, i.e. `bazel test //jvm/hermes/...`.
 
-> [!IMPORTANT]
-> If you must aggregate targets through `//...` expansion, it's best to query or filter on targets that actually match what you're looking for. The `justfile` uses this pattern for running all tests of a certain type.
+<Aside type="caution">
+If you must aggregate targets through `//...` expansion, it's best to query or filter on targets that actually match what you're looking for. The `justfile` uses this pattern for running all tests of a certain type.
+</Aside>
 
 #### Testing
 
@@ -124,8 +147,9 @@ To run:
    just start-android-demo
    ```
 
-> [!NOTE]
-> This is enough to pick up _any_ new changes since the app last installed. Additionally, the APK file can be found at `bazel-bin/android/demo/demo.apk`, which can be distributed and installed manually through ADB or dragging to your emulator
+<Aside>
+This is enough to pick up _any_ new changes since the app last installed. Additionally, the APK file can be found at `bazel-bin/android/demo/demo.apk`, which can be distributed and installed manually through ADB or dragging to your emulator
+</Aside>
 
 ### Troubleshooting
 

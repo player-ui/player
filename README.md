@@ -27,7 +27,6 @@ Out of the box, Player manages everything you'd need in order to create a modern
 ![Multiple Platforms](./docs/site/public/platform_diagram.png#gh-light-mode-only)
 ![Multiple Platforms](./docs/site/public/platform_diagram_dark_mode.png#gh-dark-mode-only)
 
-
 Add your own asset library to handle the rendering, and voilà, you have a full dynamic user experience.
 
 More features can be added to Player through it's plugin system -- most of which can even be shared across platforms!
@@ -36,7 +35,7 @@ Ready to get started? Check out the [docs](https://player-ui.github.io) for more
 
 ## Contributing
 
-We actively welcome pull requests. Learn how to [contribute](./CONTRIBUTING.md). Be sure to read our [code of conduct](./.github/CODE_OF_CONDUCT.md).
+We actively welcome pull requests. Learn how to [contribute](https://player-ui.github.io/latest/contributing/). Be sure to read our [code of conduct](./.github/CODE_OF_CONDUCT.md).
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -61,7 +60,6 @@ We actively welcome pull requests. Learn how to [contribute](./CONTRIBUTING.md).
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
-
 
 ## License
 

@@ -170,6 +170,10 @@ export default defineConfig({
               label: "Announcements",
               autogenerate: { directory: "announcements" },
             },
+            {
+              label: "Contributing",
+              autogenerate: { directory: "contributing" },
+            },
           ],
         },
         {
