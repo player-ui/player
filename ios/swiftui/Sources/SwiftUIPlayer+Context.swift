@@ -32,9 +32,9 @@ public extension SwiftUIPlayer {
 
         private var contextBuilder: () -> JSContext
         private let partialMatchPlugin: PartialMatchFingerprintPlugin = .init()
-        /// All plugins applied to the currently loaded context (caller-supplied plugins plus
-        /// `partialMatchPlugin`), retained so `unload()` can tear them down too.
-        private var activePlugins: [NativePlugin] = []
+        /// Plugins applied to the currently loaded context, held weakly so this (possibly
+        /// global) context doesn't extend their lifetime. Torn down on `unload()`/next `load()`.
+        private var activePlugins: [WeakPlugin] = []
         private var flow: String?
         private var registryWatch: AnyCancellable?
         private var state: BaseFlowState?
@@ -90,11 +90,14 @@ public extension SwiftUIPlayer {
 
             let context: JSContext = contextBuilder()
 
+            // Plugins from a previous flow loaded without `unload()` still point at its context.
+            teardownActivePlugins()
+
             let allPlugins = plugins + [partialMatchPlugin]
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
                 return logger.e("Failed to load player")
             }
-            activePlugins = allPlugins
+            activePlugins = allPlugins.map(WeakPlugin.init)
 
             let hooks = SwiftUIPlayerHooks(from: playerValue)
 
@@ -156,9 +159,7 @@ public extension SwiftUIPlayer {
                 }
                 // Break plugin → JSContext/JSValue references, including caller-supplied
                 // plugins, so a late callback can't reach the now-torn-down context.
-                activePlugins.forEach { $0.teardown() }
-                // reset activePlugins
-                activePlugins = []
+                teardownActivePlugins()
                 // Release the JS player instance and all hook JSValues
                 player = nil
                 hooks = nil
@@ -170,6 +171,11 @@ public extension SwiftUIPlayer {
                 self?.result = nil
             }
             registry.resetView()
+        }
+
+        private func teardownActivePlugins() {
+            activePlugins.forEach { $0.plugin?.teardown() }
+            activePlugins = []
         }
 
         /// Clear the exceptionHandler of the context to remove reference to the logger

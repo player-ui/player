@@ -166,6 +166,43 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertNil(plugin.context)
     }
 
+    /// The context (e.g. global `sharedManaged`, which ManagedPlayer never unloads on
+    /// dismissal) must not keep caller-supplied plugins alive.
+    func testContextDoesNotRetainPlugins() {
+        let context = SwiftUIPlayer.Context { JSContext()! }
+        weak var weakSpy: TeardownSpyPlugin?
+
+        autoreleasepool {
+            let spy = TeardownSpyPlugin()
+            weakSpy = spy
+            let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [spy], context: context)
+            _ = player
+        }
+
+        XCTAssertTrue(context.isLoaded)
+        XCTAssertNil(weakSpy, "Context should hold plugins weakly")
+    }
+
+    /// Verifies loading a new flow without `unload()` tears down the previous flow's plugins,
+    /// which would otherwise keep pointing at the old JSContext, and leaves the new ones active.
+    func testLoadingNewFlowTearsDownPreviousPlugins() {
+        let context = SwiftUIPlayer.Context { JSContext()! }
+        let first = TeardownSpyPlugin()
+        let second = TeardownSpyPlugin()
+
+        autoreleasepool {
+            _ = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [first], context: context)
+            _ = SwiftUIPlayer(
+                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                plugins: [second],
+                context: context
+            )
+        }
+
+        XCTAssertEqual(first.teardownCallCount, 1, "Previous flow's plugin should be torn down")
+        XCTAssertEqual(second.teardownCallCount, 0, "Current flow's plugin should stay active")
+    }
+
     /// Spins the run loop until `object()` returns nil or `timeout` elapses.
     /// The setTimeout polyfill dispatches via GCD (background → main), so
     /// the run loop must tick to let those blocks execute and release JSValues.

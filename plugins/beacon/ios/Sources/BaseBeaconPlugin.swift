@@ -102,6 +102,13 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         )
     }
 
+    /// Also releases `hooks` (which hold the old `pluginRef`) and child beacon plugins.
+    override open func teardown() {
+        hooks = nil
+        plugins.forEach { $0.teardown() }
+        super.teardown()
+    }
+
     override open func getUrlForFile(fileName: String) -> URL? {
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
     }
