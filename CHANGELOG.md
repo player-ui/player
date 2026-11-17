@@ -1,3 +1,35 @@
+# 1.5.0-next.0 (Tue Nov 17 2026)
+
+### Release Notes
+
+#### feat(streaming-data): load large collections in batches outside the data model ([#968](https://github.com/player-ui/player/pull/968))
+
+New `@player-ui/streaming-data-plugin-core` loads large collections in batches outside the data model and saves changes to them through `commit-records` `EXTERNAL` states. See the Streaming Data plugin docs.
+
+---
+
+#### 🚀 Enhancement
+
+- feat(streaming-data): load large collections in batches outside the data model [#968](https://github.com/player-ui/player/pull/968) ([@shahabdsh](https://github.com/shahabdsh))
+
+#### 🐛 Bug Fix
+
+- Update README.md [#975](https://github.com/player-ui/player/pull/975) ([@KetanReddy](https://github.com/KetanReddy))
+- Put back all-contributors plugin, retroactively update contributors [#973](https://github.com/player-ui/player/pull/973) ([@KVSRoyal](https://github.com/KVSRoyal))
+- fix(core): rebuild data stages after the dataController hook [#967](https://github.com/player-ui/player/pull/967) ([@shahabdsh](https://github.com/shahabdsh))
+- Merge branch 'fix/binding-tracker-resolved-node-map' into fix/late-resolve-data-stages [#966](https://github.com/player-ui/player/pull/966) ([@shahabdsh](https://github.com/shahabdsh))
+- docs(core): say that a late data stage rebuilds the pipeline [#966](https://github.com/player-ui/player/pull/966) ([@shahabdsh](https://github.com/shahabdsh))
+- fix(core): release replaced nodes in the validation binding tracker [#966](https://github.com/player-ui/player/pull/966) ([@shahabdsh](https://github.com/shahabdsh))
+- fix(core): run data stages tapped after the pipeline is built [#966](https://github.com/player-ui/player/pull/966) ([@shahabdsh](https://github.com/shahabdsh))
+
+#### Authors: 3
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Shahab Deljoo ([@shahabdsh](https://github.com/shahabdsh))
+
+---
+
 # 1.4.0 (Mon Nov 16 2026)
 
 ### Release Notes
