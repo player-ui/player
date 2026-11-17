@@ -28,6 +28,19 @@ const keysAt = (
   );
 };
 
+/** The keys of the held records a request updates or removes */
+export function requestedKeys<R extends object>(
+  collection: CollectionHandle<R>,
+  request: CommitRecordsRequest,
+  context: ChangeContext,
+): string[] {
+  const keys = new Set([
+    ...keysAt(context, request.update),
+    ...keysAt(context, request.remove),
+  ]);
+  return [...keys].filter((key) => collection.get(key) !== undefined);
+}
+
 /** The fields of `after` that differ from `record`; a field `after` dropped becomes null */
 const changedFields = (
   record: object,
@@ -73,15 +86,18 @@ export function collectChanges<R extends object>(
 
   const { rowBinding, eachRow } = request;
   if (rowBinding && eachRow.length > 0) {
-    keysAt(context, request.update).forEach((key) => {
-      const record = collection.get(key);
-      if (!record) return;
-      context.set(rowBinding, record);
-      eachRow.forEach((expression) => context.evaluate(expression));
-      const after = context.get(rowBinding);
-      if (isPlainObject(after)) toUpdate(key, record, after);
-    });
-    context.delete(rowBinding);
+    try {
+      keysAt(context, request.update).forEach((key) => {
+        const record = collection.get(key);
+        if (!record) return;
+        context.set(rowBinding, record);
+        eachRow.forEach((expression) => context.evaluate(expression));
+        const after = context.get(rowBinding);
+        if (isPlainObject(after)) toUpdate(key, record, after);
+      });
+    } finally {
+      context.delete(rowBinding);
+    }
   }
 
   if (request.save) {

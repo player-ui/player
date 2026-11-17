@@ -66,6 +66,7 @@ const flow: Flow = {
           Rename: "EXTERNAL_rename",
           Remove: "EXTERNAL_remove",
           Misplaced: "EXTERNAL_misplaced",
+          Broken: "EXTERNAL_broken",
           Form: "VIEW_form",
           Done: "END_done",
         },
@@ -98,6 +99,18 @@ const flow: Flow = {
           rowBinding: "row",
           eachRow: ["{{row.name}} = 'renamed'"],
         },
+        transitions: RETURNS,
+      },
+      EXTERNAL_broken: {
+        state_type: "EXTERNAL",
+        ref: "commit-records",
+        param: {
+          binding: "items",
+          update: "selected",
+          remove: "doomed",
+          rowBinding: "row",
+        },
+        eachRow: ["{{row.name}} = 'renamed'", "missing()"],
         transitions: RETURNS,
       },
       END_done: { state_type: "END", outcome: "done" },
@@ -688,6 +701,38 @@ describe("StreamingDataPlugin", () => {
       error: { message: "This collection's source can't save." },
     });
     expect(names(test)).toEqual(["A"]);
+  });
+
+  it("sends nothing, not even removals, when an eachRow expression fails, and fails every record the save names", async () => {
+    const test = setup();
+    await loadAll(test, [item("a"), item("b"), item("c")]);
+    test.controllers().data.set([
+      ["selected", ["a", "b", "missing"]],
+      ["doomed", "c"],
+    ]);
+
+    test.controllers().flow.transition("Broken");
+    await vitest.waitFor(() =>
+      expect(test.status()?.lastCommit?.outcome).toBe("failed"),
+    );
+    await vitest.waitFor(() => expect(test.stateName()).toBe("VIEW_main"));
+
+    expect(test.commits).toHaveLength(0);
+    expect(names(test)).toEqual(["A", "B", "C"]);
+    expect(test.get("row")).toBeUndefined();
+    expect(test.status()).toMatchObject({
+      committing: false,
+      lastCommit: {
+        outcome: "failed",
+        saved: 0,
+        failed: 3,
+        failedKeys: ["a", "b", "c"],
+      },
+    });
+    expect(test.status()?.lastCommit?.error?.message).toContain(
+      "Error evaluating expression: missing()",
+    );
+    expect(test.player.getState().status).toBe("in-progress");
   });
 
   it("keeps the view that started a save current, so it can show the save running", async () => {

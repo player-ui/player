@@ -20,7 +20,7 @@ collection.append([
   { id: "b", name: "B", note: "keep" },
 ]);
 
-/** A data model held in a map, where `{{row.name}} = 'x'` sets the row's name */
+/** A data model held in a map, where `{{row.name}} = 'x'` sets the row's name and `fail()` throws */
 const contextOf = (data: Record<string, unknown>) => {
   const model = new Map(Object.entries(data));
   const context: ChangeContext = {
@@ -32,6 +32,7 @@ const contextOf = (data: Record<string, unknown>) => {
       model.delete(binding);
     },
     evaluate: (expression) => {
+      if (expression === "fail()") throw new Error("Broken");
       const [, field, value] =
         /^\{\{row\.(\w+)\}\} = '(\w*)'$/.exec(expression) ?? [];
       if (field)
@@ -72,6 +73,23 @@ describe("collectChanges", () => {
       },
     ]);
     expect(collection.get("a")).toEqual({ id: "a", name: "A" });
+    expect(model.has("row")).toBe(false);
+  });
+
+  it("clears the row when an eachRow expression throws", () => {
+    const { model, context } = contextOf({ selected: ["a", "b"] });
+
+    expect(() =>
+      collectChanges(
+        collection,
+        request({
+          update: "selected",
+          rowBinding: "row",
+          eachRow: ["{{row.name}} = 'x'", "fail()"],
+        }),
+        context,
+      ),
+    ).toThrow("Broken");
     expect(model.has("row")).toBe(false);
   });
 

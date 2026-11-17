@@ -163,6 +163,8 @@ To change every selected record, name the keys in `param.update`, a binding to c
 
 `param.save` names a binding holding a draft record: a draft without a key is created, and a draft with a key saves its changed fields. `param.remove` names a binding holding the key, or keys, to remove. One state can combine all three.
 
+If an `eachRow` expression fails, the plugin sends nothing, not even the removals, and fails the save instead of the flow: `lastCommit.error` says why, and `failedKeys` lists every record that `update` and `remove` name.
+
 Player drops the current view when an `EXTERNAL` state starts. So that the view can show the save running, the handler keeps the view that started the save current until the flow moves on. If that view is an overlay that closes when the flow leaves it, such as a modal, the handler shows the view underneath instead. Tell the plugin which views are overlays with the `isOverlay` option:
 
 ```ts

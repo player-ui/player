@@ -19,7 +19,8 @@ import type {
 import { resolveDataRefs } from "@player-ui/player";
 import type { ExternalStateHandler } from "@player-ui/external-state-plugin";
 import queueMicrotask from "queue-microtask";
-import { collectChanges } from "./collectChanges";
+import { collectChanges, requestedKeys } from "./collectChanges";
+import type { ChangeContext } from "./collectChanges";
 import { ActiveLoad, CollectionState } from "./CollectionState";
 import {
   CollectionDeclaration,
@@ -498,6 +499,10 @@ export class StreamingDataPlugin implements PlayerPlugin {
   /**
    * Gives Player a current view again after the save's EXTERNAL state dropped it: the view that
    * started the save, or the view underneath it when that one is an overlay.
+   *
+   * Player has no supported way to keep a view current through an EXTERNAL state, so this sets
+   * `currentView` itself, and for an overlay builds a new instance of the view underneath, which
+   * view plugins such as beacons see as a new view. Replace it once Player core has such an API.
    */
   private showViewDuringSave(): void {
     const { viewController, lastView, lastViewState, backgroundState } = this;
@@ -522,16 +527,20 @@ export class StreamingDataPlugin implements PlayerPlugin {
     const state = this.find(request.binding);
     if (!state) return "failed";
 
+    const { data, expression } = controllers;
+    const context: ChangeContext = {
+      get: (binding) => data.get(binding),
+      set: (binding, value) => {
+        data.set([[binding, value]]);
+      },
+      delete: (binding) => data.delete(binding),
+      // Otherwise Player fails the flow and the expression returns, so the save would still send
+      // what the earlier expressions changed.
+      evaluate: (exp) =>
+        expression.evaluate(exp, { model: data, throwErrors: true }),
+    };
     try {
-      const { data, expression } = controllers;
-      const changes = collectChanges(state.collection, request, {
-        get: (binding) => data.get(binding),
-        set: (binding, value) => {
-          data.set([[binding, value]]);
-        },
-        delete: (binding) => data.delete(binding),
-        evaluate: (exp) => expression.evaluate(exp),
-      });
+      const changes = collectChanges(state.collection, request, context);
       return await this.commitChanges(state, changes);
     } catch (error) {
       const reason = toCollectionError(error);
@@ -540,7 +549,10 @@ export class StreamingDataPlugin implements PlayerPlugin {
       );
       this.patchStatus(state, {
         committing: false,
-        lastCommit: failedCommit([], reason),
+        lastCommit: failedCommit(
+          requestedKeys(state.collection, request, context),
+          reason,
+        ),
       });
       return "failed";
     }
