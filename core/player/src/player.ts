@@ -437,6 +437,8 @@ export class Player {
     });
 
     this.hooks.dataController.call(dataController);
+    // Plugins tap resolveDataStages in that hook, and one may read data before another taps it.
+    dataController.rebuildPipeline();
 
     validationController.setOptions({
       parseBinding,
