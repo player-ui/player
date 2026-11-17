@@ -18,7 +18,7 @@ It is recommended to build the individual targets through those that depend on t
 
 For example, you can't build `PlayerUIInternalTestUtilities` but you can build `//ios/core:PlayerUITests` which builds `PlayerUIInternalTestUtilities` through it being a test dependency.
 
-It is not an issue to use `/...` when [querying](#Examining-Targets) all targets under a package because querying just lists targets and nothing is being built.
+It is not an issue to use `/...` when [querying](#examining-targets) all targets under a package because querying just lists targets and nothing is being built.
 
 ## Adding a new plugin
 Adding a new plugin is simple using predefined macros for `BUILD.bazel` files. Additional steps are required to include new code in the final artifacts, and in the Xcode project.
