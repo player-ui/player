@@ -155,9 +155,9 @@ public extension SwiftUIPlayer {
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
                 // Break plugin → JSContext/JSValue references, including caller-supplied
-                // plugins (e.g. BeaconPlugin), so a late/async callback into one of them
-                // can't reach the now-torn-down context.
+                // plugins, so a late callback can't reach the now-torn-down context.
                 activePlugins.forEach { $0.teardown() }
+                // reset activePlugins
                 activePlugins = []
                 // Release the JS player instance and all hook JSValues
                 player = nil

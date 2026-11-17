@@ -55,10 +55,8 @@ open class JSBasePlugin {
         []
     }
 
-    /// Releases this plugin's references into its `JSContext`. Must be called before the
-    /// context is torn down (e.g. `SwiftUIPlayer.Context.unload()`) — otherwise a stale
-    /// `pluginRef` can still be invoked after the underlying JSContext has been collected,
-    /// crashing instead of safely no-oping.
+    /// Releases this plugin's references into its `JSContext`, so a stale `pluginRef`
+    /// can't be invoked after the context has been collected.
     open func teardown() {
         pluginRef = nil
         context = nil

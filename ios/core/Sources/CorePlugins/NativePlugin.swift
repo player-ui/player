@@ -18,10 +18,8 @@ public protocol NativePlugin {
     ///   - player: Player to apply to
     func apply(player: some HeadlessPlayer)
 
-    /// Called when this plugin's underlying JSContext is being unloaded (e.g. on a
-    /// ManagedPlayer flow transition). Implementations should release any references
-    /// into that context here, so a late/async callback can't invoke into a JSContext
-    /// that has already been torn down.
+    /// Called when this plugin's JSContext is being unloaded. Release any references
+    /// into it here so a late callback can't invoke into a torn-down context.
     func teardown()
 }
 

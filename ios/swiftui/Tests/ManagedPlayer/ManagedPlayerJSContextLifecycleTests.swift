@@ -117,6 +117,55 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         )
     }
 
+    /// Regression test for PLAYA-10711: a caller-supplied plugin (e.g. BeaconPlugin)
+    /// must be torn down on unload() too, not just Player's internal partialMatchPlugin
+    /// — otherwise a late callback can invoke into an already torn-down JSContext.
+    func testUnloadTearsDownCallerSuppliedPlugins() {
+        let context = SwiftUIPlayer.Context { JSContext()! }
+        let spy = TeardownSpyPlugin()
+
+        autoreleasepool {
+            let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [spy], context: context)
+            _ = player
+        }
+
+        XCTAssertEqual(spy.applyCallCount, 1, "Plugin should have been applied on load")
+        XCTAssertEqual(spy.teardownCallCount, 0, "Plugin should not be torn down before unload")
+
+        context.unload()
+
+        XCTAssertEqual(
+            spy.teardownCallCount, 1,
+            "unload() should call teardown() on every caller-supplied plugin"
+        )
+    }
+
+    /// Verifies a caller-supplied JSBasePlugin's pluginRef/context are released on
+    /// unload(), so its guard-based calls into JS (e.g. BaseBeaconPlugin.beacon(_:))
+    /// safely no-op afterward instead of invoking a stale, torn-down JSContext.
+    func testUnloadReleasesCallerSuppliedJSBasePluginReferences() {
+        let context = SwiftUIPlayer.Context { JSContext()! }
+        // Stand-in JSBasePlugin + NativePlugin conformer; its own matching behavior
+        // isn't under test here, only that Context.unload() releases its references.
+        let plugin = PartialMatchFingerprintPlugin()
+
+        autoreleasepool {
+            let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [plugin], context: context)
+            _ = player
+        }
+
+        XCTAssertNotNil(plugin.pluginRef, "pluginRef should be set once applied to a loaded context")
+        XCTAssertNotNil(plugin.context, "context should be set once applied to a loaded context")
+
+        context.unload()
+
+        XCTAssertNil(
+            plugin.pluginRef,
+            "A caller-supplied JSBasePlugin's pluginRef must be released on unload()"
+        )
+        XCTAssertNil(plugin.context)
+    }
+
     /// Spins the run loop until `object()` returns nil or `timeout` elapses.
     /// The setTimeout polyfill dispatches via GCD (background → main), so
     /// the run loop must tick to let those blocks execute and release JSValues.
@@ -133,5 +182,21 @@ private class Weak<T: AnyObject> {
 
     init(_ value: T) {
         self.value = value
+    }
+}
+
+/// Spy `NativePlugin` used to verify `SwiftUIPlayer.Context.unload()` calls
+/// `teardown()` on every caller-supplied plugin.
+private class TeardownSpyPlugin: NativePlugin {
+    let pluginName = "TeardownSpyPlugin"
+    private(set) var applyCallCount = 0
+    private(set) var teardownCallCount = 0
+
+    func apply(player _: some HeadlessPlayer) {
+        applyCallCount += 1
+    }
+
+    func teardown() {
+        teardownCallCount += 1
     }
 }
