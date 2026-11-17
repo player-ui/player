@@ -1,3 +1,31 @@
+# 1.4.0 (Mon Nov 16 2026)
+
+### Release Notes
+
+#### Context Plugin Enhancements ([#961](https://github.com/player-ui/player/pull/961))
+
+Adds the ability/pattern for assets to automatically register the context they provide as part of their definition
+
+---
+
+#### 🚀 Enhancement
+
+- Context Plugin Enhancements [#961](https://github.com/player-ui/player/pull/961) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Release main [#971](https://github.com/player-ui/player/pull/971) ([@intuit-svc](https://github.com/intuit-svc))
+- Release main [#970](https://github.com/player-ui/player/pull/970) ([@intuit-svc](https://github.com/intuit-svc))
+- Converting JSON to DSL for: Beacon, External Action, and PubSub [#962](https://github.com/player-ui/player/pull/962) ([@maxXu0713](https://github.com/maxXu0713))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- xumax3 ([@maxXu0713](https://github.com/maxXu0713))
+
+---
+
 # 1.4.0-next.0 (Mon Nov 16 2026)
 
 ### Release Notes
