@@ -32,6 +32,9 @@ public extension SwiftUIPlayer {
 
         private var contextBuilder: () -> JSContext
         private let partialMatchPlugin: PartialMatchFingerprintPlugin = .init()
+        /// All plugins applied to the currently loaded context (caller-supplied plugins plus
+        /// `partialMatchPlugin`), retained so `unload()` can tear them down too.
+        private var activePlugins: [NativePlugin] = []
         private var flow: String?
         private var registryWatch: AnyCancellable?
         private var state: BaseFlowState?
@@ -91,6 +94,7 @@ public extension SwiftUIPlayer {
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
                 return logger.e("Failed to load player")
             }
+            activePlugins = allPlugins
 
             let hooks = SwiftUIPlayerHooks(from: playerValue)
 
@@ -150,9 +154,11 @@ public extension SwiftUIPlayer {
                     ctx.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
-                // Break plugin → JSContext/JSValue references
-                partialMatchPlugin.pluginRef = nil
-                partialMatchPlugin.context = nil
+                // Break plugin → JSContext/JSValue references, including caller-supplied
+                // plugins (e.g. BeaconPlugin), so a late/async callback into one of them
+                // can't reach the now-torn-down context.
+                activePlugins.forEach { $0.teardown() }
+                activePlugins = []
                 // Release the JS player instance and all hook JSValues
                 player = nil
                 hooks = nil

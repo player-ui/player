@@ -55,6 +55,15 @@ open class JSBasePlugin {
         []
     }
 
+    /// Releases this plugin's references into its `JSContext`. Must be called before the
+    /// context is torn down (e.g. `SwiftUIPlayer.Context.unload()`) — otherwise a stale
+    /// `pluginRef` can still be invoked after the underlying JSContext has been collected,
+    /// crashing instead of safely no-oping.
+    open func teardown() {
+        pluginRef = nil
+        context = nil
+    }
+
     /// Function to get the URL for a file.
     /// This should be overridden by plugins that are outside of the PlayerUI bundle
     /// - parameters:
