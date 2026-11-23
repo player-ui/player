@@ -77,6 +77,16 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     return this.model;
   }
 
+  /**
+   * Rebuilds a built pipeline from `resolveDataStages`, keeping the model's data and hooks.
+   * Player calls this after its `dataController` hook; a stage tapped later needs another call.
+   */
+  public rebuildPipeline(): void {
+    this.model?.setMiddleware(
+      this.hooks.resolveDataStages.call(this.baseMiddleware),
+    );
+  }
+
   private resolveDataValue(
     binding: BindingInstance,
     value: any,
