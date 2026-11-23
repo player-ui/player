@@ -1145,6 +1145,27 @@ class AsyncNodePluginTests: XCTestCase {
         XCTAssertEqual(expectedMultiNode1Text, "fallback")
     }
 
+    /// `teardown()` must release `hooks` (which hold the old `pluginRef`) and tear down
+    /// child plugins, so none keep the torn-down JSContext reachable / invocable.
+    func testTeardownReleasesHooksAndChildPlugins() throws {
+        let context = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(context)
+        let child = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [child]) { _, _ in .emptyNode }
+        plugin.context = context
+
+        XCTAssertNotNil(plugin.hooks)
+        XCTAssertNotNil(child.pluginRef)
+
+        plugin.teardown()
+
+        XCTAssertNil(plugin.hooks, "hooks hold the old pluginRef and must be released")
+        XCTAssertNil(plugin.pluginRef)
+        XCTAssertNil(plugin.context)
+        XCTAssertNil(child.pluginRef, "child plugins must be torn down too")
+        XCTAssertNil(child.context)
+    }
+
     enum TestError: Error {
         case fail
     }

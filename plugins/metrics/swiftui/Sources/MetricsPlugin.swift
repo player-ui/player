@@ -29,6 +29,11 @@ public class RequestTimePlugin: NativePlugin {
             self?.requestTimeWebPlugin.pluginRef?.invokeMethod("apply", withArguments: [plugin])
         }
     }
+
+    /// Releases the wrapped web plugin's references into the torn-down `JSContext`.
+    public func teardown() {
+        requestTimeWebPlugin.teardown()
+    }
 }
 
 class RequestTimeWebPlugin: JSBasePlugin {
@@ -114,6 +119,13 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
                 onFlowEnd: HookDecode(baseValue: pluginRef, name: "onFlowEnd")
             )
         }
+    }
+
+    /// Also releases `hooks`, whose hook values hold the old `pluginRef`. They are
+    /// rebuilt by `setup(context:)` if this plugin is applied to a new context.
+    override public func teardown() {
+        hooks = nil
+        super.teardown()
     }
 
     override public func getArguments() -> [Any] {

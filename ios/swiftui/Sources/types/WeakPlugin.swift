@@ -5,16 +5,26 @@
 
 import PlayerUI
 
-/// Weak reference to a `NativePlugin`, so `SwiftUIPlayer.Context` (possibly global, e.g.
-/// `sharedManaged`) can tear down applied plugins without keeping them alive. Struct plugins
-/// box to a temporary and drop out immediately; tearing down a copy would release nothing.
+/// Weakly tracks plugins for teardown without extending their lifetime.
+/// Important for long-lived contexts like `sharedManaged`.
+/// Struct plugins aren't retained; tearing down a copy has no effect.
 struct WeakPlugin {
-    /// The plugin instance, if it is a class and is still alive.
+    /// Weak reference to the plugin
+    /// - Becomes `nil` once the plugin is deallocated.
+    /// - Structs are `nil` from the start: they aren't objects, so the cast makes a throwaway
+    ///   copy that is deallocated immediately.
     private weak var object: AnyObject?
 
     /// Wraps `plugin` without retaining it. `NativePlugin` isn't class-bound, so it's stored
     /// as `AnyObject` and cast back on access.
     init(_ plugin: NativePlugin) {
+        assert(
+            type(of: plugin) is AnyClass,
+            """
+            Value-type NativePlugin '\(plugin.pluginName)' boxes to a temporary, so it \
+            can't be tracked weakly and teardown() will never run on it. Make it a class.
+            """
+        )
         object = plugin as AnyObject
     }
 

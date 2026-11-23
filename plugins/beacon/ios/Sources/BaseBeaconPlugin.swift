@@ -59,7 +59,11 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     }
 
     public var hooks: BeaconPluginHooks?
-    /// The callback to call when a beacon is fired from the plugin
+    /// The callback to call when a beacon is fired from the plugin.
+    ///
+    /// Deliberately survives `teardown()` so the plugin keeps beaconing when it is
+    /// re-applied to a new flow. It therefore lives as long as the plugin: avoid
+    /// capturing heavy objects in it, or nil it yourself when the host is done.
     public var callback: ((BeaconStruct) -> Void)?
 
     /// BeaconPluginPlugin's to use for this BeaconPlugin
@@ -83,12 +87,15 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     /// - action: The action that was taken for the beacon
     /// - args: The context of the beacon
     public func beacon(assetBeacon: AssetBeacon) {
+        // Capture once: `teardown()` nils `pluginRef`, and a second read could otherwise
+        // observe that between the evaluateScript and the invokeMethod.
         guard
+            let pluginRef,
             let beacon = try? JSONEncoder().encode(assetBeacon),
             let beaconString = String(data: beacon, encoding: .utf8),
-            let beaconObject = pluginRef?.context.evaluateScript("(\(beaconString))")
+            let beaconObject = pluginRef.context.evaluateScript("(\(beaconString))")
         else { return }
-        pluginRef?.invokeMethod("beacon", withArguments: [beaconObject])
+        pluginRef.invokeMethod("beacon", withArguments: [beaconObject])
     }
 
     override open func setup(context: JSContext) {

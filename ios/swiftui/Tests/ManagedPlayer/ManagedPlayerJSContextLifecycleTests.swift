@@ -203,6 +203,88 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertEqual(second.teardownCallCount, 0, "Current flow's plugin should stay active")
     }
 
+    /// Loading a new flow without `unload()` must release the previous JSContext too, not
+    /// just its plugins — guards against anything retaining it across flow-to-flow
+    /// transitions (ManagedPlayer can load-over-load without an intervening `unload()`).
+    func testLoadingNewFlowReleasesPreviousJSContext() {
+        weak var weakFirstContext: JSContext?
+        var contextCount = 0
+        let context = SwiftUIPlayer.Context {
+            contextCount += 1
+            let ctx = JSContext()!
+            if contextCount == 1 { weakFirstContext = ctx }
+            return ctx
+        }
+
+        autoreleasepool {
+            _ = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [], context: context)
+        }
+        XCTAssertNotNil(weakFirstContext, "First JSContext should exist while loaded")
+
+        autoreleasepool {
+            _ = SwiftUIPlayer(
+                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                plugins: [],
+                context: context
+            )
+        }
+        waitForDeallocation(of: { weakFirstContext }, timeout: 2.0)
+
+        XCTAssertEqual(contextCount, 2)
+        XCTAssertTrue(context.isLoaded, "Second flow should be loaded")
+        XCTAssertNil(weakFirstContext, "Previous JSContext leaked across load-over-load")
+    }
+
+    /// If `setupPlayer` fails, `load()` must not leave a half-wired state: the previous flow
+    /// is torn down, the plugins setupPlayer already wired to the orphaned context are
+    /// released (else a later `unload()` can't reach them — the PLAYA-10711 bug class), and
+    /// the orphaned context itself is freed.
+    func testFailedSetupLeavesContextFullyUnloaded() {
+        weak var weakFailedContext: JSContext?
+        var contextCount = 0
+        let context = SwiftUIPlayer.Context {
+            contextCount += 1
+            let ctx = JSContext()!
+            if contextCount == 2 {
+                // A non-writable `Player` global stops the core bundle from installing
+                // `Player.Player`, so setupPlayer can't construct a player and returns nil.
+                ctx.evaluateScript(
+                    "Object.defineProperty(this, 'Player', { value: {}, writable: false, configurable: false });"
+                )
+                weakFailedContext = ctx
+            }
+            return ctx
+        }
+        let firstPlugin = PartialMatchFingerprintPlugin()
+        let failedPlugin = PartialMatchFingerprintPlugin()
+
+        autoreleasepool {
+            _ = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [firstPlugin], context: context)
+        }
+        XCTAssertTrue(context.isLoaded)
+
+        autoreleasepool {
+            _ = SwiftUIPlayer(
+                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                plugins: [failedPlugin],
+                context: context
+            )
+        }
+
+        XCTAssertEqual(contextCount, 2, "Second load should have attempted a new JSContext")
+        XCTAssertFalse(context.isLoaded, "Failed load must end fully unloaded, not half-wired")
+        XCTAssertNil(firstPlugin.pluginRef, "Previous flow's plugin should be torn down")
+        XCTAssertNil(firstPlugin.context)
+        XCTAssertNil(
+            failedPlugin.pluginRef,
+            "Plugin wired to the orphaned context before setup failed must be released"
+        )
+        XCTAssertNil(failedPlugin.context)
+
+        waitForDeallocation(of: { weakFailedContext }, timeout: 2.0)
+        XCTAssertNil(weakFailedContext, "Orphaned JSContext from the failed setup leaked")
+    }
+
     /// Spins the run loop until `object()` returns nil or `timeout` elapses.
     /// The setTimeout polyfill dispatches via GCD (background → main), so
     /// the run loop must tick to let those blocks execute and release JSValues.
