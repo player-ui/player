@@ -1,9 +1,13 @@
-# PlayerUI Typescript Development Guide
+---
+title: TypeScript Development Guide
+---
+
+import { Aside } from "@astrojs/starlight/components";
 
 ### Sections:
-1. [Setup](#Setup)
+1. [Setup](#setup)
 2. [Adding a new plugin](#adding-a-new-plugin)
-3. [Dependencies](#Dependencies)
+3. [Dependencies](#dependencies)
 
 ## Setup
 ### Demo Application
@@ -81,8 +85,9 @@ For react plugins:
 }
 ```
 
-> [!NOTE]
-> The package follows a naming convemtion of `@player-ui/{description}-plugin-{platform}`.
+<Aside>
+The package follows a naming convemtion of `@player-ui/{description}-plugin-{platform}`.
+</Aside>
 
 ### BUILD
 The `js_pipeline` macro will handle the full build:
@@ -135,8 +140,9 @@ js_pipeline(
 )
 ```
 
-> [!NOTE]
-> External dependencies are specified as such `//:node_modules/...` with the leading `//`, while internal dependencies are specified as such `:node_modules/...` without the leading `//`.
+<Aside>
+External dependencies are specified as such `//:node_modules/...` with the leading `//`, while internal dependencies are specified as such `:node_modules/...` without the leading `//`.
+</Aside>
 
 Internal dependencies also need to be added to the `package.json` either as a dependency, dev dependency, or peer dependency:
 
