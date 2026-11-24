@@ -456,9 +456,19 @@ export class ExpressionEvaluator {
     const { resolveNode, model } = options;
     const isAsync = options.async ?? false;
 
-    const expressionContext: ExpressionContext = {
-      ...options,
-      evaluate: (expr) => this.evaluate(expr, options),
+    // Only operator/handler nodes (binary, unary, call, modification) need the
+    // execution context. Build it lazily so the common leaf nodes (literals,
+    // identifiers, model refs, member access) skip the per-node allocation.
+    let cachedContext: ExpressionContext | undefined;
+    const getContext = (): ExpressionContext => {
+      if (cachedContext === undefined) {
+        cachedContext = {
+          ...options,
+          evaluate: (expr) => this.evaluate(expr, options),
+        };
+      }
+
+      return cachedContext;
     };
 
     if (node.type === "Literal") {
@@ -479,7 +489,7 @@ export class ExpressionEvaluator {
       if (operator) {
         if ("resolveParams" in operator) {
           if (operator.resolveParams === false) {
-            return operator(expressionContext, node.left, node.right, isAsync);
+            return operator(getContext(), node.left, node.right, isAsync);
           }
 
           const left = resolveNode(node.left);
@@ -489,11 +499,11 @@ export class ExpressionEvaluator {
           if (options.async && (isAwaitable(left) || isAwaitable(right))) {
             return collateAwaitable([left, right]).awaitableThen(
               ([leftVal, rightVal]) =>
-                operator(expressionContext, leftVal, rightVal, isAsync),
+                operator(getContext(), leftVal, rightVal, isAsync),
             );
           }
 
-          return operator(expressionContext, left, right, isAsync);
+          return operator(getContext(), left, right, isAsync);
         }
 
         const left = resolveNode(node.left);
@@ -517,18 +527,18 @@ export class ExpressionEvaluator {
       if (operator) {
         if ("resolveParams" in operator) {
           if (operator.resolveParams === false) {
-            return operator(expressionContext, node.argument, isAsync);
+            return operator(getContext(), node.argument, isAsync);
           }
 
           const arg = resolveNode(node.argument);
 
           if (options.async && isAwaitable(arg)) {
             return arg.awaitableThen((argVal) =>
-              operator(expressionContext, argVal, isAsync),
+              operator(getContext(), argVal, isAsync),
             );
           }
 
-          return operator(expressionContext, arg, isAsync);
+          return operator(getContext(), arg, isAsync);
         }
 
         const arg = resolveNode(node.argument);
@@ -568,7 +578,7 @@ export class ExpressionEvaluator {
       }
 
       if ("resolveParams" in operator && operator.resolveParams === false) {
-        return operator(expressionContext, ...node.args);
+        return operator(getContext(), ...node.args);
       }
 
       const args = node.args.map((n) => resolveNode(n));
@@ -579,12 +589,12 @@ export class ExpressionEvaluator {
 
         if (hasPromises) {
           return collateAwaitable(args).awaitableThen((resolvedArgs) =>
-            operator(expressionContext, ...resolvedArgs),
+            operator(getContext(), ...resolvedArgs),
           );
         }
       }
 
-      return operator(expressionContext, ...args);
+      return operator(getContext(), ...args);
     }
 
     if (node.type === "ModelRef") {
@@ -667,12 +677,7 @@ export class ExpressionEvaluator {
 
         if ("resolveParams" in operation) {
           if (operation.resolveParams === false) {
-            newValue = operation(
-              expressionContext,
-              node.left,
-              node.right,
-              isAsync,
-            );
+            newValue = operation(getContext(), node.left, node.right, isAsync);
           } else {
             const left = resolveNode(node.left);
             const right = resolveNode(node.right);
@@ -680,10 +685,10 @@ export class ExpressionEvaluator {
             if (options.async && (isAwaitable(left) || isAwaitable(right))) {
               newValue = collateAwaitable([left, right]).awaitableThen(
                 ([leftVal, rightVal]) =>
-                  operation(expressionContext, leftVal, rightVal, isAsync),
+                  operation(getContext(), leftVal, rightVal, isAsync),
               );
             } else {
-              newValue = operation(expressionContext, left, right, isAsync);
+              newValue = operation(getContext(), left, right, isAsync);
             }
           }
         } else {
