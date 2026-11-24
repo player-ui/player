@@ -101,10 +101,9 @@ public extension SwiftUIPlayer {
             activePlugins = allPlugins.map(WeakPlugin.init)
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
                 logger.e("Failed to load player")
-                // setupPlayer may have wired the plugins (and polyfills/exceptionHandler)
-                // to the now-orphaned context before failing. Release those refs and break
-                // the orphaned context's Swift cycles, then finish fully unloaded instead
-                // of half-wired.
+                // setupPlayer may have already connected the plugins, `setTimeout`, and the
+                // exception handler to the new context before failing. Clear them,
+                // then finish fully unloaded instead of half set up.
                 autoreleasepool {
                     teardownActivePlugins()
                     context.exceptionHandler = nil
@@ -159,27 +158,26 @@ public extension SwiftUIPlayer {
             // swiftlint:enable closure_parameter_position
         }
 
-        /// Unload the context. This will release the current javascript player/context and clear
-        /// the current
-        /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
-        /// by clearing the exceptionHandler and any exported objects on the context.
+        /// Unload the context. Releases the current JS player/context and clears the current
+        /// result, including the context's exception handler and `setTimeout`.
         public func unload() {
             teardownLoadedContext()
-            // All `result` writes go through the main actor (same mechanism everywhere,
-            // so their relative order is preserved).
             Task { @MainActor [weak self] in
                 self?.result = nil
             }
             registry.resetView()
         }
 
-        /// Releases the loaded JS player/context, all plugin references into it, and the
-        /// context's cross-runtime cycles. Safe to call when nothing is loaded. Shared by
-        /// `unload()` and `load()` (load-over-load replaces the context without unloading).
+        /// Releases everything tied to the loaded JS context:
+        /// - plugin references into the context
+        /// - the JS player, hooks, and flow state
+        /// - the context's exception handler and `setTimeout`
+        ///
+        /// Used by both `unload()` and `load()`, since `load()` can replace a loaded flow
+        /// without `unload()` being called first. Safe to call when nothing is loaded.
         private func teardownLoadedContext() {
-            // ObjC property accessors (e.g. JSValue.context) return autoreleased
-            // objects. Without an explicit pool, those temporaries prevent the
-            // JSContext from deallocating until the next run-loop drain.
+            // Drain autoreleased temporaries (e.g. from `JSValue.context`) now, so they
+            // don't keep the JSContext alive until the next run loop.
             autoreleasepool {
                 if let ctx = player?.context {
                     ctx.exceptionHandler = nil

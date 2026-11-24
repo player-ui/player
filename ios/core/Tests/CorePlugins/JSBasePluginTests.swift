@@ -9,8 +9,8 @@ import JavaScriptCore
 import XCTest
 
 class JSBasePluginTests: XCTestCase {
-    /// Verifies `JSBasePlugin.teardown()` releases `pluginRef` and `context`, so calls into JS
-    /// after teardown safely no-op. Uses `PartialMatchFingerprintPlugin` as a concrete subclass.
+    /// `JSBasePlugin.teardown()` sets `pluginRef` and `context` to nil, so later calls into JS
+    /// return early. Uses `PartialMatchFingerprintPlugin` as a concrete subclass.
     func testTeardownReleasesPluginRefAndContext() {
         let context = JSContext()
         let plugin = PartialMatchFingerprintPlugin()
