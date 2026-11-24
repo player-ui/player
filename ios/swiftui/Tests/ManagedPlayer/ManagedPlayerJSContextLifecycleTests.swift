@@ -8,13 +8,7 @@ import JavaScriptCore
 import XCTest
 
 class ManagedPlayerJSContextLifecycleTests: XCTestCase {
-    /// Verifies that the old JSContext is properly released when
-    /// SwiftUIPlayer.Context loads a new flow after unloading the previous one.
-    ///
-    /// The contextBuilder creates a new JSContext each time load() is called.
-    /// After unload() + reload, the old JSContext should be deallocated.
-    /// Ensures no cross-runtime retain cycles survive between Swift closures
-    /// captured in JS hook taps and JSValues referencing the old context.
+    /// After `unload()` + loading a new flow, the old JSContext is deallocated
     func testOldJSContextDeallocatedAfterUnloadAndReload() {
         weak var weakOldContext: JSContext?
 
@@ -46,8 +40,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         }
         XCTAssertFalse(context.isLoaded, "Context should not be loaded after unload")
 
-        // Drain pending GCD blocks (setTimeout polyfill dispatches
-        // background→main) that may still hold JSValue refs to the old context.
+        // Let pending setTimeout blocks run and drop their JSValue refs.
         waitForDeallocation(of: { weakOldContext }, timeout: 2.0)
 
         autoreleasepool {
@@ -71,10 +64,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         )
     }
 
-    /// Verifies that the shared JSVirtualMachine does not accumulate orphaned
-    /// JSContexts across multiple flow loads, simulating the ManagedPlayer
-    /// navigation pattern. Each flow load creates a new JSContext on the same VM.
-    /// After unload, the previous context should be released.
+    /// Repeated load/unload cycles on one shared JSVirtualMachine (the ManagedPlayer
+    /// pattern) free each JSContext instead of accumulating them.
     func testSharedVMDoesNotAccumulateContexts() throws {
         let vm = try XCTUnwrap(JSVirtualMachine())
         var createdContexts = [Weak<JSContext>]()
@@ -117,9 +108,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         )
     }
 
-    /// Regression test for PLAYA-10711: a caller-supplied plugin (e.g. BeaconPlugin)
-    /// must be torn down on unload() too, not just Player's internal partialMatchPlugin
-    /// — otherwise a late callback can invoke into an already torn-down JSContext.
+    /// PLAYA-10711: `unload()` tears down caller-supplied plugins (e.g. BeaconPlugin),
+    /// so a late callback can't call into the torn-down JSContext.
     func testUnloadTearsDownCallerSuppliedPlugins() {
         let context = SwiftUIPlayer.Context { JSContext()! }
         let spy = TeardownSpyPlugin()
@@ -140,9 +130,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         )
     }
 
-    /// Verifies a caller-supplied JSBasePlugin's pluginRef/context are released on
-    /// unload(), so its guard-based calls into JS (e.g. BaseBeaconPlugin.beacon(_:))
-    /// safely no-op afterward instead of invoking a stale, torn-down JSContext.
+    /// `unload()` sets a caller-supplied JSBasePlugin's `pluginRef`/`context` to nil, so a
+    /// later `beacon(_:)` call returns early instead of calling into the torn-down JSContext.
     func testUnloadReleasesCallerSuppliedJSBasePluginReferences() {
         let context = SwiftUIPlayer.Context { JSContext()! }
         // Stand-in JSBasePlugin + NativePlugin conformer; its own matching behavior
@@ -203,9 +192,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertEqual(second.teardownCallCount, 0, "Current flow's plugin should stay active")
     }
 
-    /// Loading a new flow without `unload()` must release the previous JSContext too, not
-    /// just its plugins — guards against anything retaining it across flow-to-flow
-    /// transitions (ManagedPlayer can load-over-load without an intervening `unload()`).
+    /// Loading a new flow without calling `unload()` first frees the previous JSContext,
+    /// not just its plugins.
     func testLoadingNewFlowReleasesPreviousJSContext() {
         weak var weakFirstContext: JSContext?
         var contextCount = 0
@@ -285,9 +273,8 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         XCTAssertNil(weakFailedContext, "Orphaned JSContext from the failed setup leaked")
     }
 
-    /// Spins the run loop until `object()` returns nil or `timeout` elapses.
-    /// The setTimeout polyfill dispatches via GCD (background → main), so
-    /// the run loop must tick to let those blocks execute and release JSValues.
+    /// Spins the run loop until `object()` is nil or `timeout` elapses, so pending
+    /// `setTimeout` callbacks can run and release their JSValues.
     private func waitForDeallocation(of object: @escaping () -> AnyObject?, timeout: TimeInterval) {
         let deadline = Date(timeIntervalSinceNow: timeout)
         while object() != nil, Date() < deadline {

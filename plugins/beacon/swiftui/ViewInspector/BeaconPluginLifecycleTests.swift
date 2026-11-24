@@ -68,8 +68,8 @@ class BeaconPluginLifecycleTests: XCTestCase {
         ViewHosting.expel()
     }
 
-    /// Spins the run loop until `object()` returns nil or `timeout` elapses, so pending GCD
-    /// blocks from the setTimeout polyfill can release their JSValues.
+    /// Spins the run loop until `object()` is nil or `timeout` elapses, so pending
+    /// `setTimeout` callbacks can run and release their JSValues.
     private func waitForDeallocation(of object: @escaping () -> AnyObject?, timeout: TimeInterval) {
         let deadline = Date(timeIntervalSinceNow: timeout)
         while object() != nil, Date() < deadline {

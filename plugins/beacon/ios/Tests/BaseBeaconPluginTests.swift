@@ -262,9 +262,9 @@ class BaseBeaconPluginTests: XCTestCase {
         XCTAssertNil(child.context, "child beacon plugins must be torn down too")
     }
 
-    /// Regression test for PLAYA-10711: a late `beacon(assetBeacon:)` call after teardown
-    /// (e.g. a delayed input callback) must no-op instead of invoking a torn-down JSContext.
-    func testBeaconAfterTeardownIsNoOp() throws {
+    /// PLAYA-10711: a late `beacon(assetBeacon:)` call after teardown (e.g. a delayed input
+    /// callback) returns early instead of calling into the torn-down JSContext.
+    func testBeaconAfterTeardownReturnsEarly() throws {
         let context = try XCTUnwrap(JSContext())
         JSUtilities.polyfill(context)
 
