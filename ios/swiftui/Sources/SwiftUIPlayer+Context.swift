@@ -89,15 +89,17 @@ public extension SwiftUIPlayer {
             }
 
             // A previous flow loaded without `unload()` leaves its plugins pointing at its
-            // context. Run the same teardown as `unload()` so both paths leave identical
-            // state (plugins, player, hooks, flow-state) before building the new context.
+            // context. Run the same teardown as `unload()` so reloading and unloading leave
+            // identical state (plugins, player, hooks, flow-state) before building the new
+            // context.
             teardownLoadedContext()
 
             let context: JSContext = contextBuilder()
 
             let allPlugins = plugins + [partialMatchPlugin]
-            // Track before setup: setupPlayer wires each JSBasePlugin to `context` as it
-            // goes, so on failure those refs still need tearing down.
+            // Store the plugins in `activePlugins` before `setupPlayer` runs. It gives each
+            // plugin a context one at a time, so if it fails partway, those plugins still
+            // need tearing down.
             activePlugins = allPlugins.map(WeakPlugin.init)
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
                 logger.e("Failed to load player")
@@ -160,7 +162,7 @@ public extension SwiftUIPlayer {
 
         /// Cleans up after `setupPlayer` fails in `load()`. It may have already connected the
         /// plugins, `setTimeout`, and the exception handler to `context` before failing, so
-        /// clear them, then finish fully unloaded instead of half set up.
+        /// clear them, then call `unload()` so nothing is left partially set up.
         private func abandonFailedLoad(context: JSContext) {
             autoreleasepool {
                 teardownActivePlugins()
@@ -187,8 +189,9 @@ public extension SwiftUIPlayer {
                     ctx.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
-                // Break plugin → JSContext/JSValue references, including caller-supplied
-                // plugins, so a late callback can't reach the now-torn-down context.
+                // Clear references into the context held by the plugins passed to `load()`,
+                // so a callback that fires after teardown (e.g. a delayed beacon) can't run
+                // JS in it.
                 teardownActivePlugins()
                 // Release the JS player instance and all hook JSValues
                 player = nil

@@ -104,8 +104,9 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         }
 
         if let asyncHookHandler {
-            hooks?.onAsyncNode.tap { node, callback in
+            hooks?.onAsyncNode.tap { [weak self] node, callback in
                 let replacementNode = try await asyncHookHandler(node, callback)
+                guard let context = self?.context else { return JSValue() }
                 return replacementNode.handlerTypeToJSValue(context: context) ?? JSValue()
             }
         }
