@@ -21,7 +21,12 @@ function findUp(node: Node.Node, target: Node.Node): boolean {
  * This allows users to embed stateful data into transforms.
  */
 export class AssetTransformCorePlugin {
-  public readonly stateStore: Map<Node.Node, LocalStateStore>;
+  /**
+   * The state of each node a transform ran on. Weak, because dynamic templates
+   * and other plugins make new nodes on every update, and the entries of nodes
+   * no later update reaches would otherwise pile up.
+   */
+  public stateStore: WeakMap<Node.Node, LocalStateStore>;
   private readonly registry: TransformRegistry;
   private beforeResolveSymbol: symbol;
   private resolveSymbol: symbol;
@@ -30,7 +35,7 @@ export class AssetTransformCorePlugin {
 
   constructor(registry: TransformRegistry) {
     this.registry = registry;
-    this.stateStore = new Map();
+    this.stateStore = new WeakMap();
     this.beforeResolveSymbol = Symbol("before resolve");
     this.resolveSymbol = Symbol("resolve");
     this.beforeResolveCountSymbol = Symbol("before resolve count");
@@ -39,7 +44,7 @@ export class AssetTransformCorePlugin {
 
   apply(view: ViewInstance) {
     // Clear out everything when we create a new view
-    this.stateStore.clear();
+    this.stateStore = new WeakMap();
 
     view.hooks.resolver.tap("asset-transform", (resolver) => {
       let lastUpdatedNode: Node.Node | undefined;
