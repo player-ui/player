@@ -108,7 +108,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         )
     }
 
-    /// PLAYA-10711: `unload()` tears down caller-supplied plugins (e.g. BeaconPlugin),
+    /// `unload()` tears down caller-supplied plugins (e.g. BeaconPlugin),
     /// so a late callback can't call into the torn-down JSContext.
     func testUnloadTearsDownCallerSuppliedPlugins() {
         let context = SwiftUIPlayer.Context { JSContext()! }
@@ -225,7 +225,7 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
     /// If `setupPlayer` fails, `load()` must not leave a half-wired state: the previous flow
     /// is torn down, the plugins setupPlayer already wired to the orphaned context are
-    /// released (else a later `unload()` can't reach them — the PLAYA-10711 bug class), and
+    /// released (else a later `unload()` can't reach them and they keep the dead context), and
     /// the orphaned context itself is freed.
     func testFailedSetupLeavesContextFullyUnloaded() {
         weak var weakFailedContext: JSContext?
