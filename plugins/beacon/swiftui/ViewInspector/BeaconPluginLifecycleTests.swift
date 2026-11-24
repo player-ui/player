@@ -15,7 +15,7 @@ import ViewInspector
 import XCTest
 
 class BeaconPluginLifecycleTests: XCTestCase {
-    /// Reproduces the PLAYA-10711 crash scenario:
+    /// Reproduces the late-beacon crash:
     /// An input view retains `BeaconContext` from the environment.
     /// After a flow transition calls `unload()`, a delayed `onEditingChanged` triggers a beacon.
     /// The beacon must not execute JavaScript or retain the unloaded `JSContext`.
