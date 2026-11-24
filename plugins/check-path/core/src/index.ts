@@ -35,8 +35,12 @@ interface ViewInfo {
   /** A cache of an asset or view's id to it's node */
   assetIdMap: Map<string, Node.Asset | Node.View>;
 
-  /** A map of a node to it's resolved node and value */
-  resolvedMap: Map<
+  /**
+   * A map of a node to it's resolved node and value. Weak, because dynamic
+   * templates and other plugins make new nodes on every update, and the entry
+   * of a node no later update reaches would keep that update's resolved tree.
+   */
+  resolvedMap: WeakMap<
     Node.Node,
     {
       /** The final resolved AST node */
@@ -93,7 +97,7 @@ export class CheckPathPlugin implements PlayerPlugin {
       viewController.hooks.view.tap(this.name, (view) => {
         view.hooks.resolver.tap(this.name, (resolver: Resolver) => {
           const viewInfo: ViewInfo = {
-            resolvedMap: new Map(),
+            resolvedMap: new WeakMap(),
             assetIdMap: new Map(),
             resolver,
           };
@@ -118,6 +122,16 @@ export class CheckPathPlugin implements PlayerPlugin {
             }
 
             return value;
+          });
+
+          // Forget the assets that left the view. A resolved node keeps its
+          // parents, so each would keep the tree of the update that resolved it.
+          resolver.hooks.afterUpdate.tap(this.name, () => {
+            viewInfo.assetIdMap.forEach((node, id) => {
+              if (!resolver.getSourceNode(node)) {
+                viewInfo.assetIdMap.delete(id);
+              }
+            });
           });
         });
       });
