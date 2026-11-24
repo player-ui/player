@@ -101,17 +101,7 @@ public extension SwiftUIPlayer {
             activePlugins = allPlugins.map(WeakPlugin.init)
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
                 logger.e("Failed to load player")
-                // setupPlayer may have already connected the plugins, `setTimeout`, and the
-                // exception handler to the new context before failing. Clear them,
-                // then finish fully unloaded instead of half set up.
-                autoreleasepool {
-                    teardownActivePlugins()
-                    context.exceptionHandler = nil
-                    context.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
-                    JSGarbageCollect(context.jsGlobalContextRef)
-                }
-                unload()
-                return
+                return abandonFailedLoad(context: context)
             }
 
             let hooks = SwiftUIPlayerHooks(from: playerValue)
@@ -166,6 +156,19 @@ public extension SwiftUIPlayer {
                 self?.result = nil
             }
             registry.resetView()
+        }
+
+        /// Cleans up after `setupPlayer` fails in `load()`. It may have already connected the
+        /// plugins, `setTimeout`, and the exception handler to `context` before failing, so
+        /// clear them, then finish fully unloaded instead of half set up.
+        private func abandonFailedLoad(context: JSContext) {
+            autoreleasepool {
+                teardownActivePlugins()
+                context.exceptionHandler = nil
+                context.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
+                JSGarbageCollect(context.jsGlobalContextRef)
+            }
+            unload()
         }
 
         /// Releases everything tied to the loaded JS context:

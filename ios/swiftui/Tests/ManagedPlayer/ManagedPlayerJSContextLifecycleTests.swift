@@ -143,7 +143,10 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
             _ = player
         }
 
-        XCTAssertNotNil(plugin.pluginRef, "pluginRef should be set once applied to a loaded context")
+        XCTAssertNotNil(
+            plugin.pluginRef,
+            "pluginRef should be set once applied to a loaded context"
+        )
         XCTAssertNotNil(plugin.context, "context should be set once applied to a loaded context")
 
         context.unload()
@@ -182,7 +185,10 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
         autoreleasepool {
             _ = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [first], context: context)
             _ = SwiftUIPlayer(
-                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                flow: FlowData.COUNTER.replacingOccurrences(
+                    of: "counter-flow",
+                    with: "counter-flow-2"
+                ),
                 plugins: [second],
                 context: context
             )
@@ -211,7 +217,10 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
         autoreleasepool {
             _ = SwiftUIPlayer(
-                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                flow: FlowData.COUNTER.replacingOccurrences(
+                    of: "counter-flow",
+                    with: "counter-flow-2"
+                ),
                 plugins: [],
                 context: context
             )
@@ -253,7 +262,10 @@ class ManagedPlayerJSContextLifecycleTests: XCTestCase {
 
         autoreleasepool {
             _ = SwiftUIPlayer(
-                flow: FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2"),
+                flow: FlowData.COUNTER.replacingOccurrences(
+                    of: "counter-flow",
+                    with: "counter-flow-2"
+                ),
                 plugins: [failedPlugin],
                 context: context
             )

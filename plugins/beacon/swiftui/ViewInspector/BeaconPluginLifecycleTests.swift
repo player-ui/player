@@ -38,13 +38,17 @@ class BeaconPluginLifecycleTests: XCTestCase {
         // onAppear can fire more than once under re-hosting; don't fail on over-fulfill.
         appeared.assertForOverFulfill = false
         try autoreleasepool {
-            let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [plugin], context: playerContext)
+            let player = SwiftUIPlayer(
+                flow: FlowData.COUNTER,
+                plugins: [plugin],
+                context: playerContext
+            )
             let input = BeaconContextProbe {
                 captured = $0
                 appeared.fulfill()
             }
             // Same path the crash took: BeaconPlugin's view hook injects the BeaconContext.
-            ViewHosting.host(view: try XCTUnwrap(player.hooks?.view.call(AnyView(input))))
+            try ViewHosting.host(view: XCTUnwrap(player.hooks?.view.call(AnyView(input))))
         }
         wait(for: [appeared], timeout: 5)
         let beaconContext = try XCTUnwrap(captured, "BeaconPlugin should inject a BeaconContext")
@@ -62,7 +66,11 @@ class BeaconPluginLifecycleTests: XCTestCase {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.3))
 
         XCTAssertEqual(lateBeacons, 0, "Late beacon was delivered through the torn-down JSContext")
-        XCTAssertEqual(lateExceptions, 0, "Late beacon raised a JS exception in the torn-down JSContext")
+        XCTAssertEqual(
+            lateExceptions,
+            0,
+            "Late beacon raised a JS exception in the torn-down JSContext"
+        )
         XCTAssertNil(weakJSContext, "BeaconPlugin kept the torn-down JSContext alive")
 
         ViewHosting.expel()
