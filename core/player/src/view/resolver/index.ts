@@ -9,6 +9,7 @@ import type {
   Updates,
 } from "../../data";
 import { DependencyModel, withParser } from "../../data";
+import type { ExpressionType } from "../../expressions";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
 import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
@@ -53,6 +54,23 @@ const withContext = (model: DataModelWithParser): DataModelWithParser => {
     },
   };
 };
+
+// The functions in a node's resolve options are made outside `computeTree`.
+// Closures made in one call share its scope, and `computeTree`'s holds the
+// update's cache, so a plugin keeping one, as an action's `run` keeps
+// `evaluate`, would keep every node of that update and, through the values it
+// reuses, of the updates before it.
+
+/** Evaluates an expression against the model a node reads data through */
+const makeEvaluate =
+  (options: Resolve.ResolverOptions, model: DataModelWithParser) =>
+  (exp: ExpressionType) =>
+    options.evaluator.evaluate(exp, { model });
+
+/** The bindings a node has read so far */
+const makeGetDependencies =
+  (dependencyModel: DependencyModel) => (scope?: "core" | "children") =>
+    dependencyModel.getDependencies(scope);
 
 export type ResolverHooks = {
   /** A hook to allow skipping of the resolution tree for a specific node */
@@ -265,8 +283,7 @@ export class Resolver {
         ...options.data,
         model: depModelWithParser,
       },
-      evaluate: (exp) =>
-        this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
+      evaluate: makeEvaluate(this.options, depModelWithParser),
       node,
     };
 
@@ -475,8 +492,7 @@ export class Resolver {
     try {
       resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
         ...resolveOptions,
-        getDependencies: (scope?: "core" | "children") =>
-          dependencyModel.getDependencies(scope),
+        getDependencies: makeGetDependencies(dependencyModel),
       });
     } catch (err: unknown) {
       throw new ResolverError(err, ResolverStage.AfterResolve, node);
