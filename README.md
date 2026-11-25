@@ -3,7 +3,7 @@
     <img width="400" alt="player" src="./logo.png"/>
   </a>
   <a target="_blank" rel="noopener noreferrer" href="https://github.com/player-ui/player.git#gh-dark-mode-only">
-    <img width="400" alt="player" src="./docs/site/public/logo/logo-dark-large.png"/>
+    <img width="400" alt="player" src="./docs/site/src/assets/logo/logo-dark-large.png"/>
   </a>
 </h1>
 
@@ -13,15 +13,15 @@
 
 Player is a framework for building cross-platform dynamic experiences. The core engine is authored in TypeScript with specific adaptors to natively render on `iOS`, `Android`, and `React`. It's built from the ground up with plugins in mind to perfectly tailor the experience specifically for your app.
 
-![Overview](./docs/site/public/overview_diagram.png#gh-light-mode-only)
-![Overview](./docs/site/public/overview_diagram_dark_mode.png#gh-dark-mode-only)
+![Overview](./docs/site/src/assets/overview_diagram.png#gh-light-mode-only)
+![Overview](./docs/site/src/assets/overview_diagram_dark_mode.png#gh-dark-mode-only)
 
 # What does it do?
 
 Out of the box, Player manages everything you'd need in order to create a modern dynamic user experience. Start by supplying some semantic JSON content, where you can describe views, your data, validation rules, and much more.
 
-![Multiple Platforms](./docs/site/public/platform_diagram.png#gh-light-mode-only)
-![Multiple Platforms](./docs/site/public/platform_diagram_dark_mode.png#gh-dark-mode-only)
+![Multiple Platforms](./docs/site/src/assets/platform_diagram.png#gh-light-mode-only)
+![Multiple Platforms](./docs/site/src/assets/platform_diagram_dark_mode.png#gh-dark-mode-only)
 
 Add your own asset library to handle the rendering, and voilà, you have a full dynamic user experience.
 
