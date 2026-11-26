@@ -241,4 +241,70 @@ class BaseBeaconPluginTests: XCTestCase {
         // Assert that the handler was called exactly once
         XCTAssertEqual(handlerCallCount, 1)
     }
+
+    /// Verifies `BaseBeaconPlugin.teardown()` also releases `hooks` (which hold the old
+    /// `pluginRef`) and tears down child plugins, so none keep the old JSContext reachable.
+    func testTeardownReleasesHooksAndChildPlugins() throws {
+        let context = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(context)
+        let child = BPPlugin(fileName: "", pluginName: "")
+        let plugin = BaseBeaconPlugin<DefaultBeacon>(plugins: [child]) { _ in }
+        plugin.context = context
+
+        XCTAssertNotNil(plugin.hooks)
+        XCTAssertNotNil(child.context)
+
+        plugin.teardown()
+
+        XCTAssertNil(plugin.hooks, "hooks hold the old pluginRef and must be released")
+        XCTAssertNil(plugin.pluginRef)
+        XCTAssertNil(plugin.context)
+        XCTAssertNil(child.context, "child beacon plugins must be torn down too")
+    }
+
+    /// A late `beacon(assetBeacon:)` call after teardown (e.g. a delayed input
+    /// callback) returns early instead of calling into the torn-down JSContext.
+    func testBeaconAfterTeardownReturnsEarly() throws {
+        let context = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(context)
+
+        let beaconed = expectation(description: "Beacon not sent")
+        beaconed.isInverted = true
+
+        let plugin = BaseBeaconPlugin<DefaultBeacon>(plugins: []) { _ in beaconed.fulfill() }
+        plugin.context = context
+        plugin.teardown()
+
+        plugin.beacon(assetBeacon: AssetBeacon(
+            action: "action",
+            element: "element",
+            asset: BeaconableAsset(id: "id")
+        ))
+        wait(for: [beaconed], timeout: 0.5)
+    }
+
+    /// Plugins are reused across flows: Context tears them down on unload/load and the next
+    /// `load()` re-applies them to a fresh context. `callback` is only set in `init`, so
+    /// `teardown()` must keep it, or beacons silently stop after the first flow.
+    func testBeaconCallbackSurvivesTeardownAndReapply() throws {
+        let beaconed = expectation(description: "Beacon delivered after re-apply")
+        let plugin = BaseBeaconPlugin<DefaultBeacon>(plugins: []) { _ in beaconed.fulfill() }
+
+        let first = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(first)
+        plugin.context = first
+        plugin.teardown()
+
+        let second = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(second)
+        plugin.context = second
+
+        XCTAssertNotNil(plugin.callback, "teardown() must not drop the host callback")
+        plugin.beacon(assetBeacon: AssetBeacon(
+            action: "action",
+            element: "element",
+            asset: BeaconableAsset(id: "id")
+        ))
+        wait(for: [beaconed], timeout: 1)
+    }
 }

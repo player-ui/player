@@ -55,6 +55,13 @@ open class JSBasePlugin {
         []
     }
 
+    /// Releases this plugin's references into its `JSContext`, so a stale `pluginRef`
+    /// can't be invoked after the context has been collected.
+    open func teardown() {
+        pluginRef = nil
+        context = nil
+    }
+
     /// Function to get the URL for a file.
     /// This should be overridden by plugins that are outside of the PlayerUI bundle
     /// - parameters:

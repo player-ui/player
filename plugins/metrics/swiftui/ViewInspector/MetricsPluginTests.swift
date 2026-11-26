@@ -164,6 +164,40 @@ class MetricsPluginTests: XCTestCase {
 
         wait(for: [handlerExpectationFlowEnd], timeout: 10)
     }
+
+    /// `teardown()` must release `hooks`, whose hook values hold the old `pluginRef` and
+    /// would otherwise keep the torn-down JSContext reachable / invocable.
+    func testTeardownReleasesHooksAndContext() throws {
+        let context = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(context)
+        let plugin = MetricsPlugin()
+        plugin.context = context
+
+        XCTAssertNotNil(plugin.hooks)
+        XCTAssertNotNil(plugin.pluginRef)
+
+        plugin.teardown()
+
+        XCTAssertNil(plugin.hooks, "hooks hold the old pluginRef and must be released")
+        XCTAssertNil(plugin.pluginRef)
+        XCTAssertNil(plugin.context)
+    }
+
+    /// A torn-down plugin re-applied to a new context rebuilds its hooks there.
+    func testTeardownThenReapplyRebuildsHooks() throws {
+        let plugin = MetricsPlugin()
+        let first = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(first)
+        plugin.context = first
+        plugin.teardown()
+
+        let second = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(second)
+        plugin.context = second
+
+        XCTAssertNotNil(plugin.hooks)
+        XCTAssertTrue(plugin.pluginRef?.context === second)
+    }
 }
 
 class RequestTimePluginTests: XCTestCase {

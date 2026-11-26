@@ -32,6 +32,9 @@ public extension SwiftUIPlayer {
 
         private var contextBuilder: () -> JSContext
         private let partialMatchPlugin: PartialMatchFingerprintPlugin = .init()
+        /// Plugins applied to the currently loaded context, held weakly so this (possibly
+        /// global) context doesn't extend their lifetime. Torn down on `unload()`/next `load()`.
+        private var activePlugins: [WeakPlugin] = []
         private var flow: String?
         private var registryWatch: AnyCancellable?
         private var state: BaseFlowState?
@@ -85,11 +88,22 @@ public extension SwiftUIPlayer {
                 return
             }
 
+            // A previous flow loaded without `unload()` leaves its plugins pointing at its
+            // context. Run the same teardown as `unload()` so reloading and unloading leave
+            // identical state (plugins, player, hooks, flow-state) before building the new
+            // context.
+            teardownLoadedContext()
+
             let context: JSContext = contextBuilder()
 
             let allPlugins = plugins + [partialMatchPlugin]
+            // Store the plugins in `activePlugins` before `setupPlayer` runs. It gives each
+            // plugin a context one at a time, so if it fails partway, those plugins still
+            // need tearing down.
+            activePlugins = allPlugins.map(WeakPlugin.init)
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
-                return logger.e("Failed to load player")
+                logger.e("Failed to load player")
+                return abandonFailedLoad(context: context)
             }
 
             let hooks = SwiftUIPlayerHooks(from: playerValue)
@@ -97,7 +111,7 @@ public extension SwiftUIPlayer {
             self.player = playerValue
             self.flow = flow
             self.hooks = hooks
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 self?.result = nil
             }
 
@@ -129,30 +143,56 @@ public extension SwiftUIPlayer {
                 weak playerValue
             ] result in
                 guard let self, let playerValue, self.player == playerValue else { return }
-                DispatchQueue.main.async { [weak self] in
+                Task { @MainActor [weak self] in
                     self?.result = result
                 }
             }
             // swiftlint:enable closure_parameter_position
         }
 
-        /// Unload the context. This will release the current javascript player/context and clear
-        /// the current
-        /// result. Also breaks cross-runtime retain cycles between Swift closures and the JSContext
-        /// by clearing the exceptionHandler and any exported objects on the context.
+        /// Unload the context. Releases the current JS player/context and clears the current
+        /// result, including the context's exception handler and `setTimeout`.
         public func unload() {
-            // ObjC property accessors (e.g. JSValue.context) return autoreleased
-            // objects. Without an explicit pool, those temporaries prevent the
-            // JSContext from deallocating until the next run-loop drain.
+            teardownLoadedContext()
+            Task { @MainActor [weak self] in
+                self?.result = nil
+            }
+            registry.resetView()
+        }
+
+        /// Cleans up after `setupPlayer` fails in `load()`. It may have already connected the
+        /// plugins, `setTimeout`, and the exception handler to `context` before failing, so
+        /// clear them, then call `unload()` so nothing is left partially set up.
+        private func abandonFailedLoad(context: JSContext) {
+            autoreleasepool {
+                teardownActivePlugins()
+                context.exceptionHandler = nil
+                context.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
+                JSGarbageCollect(context.jsGlobalContextRef)
+            }
+            unload()
+        }
+
+        /// Releases everything tied to the loaded JS context:
+        /// - plugin references into the context
+        /// - the JS player, hooks, and flow state
+        /// - the context's exception handler and `setTimeout`
+        ///
+        /// Used by both `unload()` and `load()`, since `load()` can replace a loaded flow
+        /// without `unload()` being called first. Safe to call when nothing is loaded.
+        private func teardownLoadedContext() {
+            // Drain autoreleased temporaries (e.g. from `JSValue.context`) now, so they
+            // don't keep the JSContext alive until the next run loop.
             autoreleasepool {
                 if let ctx = player?.context {
                     ctx.exceptionHandler = nil
                     ctx.setObject(nil, forKeyedSubscript: JSUtilities.setTimeoutKey)
                     JSGarbageCollect(ctx.jsGlobalContextRef)
                 }
-                // Break plugin → JSContext/JSValue references
-                partialMatchPlugin.pluginRef = nil
-                partialMatchPlugin.context = nil
+                // Clear references into the context held by the plugins passed to `load()`,
+                // so a callback that fires after teardown (e.g. a delayed beacon) can't run
+                // JS in it.
+                teardownActivePlugins()
                 // Release the JS player instance and all hook JSValues
                 player = nil
                 hooks = nil
@@ -160,10 +200,14 @@ public extension SwiftUIPlayer {
                 // Release InProgressState which holds PlayerControllers (JSValues)
                 state = nil
             }
-            DispatchQueue.main.async { [weak self] in
-                self?.result = nil
-            }
-            registry.resetView()
+        }
+
+        private func teardownActivePlugins() {
+            // Teardown races late JS-invoking callbacks (e.g. a delayed beacon) unless both
+            // stay on the main thread, where Player invokes plugins.
+            assert(Thread.isMainThread, "plugin teardown must run on the main thread")
+            activePlugins.forEach { $0.plugin?.teardown() }
+            activePlugins = []
         }
 
         /// Clear the exceptionHandler of the context to remove reference to the logger

@@ -1145,6 +1145,58 @@ class AsyncNodePluginTests: XCTestCase {
         XCTAssertEqual(expectedMultiNode1Text, "fallback")
     }
 
+    /// `teardown()` must release `hooks` (which hold the old `pluginRef`) and tear down
+    /// child plugins, so none keep the torn-down JSContext reachable / invocable.
+    func testTeardownReleasesHooksAndChildPlugins() throws {
+        let context = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(context)
+        let child = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [child]) { _, _ in .emptyNode }
+        plugin.context = context
+
+        XCTAssertNotNil(plugin.hooks)
+        XCTAssertNotNil(child.pluginRef)
+
+        plugin.teardown()
+
+        XCTAssertNil(plugin.hooks, "hooks hold the old pluginRef and must be released")
+        XCTAssertNil(plugin.pluginRef)
+        XCTAssertNil(plugin.context)
+        XCTAssertNil(child.pluginRef, "child plugins must be torn down too")
+        XCTAssertNil(child.context)
+    }
+
+    /// A handler still awaiting when `teardown()` runs must not build its node in the
+    /// torn-down context once it finishes.
+    func testHandlerFinishingAfterTeardownReturnsEarly() throws {
+        let context = try XCTUnwrap(JSContext())
+        JSUtilities.polyfill(context)
+        let suspended = expectation(description: "handler suspended")
+        var resume: CheckedContinuation<Void, Never>?
+        let plugin = AsyncNodePlugin { _, _ in
+            await withCheckedContinuation { resume = $0; suspended.fulfill() }
+            return .singleNode(.concrete(context.evaluateScript("({ id: 'late' })")))
+        }
+        plugin.context = context
+        let hook = try XCTUnwrap(plugin.hooks?.onAsyncNode.hook)
+
+        let resolved = expectation(description: "hook promise resolved")
+        var result: JSValue?
+        let onResolve: @convention(block) (JSValue?) -> Void = { result = $0; resolved.fulfill() }
+        hook.invokeMethod(
+            "call",
+            withArguments: [JSValue(object: [:], in: context) as Any, JSValue()]
+        )?
+            .invokeMethod("then", withArguments: [JSValue(object: onResolve, in: context) as Any])
+        wait(for: [suspended], timeout: 5)
+
+        plugin.teardown()
+        resume?.resume()
+        wait(for: [resolved], timeout: 5)
+
+        XCTAssertNotEqual(result?.objectForKeyedSubscript("id")?.toString(), "late")
+    }
+
     enum TestError: Error {
         case fail
     }

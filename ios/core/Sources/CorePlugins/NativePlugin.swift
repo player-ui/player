@@ -17,8 +17,13 @@ public protocol NativePlugin {
     /// - parameters:
     ///   - player: Player to apply to
     func apply(player: some HeadlessPlayer)
+
+    /// Called when this plugin's JSContext is being unloaded. Release any references
+    /// into it here so a late callback can't invoke into a torn-down context.
+    func teardown()
 }
 
 public extension NativePlugin {
     func apply(player _: some HeadlessPlayer) {}
+    func teardown() {}
 }
